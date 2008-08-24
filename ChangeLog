@@ -1,5 +1,13 @@
 2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/adminwindow.py:
+	  Make sure that, when you stop a component, all client-side messages
+	  are cleared from the state, so that the UI can remove them when
+	  the component is sleeping.  This got broken again recently, please
+	  take care when rewriting UI code.
+
+2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/base/baseadminnode.py:
 	  Make the id of render errors unique by using the title of the
 	  Node.  This makes sure that render error messages from one node

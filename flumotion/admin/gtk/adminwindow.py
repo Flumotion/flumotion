@@ -948,8 +948,21 @@ class AdminWindow(Loggable, GladeDelegate):
         """
         @returns: a L{twisted.internet.defer.Deferred}
         """
-        return self._componentDo(state, 'componentStop',
-                                 'Stop', 'Stopping', 'Stopped')
+        self.debug('stopping component %r' % state)
+        d = self._componentDo(state, 'componentStop', 
+                              'Stop', 'Stopping', 'Stopped')
+
+        # clear locally added messages after stopping the component
+        def cb(result):
+            states = self._getStatesFromState(state)
+            for s in states:
+                self.debug('removing local messages on %r after stopping' % s)
+                for message in s.get('messages', []):
+                    s.observe_remove('messages', message)
+
+        d.addCallback(cb)
+
+        return d
 
     def _componentStart(self, state):
         """
@@ -964,6 +977,16 @@ class AdminWindow(Loggable, GladeDelegate):
         """
         return self._componentDo(state, 'deleteComponent',
                                  'Delete', 'Deleting', 'Deleted')
+
+    def _getStatesFromState(self, state):
+        # componentDo can be called on a None state, which means
+        # 'look at the current selection'
+        if state is None:
+            states = self._componentList.getSelectedStates()
+        else:
+            states = [state]
+
+        return states
 
     def _componentDo(self, state, methodName, action, doing, done):
         """Do something with a component and update the statusbar.
@@ -983,10 +1006,7 @@ class AdminWindow(Loggable, GladeDelegate):
         @rtype: L{twisted.internet.defer.Deferred}
         @returns: a deferred that will fire when the action is completed.
         """
-        if state is None:
-            states = self._componentList.getSelectedStates()
-        else:
-            states = [state]
+        states = self._getStatesFromState(state)
 
         if not states:
             return
