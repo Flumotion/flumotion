@@ -1,3 +1,9 @@
+2008-08-24  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/common/bundle.py:
+	Revert r6608 and r6614, as they introduced a fatal race condition
+	in the unbundling code. Fixes #1116.
+
 2008-08-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/service/main.py:
