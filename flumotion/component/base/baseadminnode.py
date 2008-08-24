@@ -218,10 +218,14 @@ class BaseAdminGtkNode(log.Loggable):
 
         Returns: a deferred returning the main widget for embedding
         """
+        self.debug('BaseAdminGtkNode.render() for %s' % self.title)
+
         # clear up previous error messages
         allmessages = self.state.get('messages', [])
         for message in allmessages:
-            if message.id == 'render':
+            # since we can have multiple nodes, only remove the one from
+            # ours; this assumes each node's title is unique for a component
+            if message.id == 'render-%s' % self.title:
                 self.debug('Removing previous messages %r' % message)
                 self.state.observe_remove('messages', message)
 
@@ -232,7 +236,7 @@ class BaseAdminGtkNode(log.Loggable):
             m = messages.Error(T_(N_(
                 "Internal error in component UI.  "
                 "Please file a bug against the component.")),
-                debug=debug, mid="render")
+                debug=debug, mid="render-%s" % self.title)
             self.addMessage(m)
 
             label = gtk.Label(_("Internal error.\nSee component error "

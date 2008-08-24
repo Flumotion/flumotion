@@ -1,5 +1,13 @@
 2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/baseadminnode.py:
+	  Make the id of render errors unique by using the title of the
+	  Node.  This makes sure that render error messages from one node
+	  do not get removed by the successful rendering of another node,
+	  both deriving from the same base class.
+
+2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/adminwindow.py:
 	  Make docstrings adhere to style guide.
 	  Document the fact that _componentDo can also take a None state,
