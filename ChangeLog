@@ -1,5 +1,11 @@
 2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/base/baseadminnode.py:
+	  Make the TypeError clearer by saying which method is responsible
+	  for the bug.
+
+2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/adminwindow.py:
 	  Make sure that, when you stop a component, all client-side messages
 	  are cleared from the state, so that the UI can remove them when

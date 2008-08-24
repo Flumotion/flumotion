@@ -277,10 +277,12 @@ class BaseAdminGtkNode(log.Loggable):
 
             return failure
 
-        def renderFinished(_):
+        def renderFinishedCallback(_):
             if not self.widget:
                 self.debug('render: no self.widget, failing')
-                raise TypeError('no self.widget')
+                raise TypeError(
+                    '%r.haveWidgetTree should have set self.widget' %
+                        self.__class__)
 
             if self._pendingUIState:
                 self.debug('render: calling setUIState on the node')
@@ -294,7 +296,7 @@ class BaseAdminGtkNode(log.Loggable):
 
         d = loadGladeFile()
         d.addErrback(loadGladeFileErrback)
-        d.addCallback(renderFinished)
+        d.addCallback(renderFinishedCallback)
         d.addErrback(renderFinishedErrback)
         return d
 
