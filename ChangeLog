@@ -1,6 +1,14 @@
 2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/base/baseadminnode.py:
+	  When there is a component UI error in a tab, say which tab.
+	  When the error is because the component's Node still uses glade_file
+	  then warnings.warn and show a component warning message, but
+	  still work.
+
+2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/base/baseadminnode.py:
 	  Make the TypeError clearer by saying which method is responsible
 	  for the bug.
 

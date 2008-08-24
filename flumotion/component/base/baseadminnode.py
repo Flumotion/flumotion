@@ -234,8 +234,8 @@ class BaseAdminGtkNode(log.Loggable):
             # an error label, given a debug string
             self.warning("error rendering component UI; debug %s", debug)
             m = messages.Error(T_(N_(
-                "Internal error in component UI.  "
-                "Please file a bug against the component.")),
+                "Internal error in component UI's '%s' tab.  "
+                "Please file a bug against the component."), self.title),
                 debug=debug, mid="render-%s" % self.title)
             self.addMessage(m)
 
@@ -249,6 +249,19 @@ class BaseAdminGtkNode(log.Loggable):
             return label
 
         def loadGladeFile():
+            # F0.8
+            if hasattr(self, 'glade_file'):
+                self.gladeFile = self.glade_file
+                debug = "class %r should have glade_file " \
+                    "changed to gladeFile" % self.__class__
+                import warnings
+                warnings.warn(debug, DeprecationWarning)
+                m = messages.Warning(T_(N_(
+                    "Internal error in component UI's '%s' tab.  "
+                    "Please file a bug against the component."), self.title),
+                    debug=debug, mid="render-%s" % self.title)
+                self.addMessage(m)
+
             if not self.gladeFile:
                 return defer.succeed(None)
 
