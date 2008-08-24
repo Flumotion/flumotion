@@ -303,16 +303,18 @@ class AdminWindow(Loggable, GladeDelegate):
         self._killComponentAction.set_property('visible', enabled)
 
     def getWindow(self):
-        """Get the gtk window for the admin interface
+        """Get the gtk window for the admin interface.
+
         @returns: window
-        @rtype: gtk.Window
+        @rtype:   L{gtk.Window}
         """
         return self._window
 
     def openConnection(self, info):
-        """Connects to a manager given a connection info
+        """Connects to a manager given a connection info.
+
         @param info: connection info
-        @type info: L{PBConnectionInfo}
+        @type  info: L{PBConnectionInfo}
         """
         assert isinstance(info, PBConnectionInfo), info
         return self._openConnection(info)
@@ -964,17 +966,22 @@ class AdminWindow(Loggable, GladeDelegate):
                                  'Delete', 'Deleting', 'Deleted')
 
     def _componentDo(self, state, methodName, action, doing, done):
-        """Do something with a component and update the statusbar
-        @param state: componentState
-        @type state: L{AdminComponentState}
+        """Do something with a component and update the statusbar.
+
+        @param state:      componentState; if not specified, will use the
+                           currently selected component(s)
+        @type  state:      L{AdminComponentState} or None
         @param methodName: name of the method to call
-        @type methodName: str
-        @param action: string used to explain that to do
-        @type action: str
-        @param doing: string used to explain that the action started
-        @type doing: str
-        @param done: string used to explain that the action was completed
-        @type done: str
+        @type  methodName: str
+        @param action:     string used to explain that to do
+        @type  action:     str
+        @param doing:      string used to explain that the action started
+        @type  doing:      str
+        @param done:       string used to explain that the action was completed
+        @type  done:       str
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        @returns: a deferred that will fire when the action is completed.
         """
         if state is None:
             states = self._componentList.getSelectedStates()
