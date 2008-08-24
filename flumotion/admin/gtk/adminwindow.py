@@ -949,10 +949,11 @@ class AdminWindow(Loggable, GladeDelegate):
         @returns: a L{twisted.internet.defer.Deferred}
         """
         self.debug('stopping component %r' % state)
-        d = self._componentDo(state, 'componentStop', 
+        d = self._componentDo(state, 'componentStop',
                               'Stop', 'Stopping', 'Stopped')
 
         # clear locally added messages after stopping the component
+
         def cb(result):
             states = self._getStatesFromState(state)
             for s in states:
