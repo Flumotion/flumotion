@@ -228,6 +228,7 @@ class AdminWindow(Loggable, GladeDelegate):
         if key == 'message':
             self.statusbar.set('main', value)
         elif key == 'mood':
+            self.debug('state %r has mood set to %r' % (state, value))
             self._updateComponentActions()
             current = self.components_view.getSelectedNames()
             if value == moods.sleeping.value:
@@ -949,21 +950,8 @@ class AdminWindow(Loggable, GladeDelegate):
         @returns: a L{twisted.internet.defer.Deferred}
         """
         self.debug('stopping component %r' % state)
-        d = self._componentDo(state, 'componentStop',
-                              'Stop', 'Stopping', 'Stopped')
-
-        # clear locally added messages after stopping the component
-
-        def cb(result):
-            states = self._getStatesFromState(state)
-            for s in states:
-                self.debug('removing local messages on %r after stopping' % s)
-                for message in s.get('messages', []):
-                    s.observe_remove('messages', message)
-
-        d.addCallback(cb)
-
-        return d
+        return self._componentDo(state, 'componentStop',
+                                 'Stop', 'Stopping', 'Stopped')
 
     def _componentStart(self, state):
         """
@@ -1081,6 +1069,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         def compSet(state, key, value):
             if key == 'mood':
+                self.debug('state %r has mood set to %r' % (state, value))
                 self._updateComponentActions()
 
         def compAppend(state, key, value):

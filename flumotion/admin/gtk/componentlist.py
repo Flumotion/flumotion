@@ -282,6 +282,13 @@ class ComponentList(log.Loggable, gobject.GObject):
         self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
 
         if key == 'mood':
+            self.debug('stateSet: mood of %r changed to %r' % (state, value))
+
+            if value == moods.sleeping.value:
+                self.debug('sleeping, removing local messages on %r' % state)
+                for message in state.get('messages', []):
+                    state.observe_remove('messages', message)
+
             self._setMoodValue(titer, value)
             self._updateWorker(titer, state)
         elif key == 'name':
