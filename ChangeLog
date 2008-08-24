@@ -1,3 +1,10 @@
+2008-08-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/command/common.py:
+	* flumotion/admin/command/component.py:
+	* flumotion/admin/command/manager.py:
+	  Fixes and cleanups.
+
 2008-08-24  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/common/bundle.py:

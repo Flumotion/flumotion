@@ -64,7 +64,7 @@ Examples: getConfiguration, getVersions
             args = []
 
         p = self.parentCommand
-        d = self.getRootCommand().adminModel.callRemote(
+        d = self.getRootCommand().medium.callRemote(
             methodName, *args)
 
         def cb(result):
@@ -76,8 +76,7 @@ Examples: getConfiguration, getVersions
             # FIXME
             if failure.check(errors.NoMethodError) \
                 or failure.check(flavors.NoSuchMethod):
-                common.errorRaise("No method '%s' on manager." % (
-                    methodName, workerName))
+                common.errorRaise("No method '%s' on manager." % methodName)
             elif failure.check(errors.RemoteRunError):
                 common.errorRaise(log.getFailureMessage(failure))
             else:
@@ -100,10 +99,10 @@ class Load(common.AdminCommand):
             common.errorRaise('Please specify a configuration file')
 
         if not os.path.exists(filePath):
-            common.errorRaise("'%s' does not exist.")
+            common.errorRaise("'%s' does not exist." % filePath)
 
         p = self.parentCommand
-        d = self.getRootCommand().adminModel.callRemote('loadConfiguration',
+        d = self.getRootCommand().medium.callRemote('loadConfiguration',
             open(filePath).read())
 
         def eb(failure):

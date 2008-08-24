@@ -121,6 +121,7 @@ class AdminCommand(util.LogCommand):
         self.getRootCommand().loginDeferred.addCallback(self._callback, args)
 
     def _callback(self, result, args):
+        self.debug('invoking doCallback with args %r', args)
         return self.doCallback(args)
 
     def doCallback(self, args):

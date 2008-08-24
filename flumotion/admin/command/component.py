@@ -74,7 +74,7 @@ and its remote_* methods.
 Examples: getConfig, setFluDebug""" % common.ARGUMENTS_DESCRIPTION
 
     def doCallback(self, args):
-        if not self.componentId:
+        if not self.parentCommand.componentId:
             common.errorRaise("Please specify a component id "
                 "with 'component -i [component-id]'")
 
