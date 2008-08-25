@@ -1,5 +1,11 @@
 2008-08-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/manager/config.py:
+	  Add some newlines to serialization around flows/atmosphere and
+	  components so the structure of the XML is visually clear again.
+
+2008-08-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/audiotest/audiotest.xml:
 	* flumotion/component/producers/videotest/videotest.xml:
 	  Update descriptions to talk about example and demonstration.

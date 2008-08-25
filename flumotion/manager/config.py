@@ -767,9 +767,12 @@ class PlanetXMLWriter(XMLWriter):
     def _writePlanet(self, planet):
         attrs = [('name', planet.get('name'))]
         self.pushTag('planet', attrs)
+        self.writeLine()
         self._writeAtmosphere(planet.get('atmosphere'))
+        self.writeLine()
         for flow in planet.get('flows'):
             self._writeFlow(flow)
+            self.writeLine()
         self.popTag()
 
     def _writeAtmosphere(self, atmosphere):
@@ -817,6 +820,7 @@ class PlanetXMLWriter(XMLWriter):
         self._writePlugs(config['plugs'].items())
         self._writeVirtualFeeds(config['virtual-feeds'].items())
         self.popTag()
+        self.writeLine()
 
     def _writeEater(self, name, feeders):
         attrs = [('name', name)]
