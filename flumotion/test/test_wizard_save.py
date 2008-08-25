@@ -199,7 +199,8 @@ class TestWizardSave(testsuite.TestCase):
 
     def _createHTTPStreamer(self):
         common = Settable(has_bandwidth_limit=False,
-                          burst_on_connect=False)
+                          burst_on_connect=False,
+                          set_hostname=False)
         streamer = HTTPStreamer(common)
         streamer.worker = 'streamer-worker'
         return streamer
