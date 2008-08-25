@@ -1,3 +1,8 @@
+2008-08-25  Pedro Gracia  <pedro@flumotion.com>
+
+	* po/es.po:
+        Translated fuzzy new messages to Spanish.
+
 2008-08-25  Johan Dahlin  <johan@flumotion>
 
 	* data/glade/http-wizard.glade:
