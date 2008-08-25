@@ -4,7 +4,7 @@
 
     <component type="audiotest-producer"
                base="flumotion/component/producers/audiotest"
-               _description="Produces a test signal.">
+               _description="Produces an example audio signal without using a device.  This is useful for demonstrations or testing.">
       <source location="flumotion.component.producers.audiotest.audiotest" />
       <feeder name="default"/>
 
@@ -32,8 +32,7 @@
         <property name="frequency" type="int"
                   _description="The frequency of the test signal (in Hz)." />
         <property name="drop-probability" type="float"
-                  _description="The fraction of buffers to drop (0.0 - 1.0)." />
-                  <!-- FIXME: What's this about? murrayc -->
+                  _description="The fraction of buffers to drop (0.0 - 1.0). Only useful for debugging." />
       </properties>
     </component>
 
