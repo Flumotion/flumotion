@@ -76,9 +76,17 @@ class HTTPStreamer(Consumer):
         @returns: the url
         """
         return 'http://%s:%d%s' % (
-            self.properties.get('hostname', self.hostname),
+            self.getHostname(),
             self.getPorter().getPort(),
             self.properties.mount_point)
+
+    def getHostname(self):
+        """Fetch the hostname this stream will be published on
+        @returns: the hostname
+        """
+        if self._common.set_hostname:
+            return self._common.hostname
+        return self.properties.get('hostname', self.hostname)
 
     # Component
 
@@ -89,6 +97,9 @@ class HTTPStreamer(Consumer):
                 self._common.bandwidth_limit * 1e6)
 
         porter = self.getPorter()
+        hostname = self.getHostname()
+        if hostname:
+            properties.hostname = hostname
         properties.porter_socket_path = porter.getSocketPath()
         properties.porter_username = porter.getUsername()
         properties.porter_password = porter.getPassword()
@@ -331,12 +342,6 @@ class HTTPSpecificStep(ConsumerStep):
             self.model.hostname = hostname
             self.wizard.taskFinished()
 
-        def checkWorkerHostname(unused):
-            d = self.wizard.runInWorker(
-                self.worker, 'flumotion.worker.checks.http',
-                'runHTTPStreamerChecks')
-            d.addCallback(finished)
-
         def checkElements(elements):
             if elements:
                 f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
@@ -354,7 +359,7 @@ class HTTPSpecificStep(ConsumerStep):
 
             # now check import
             d = self.wizard.checkImport(self.worker, 'twisted.web')
-            d.addCallback(checkWorkerHostname)
+            d.addCallback(finished)
             d.addErrback(importError)
 
         # first check elements

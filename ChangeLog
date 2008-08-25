@@ -1,5 +1,15 @@
 2008-08-25  Johan Dahlin  <johan@flumotion>
 
+	* data/glade/http-wizard.glade:
+	* flumotion/admin/gtk/consumptionsteps.py:
+	* flumotion/admin/gtk/httpstreamersteps.py:
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	* flumotion/worker/checks/http.py:
+	Make it possible to override the public hostname.
+	Fixes #928.
+
+2008-08-25  Johan Dahlin  <johan@flumotion>
+
 	* common/common.mk (check-local-pep8): Add --repeat here, so we
 	can see more than just the first error.
 

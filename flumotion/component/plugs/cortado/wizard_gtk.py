@@ -114,7 +114,6 @@ class CortadoHTTPServer(HTTPServer):
         self.properties.porter_password = porter.getPassword()
         self.properties.port = porter.getPort()
         self.properties.type = 'slave'
-
         plug = CortadoHTTPPlug(self, streamer, audioProducer, videoProducer)
         self.addPlug(plug)
 
@@ -125,6 +124,13 @@ class CortadoHTTPServer(HTTPServer):
         return 'http://%s:%d%s' % (self.streamer.hostname,
                                    self.properties.port,
                                    self.properties.mount_point)
+
+    def getProperties(self):
+        properties = super(CortadoHTTPServer, self).getProperties()
+        hostname = self.streamer.getHostname()
+        if hostname:
+            properties.hostname = hostname
+        return properties
 
 
 class CortadoWizardPlugin(object):

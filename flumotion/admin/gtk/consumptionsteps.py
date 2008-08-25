@@ -45,6 +45,8 @@ class HTTPCommon(object):
         self.client_limit = 1000
         self.bandwidth_limit = 500.0
         self.burst_on_connect = False
+        self.set_hostname = False
+        self.hostname = ''
 
 
 class ConsumptionStep(WizardStep):
@@ -275,13 +277,18 @@ class HTTPConsumptionStep(WorkerWizardStep):
         self.burst_on_connect.data_type = bool
         self.client_limit.data_type = int
         self.port.data_type = int
+        self.hostname.data_type = str
+        self.hostname.set_sensitive(False)
 
         self.add_proxy(self.porter.properties, ['port'])
-        self.add_proxy(self.common, ['has_client_limit',
-                                     'has_bandwidth_limit',
-                                     'client_limit',
-                                     'bandwidth_limit',
-                                     'burst_on_connect'])
+        self._proxy = self.add_proxy(
+            self.common, ['has_client_limit',
+                          'has_bandwidth_limit',
+                          'client_limit',
+                          'bandwidth_limit',
+                          'burst_on_connect',
+                          'set_hostname',
+                          'hostname'])
 
     def activated(self):
         self._verify()
@@ -291,6 +298,7 @@ class HTTPConsumptionStep(WorkerWizardStep):
 
     def workerChanged(self, worker):
         self.porter.worker = worker
+        self._runWorkerChecks()
 
     # Private
 
@@ -300,6 +308,16 @@ class HTTPConsumptionStep(WorkerWizardStep):
         self.bandwidth_limit.set_sensitive(
             self.has_bandwidth_limit.get_active())
 
+    def _runWorkerChecks(self):
+
+        def finished(public_hostname):
+            self.common.hostname = public_hostname
+            self._proxy.update('hostname')
+        d = self.wizard.runInWorker(
+            self.worker, 'flumotion.worker.checks.http',
+            'runHTTPStreamerChecks')
+        d.addCallback(finished)
+
     # Callbacks
 
     def on_has_client_limit_toggled(self, checkbutton):
@@ -307,3 +325,6 @@ class HTTPConsumptionStep(WorkerWizardStep):
 
     def on_has_bandwidth_limit_toggled(self, checkbutton):
         self._verify()
+
+    def on_set_hostname__toggled(self, checkbutton):
+        self.hostname.set_sensitive(checkbutton.get_active())
