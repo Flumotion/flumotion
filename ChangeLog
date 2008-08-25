@@ -1,3 +1,8 @@
+2008-08-25  Johan Dahlin  <johan@flumotion>
+
+	* common/common.mk (check-local-pep8): Add --repeat here, so we
+	can see more than just the first error.
+
 2008-08-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/config.py:
