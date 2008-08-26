@@ -128,6 +128,20 @@ COMPONENT PROPERTIES
 - bitrate should always be in bps, and have as description
   Bitrate to encode at (in bps)
 
+PLUGS
+-----
+- component plugs should always be lowercase, and consist of two
+  dash-separated words.
+  The first part should describe the socket the plug goes into:
+  adminaction, requestlogger, component, manager, ratecontroller, bouncer
+  The second part should distinguish it from other plugs for the same socket:
+  file, database, example, ...
+  (this is the reverse from component naming, mostly done because not all
+   socket types are verb-y)
+- the socket should be named after the fully qualified class name of the Plug
+  base class
+- All plug class names should end in Plug
+ 
 DEPRECATING
 -----------
 - all deprecated methods should be marked with a comment tag, so that they
