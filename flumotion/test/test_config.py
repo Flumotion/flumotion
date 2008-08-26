@@ -345,18 +345,17 @@ class TestConfig(testsuite.TestCase):
 
     def testParseManagerWithPlugs(self):
         conf = ManagerConfigXML(
-             """
-             <planet>
-               <manager name="aname">
-                 <plugs>
-                   <plug
-                   socket="flumotion.component.plugs.adminaction.AdminAction"
-                         type="test-adminaction">
-                     <property name="foo">bar</property>
-                   </plug>
-                 </plugs>
-               </manager>
-             </planet>""")
+"""
+<planet>
+  <manager name="aname">
+    <plugs>
+      <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+            type="test-adminaction">
+        <property name="foo">bar</property>
+      </plug>
+    </plugs>
+  </manager>
+</planet>""")
         conf.parseBouncerAndPlugs()
         self.failUnless(conf.manager)
         self.failIf(conf.manager.host)

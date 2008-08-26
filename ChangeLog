@@ -1,3 +1,9 @@
+2008-08-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_config.py:
+	  Move config to the left so it doesn't exceed 80 chars after
+	  renaming.  Maybe we should do this for all of them.
+
 2008-08-26  Murray Cumming  <murrayc@murrayc.com>
 
 	* flumotion/admin/gtk/httpstreamersteps.py:
@@ -12,7 +18,7 @@
 2008-08-25  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po:
-        Translated fuzzy new messages to Spanish.
+	  Translated fuzzy new messages to Spanish.
 
 2008-08-25  Johan Dahlin  <johan@flumotion>
 
