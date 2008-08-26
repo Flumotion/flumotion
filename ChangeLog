@@ -1,3 +1,8 @@
+2008-08-26  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/sectionwizard.glade:
+	Add left,right & bottom padding to the message view.
+
 2008-08-25  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po:
