@@ -28,7 +28,6 @@ twisted.spread/PB protocol.
 """
 
 import gettext
-import os
 
 import gtk
 from gtk import gdk

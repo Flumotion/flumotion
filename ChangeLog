@@ -1,5 +1,14 @@
 2008-08-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/command/common.py:
+	* flumotion/admin/command/component.py:
+	* flumotion/admin/command/manager.py:
+	* flumotion/monitor/nagios/log.py:
+	* flumotion/ui/fileselector.py:
+	  pychecker cleanups.
+
+2008-08-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_config.py:
 	  Move config to the left so it doesn't exceed 80 chars after
 	  renaming.  Maybe we should do this for all of them.

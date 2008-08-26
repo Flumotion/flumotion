@@ -71,11 +71,11 @@ def parseTypedArgs(spec, args):
             if argtype == ')':
                 return tuple(accum)
             elif argtype == '(':
-                accum.append(_do_parse_typed_args(spec, args))
+                accum.append(_doParseTypedArgs(spec, args))
             elif argtype == '}':
                 return dict(accum)
             elif argtype == '{':
-                accum.append(_do_parse_typed_args(spec, args))
+                accum.append(_doParseTypedArgs(spec, args))
             elif argtype == ']':
                 return accum
             elif argtype == '[':

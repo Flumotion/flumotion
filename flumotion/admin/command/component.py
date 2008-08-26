@@ -43,7 +43,6 @@ class Delete(common.AdminCommand):
             common.errorRaise("Please specify a component id "
                 "with 'component -i [component-id]'")
 
-        p = self.parentCommand
         d = self.getRootCommand().medium.callRemote('deleteComponent',
             self.parentCommand.componentState)
 
@@ -153,7 +152,7 @@ class PropertyGet(common.AdminCommand):
 
     def do(self, args):
         if not args:
-            return errorReturn('Please specify a property to get.')
+            return common.errorReturn('Please specify a property to get.')
 
         self._propertyName = args[0]
 
