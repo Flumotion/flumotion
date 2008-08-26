@@ -1,3 +1,9 @@
+2008-08-26  Murray Cumming  <murrayc@murrayc.com>
+
+	* flumotion/admin/gtk/httpstreamersteps.py:
+	* flumotion/admin/gtk/shout2steps.py: Added docSection IDs for 
+	these assistant pages.
+
 2008-08-26  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/sectionwizard.glade:
