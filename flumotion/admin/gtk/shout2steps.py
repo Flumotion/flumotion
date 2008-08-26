@@ -82,9 +82,6 @@ class Shout2BothStep(Shout2Step):
     name = 'Icecast streamer (audio & video)'
     title = _('Icecast Streamer (Audio and Video)')
     sidebarName = _('Icecast audio/video')
-    docSection = 'help-configuration-assistant-icecast-streaming-both'
-    docAnchor = ''
-    docVersion = 'local'
 
     # ConsumerStep
 
@@ -96,9 +93,6 @@ class Shout2AudioStep(Shout2Step):
     name = 'Icecast streamer (audio only)'
     title = _('Icecast Streamer (Audio Only)')
     sidebarName = _('Icecast Audio')
-    docSection = 'help-configuration-assistant-icecast-streaming-audio-only'
-    docAnchor = ''
-    docVersion = 'local'
 
     # ConsumerStep
 
@@ -110,9 +104,6 @@ class Shout2VideoStep(Shout2Step):
     name = 'Icecast streamer (video only)'
     title = _('Icecast Streamer (Video Only)')
     sidebarName = _('Icecast Video')
-    docSection = 'help-configuration-assistant-icecast-streaming-video-only'
-    docAnchor = ''
-    docVersion = 'local'
 
     # ConsumerStep
 
