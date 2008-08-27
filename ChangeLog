@@ -1,3 +1,8 @@
+2008-08-27  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/ui/fileselector.py (FileSelector._rowActivated):
+	raise NotImplementedError instead of just NotImplemented.
+
 2008-08-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/worker/checks/gst010.py:

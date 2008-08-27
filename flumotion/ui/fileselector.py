@@ -89,7 +89,7 @@ class FileSelector(ObjectList):
         elif IFile.providedBy(vfsFile):
             self.emit('selected', vfsFile)
         else:
-            raise NotImplemented
+            raise NotImplementedError(vfsFile)
 
     def _renderIcon(self, iconNames):
         iconInfo = self._iconTheme.choose_icon(iconNames,
