@@ -1,3 +1,9 @@
+2008-08-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/worker/checks/gst010.py:
+	New firewire stack does not create raw1394 device node so check
+	for /dev/fw0 as well.
+
 2008-08-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/command/common.py:

@@ -179,8 +179,15 @@ def check1394(mid):
         return result
 
     # first check if the obvious device node exists
-    if not os.path.exists('/dev/raw1394'):
-        m = messages.Error(T_(N_("Device node /dev/raw1394 does not exist.")),
+    # FIXME: we would be better checking hal for a firewire device
+    # and then a camera
+    # existence of /dev/fw0 only guarantees that there is a firewire chipset
+    # and that kernel module is loaded
+    # existence of /dev/raw1394 only guarantees that module raw1394 is loaded
+    if not os.path.exists('/dev/fw0'):
+        if not os.path.exists('/dev/raw1394'):
+            m = messages.Error(T_(N_(
+                "Neither device node /dev/fw0 nor /dev/raw1394 exists.")),
             id=mid)
         result.add(m)
         return defer.succeed(result)
