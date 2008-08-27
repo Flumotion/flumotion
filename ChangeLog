@@ -1,5 +1,14 @@
 2008-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* Makefile.am:
+	  Make sure we validate the registry.
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/test/test_http.py:
+	  Break some lines in preparation for a plug rename.
+
+2008-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/compat.py:
 	  Trigger deprecation on using a function, not importing.  This way
 	  we can get a call site that is not in ihooks.py and have a hope

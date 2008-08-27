@@ -95,8 +95,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         self._removing = {} # Optional deferred notification of client removals
 
-        self.loggers = \
-            streamer.plugs['flumotion.component.plugs.loggers.Logger']
+        self.loggers = streamer.plugs[
+            'flumotion.component.plugs.loggers.Logger']
 
         self.logfilter = None
 
