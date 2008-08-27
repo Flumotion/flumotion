@@ -17,7 +17,7 @@ check-local-pep8:
 	find $(top_srcdir)/flumotion -name \*.py.in | sort | uniq | xargs $(PYTHON) $(top_srcdir)/common/pep8.py --repeat
 
 coverage:
-	@trial --temp-directory=_trial_coverage --coverage flumotion.test
+	@$(top_builddir)/env bash -c "trial --temp-directory=_trial_coverage --coverage flumotion.test"
 	make show-coverage
 
 show-coverage:

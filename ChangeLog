@@ -1,5 +1,10 @@
 2008-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/common.mk:
+	  Make sure we execute trial for coverage in the built environment.
+
+2008-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* Makefile.am:
 	  Make sure we validate the registry.
 	* flumotion/component/consumers/httpstreamer/resources.py:
