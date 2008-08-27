@@ -4,7 +4,7 @@
 
     <component type="audiotest-producer"
                base="flumotion/component/producers/audiotest"
-               _description="Produces an example audio signal without using a device.  This is useful for demonstrations or testing.">
+               _description="Produces an example audio signal without using a device.">
       <source location="flumotion.component.producers.audiotest.audiotest" />
       <feeder name="default"/>
 

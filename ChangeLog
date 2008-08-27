@@ -1,3 +1,9 @@
+2008-08-27  Johan Dahlin  <johan@fluflumotion.com>
+
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/videotest/videotest.xml:
+	Make the video/audio test component descriptions shorter
+
 2008-08-27  Murray Cumming  <murrayc@murrayc.com>
 
 	* data/glade/shout2-wizard.glade: Changed some labels and added some 
@@ -7,6 +13,11 @@
 
 	* po/es.po:
         Spanish translation sync now.
+
+2008-08-27  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/ui/wizard.py (WizardSidebar.jumpToStep): Sidebar is
+	in wizard.
 
 2008-08-27  Johan Dahlin  <johan@flumotion.com>
 

@@ -2,7 +2,7 @@
   <components>
     <component type="videotest-producer"
                base="flumotion/component/producers/videotest"
-               _description="Produces an example video signal without using a device.  This is useful for demonstrations and testing.">
+               _description="Produces an example video signal without using a device.">
       <source location="flumotion.component.producers.videotest.videotest" />
 
       <feeder name="default" />
