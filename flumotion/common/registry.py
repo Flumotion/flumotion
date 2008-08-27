@@ -81,7 +81,7 @@ class RegistryEntryComponent(pb.Copyable, pb.RemoteCopy):
         @type  files:      list of L{RegistryEntryFile}
         @param entries:    dict of entry point type -> entry
         @type  entries:    dict of str -> L{RegistryEntryEntry}
-        @param sockets:    list of sockets supported by the element
+        @param sockets:    list of sockets supported by the component
         @type  sockets:    list of str
         @param wizards:    list of wizard entries
         @type  wizards:    list of L{RegistryEntryWizard}
@@ -188,7 +188,7 @@ class RegistryEntryPlug:
         @param socket:     the fully qualified class name of the socket this
                            plug can be plugged in to
         @type  socket:     str
-        @param entries:    entry pointes for instantiating the plug
+        @param entries:    entry points for instantiating the plug
         @type  entries:    list of L{RegistryEntryEntry}
         @param properties: properties of the plug
         @type  properties: dict of str -> L{RegistryEntryProperty}
