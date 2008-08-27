@@ -432,7 +432,7 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
             return
         self._stack.skipTo(lambda x: x.name == name)
         step = self._stack.current()
-        self.sidebar.jumpTo(step.section)
+        self._wizard.sidebar.jumpTo(step.section)
         self._currentSection = self._getSectionByName(step.section)
         self._setStep(step)
 

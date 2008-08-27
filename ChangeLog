@@ -1,3 +1,8 @@
+2008-08-27  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/ui/wizard.py (WizardSidebar.jumpToStep): Sidebar is
+	in wizard.
+
 2008-08-27  Johan Dahlin  <johan@fluflumotion.com>
 
 	* flumotion/component/producers/audiotest/audiotest.xml:
@@ -13,11 +18,6 @@
 
 	* po/es.po:
         Spanish translation sync now.
-
-2008-08-27  Johan Dahlin  <johan@flumotion.com>
-
-	* flumotion/ui/wizard.py (WizardSidebar.jumpToStep): Sidebar is
-	in wizard.
 
 2008-08-27  Johan Dahlin  <johan@flumotion.com>
 
