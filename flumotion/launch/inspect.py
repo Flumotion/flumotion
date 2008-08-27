@@ -172,10 +172,8 @@ def main(args):
         if r.hasPlug(cname):
             handled = True
             p = r.getPlug(cname)
-            print '\nPlug:'
+            print '\nPlug type:'
             print '  %s' % cname
-            print '\nType:'
-            print '  %s' % p.getType()
             print '\nEntry:'
             e = p.getEntry()
             print '  %s() in %s' % (e.getFunction(), e.getModuleName())

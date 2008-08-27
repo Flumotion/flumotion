@@ -1,3 +1,9 @@
+2008-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/launch/inspect.py:
+	  These two lines print the same thing, so might as well show it only
+	  once.
+
 2008-08-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/wizard.py (WizardSidebar.jumpToStep): Sidebar is
