@@ -1,5 +1,12 @@
 2008-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/twisted/compat.py:
+	  Trigger deprecation on using a function, not importing.  This way
+	  we can get a call site that is not in ihooks.py and have a hope
+	  of fixing them.
+
+2008-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/launch/inspect.py:
 	  These two lines print the same thing, so might as well show it only
 	  once.

@@ -32,20 +32,25 @@ import zope.interface as zi
 
 __version__ = "$Rev$"
 
-warnings.warn(
-    "This module is deprecated, use zope.interface directly instead",
-    DeprecationWarning)
-
 
 def implementsInterface(object, interface):
+    warnings.warn(
+        "This module is deprecated, use zope.interface directly instead",
+        DeprecationWarning, stacklevel=2)
     return interface.providedBy(object)
 
 
 def implementedBy(object):
+    warnings.warn(
+        "This module is deprecated, use zope.interface directly instead",
+        DeprecationWarning, stacklevel=2)
     return zi.implementedBy(object)
 
 
 def isInterface(object):
+    warnings.warn(
+        "This module is deprecated, use zope.interface directly instead",
+        DeprecationWarning, stacklevel=2)
     return isinstance(object, zi.InterfaceClass)
 
 Interface = zi.Interface
