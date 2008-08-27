@@ -35,7 +35,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="label1">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_Port:</property>
+	      <property name="label" translatable="yes">Server _Port:</property>
 	      <property name="use_underline">True</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -153,7 +153,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="label8">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_Hostname:</property>
+	      <property name="label" translatable="yes">Server _Hostname:</property>
 	      <property name="use_underline">True</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -186,6 +186,7 @@
 	      <property name="has_frame">True</property>
 	      <property name="invisible_char">*</property>
 	      <property name="activates_default">False</property>
+              <property name="tooltip" translatable="yes">This is the IP address of the existing Icecast server which will receive the stream.</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -291,7 +292,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="label11">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_URL:</property>
+	      <property name="label" translatable="yes">Associated _URL:</property>
 	      <property name="use_underline">True</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -324,6 +325,7 @@
 	      <property name="has_frame">True</property>
 	      <property name="invisible_char">*</property>
 	      <property name="activates_default">False</property>
+              <property name="tooltip" translatable="yes">This is an informative URL which will be associated with the stream. For instance, it may be a descriptive HTML page.</property>
 	    </widget>
 	    <packing>
 	      <property name="left_attach">1</property>
@@ -357,6 +359,7 @@
 		  <property name="snap_to_ticks">False</property>
 		  <property name="wrap">False</property>
 		  <property name="adjustment">8000 1024 65535 1 10 10</property>
+                  <property name="tooltip" translatable="yes">This is the network port on which the existing Icecast server is listening for the stream.</property>
 		</widget>
 	      </child>
 	    </widget>
