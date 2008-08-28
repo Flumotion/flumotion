@@ -1,3 +1,8 @@
+2008-08-28  Murray Cumming  <murrayc@murrayc.com>
+
+	* flumotion/component/consumers/disker/disker.glade: Start New File 
+	button: Use header capitalization as per the HIG.
+
 2008-08-28  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/sectionwizard.glade:
