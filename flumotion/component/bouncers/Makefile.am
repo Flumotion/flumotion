@@ -15,7 +15,7 @@ component_PYTHON = \
 	tokentestbouncer.py
 
 component_DATA = htpasswdcrypt.xml saltsha256.xml bouncer.glade tokentest.xml \
-	ipbouncer.py icalbouncer.xml deprecated.xml bouncer.xml
+	icalbouncer.xml deprecated.xml bouncer.xml
 
 
 TAGS_FILES = $(component_PYTHON)

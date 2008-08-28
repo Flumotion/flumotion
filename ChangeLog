@@ -1,5 +1,10 @@
 2008-08-28  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/component/bouncers/Makefile.am (component_DATA): Remove
+	ipbouncer.py which is already in component_PYTHON.
+
+2008-08-28  Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/manager/config.py:
 	* flumotion/test/test_manager_config.py:
 	Make sure multiple config properties are serialized property.
