@@ -834,13 +834,19 @@ class PlanetXMLWriter(XMLWriter):
 
         def serialise(propVal):
             if isinstance(propVal, tuple): # fractions are our only tuple type
-                return "%d/%d" % propVal
-            return propVal
+                return ["%d/%d" % propVal]
+            elif isinstance(propVal, list):
+                return propVal
+            else:
+                return [propVal]
         for name, value in properties:
             attrs = [('name', name)]
-            self.writeTag('property', attrs, serialise(value))
+            for value in serialise(value):
+                self.writeTag('property', attrs, value)
 
     def _writePlugs(self, plugs):
+        if not plugs:
+            return
         self.pushTag('plugs')
         for socket, plugs in plugs:
             for plug in plugs:

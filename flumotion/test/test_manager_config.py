@@ -24,7 +24,9 @@ from cStringIO import StringIO
 from flumotion.common import testsuite
 from flumotion.common.errors import ConfigError
 from flumotion.manager.config import ConfigEntryComponent, \
-     ConfigEntryManager, ManagerConfigParser, PlanetConfigParser
+     ConfigEntryManager, ManagerConfigParser, PlanetConfigParser, \
+     PlanetXMLWriter
+from flumotion.manager.manager import Vishnu
 
 
 def flatten(seq):
@@ -213,3 +215,55 @@ class TestPlanetConfigParser(testsuite.TestCase):
             '</component>')
         config = PlanetConfigParser(f)
         self.assertRaises(ConfigError, config.parse)
+
+
+class TestXMLWriter(testsuite.TestCase):
+
+    def testPlug(self):
+        xml = (
+            '<planet name="planet-name">\n'
+            '  \n'
+            '  <atmosphere>\n'
+            '    <component name="server"\n'
+            '               type="http-server"\n'
+            '               label="label"\n'
+            '               worker="worker"\n'
+            '               project="flumotion"\n'
+            '               version="1.0">\n'
+            '      <property name="type">slave</property>\n'
+            '      <plugs>\n'
+            '        <plug socket="flumotion.component.plugs.loggers.Logger" '
+            'type="apachelogger">\n'
+            '          <property name="logfile">foobar</property>\n'
+            '        </plug>\n'
+            '      </plugs>\n'
+            '    </component>\n'
+            '    \n'
+            '  </atmosphere>\n'
+            '  \n'
+            '</planet>\n')
+        vishnu = Vishnu('planet-name')
+        vishnu.loadComponentConfigurationXML(StringIO(xml), 'foo')
+        testsuite.diffStrings(xml, vishnu.getConfiguration())
+
+    def testMultiple(self):
+        xml = (
+            '<planet name="planet-name">\n'
+            '  \n'
+            '  <atmosphere>\n'
+            '    <component name="bouncer"\n'
+            '               type="ip-bouncer"\n'
+            '               label="label"\n'
+            '               worker="worker"\n'
+            '               project="flumotion"\n'
+            '               version="1.0">\n'
+            '      <property name="allow">A</property>\n'
+            '      <property name="allow">B</property>\n'
+            '    </component>\n'
+            '    \n'
+            '  </atmosphere>\n'
+            '  \n'
+            '</planet>\n')
+        vishnu = Vishnu('planet-name')
+        vishnu.loadComponentConfigurationXML(StringIO(xml), 'foo')
+        testsuite.diffStrings(xml, vishnu.getConfiguration())

@@ -1,3 +1,10 @@
+2008-08-28  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/manager/config.py:
+	* flumotion/test/test_manager_config.py:
+	Make sure multiple config properties are serialized property.
+	Add a test.
+
 2008-08-28  Murray Cumming  <murrayc@murrayc.com>
 
 	* flumotion/component/consumers/disker/disker.glade: Start New File 
