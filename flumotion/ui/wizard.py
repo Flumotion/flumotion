@@ -402,6 +402,10 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
         return self._stack.pos != 0
 
     def prepareNextStep(self, step):
+        if hasattr(step, 'lastStep'):
+            self._wizard.finish(completed=True)
+            return
+
         next = step.getNext()
         if isinstance(next, WizardStep):
             nextStep = next
@@ -637,8 +641,6 @@ class SectionWizard(GladeWindow, log.Loggable):
             '<i>%s</i>' % escape(description or ''))
 
     def blockNext(self, block):
-        if self.button_finish.get_property('sensitive'):
-            return
         self.button_next.set_sensitive(not block)
         # work around a gtk+ bug #56070
         if not block:
@@ -688,13 +690,12 @@ class SectionWizard(GladeWindow, log.Loggable):
 
         self.button_help.set_sensitive(hasHelp)
         self.button_prev.set_sensitive(canGoBack)
-        self.button_next.set_sensitive(hasNext)
-        self.button_finish.set_sensitive(not hasNext)
 
         if hasNext:
-            self.button_next.grab_focus()
+            self.button_next.set_label(gtk.STOCK_GO_FORWARD)
         else:
-            self.button_finish.grab_focus()
+            self.button_next.set_label(_('_Finish'))
+        self.button_next.grab_focus()
 
     # Private
 
@@ -711,9 +712,6 @@ class SectionWizard(GladeWindow, log.Loggable):
         step = self.getCurrentStep()
         self.emit('help-clicked', step.docSection, step.docAnchor,
                   step.docVersion)
-
-    def _finishClicked(self):
-        self.finish(completed=True)
 
     # Callbacks
 
@@ -742,9 +740,6 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     def on_button_next_clicked(self, button):
         self.goNext()
-
-    def on_button_finish_clicked(self, button):
-        self._finishClicked()
 
     def on_sidebar_step_chosen(self, sidebar, name):
         self.sidebar.jumpToStep(name)

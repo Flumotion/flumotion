@@ -1,3 +1,10 @@
+2008-08-28  Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/sectionwizard.glade:
+	* flumotion/ui/wizard.py:
+	Revert wizard forward/finish change.
+	Fixes #996
+
 2008-08-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/common.mk:
@@ -767,13 +774,6 @@
 	* flumotion/test/test_wizard_save.py:
 	Remove YUV/RGB combo from video test src page in the wizard
 	Fixes #1091.
-
-2008-07-31  Johan Dahlin  <johan@flumotion.com>
-
-	* data/glade/sectionwizard.glade:
-	* flumotion/ui/wizard.py:
-	Add a finish button, and always show and make it
-	sensitive iff it wizard can be finished.
 
 2008-07-31  Johan Dahlin  <johan@flumotion.com>
 
