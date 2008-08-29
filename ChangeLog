@@ -1,5 +1,10 @@
 2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/glade/welcome-wizard.glade:
+	  Make first page less scary.  Fixes #1122.
+
+2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/process.py:
 	  Document and make SystemError correct.
 
