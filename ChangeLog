@@ -1,9 +1,14 @@
+2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/bouncers/Makefile.am:
+	  Properly package ipbouncer.xml so make distcheck works again.
+
 2008-08-29  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
 	* flumotion/component/misc/httpserver/httpserver.xml:
 	* flumotion/component/plugs/plugs.xml:
-          Socket name have to follow the style guide.
+	  Socket name have to follow the style guide.
 
 2008-08-29  Pedro Gracia  <pedro@flumotion.com>
 
@@ -15,8 +20,8 @@
 	* flumotion/component/plugs/Makefile.am:
 	* flumotion/component/plugs/plugs.xml:
 	* flumotion/component/plugs/rrd.py:
-          Streamers can write RRD files directly with this plug.
-          Fixes #1111.
+	  Streamers can write RRD files directly with this plug.
+	  Fixes #1111.
 
 2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
@@ -30,11 +35,6 @@
 
 	* flumotion/monitor/nagios/main.py:
 	  Fix comment.
-
-2008-08-28  Johan Dahlin  <johan@flumotion.com>
-
-	* flumotion/component/bouncers/Makefile.am (component_DATA): Remove
-	ipbouncer.py which is already in component_PYTHON.
 
 2008-08-28  Johan Dahlin  <johan@flumotion.com>
 
