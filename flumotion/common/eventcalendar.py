@@ -194,7 +194,7 @@ class Event(Loggable):
                         dateTime.microsecond, now)
 
     def __repr__(self):
-        return "<Event %r >" % (self.toTuple())
+        return "<Event %r >" % (self.toTuple(), )
 
     def toTuple(self):
         return (self.uid, self.start, self.end, self.content, self.rrule,

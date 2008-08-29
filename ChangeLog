@@ -1,5 +1,13 @@
 2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/eventcalendar.py:
+	  Fix repr interpolation.
+	  Makes FLU_DEBUG=4 trial
+	  flumotion.test.test_component_base_scheduler.SchedulerTest
+	  not fail.
+
+2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/monitor/nagios/main.py:
 	  Fix comment.
 
