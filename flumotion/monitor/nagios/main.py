@@ -95,16 +95,16 @@ class Mood(util.LogCommand):
 # Because we run a reactor and use deferreds, the flow is slightly different
 # from the usual Command flow.
 
-# Manager will first create a managerDeferred instance variable, which will
+# Nagios will first create a managerDeferred instance variable, which will
 # allow subcommands to hook into the connection and schedule callbacks.
 
-# Manager will then parse the command line, allowing all subcommands to
+# Nagios will then parse the command line, allowing all subcommands to
 # hook into this step with their respective handleOptions/parse/do methods.
 
 # Subcommands are expected to use the ok/warning/critical methods to report
 # a message and set the exit state.
 
-# The Manager root command will take care of stopping the reactor and returning
+# The Nagios root command will take care of stopping the reactor and returning
 # the exit value.
 
 
