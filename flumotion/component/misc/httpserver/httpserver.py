@@ -511,6 +511,22 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                     'description': self._description,
                     'url': self.getUrl()}
 
+    def getClients(self):
+        """
+        Return the number of connected clients
+        """
+        return len(self._connected_clients)
+
+    def getBytesSent(self):
+        """
+        Current Bandwidth
+        """
+        bytesTransferred = self._total_bytes_written
+        for request in self._connected_clients.values():
+            if request._transfer:
+                bytesTransferred += request._transfer.bytesWritten
+        return bytesTransferred
+
     def getLoadData(self):
         """
         Return a tuple (deltaadded, deltaremoved, bytes_transferred,
@@ -518,12 +534,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         user values. The deltas and current_load are NOT currently
         implemented here, we set them as zero.
         """
-        bytesTransferred = self._total_bytes_written
-        for request in self._connected_clients.values():
-            if request._transfer:
-                bytesTransferred += request._transfer.bytesWritten
-
-        return (0, 0, bytesTransferred, len(self._connected_clients), 0)
+        return (0, 0, self.getBytesSent(), self.getClients(), 0)
 
     def rotateLog(self):
         """

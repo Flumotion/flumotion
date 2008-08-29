@@ -35,6 +35,7 @@
         <socket type="flumotion.component.plugs.loggers.Logger"/>
         <socket type="flumotion.component.plugs.lifecycle.ComponentLifecycle" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProvider"/>
+        <socket type="flumotion.component.plugs.rrd.RRD" />
         <socket type="flumotion.component.misc.httpserver.ratecontroller.RateController"/>
       </sockets>
 
@@ -42,10 +43,10 @@
          <!-- FIXME: the following comment is not valid anymore, right? -->
          <!-- Warning: mount_point of / is broken -->
         <property name="mount-point" type="string"
-		  _description="The mount point on which the stream can be accessed." />
+                  _description="The mount point on which the stream can be accessed." />
         <property name="path" type="string"
-          _description="The base path to map to the mount-point" />
-
+                  _description="The base path to map to the mount-point" />
+ 
         <property name="type" type="string"
                   _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
 

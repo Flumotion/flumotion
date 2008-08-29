@@ -10,6 +10,7 @@ component_PYTHON = \
 	lifecycle.py \
 	loggers.py \
 	manhole.py \
+	rrd.py \
 	streamdata.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/plugs

@@ -60,6 +60,20 @@
       </properties>
     </plug>
 
+    <plug socket="flumotion.component.plugs.rrd.RRD" type="rrd">
+      <entry location="flumotion/component/plugs/rrd.py"
+             function="RRDPlug"/>
+             
+      <properties>
+          <property name="timeout" type="int" required="false"
+                    description="time (in seconds) to update the RRD files"/>
+          <property name="clients-filename" type="string" required="true"
+                    description="absolute path to the RRD clients file"/>
+          <property name="bytes-filename" type="string" required="true"
+                    description="absolute path to the RRD bytes transfered file"/>
+      </properties>
+    </plug>
+
   </plugs>
 
   <bundles>
@@ -131,6 +145,16 @@
       <directories>
         <directory name="flumotion/component/plugs">
           <filename location="streamdata.py" />
+        </directory>
+      </directories>
+    </bundle>
+    <bundle name="base-plugs-rrd">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="rrd.py" />
         </directory>
       </directories>
     </bundle>

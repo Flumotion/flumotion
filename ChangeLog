@@ -1,3 +1,16 @@
+2008-08-29  Pedro Gracia  <pedro@flumotion.com>
+
+	reviewed by: Arek Korbik  <arkadini@gmail.com> 
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/plugs/Makefile.am:
+	* flumotion/component/plugs/plugs.xml:
+	* flumotion/component/plugs/rrd.py:
+          Streamers can write RRD files directly with this plug.
+          Fixes #1111.
+
 2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/eventcalendar.py:
