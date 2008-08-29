@@ -31,7 +31,7 @@ Note that Flumotion log files log in the server's local time, and this check
 compares against the local time too, so the server logging and the server
 checking should be in the same timezone.
 """
-    usage = "recent [-s string] log-file-path"
+    usage = "[-s string] log-file-path"
 
     def addOptions(self):
         self.parser.add_option('-s', '--string',

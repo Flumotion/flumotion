@@ -36,7 +36,7 @@ __version__ = "$Rev$"
 
 class Mood(util.LogCommand):
     description = "Check the mood of a component."
-    usage = "mood [mood options] [component id]"
+    usage = "[mood options] [component id]"
 
     def addOptions(self):
         default = "hungry"

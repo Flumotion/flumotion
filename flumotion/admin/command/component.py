@@ -63,7 +63,7 @@ class Delete(common.AdminCommand):
 
 
 class Invoke(common.AdminCommand):
-    usage = "invoke [method-name] [arguments]"
+    usage = "[method-name] [arguments]"
     summary = "invoke a method on a component"
     description = """Invoke a method on a component.
 %s
@@ -296,7 +296,7 @@ class Component(util.LogCommand):
     @type  planetState:    L{flumotion.common.state.AdminPlanetState}
     """
     description = "Act on a component."
-    usage = "component -i [component id]"
+    usage = "-i [component id]"
 
     subCommandClasses = [Delete, Invoke, List, Mood, Property, Start, Stop]
 

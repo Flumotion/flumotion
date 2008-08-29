@@ -262,7 +262,7 @@ class JobOrphaned(util.LogCommand):
 class JobVSize(util.LogCommand):
     name = 'vsize'
     description = "Check the vsize of job processes."
-    usage = 'vsize [vsize-options]'
+    usage = '[vsize-options]'
 
     def addOptions(self):
         default = "128M"
@@ -355,7 +355,6 @@ class WorkerMultiple(util.LogCommand):
 
 class Worker(util.LogCommand):
     description = "Check worker processes."
-    usage = "worker [command]"
 
     subCommandClasses = [WorkerMultiple, ]
 

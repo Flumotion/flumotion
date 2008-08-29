@@ -1,3 +1,14 @@
+2008-08-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/command/component.py:
+	* flumotion/admin/command/manager.py:
+	* flumotion/admin/command/worker.py:
+	* flumotion/monitor/nagios/log.py:
+	* flumotion/monitor/nagios/main.py:
+	* flumotion/monitor/nagios/process.py:
+	* flumotion/monitor/nagios/stream.py:
+	  Remove own name from usage.
+
 2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/welcome-wizard.glade:

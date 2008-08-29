@@ -37,7 +37,7 @@ __version__ = "$Rev: 6562 $"
 
 
 class Invoke(common.AdminCommand):
-    usage = "invoke [method-name] [arguments]"
+    usage = "[method-name] [arguments]"
     summary = "invoke a method on a manager"
     description = """Invoke a method on a manager.
 %s
@@ -88,7 +88,7 @@ Examples: getConfiguration, getVersions
 
 
 class Load(common.AdminCommand):
-    usage = "load [configuration-file]"
+    usage = "[configuration-file]"
     summary = "load a configuration onto the manager."
 
     def doCallback(self, args):

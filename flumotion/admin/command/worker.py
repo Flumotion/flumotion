@@ -40,7 +40,7 @@ __version__ = "$Rev: 6562 $"
 
 
 class Invoke(common.AdminCommand):
-    usage = "invoke [method-name] [arguments]"
+    usage = "[method-name] [arguments]"
     summary = "invoke a method on a worker"
     description = """Invoke a method on a worker.
 %s
@@ -114,7 +114,7 @@ class List(common.AdminCommand):
 
 
 class Run(common.AdminCommand):
-    usage = "run [module-name] [method-name] [arguments]"
+    usage = "[module-name] [method-name] [arguments]"
     summary = "run a method on a worker"
     description = """Run a method on a worker
 %s

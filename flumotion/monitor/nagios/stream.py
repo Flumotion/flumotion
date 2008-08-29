@@ -36,7 +36,7 @@ URLFINDER = 'http://[^\s"]*' # to search urls in playlists
 class Check(util.LogCommand):
     """Main class to perform the stream checks"""
     description = 'Check stream.'
-    usage = 'check [options] url'
+    usage = '[options] url'
 
     def __init__(self, parentCommand=None, **kwargs):
         """Initial values and pipeline setup"""
