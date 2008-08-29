@@ -1,3 +1,8 @@
+2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/assistant/scenarios.py:
+	  Make scenario descriptions consistent.  Fixes #1123.
+
 2008-08-29  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/common/netutils.py:

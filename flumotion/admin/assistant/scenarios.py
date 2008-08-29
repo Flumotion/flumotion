@@ -138,7 +138,7 @@ class Scenario(object):
 
 
 class LiveScenario(Scenario):
-    short = _("Set up a live stream")
+    short = _("Stream live")
     description = _(
         """Allows you to create a live stream from a device or a file.
         """)
