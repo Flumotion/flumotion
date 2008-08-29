@@ -60,7 +60,7 @@
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.plugs.rrd.RRD" type="rrd">
+    <plug socket="flumotion.component.plugs.rrd.RRDPlug" type="rrd">
       <entry location="flumotion/component/plugs/rrd.py"
              function="RRDPlug"/>
              

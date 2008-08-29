@@ -1,5 +1,12 @@
 2008-08-29  Pedro Gracia  <pedro@flumotion.com>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/plugs/plugs.xml:
+          Socket name have to follow the style guide.
+
+2008-08-29  Pedro Gracia  <pedro@flumotion.com>
+
 	reviewed by: Arek Korbik  <arkadini@gmail.com> 
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:

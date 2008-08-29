@@ -20,7 +20,7 @@
         <socket type="flumotion.component.plugs.loggers.Logger" />
         <socket type="flumotion.component.plugs.lifecycle.ComponentLifecycle" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProvider" />
-        <socket type="flumotion.component.plugs.rrd.RRD" />
+        <socket type="flumotion.component.plugs.rrd.RRDPlug" />
         <socket type="flumotion.component.bouncers.plug.BouncerPlug" />
       </sockets>
 
@@ -32,7 +32,7 @@
         <property name="issuer-class" type="string"
                   _description="The Python class of the Keycard issuer to use." />
         <property name="mount-point" type="string"
-		  _description="The mount point on which the stream can be accessed." />
+          _description="The mount point on which the stream can be accessed." />
 
         <property name="type" type="string"
                   _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
