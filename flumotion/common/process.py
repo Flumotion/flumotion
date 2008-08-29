@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_common -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_common_process -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -38,6 +38,18 @@ def startup(processType, processName, daemonize=False, daemonizeTo='/'):
     """
     Prepare a process for starting, logging appropriate standarised messages.
     First daemonizes the process, if daemonize is true.
+
+    @param processType: The process type, for example 'worker'. Used
+                        as the first part of the log file and PID file names.
+    @type  processType: str
+    @param processName: The service name of the process. Used to
+                        disambiguate different instances of the same daemon.
+                        Used as the second part of log file and PID file names.
+    @type  processName: str
+    @param daemonize:   whether to daemonize the current process.
+    @type  daemonize:   bool
+    @param daemonizeTo: The directory that the daemon should run in.
+    @type  daemonizeTo: str
     """
     log.info(processType, "Starting %s '%s'", processType, processName)
 
@@ -122,12 +134,13 @@ def _daemonizeHelper(processType, daemonizeTo='/', processName=None):
     locations.
 
     @param processType: The process type, for example 'worker'. Used
-    as part of the log file and PID file names.
+                        as the first part of the log file and PID file names.
     @type  processType: str
     @param daemonizeTo: The directory that the daemon should run in.
     @type  daemonizeTo: str
     @param processName: The service name of the process. Used to
-    disambiguate different instances of the same daemon.
+                        disambiguate different instances of the same daemon.
+                        Used as the second part of log file and PID file names.
     @type  processName: str
     """
 
@@ -139,8 +152,9 @@ def _daemonizeHelper(processType, daemonizeTo='/', processName=None):
     pid = getPid(processType, processName)
     if pid:
         raise SystemError(
-            "A %s service named '%s' is already running with pid %d"
-            % (processType, processName or processType, pid))
+            "A %s service%s is already running with pid %d" % (
+                processType, processName and ' named %s' % processName or '',
+                pid))
 
     log.debug(processType, "%s service named '%s' daemonizing",
         processType, processName)
