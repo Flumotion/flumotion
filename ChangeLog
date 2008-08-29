@@ -11,7 +11,7 @@
 2008-08-29  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/common/netutils.py:
-          Changes to support Solaris.
+	  Changes to support Solaris.
 
 2008-08-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
