@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-08-27 14:47+0200\n"
-"PO-Revision-Date: 2008-08-27 16:01+0200\n"
+"POT-Creation-Date: 2008-09-01 19:30+0200\n"
+"PO-Revision-Date: 2008-09-01 19:41+0200\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,9 +20,9 @@ msgstr ""
 msgid "Flumotion Administration"
 msgstr "Administración de Flumotion"
 
-#: ../data/glade/admin-wizard.glade.h:1 ../data/glade/sectionwizard.glade.h:1
-msgid "Flumotion Configuration Assistant"
-msgstr "Asistente para la configuración de Flumotion"
+#: ../data/glade/admin-wizard.glade.h:1
+msgid "Flumotion Connections"
+msgstr "Conexiones de Flumotion"
 
 #: ../data/glade/admin-wizard.glade.h:2
 msgid "Name of step"
@@ -47,7 +47,7 @@ msgstr "Nombre del paso"
 #. Headers in this file shall remain intact.
 #: ../data/glade/audio-encoder-wizard.glade.h:1
 #: ../flumotion/component/encoders/dirac/wizard.glade.h:1
-#: ../flumotion/component/encoders/theora/wizard.glade.h:4
+#: ../flumotion/component/encoders/theora/wizard.glade.h:5
 #: ../flumotion/component/encoders/vorbis/wizard.glade.h:1
 msgid "Bit _rate:"
 msgstr "Tasa de _transferencia:"
@@ -244,7 +244,6 @@ msgstr "_Límite del usuario:"
 
 #: ../data/glade/http-wizard.glade.h:7 ../data/glade/ondemand-wizard.glade.h:9
 #: ../data/glade/open-connection.glade.h:2
-#: ../data/glade/shout2-wizard.glade.h:6
 msgid "_Port:"
 msgstr "_Puerto:"
 
@@ -258,7 +257,7 @@ msgstr ""
 
 #: ../data/glade/httpstreamer-wizard.glade.h:1
 #: ../data/glade/ondemand-wizard.glade.h:8
-#: ../data/glade/shout2-wizard.glade.h:4
+#: ../data/glade/shout2-wizard.glade.h:9
 msgid "_Mount point:"
 msgstr "_Punto de anclaje:"
 
@@ -319,8 +318,8 @@ msgid ""
 "Enable this to show a couple of logotypes in the bottom left corner of the "
 "video output."
 msgstr ""
-"Seleccione esto para mostrar algunos logotipos en la parte inferior izquierda"
-"de la salida de video."
+"Seleccione esto para mostrar algunos logotipos en la parte inferior "
+"izquierdade la salida de video."
 
 #: ../data/glade/overlay-wizard.glade.h:2
 msgid "Show _logos in bottom left corner"
@@ -348,6 +347,10 @@ msgstr ""
 "Por favor, seleccione las fuente que desee \n"
 "usar en su flujo en vivo:"
 
+#: ../data/glade/sectionwizard.glade.h:1
+msgid "Flumotion Configuration Assistant"
+msgstr "Asistente para la configuración de Flumotion"
+
 #: ../data/glade/scenario-wizard.glade.h:1
 msgid "Please select what you would like to do:"
 msgstr "Por favor, seleccione lo que le gustaría hacer:"
@@ -361,24 +364,51 @@ msgstr ""
 "usar en su \"streamer\":"
 
 #: ../data/glade/shout2-wizard.glade.h:1
+msgid "Associated _URL:"
+msgstr "_URL asociada:"
+
+#: ../data/glade/shout2-wizard.glade.h:2
 msgid "P_assword:"
 msgstr "_Contraseña:"
 
-#: ../data/glade/shout2-wizard.glade.h:2
+#: ../data/glade/shout2-wizard.glade.h:3
+msgid "Server _Hostname:"
+msgstr "_Nombre del Servidor:"
+
+#: ../data/glade/shout2-wizard.glade.h:4
+msgid "Server _Port:"
+msgstr "_Puerto del Servidor:"
+
+#: ../data/glade/shout2-wizard.glade.h:5
+msgid ""
+"This is an informative URL which will be associated with the stream. For "
+"instance, it may be a descriptive HTML page."
+msgstr ""
+"Esta es una URL informativa que estará asociada con el flujo. Por ejemplo puede "
+"ser una página que lo describa en HTML."
+
+#: ../data/glade/shout2-wizard.glade.h:6
+msgid ""
+"This is the IP address of the existing Icecast server which will receive the "
+"stream."
+msgstr ""
+"Esta es la dirección IP del servidor de Icecast que recibirá el flujo."
+
+#: ../data/glade/shout2-wizard.glade.h:7
+msgid ""
+"This is the network port on which the existing Icecast server is listening "
+"for the stream."
+msgstr ""
+"Este es el puerto de red en el que está escuchando el servidor de Icecast "
+"esperando por el flujo."
+
+#: ../data/glade/shout2-wizard.glade.h:8
 msgid "_Description:"
 msgstr "_Descripcción:"
 
-#: ../data/glade/shout2-wizard.glade.h:3
-msgid "_Hostname:"
-msgstr "_Servidor:"
-
-#: ../data/glade/shout2-wizard.glade.h:5
+#: ../data/glade/shout2-wizard.glade.h:10
 msgid "_Name:"
 msgstr "Nombre:"
-
-#: ../data/glade/shout2-wizard.glade.h:7
-msgid "_URL:"
-msgstr "_URL:"
 
 #: ../data/glade/summary-wizard.glade.h:1
 msgid ""
@@ -423,19 +453,14 @@ msgid ""
 "Welcome to the Flumotion configuration assistant.\n"
 "\n"
 "This assistant helps to create a Flumotion configuration for simple "
-"scenarios such as live streaming of a single camera or free on-demand "
-"streaming of pre-existing video files. The assistant should help you to "
-"become familiar with Flumotion and can be useful to generate fragments of "
-"configuration files for more complex Flumotion systems. "
+"scenarios such as live streaming from a webcam, camera, or file, or on-"
+"demand streaming of files."
 msgstr ""
 "Bienvenido al asistente para la configuración de Flumotion.\n"
 "\n"
-"Este asistente le ayudará a crear una configuración de Flumotion para"
-"escenarios simples tales como \"streaming\" en vivo de una cámara o "
-"\"streaming\" de videos bajo demanda sin restricciones. El asistente le"
-"ayudará a familiarizarse con Flumotion y puede ser útil para generar"
-"fragmentos de ficheros de configuración para sistemas con Flumotion"
-"más complejos."
+"Este asistente le ayudará a crear una configuración de Flumotion "
+"para escenarios simples tales como flujos en vivo de una cámara web,"
+"una cámara o flujos de videos bajo demanda."
 
 #: ../flumotion/admin/admin.py:447
 msgid "Internal error in component."
@@ -463,14 +488,15 @@ msgid "Summary"
 msgstr "Sumario"
 
 #: ../flumotion/admin/assistant/scenarios.py:141
-msgid "Set up a live stream"
-msgstr "Configurar un flujo en vivo"
+msgid "Stream live"
+msgstr "Flujo en vivo"
 
 #: ../flumotion/admin/assistant/scenarios.py:143
 msgid ""
 "Allows you to create a live stream from a device or a file.\n"
 "        "
-msgstr "Le permite crear un flujo en vivo desde un dispositivo o un fichero.\n"
+msgstr ""
+"Le permite crear un flujo en vivo desde un dispositivo o un fichero.\n"
 "        "
 
 #: ../flumotion/admin/assistant/scenarios.py:217
@@ -1803,7 +1829,7 @@ msgid "Current filename:"
 msgstr "Nombre del fichero actual:"
 
 #: ../flumotion/component/consumers/disker/disker.glade.h:2
-msgid "Start new file"
+msgid "Start New File"
 msgstr "Iniciar un nuevo fichero"
 
 #: ../flumotion/component/consumers/disker/disker.py:125
@@ -2126,7 +2152,9 @@ msgstr "Un codificador usando fotogramas JPEG y delta."
 
 #: ../flumotion/component/encoders/smoke/smoke.xml.h:2
 msgid "How often a key frame should appear (in frames. default: 20)"
-msgstr "Frecuencia a la que el fotograma clave debiera aparecer (en fotogramas, por defecto: 20)"
+msgstr ""
+"Frecuencia a la que el fotograma clave debiera aparecer (en fotogramas, por "
+"defecto: 20)"
 
 #: ../flumotion/component/encoders/smoke/smoke.xml.h:3
 #: ../flumotion/component/encoders/smoke/wizard_gtk.py:42
@@ -2156,7 +2184,7 @@ msgid "M_inimum quality:"
 msgstr "Calidad _mínima:"
 
 #: ../flumotion/component/encoders/smoke/wizard.glade.h:3
-msgid "_Keyframe spacing: every"
+msgid "_Key frame spacing: every"
 msgstr "_Distancia del fotograma clave: cada"
 
 #: ../flumotion/component/encoders/smoke/wizard.glade.h:4
@@ -2227,19 +2255,19 @@ msgid "Whether to use quick, lower-quality compression."
 msgstr "Si usar una compresión rápida, de baja calidad."
 
 #: ../flumotion/component/encoders/theora/wizard.glade.h:3
-msgid "Advanced settings"
-msgstr "Configuraciones avanzadas"
-
-#: ../flumotion/component/encoders/theora/wizard.glade.h:5
 msgid ""
-"Shorter time between keyframes reduces playback latency at the cost of a "
-"higher bitrate or lower quality."
+"A shorter time between key frames reduces playback latency at the cost of a "
+"higher bit rate or lower quality."
 msgstr ""
 "Tiempos entre \"keyframes\" más cortos reducen la latencia de la "
 "reproducción al costo de un mayor ratio de bits o una calidad más baja."
 
+#: ../flumotion/component/encoders/theora/wizard.glade.h:4
+msgid "Advanced settings"
+msgstr "Configuraciones avanzadas"
+
 #: ../flumotion/component/encoders/theora/wizard.glade.h:6
-msgid "Time between _keyframes:"
+msgid "Time between _key frames:"
 msgstr "Tiempo entre fotogramas _clave:"
 
 #: ../flumotion/component/encoders/theora/wizard.glade.h:7
@@ -2270,8 +2298,9 @@ msgstr "Número de canales de audio para codificar."
 msgid ""
 "The quality to encode at (from -0.1 to 1.0).  This is only used if bitrate "
 "is not set."
-msgstr "Calidad a la que se codificará (desde -0.1 a 1.0).  Ésto sólo será usado "
-"si el \"bitrate\" no está definido."
+msgstr ""
+"Calidad a la que se codificará (desde -0.1 a 1.0).  Ésto sólo será usado si "
+"el \"bitrate\" no está definido."
 
 #: ../flumotion/component/encoders/vorbis/vorbis.xml.h:5
 #: ../flumotion/component/encoders/vorbis/wizard_gtk.py:62
@@ -2403,7 +2432,8 @@ msgstr "Dirección (URL) del flujo que estamos viendo."
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:4
 msgid "The base URL used to fetch the cortado applet code."
-msgstr "Direción base de la URL usada para obtener el código del \"applet\" cortado."
+msgstr ""
+"Direción base de la URL usada para obtener el código del \"applet\" cortado."
 
 #. FIXME: What is this? murrayc
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:6
@@ -2462,12 +2492,8 @@ msgid "_Wave form:"
 msgstr "_Forma de onda:"
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:1
-msgid ""
-"Produces an example audio signal without using a device.  This is useful for "
-"demonstrations or testing."
-msgstr ""
-"Produce un ejemplo de señal de audio sin usan un dispositivo. Ésto es "
-"útil para demostraciones o pruebas."
+msgid "Produces an example audio signal without using a device."
+msgstr "Produce un ejemplo de señal de audio sin usar un dispositivo."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:2
 msgid "Test audio producer"
@@ -2480,7 +2506,9 @@ msgstr "Tasa de muestreo (en Hz)."
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:4
 #: ../flumotion/component/producers/videotest/videotest.xml.h:3
 msgid "The fraction of buffers to drop (0.0 - 1.0). Only useful for debugging."
-msgstr "Fracción de buffers que se pueden perder (0.0 - 1.0). Sólo útil para depuración."
+msgstr ""
+"Fracción de buffers que se pueden perder (0.0 - 1.0). Sólo útil para "
+"depuración."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:5
 msgid "The frequency of the test signal (in Hz)."
@@ -2512,7 +2540,8 @@ msgstr "Fuente de audio de prueba"
 
 #: ../flumotion/component/producers/bttv/bttv.xml.h:1
 msgid "A producer that captures a raw video feed from a TV card."
-msgstr "A productor que captura una entrada de video \"raw\" desde una tarjeta de TV."
+msgstr ""
+"A productor que captura una entrada de video \"raw\" desde una tarjeta de TV."
 
 #: ../flumotion/component/producers/bttv/bttv.xml.h:2
 msgid "TV card"
@@ -2527,7 +2556,6 @@ msgstr "Brillo del video (0-65535)."
 #: ../flumotion/component/producers/webcam/webcam.xml.h:5
 msgid "The contrast of the video (0-65535)."
 msgstr "Contraste del vídeo (0-65535)."
-""
 
 #: ../flumotion/component/producers/bttv/bttv.xml.h:5
 msgid "The frame rate of the produced video."
@@ -2659,7 +2687,8 @@ msgstr "Produce \"feeds\" desde un dispositivo Firewire/DV."
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:4
 msgid "The GUID of the device (a hexadecimal such as 0xhhhhhhhhhhhhhhhh)."
-msgstr "GUID del dispositivo (un número hexagesimal del tipo 0xhhhhhhhhhhhhhhhh)."
+msgstr ""
+"GUID del dispositivo (un número hexagesimal del tipo 0xhhhhhhhhhhhhhhhh)."
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:5
 msgid "The final width, including correction."
@@ -2880,8 +2909,8 @@ msgid ""
 "The label of the input track to be used for recording (the default is to use "
 "whatever is currently set)."
 msgstr ""
-"Etiqueta de la pista de entrada que será usada para la grabación (por defecto "
-"es usado lo que esté puesto en ese momento)."
+"Etiqueta de la pista de entrada que será usada para la grabación (por "
+"defecto es usado lo que esté puesto en ese momento)."
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:1
 msgid "Bi_t depth:"
@@ -2961,12 +2990,8 @@ msgid "Pattern"
 msgstr "Patrón"
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:1
-msgid ""
-"Produces an example video signal without using a device.  This is useful for "
-"demonstrations and testing."
-msgstr ""
-"Produce un ejemplo de señal de video sin usar un dispositivo. Esto es "
-"útil para demostraciones y pruebas."
+msgid "Produces an example video signal without using a device."
+msgstr "Produce un ejemplo de señal de video sin usar un dispositivo."
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:2
 msgid "Test video producer"
@@ -3024,7 +3049,8 @@ msgstr "Tipo Mime del video a producir (por ej. video/x-raw-yuv)."
 msgid ""
 "The element factory from which to instantiate the capture element. Defaults "
 "to 'v4lsrc'"
-msgstr "El elemento factoría desde el cual se instancia el elemento de captura. Por "
+msgstr ""
+"El elemento factoría desde el cual se instancia el elemento de captura. Por "
 "defecto es  'v4lsrc'"
 
 #: ../flumotion/component/producers/webcam/webcam.xml.h:7
@@ -3181,13 +3207,13 @@ msgstr "Soy una cadena traducida"
 
 #. use our "fake" ngettext so it gets picked up
 #: ../flumotion/test/test_i18n.py:111 ../flumotion/test/test_i18n.py:116
-#, fuzzy, python-format
+#, python-format
 msgid "I can translate %d thing"
 msgstr "Puedo traducir %d"
 
 #. use the "real" ngettext, from the module, also gets picked up
 #: ../flumotion/test/test_i18n.py:114 ../flumotion/test/test_i18n.py:118
-#, fuzzy, python-format
+#, python-format
 msgid "I translated %d thing"
 msgstr "Traduje %d"
 
@@ -3198,7 +3224,7 @@ msgstr "%s puede ser transladado"
 
 #. Andy 3 is a droid in the Andy series and doesn't need translating
 #: ../flumotion/test/test_i18n.py:151
-#, fuzzy, python-format
+#, python-format
 msgid "%s %d has %d thing"
 msgstr "%s %d tiene %d"
 
@@ -3214,6 +3240,10 @@ msgstr "¿Pero %s sabe eso?"
 #: ../flumotion/ui/fileselector.py:172
 msgid "Select a folder..."
 msgstr "Seleccione una carpeta..."
+
+#: ../flumotion/ui/wizard.py:697
+msgid "_Finish"
+msgstr "_Finalizar"
 
 #: ../flumotion/worker/checks/audio.py:86
 #: ../flumotion/worker/checks/check.py:54
@@ -3318,6 +3348,12 @@ msgstr "No se ha podido probar el dispositivo Firewire."
 #: ../flumotion/worker/job.py:334
 msgid "Check timed out."
 msgstr "Tiempo de comprobación excedido."
+
+#~ msgid "_URL:"
+#~ msgstr "_URL:"
+
+#~ msgid "Set up a live stream"
+#~ msgstr "Configurar un flujo en vivo"
 
 #, fuzzy
 #~ msgid "Stream to Java"
@@ -3426,9 +3462,6 @@ msgstr "Tiempo de comprobación excedido."
 
 #~ msgid "Test video source"
 #~ msgstr "Fuente del video de prueba"
-
-#~ msgid "GStreamer:"
-#~ msgstr "GStreamer:"
 
 #~ msgid "Please upgrade '%s' to version %s or development packages."
 #~ msgstr ""
