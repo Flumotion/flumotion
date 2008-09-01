@@ -162,7 +162,7 @@
 	      <child>
 		<widget class="GtkSpinButton" id="keyframe_delta">
 		  <property name="visible">True</property>
-		  <property name="tooltip" translatable="yes">Shorter time between keyframes reduces playback latency at the cost of a higher bitrate or lower quality.</property>
+		  <property name="tooltip" translatable="yes">A shorter time between key frames reduces playback latency at the cost of a higher bit rate or lower quality.</property>
 		  <property name="can_focus">True</property>
 		  <property name="climb_rate">1</property>
 		  <property name="digits">3</property>
@@ -277,7 +277,7 @@
 	      <child>
 		<widget class="GtkLabel" id="label6">
 		  <property name="visible">True</property>
-		  <property name="label" translatable="yes">Time between _keyframes:</property>
+		  <property name="label" translatable="yes">Time between _key frames:</property>
 		  <property name="use_underline">True</property>
 		  <property name="use_markup">False</property>
 		  <property name="justify">GTK_JUSTIFY_LEFT</property>
