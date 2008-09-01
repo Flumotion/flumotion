@@ -1,5 +1,10 @@
 2008-09-01  Murray Cumming  <murrayc@murrayc.com>
 
+	* flumotion/component/encoders/smoke/wizard.glade: Key frame instead of 
+	Keyframe.
+
+2008-09-01  Murray Cumming  <murrayc@murrayc.com>
+
 	* flumotion/component/encoders/theora/wizard.glade: Change keyframe 
 	to key frame in UI strings.
 
