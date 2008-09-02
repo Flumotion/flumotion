@@ -294,7 +294,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self._porterUsername = props['porter-username']
             self._porterPassword = props['porter-password']
         self._loggers = self.plugs.get(
-            'flumotion.component.plugs.loggers.Logger', [])
+            'flumotion.component.plugs.loggers.RequestLoggerPlug', [])
 
         self.httpauth = httpbase.HTTPAuthentication(self)
         if 'bouncer' in props:
@@ -307,7 +307,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 logFilter.addIPFilter(f)
             self._logfilter = logFilter
         socket = ('flumotion.component.misc.'
-                  'httpserver.ratecontroller.RateController')
+                  'httpserver.ratecontrol.RateController')
         plugs = self.plugs.get(socket, [])
         if plugs:
             # Rate controller factory plug; only one supported.

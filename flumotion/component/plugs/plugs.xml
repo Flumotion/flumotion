@@ -1,33 +1,33 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.plugs.loggers.Logger"
-          type="apachelogger">
+    <plug socket="flumotion.component.plugs.loggers.RequestLoggerPlug"
+          type="requestlogger-file">
       <entry location="flumotion/component/plugs/loggers.py"
-             function="ApacheLogger"/>
+             function="RequestLoggerFilePlug"/>
 
       <properties>
         <property name="logfile" type="string" required="true"/>
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.plugs.adminaction.AdminAction"
-          type="adminactionfilelogger">
+    <plug socket="flumotion.component.plugs.adminaction.AdminActionPlug"
+          type="adminaction-loggerfile">
       <entry location="flumotion/component/plugs/adminaction.py"
-             function="AdminActionFileLogger"/>
+             function="AdminActionLoggerFilePlug"/>
 
       <properties>
         <property name="logfile" type="string" required="true"/>
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.plugs.lifecycle.ManagerLifecycle"
-          type="managerlifecycleprinter">
+    <plug socket="flumotion.component.plugs.base.ManagerPlug"
+          type="manager-example">
       <entry location="flumotion/component/plugs/lifecycle.py"
-             function="ManagerLifecyclePrinter"/>
+             function="ManagerExamplePlug"/>
     </plug>
 
-    <plug socket="flumotion.component.plugs.lifecycle.ManagerLifecycle"
-          type="manager-manhole-plug">
+    <plug socket="flumotion.component.plugs.base.ManagerPlug"
+          type="manager-manhole">
       <entry location="flumotion/component/plugs/manhole.py"
              function="ManagerManholePlug"/>
 
@@ -39,30 +39,30 @@
     </plug>
 
     <plug socket="flumotion.component.plugs.identity.IdentityProvider"
-          type="exampleidentityprovider">
+          type="identityprovider-example">
       <entry location="flumotion/component/plugs/identity.py"
-             function="ExampleIdentityProvider"/>
+             function="IdentityProviderExamplePlug"/>
     </plug>
 
-    <plug socket="flumotion.component.plugs.lifecycle.ComponentLifecycle"
-          type="componentlifecycleprinter">
+    <plug socket="flumotion.component.plugs.base.ComponentPlug"
+          type="component-example">
       <entry location="flumotion/component/plugs/lifecycle.py"
-             function="ComponentLifecyclePrinter"/>
+             function="ComponentExamplePlug"/>
     </plug>
 
-    <plug socket="flumotion.component.plugs.streamdata.StreamDataProvider"
-          type="examplestreamdataprovider">
+    <plug socket="flumotion.component.plugs.streamdata.StreamDataProviderPlug"
+          type="streamdataprovider-example">
       <entry location="flumotion/component/plugs/streamdata.py"
-             function="ExampleStreamDataProvider"/>
+             function="StreamDataProviderExamplePlug"/>
 
       <properties>
         <property name="description" type="string" required="true"/>
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.plugs.rrd.RRDPlug" type="rrd">
+    <plug socket="flumotion.component.plugs.rrd.RRDPlug" type="component-rrd">
       <entry location="flumotion/component/plugs/rrd.py"
-             function="RRDPlug"/>
+             function="ComponentRRDPlug"/>
              
       <properties>
           <property name="timeout" type="int" required="false"

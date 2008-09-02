@@ -243,7 +243,7 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
                                       keycard.requesterId, keycard.id)
 
 
-class TrivialBouncerPlug(BouncerPlug):
+class BouncerTrivialPlug(BouncerPlug):
     """
     A very trivial bouncer implementation.
 

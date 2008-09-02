@@ -58,7 +58,7 @@ class TokenTestBase(log.Loggable):
             return None
 
 
-class TokenTestPlug(TokenTestBase, plug.BouncerPlug):
+class BouncerTestTokenPlug(TokenTestBase, plug.BouncerPlug):
 
     def __init__(self, args):
         plug.BouncerPlug.__init__(self, args)

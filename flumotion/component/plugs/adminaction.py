@@ -29,7 +29,7 @@ from flumotion.component.plugs import base
 __version__ = "$Rev$"
 
 
-class AdminAction(base.ManagerPlug):
+class AdminActionPlug(base.ManagerPlug):
     """
     Base class for plugs that can react to actions by an admin. For
     example, some plugs might want to check that the admin in question
@@ -47,7 +47,7 @@ class AdminAction(base.ManagerPlug):
         raise NotImplementedError('subclasses have to override me')
 
 
-class AdminActionFileLogger(AdminAction):
+class AdminActionLoggerFilePlug(AdminActionPlug):
     filename = None
     file = None
 

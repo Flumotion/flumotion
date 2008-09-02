@@ -319,7 +319,7 @@ class Vishnu(log.Loggable):
         """
         @param identity: L{flumotion.common.identity.Identity}
         """
-        socket = 'flumotion.component.plugs.adminaction.AdminAction'
+        socket = 'flumotion.component.plugs.adminaction.AdminActionPlug'
         if socket in self.plugs:
             for plug in self.plugs[socket]:
                 plug.action(identity, message, args, kw)

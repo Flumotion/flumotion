@@ -22,8 +22,8 @@
       </eater>
       <property name="port">8800</property>
       <plugs>
-        <plug socket="flumotion.component.plugs.loggers.Logger"
-              type="apachelogger">
+        <plug socket="flumotion.component.plugs.loggers.RequestLoggerPlug"
+              type="requestlogger-file">
           <property name="logfile">/tmp/ogg-test-theora.access.log</property>
         </plug>
       </plugs>

@@ -1,11 +1,11 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.plugs.lifecycle.ComponentLifecycle"
-          type="cortado-plug">
+    <plug socket="flumotion.component.plugs.base.ComponentPlug"
+          type="component-cortado">
       <entries>
         <entry type="default"
                location="flumotion/component/plugs/cortado/cortado.py"
-               function="CortadoPlug" />
+               function="ComponentCortadoPlug" />
         <entry type="wizard"
                location="flumotion/component/plugs/cortado/wizard_gtk.py"
                function="CortadoWizardPlugin" />
@@ -47,7 +47,7 @@
     </plug>
   </plugs>
   <bundles>
-    <bundle name="cortado-plug">
+    <bundle name="component-cortado">
       <dependencies>
         <dependency name="base-plugs" />
       </dependencies>

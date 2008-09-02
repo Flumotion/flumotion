@@ -29,12 +29,12 @@ from flumotion.common.manhole import openAnonymousTelnetManhole
 __version__ = "$Rev$"
 
 
-class ManagerManholePlug(lifecycle.ManagerLifecycle):
+class ManagerManholePlug(base.ManagerPlug):
     """
     """
 
     def __init__(self, args):
-        lifecycle.ManagerLifecycle.__init__(self, args)
+        base.ManagerPlug.__init__(self, args)
         self.useSSH = False
         self.authorizedKeysFile = None
         self.port = None

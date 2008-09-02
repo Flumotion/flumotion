@@ -48,7 +48,7 @@ MAX_LOGNAME_SIZE = 30
 ID_CACHE_MAX_SIZE = 1024
 
 
-LOG_CATEGORY = "cached-local-plug"
+LOG_CATEGORY = "fileprovider-localcached"
 
 _errorLookup = {errno.ENOENT: NotFoundError,
                 errno.EISDIR: fileprovider.CannotOpenError,
@@ -137,7 +137,7 @@ class CachedLocalPlug(fileprovider.FileProvider, log.Loggable):
     def startStatsUpdates(self, updater):
         #FIXME: This is temporary. Should be done with plug UI.
         # Used for the UI to know which plug is used
-        updater.update("provider-name", "cached-local-plug")
+        updater.update("provider-name", "fileprovider-localcached")
         self.stats.startUpdates(updater)
 
     def stopStatsUpdates(self):

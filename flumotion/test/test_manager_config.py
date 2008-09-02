@@ -92,8 +92,8 @@ class TestManagerConfigParser(testsuite.TestCase):
     def testParsePlugs(self):
         f = self._buildManager(
             """<plugs>
-  <plug socket="flumotion.component.plugs.adminaction.AdminAction"
-          type="adminactionfilelogger">
+  <plug socket="flumotion.component.plugs.adminaction.AdminActionPlug"
+          type="adminaction-loggerfile">
     <property name="logfile">/dev/stdout</property>
   </plug>
 </plugs>""")
@@ -105,7 +105,7 @@ class TestManagerConfigParser(testsuite.TestCase):
         first = values[0]
         self.failUnless(isinstance(first, dict))
         self.failUnless('type' in first)
-        self.assertEquals(first['type'], 'adminactionfilelogger')
+        self.assertEquals(first['type'], 'adminaction-loggerfile')
         self.failUnless('properties' in first)
         properties = first['properties']
         self.failUnless('logfile' in properties)
@@ -233,8 +233,8 @@ class TestXMLWriter(testsuite.TestCase):
             '      <property name="type">slave</property>\n'
             '      <plugs>\n'
             '        <plug socket='
-            '"flumotion.component.plugs.loggers.Logger" '
-            'type="apachelogger">\n'
+            '"flumotion.component.plugs.loggers.RequestLoggerPlug"\n'
+            '              type="requestlogger-file">\n'
             '          <property name="logfile">foobar</property>\n'
             '        </plug>\n'
             '      </plugs>\n'

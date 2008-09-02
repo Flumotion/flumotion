@@ -33,7 +33,7 @@ from flumotion.component.misc.httpserver.fileprovider import FileClosedError
 # os.SEEK_SET is not definied in python 2.4
 SEEK_SET = 0
 
-LOG_CATEGORY = "local-plug"
+LOG_CATEGORY = "fileprovider-local"
 
 
 class LocalPlug(fileprovider.FileProvider, log.Loggable):

@@ -27,7 +27,7 @@ from flumotion.component.plugs import base
 __version__ = "$Rev$"
 
 
-class Logger(base.ComponentPlug):
+class RequestLoggerPlug(base.ComponentPlug):
     """
     Base class for logger implementations. Should be renamed to
     StreamLogger later...
@@ -65,7 +65,7 @@ def _http_session_completed_to_apache_log(args):
                args['user-agent'], args['time-connected']))
 
 
-class ApacheLogger(Logger):
+class RequestLoggerFilePlug(RequestLoggerPlug):
     filename = None
     file = None
 

@@ -46,7 +46,7 @@ class TestOldProperties(testsuite.TestCase):
             'clock-master': None,
             'plugs': {
                 'flumotion.component.plugs.streamdata.StreamDataProvider': [],
-                'flumotion.component.plugs.loggers.Logger': [],
+                'flumotion.component.plugs.loggers.RequestLoggerPlug': [],
             },
             'type': 'http-streamer',
             'properties': properties

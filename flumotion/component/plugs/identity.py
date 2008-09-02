@@ -29,7 +29,7 @@ from flumotion.component.plugs import base
 __version__ = "$Rev$"
 
 
-class IdentityProvider(base.ManagerPlug):
+class IdentityProviderPlug(base.ManagerPlug):
     """
     Base class for plugs can calculate an identity of a remote host. See
     L{flumotion.manager.manager.Vishnu.computeIdentity} for more
@@ -49,7 +49,7 @@ class IdentityProvider(base.ManagerPlug):
         raise NotImplementedError
 
 
-class ExampleIdentityProvider(IdentityProvider):
+class IdentityProviderExamplePlug(IdentityProviderPlug):
     """
     Example implementation of the IdentityProvider socket, randomly
     chooses an identity for the remote host.

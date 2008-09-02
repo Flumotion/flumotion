@@ -19,9 +19,9 @@
   </components>
   <plugs>
     <plug socket="flumotion.component.bouncers.plug.BouncerPlug"
-          type="token-test-bouncer-plug">
+          type="bouncer-testtoken">
       <entry location="flumotion/component/bouncers/tokentest.py"
-             function="TokenTestPlug"/>
+             function="BouncerTestTokenPlug"/>
       <properties>
         <property name="authorized-token" type="string" required="True"
                   _description="The token that is authorized" />

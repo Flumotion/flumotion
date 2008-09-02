@@ -637,8 +637,8 @@ class ManagerConfigParser(FlumotionConfigParser):
     logCategory = 'config'
 
     MANAGER_SOCKETS = \
-        ['flumotion.component.plugs.adminaction.AdminAction',
-         'flumotion.component.plugs.lifecycle.ManagerLifecycle',
+        ['flumotion.component.plugs.adminaction.AdminActionPlug',
+         'flumotion.component.plugs.base.ManagerPlug',
          'flumotion.component.plugs.identity.IdentityProvider']
 
     def __init__(self, file):

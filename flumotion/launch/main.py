@@ -46,7 +46,7 @@ Components can be backreferenced using their names::
 
 In addition, components can have plugs::
 
-  flumotion-launch http-streamer /apachelogger,logfile=/dev/stdout
+  flumotion-launch http-streamer /requestlogger-file,logfile=/dev/stdout
 
 Flumotion-launch explicitly avoids much of Flumotion's core logic. It
 does not import flumotion.manager, flumotion.admin, or flumotion.worker.

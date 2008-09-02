@@ -1,5 +1,40 @@
 2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/bouncers/bouncer.xml:
+	* flumotion/component/bouncers/plug.py:
+	* flumotion/component/bouncers/tokentest.py:
+	* flumotion/component/bouncers/tokentest.xml:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/localprovider.py:
+	* flumotion/component/misc/httpserver/ratecontrol.py:
+	* flumotion/component/plugs/adminaction.py:
+	* flumotion/component/plugs/cortado/cortado.xml:
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	* flumotion/component/plugs/identity.py:
+	* flumotion/component/plugs/lifecycle.py:
+	* flumotion/component/plugs/loggers.py:
+	* flumotion/component/plugs/manhole.py:
+	* flumotion/component/plugs/plugs.xml:
+	* flumotion/component/plugs/streamdata.py:
+	* flumotion/launch/main.py:
+	* flumotion/manager/config.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test.xml:
+	* flumotion/test/test_component_bouncers_component.py:
+	* flumotion/test/test_component_bouncers_plug.py:
+	* flumotion/test/test_component_httpserver.py:
+	* flumotion/test/test_component_httpstreamer.py:
+	* flumotion/test/test_config.py:
+	* flumotion/test/test_http.py:
+	* flumotion/test/test_manager_config.py:
+	  Rename plugs according to styleguide.  Fixes #946.
+
+2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpserver/httpserver.xml:
 	* flumotion/component/plugs/plugs.xml:
 	  Fix deprecated description attributes.

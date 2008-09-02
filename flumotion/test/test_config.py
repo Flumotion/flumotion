@@ -95,7 +95,7 @@ regchunk = """
         <property name="rate" type="fraction" required="true"/>
       </properties>
     </plug>
-    <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+    <plug socket="flumotion.component.plugs.adminaction.AdminActionPlug"
           type="test-adminaction">
       <entry location="qux/baz.py" function="Quxulator"/>
       <properties>
@@ -349,7 +349,7 @@ class TestConfig(testsuite.TestCase):
 <planet>
   <manager name="aname">
     <plugs>
-      <plug socket="flumotion.component.plugs.adminaction.AdminAction"
+      <plug socket="flumotion.component.plugs.adminaction.AdminActionPlug"
             type="test-adminaction">
         <property name="foo">bar</property>
       </plug>
@@ -362,15 +362,15 @@ class TestConfig(testsuite.TestCase):
         self.failIf(conf.bouncer)
         self.assertEquals(
             conf.plugs,
-            {'flumotion.component.plugs.adminaction.AdminAction':
+            {'flumotion.component.plugs.adminaction.AdminActionPlug':
              [{'type':'test-adminaction',
                'socket':
-               'flumotion.component.plugs.adminaction.AdminAction',
+               'flumotion.component.plugs.adminaction.AdminActionPlug',
                'entries': {'default':
                            {'function-name': 'Quxulator',
                             'module-name': 'qux.baz'}},
                'properties': {'foo': 'bar'}}],
-             'flumotion.component.plugs.lifecycle.ManagerLifecycle':
+             'flumotion.component.plugs.base.ManagerPlug':
              [],
              'flumotion.component.plugs.identity.IdentityProvider':
              []})

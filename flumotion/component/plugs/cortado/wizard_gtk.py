@@ -50,7 +50,7 @@ class CortadoHTTPPlug(HTTPPlug):
     """I am a model representing the configuration file for a
     Cortado HTTP streaming plug.
     """
-    plugType = "cortado-plug"
+    plugType = "component-cortado"
 
     # Component
 

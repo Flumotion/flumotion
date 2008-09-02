@@ -191,7 +191,7 @@ class SimpleTestPlug2(ComponentPlug):
     def start(self, component):
         component.setRootResource(_Resource(path='noogie'))
 
-PLUGTYPE = 'flumotion.component.plugs.lifecycle.ComponentLifecycle'
+PLUGTYPE = 'flumotion.component.plugs.base.ComponentPlug'
 
 
 class PlugTest(testsuite.TestCase):

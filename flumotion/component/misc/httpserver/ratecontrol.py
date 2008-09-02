@@ -30,7 +30,7 @@ from twisted.internet import reactor
 from flumotion.component.plugs import base as plugbase
 
 
-class RateController(plugbase.ComponentPlug):
+class RateControllerPlug(plugbase.ComponentPlug):
 
     # Create a producer-consumer proxy that sits between a FileTransfer object
     # and a request object.
@@ -40,7 +40,7 @@ class RateController(plugbase.ComponentPlug):
         pass
 
 
-class FixedRatePlug(RateController):
+class RateControllerFixedPlug(RateControllerPlug):
 
     def __init__(self, args):
         props = args['properties']

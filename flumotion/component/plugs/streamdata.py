@@ -24,7 +24,7 @@ from flumotion.component.plugs import base
 __version__ = "$Rev$"
 
 
-class StreamDataProvider(base.ComponentPlug):
+class StreamDataProviderPlug(base.ComponentPlug):
     """
     Base class for streamdata plugs, a plug that allows a streamer's
     getStreamData() method to be pluggable.
@@ -41,7 +41,7 @@ class StreamDataProvider(base.ComponentPlug):
         raise NotImplementedError
 
 
-class ExampleStreamDataProvider(StreamDataProvider):
+class StreamDataProviderExamplePlug(StreamDataProviderPlug):
     description = None
     url = None
 

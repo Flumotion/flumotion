@@ -29,9 +29,9 @@ class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
 
     def setUp(self):
         args = {'socket': 'flumotion.component.bouncers.plug.BouncerPlug',
-                'type': 'trivial-bouncer-plug',
+                'type': 'bouncer-trivial',
                 'properties': {}}
-        self.obj = plug.TrivialBouncerPlug(args)
+        self.obj = plug.BouncerTrivialPlug(args)
         self.medium = bouncertest.FakeMedium()
         self.obj.setMedium(self.medium)
         d = defer.maybeDeferred(self.obj.start, None)

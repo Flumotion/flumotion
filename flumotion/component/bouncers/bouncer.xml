@@ -1,9 +1,9 @@
 <registry>
   <plugs>
     <plug socket="flumotion.component.bouncers.plug.BouncerPlug"
-          type="trivial-bouncer-plug">
+          type="bouncer-trivial">
       <entry location="flumotion/component/bouncers/plug.py"
-             function="TrivialBouncerPlug"/>
+             function="BouncerTrivialPlug"/>
     </plug>
   </plugs>
 

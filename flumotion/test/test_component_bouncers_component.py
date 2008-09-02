@@ -34,13 +34,13 @@ class TrivialBouncerTest(bouncertest.TrivialBouncerTest):
     def setUp(self):
         plugs = {component.BOUNCER_SOCKET:
                  [{'socket': component.BOUNCER_SOCKET,
-                   'type': 'trivial-bouncer-plug',
+                   'type': 'bouncer-trivial',
                    'properties': {},
                    'entries': {'default':
                                {'module-name':
                                 'flumotion.component.bouncers.plug',
                                 'function-name':
-                                'TrivialBouncerPlug'}}}]}
+                                'BouncerTrivialPlug'}}}]}
         self.obj = component.Bouncer({'name': 'fake',
                                       'avatarId': '/default/fake',
                                       'plugs': plugs,

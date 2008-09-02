@@ -24,16 +24,16 @@ from flumotion.component.plugs import base
 __version__ = "$Rev$"
 
 
-class ManagerLifecycle(base.ManagerPlug):
+class ManagerPlug(base.ManagerPlug):
     """
     Base class for plugs that are started when the manager is started,
-    and stopped when the manager is shut down. ManagerLifecycle plugs
+    and stopped when the manager is shut down. ManagerPlug plugs
     have no special methods; they are expected to do their interesting
     actions in response to the ManagerPlug start() and stop() methods.
     """
 
 
-class ManagerLifecyclePrinter(ManagerLifecycle):
+class ManagerExamplePlug(ManagerPlug):
     """
     Example implementation of the ManagerLifecyle socket, just prints
     things on the console. Pretty stupid!
@@ -52,16 +52,16 @@ class ManagerLifecyclePrinter(ManagerLifecycle):
                   info['using_ssl'] and 'with ssl' or 'without ssl'))
 
 
-class ComponentLifecycle(base.ComponentPlug):
+class ComponentPlug(base.ComponentPlug):
     """
     Base class for plugs that are started when a component is started,
-    and stopped when the component is stopped. ComponentLifecycle plugs
+    and stopped when the component is stopped. ComponentPlug plugs
     have no special methods; they are expected to do their interesting
     actions in response to the ComponentPlug start() and stop() methods.
     """
 
 
-class ComponentLifecyclePrinter(ComponentLifecycle):
+class ComponentExamplePlug(ComponentPlug):
     """
     Example implementation of the ComponentLifecyle socket, just prints
     things on the console. Pretty stupid!

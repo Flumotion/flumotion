@@ -1,11 +1,11 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.misc.httpserver.ratecontroller.RateController"
-          type="fixed-rate-plug">
+    <plug socket="flumotion.component.misc.httpserver.ratecontrol.RateControllerPlug"
+          type="ratecontroller-fixed">
       <entries>
         <entry type="default"
                location="flumotion/component/misc/httpserver/ratecontrol.py"
-               function="FixedRatePlug" />
+               function="RateControllerFixedPlug" />
       </entries>
 
       <properties>
@@ -19,11 +19,11 @@
     </plug>
 
     <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProvider"
-          type="local-plug">
+          type="fileprovider-local">
       <entries>
         <entry type="default"
                location="flumotion/component/misc/httpserver/localprovider.py"
-               function="LocalPlug" />
+               function="FileProviderLocalPlug" />
       </entries>
 
       <properties>
@@ -33,11 +33,11 @@
     </plug>
 
     <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProvider"
-          type="cached-local-plug">
+          type="fileprovider-localcached">
       <entries>
         <entry type="default"
                location="flumotion/component/misc/httpserver/cachedprovider.py"
-               function="CachedLocalPlug" />
+               function="FileProviderLocalCachedPlug" />
       </entries>
 
       <properties>
@@ -70,11 +70,11 @@
       </entries>
 
       <sockets>
-        <socket type="flumotion.component.plugs.loggers.Logger"/>
-        <socket type="flumotion.component.plugs.lifecycle.ComponentLifecycle" />
-        <socket type="flumotion.component.plugs.streamdata.StreamDataProvider"/>
+        <socket type="flumotion.component.plugs.loggers.RequestLoggerPlug"/>
+        <socket type="flumotion.component.plugs.base.ComponentPlug" />
+        <socket type="flumotion.component.plugs.streamdata.StreamDataProviderPlug"/>
         <socket type="flumotion.component.plugs.rrd.RRDPlug" />
-        <socket type="flumotion.component.misc.httpserver.ratecontroller.RateController"/>
+        <socket type="flumotion.component.misc.httpserver.ratecontrol.RateControllerPlug"/>
         <socket type="flumotion.component.misc.httpserver.fileprovider.FileProvider"/>
       </sockets>
 
@@ -170,7 +170,7 @@
         </directories>
     </bundle>
 
-    <bundle name="fixed-rate-plug">
+    <bundle name="ratecontroller-fixed">
       <dependencies>
         <dependency name="http-server-component" />
         <dependency name="base-plugs" />
