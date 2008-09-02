@@ -1,5 +1,13 @@
 2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/plugs/plugs.xml:
+	  Fix deprecated description attributes.
+	* common/validate-registry.py:
+	  Make using deprecated description attributes an error.
+
+2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_manager_config.py:
 	  Change so it won't break the 80 character rule after changing plug
 	  names.

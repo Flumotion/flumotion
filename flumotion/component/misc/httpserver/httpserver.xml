@@ -28,7 +28,7 @@
 
       <properties>
         <property name="path" type="string" required="true"
-                  description="The base path to map to the mount-point" />
+                  _description="The base path to map to the mount-point" />
       </properties>
     </plug>
 
@@ -42,17 +42,17 @@
 
       <properties>
         <property name="path" type="string" required="true"
-                  description="The base path to map to the mount-point (network file system)" />
+                  _description="The base path to map to the mount-point (network file system)" />
         <property name="cache-dir" type="string"
-                  description="The directory where the files are cached" />
+                  _description="The directory where the files are cached" />
         <property name="cache-size" type="int"
-                  description="The maximum size of the cache directory in MB" />
+                  _description="The maximum size of the cache directory in MB" />
         <property name="cleanup-enabled" type="bool"
-                  description="If the cache should be monitored and cleaned up" />
+                  _description="If the cache should be monitored and cleaned up" />
         <property name="cleanup-threshold" type="int"
-                  description="The cache usage in percentage that trigger a cleanup" />
+                  _description="The cache usage in percentage that trigger a cleanup" />
         <property name="cleanup-max-usage" type="int"
-                  description="The maximum cache usage in percentage after cleanup" />
+                  _description="The maximum cache usage in percentage after cleanup" />
       </properties>
     </plug>
   </plugs>
@@ -93,7 +93,7 @@
                   _description="The server's host name to display." />
 
         <property name="description" type="string"
-                  _description="The description of the server." />
+                  _description="The _description of the server." />
 
         <property name="bouncer" type="string"
                   _description="The name of a bouncer in the atmosphere to authenticate against." />

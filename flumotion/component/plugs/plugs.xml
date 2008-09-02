@@ -66,11 +66,11 @@
              
       <properties>
           <property name="timeout" type="int" required="false"
-                    description="time (in seconds) to update the RRD files"/>
+                    _description="time (in seconds) to update the RRD files"/>
           <property name="clients-filename" type="string" required="true"
-                    description="absolute path to the RRD clients file"/>
+                    _description="absolute path to the RRD clients file"/>
           <property name="bytes-filename" type="string" required="true"
-                    description="absolute path to the RRD bytes transfered file"/>
+                    _description="absolute path to the RRD bytes transfered file"/>
       </properties>
     </plug>
 
