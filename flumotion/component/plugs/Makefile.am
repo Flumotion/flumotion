@@ -7,8 +7,8 @@ component_PYTHON = \
 	adminaction.py \
 	base.py \
 	identity.py \
-	loggers.py \
 	manhole.py \
+	request.py \
 	rrd.py \
 	streamdata.py
 

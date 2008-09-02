@@ -1,3 +1,8 @@
+2008-09-02  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/plugs/Makefile.am:
+	Fix after tired Thomas - add request.py to Makefile.am.
+
 2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
