@@ -4,7 +4,11 @@
 import sys
 import warnings
 
+# hack for import funkiness together with flumotion.twisted.reflect.namedAny
+from twisted.internet import reactor
+
 from flumotion.common import registry
+from flumotion.twisted import reflect
 
 exitCode = 0
 
@@ -60,6 +64,12 @@ for c in registry.getComponents():
     if not c.description:
         componentError(c, 'is missing a description')
 
+    for s in c.sockets:
+        try:
+            function = reflect.namedAny(s)
+        except AttributeError:
+            componentError(c, 'could not import socket %s' % s)
+
     def propertyError(c, p, msg):
         global exitCode
         sys.stderr.write("Property %s on component %s from %s %s.\n" %(
@@ -75,5 +85,47 @@ for c in registry.getComponents():
             propertyError(c, p, "is missing a description")
 
     #import code; code.interact(local=locals())
+
+# verify all plugs
+
+
+def plugError(p, msg):
+    global exitCode
+    sys.stderr.write("Plug %s from %s %s.\n" % (
+            p.type, p.filename, msg))
+    exitCode += 1
+
+for plug in registry.getPlugs():
+    if plug.type != plug.type.lower():
+        plugError(plug, 'contains capitals')
+    if plug.type.find('_') > -1:
+        plugError(plug, 'contains underscores')
+    #if not plug.description:
+    #    plugError(plug, 'is missing a description')
+
+    # a plug type and its class name should match too
+    normalizedType = ''.join(plug.type.split('-')) + 'plug'
+    function = plug.entries['default'].function
+    normalizedClass = function.lower()
+    if normalizedType != normalizedClass:
+        plugError(plug, 'type %s does not match class %s' % (
+            plug.type, function))
+
+    def propertyError(plug, p, msg):
+        global exitCode
+        sys.stderr.write("Property %s on plug %s from %s %s.\n" %(
+                p.name, plug.type, plug.filename, msg))
+        exitCode += 1
+
+    for p in plug.getProperties():
+        if p.name != p.name.lower():
+            propertyError(c, p, "contains capitals")
+        if p.name.find('_') > -1:
+            propertyError(c, p, "contains underscores")
+        #if not p.description:
+        #    propertyError(c, p, "is missing a description")
+
+    #import code; code.interact(local=locals())
+
 
 sys.exit(exitCode)

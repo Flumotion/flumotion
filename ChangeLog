@@ -1,5 +1,10 @@
 2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/validate-registry.py:
+	  Validate plug naming.
+
+2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/bouncers/bouncer.xml:
 	* flumotion/component/bouncers/plug.py:
 	* flumotion/component/bouncers/tokentest.py:
