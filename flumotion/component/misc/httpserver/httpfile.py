@@ -230,14 +230,13 @@ class File(resource.Resource, log.Loggable):
                            "%d of total file size %d", ranges, first, fileSize)
                 provider.seek(first)
 
-        request.setResponseRange(first, last, fileSize)
-        if (first > 0) or (last < (fileSize - 1)):
             # FIXME: is it still partial if the request was for the complete
             # file ? Couldn't find a conclusive answer in the spec.
             request.setResponseCode(http.PARTIAL_CONTENT)
             request.setHeader('Content-Range', "bytes %d-%d/%d" %
                               (first, last, fileSize))
 
+        request.setResponseRange(first, last, fileSize)
         self.do_prepareBody(request, provider, first, last)
 
         if request.method == 'HEAD':
