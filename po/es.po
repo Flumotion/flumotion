@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-09-01 19:30+0200\n"
-"PO-Revision-Date: 2008-09-01 19:41+0200\n"
+"POT-Creation-Date: 2008-09-02 15:04+0200\n"
+"PO-Revision-Date: 2008-09-02 15:18+0200\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -384,15 +384,14 @@ msgid ""
 "This is an informative URL which will be associated with the stream. For "
 "instance, it may be a descriptive HTML page."
 msgstr ""
-"Esta es una URL informativa que estará asociada con el flujo. Por ejemplo puede "
-"ser una página que lo describa en HTML."
+"Esta es una URL informativa que estará asociada con el flujo. Por ejemplo "
+"puede ser una página que lo describa en HTML."
 
 #: ../data/glade/shout2-wizard.glade.h:6
 msgid ""
 "This is the IP address of the existing Icecast server which will receive the "
 "stream."
-msgstr ""
-"Esta es la dirección IP del servidor de Icecast que recibirá el flujo."
+msgstr "Esta es la dirección IP del servidor de Icecast que recibirá el flujo."
 
 #: ../data/glade/shout2-wizard.glade.h:7
 msgid ""
@@ -458,9 +457,9 @@ msgid ""
 msgstr ""
 "Bienvenido al asistente para la configuración de Flumotion.\n"
 "\n"
-"Este asistente le ayudará a crear una configuración de Flumotion "
-"para escenarios simples tales como flujos en vivo de una cámara web,"
-"una cámara o flujos de videos bajo demanda."
+"Este asistente le ayudará a crear una configuración de Flumotion para "
+"escenarios simples tales como flujos en vivo de una cámara web,una cámara o "
+"flujos de videos bajo demanda."
 
 #: ../flumotion/admin/admin.py:447
 msgid "Internal error in component."
@@ -1547,9 +1546,9 @@ msgstr "Funcionando desde:"
 #: ../flumotion/component/base/properties.glade.h:2
 #: ../flumotion/component/consumers/httpstreamer/admin_gtk.py:141
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:11
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:137
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:282
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:5
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:5
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:29
 msgid "Statistics"
 msgstr "Estadísticas"
 
@@ -1559,6 +1558,7 @@ msgstr "Tipo:"
 
 #: ../flumotion/component/base/component.glade.h:10
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:13
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:31
 msgid "Uptime:"
 msgstr "Tiempo de funcionamiento:"
 
@@ -1692,7 +1692,7 @@ msgstr "\"Eater\" <b>%s</b>"
 #: ../flumotion/component/base/eatersnode.py:77
 #: ../flumotion/component/base/feedersnode.py:85
 #: ../flumotion/component/base/feedersnode.py:99
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:99
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:267
 msgid "Byte"
 msgstr "Byte"
 
@@ -1887,7 +1887,7 @@ msgstr "<b>Consumo del Cliente</b>"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:2
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:2
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:2
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:4
 msgid "<b>Clients</b>"
 msgstr "<b>Clientes</b>"
 
@@ -1897,7 +1897,7 @@ msgid "<b>Stream</b>"
 msgstr "<b>Flujo</b>"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:4
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:3
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:7
 msgid "<b>URL</b>"
 msgstr "<b>URL</b>"
 
@@ -1906,6 +1906,7 @@ msgid "Average bitrate:"
 msgstr "Promedio de transferencia:"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:6
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:11
 msgid "Average:"
 msgstr "Promedio:"
 
@@ -1915,7 +1916,7 @@ msgstr "Transferencia actual:"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:8
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:4
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:4
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:15
 msgid "Current:"
 msgstr "Actual:"
 
@@ -1924,12 +1925,13 @@ msgid "Mime type:"
 msgstr "Tipo MIME:"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:10
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:24
 msgid "Peak:"
 msgstr "Pico:"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:12
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:6
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:6
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:30
 msgid "Total bytes:"
 msgstr "Bytes totales:"
 
@@ -1973,7 +1975,7 @@ msgid "Learn how to increase the maximum number of clients."
 msgstr "Aprenda cómo incrementar el número máximo de clientes."
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:798
-#: ../flumotion/component/misc/httpserver/httpserver.py:307
+#: ../flumotion/component/misc/httpserver/httpserver.py:386
 #: ../flumotion/component/misc/porter/porter.py:356
 #, python-format
 msgid "Network error: TCP port %d is not available."
@@ -2353,14 +2355,139 @@ msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 "Error del GStreamer: no se ha podido analizar la tubería del componente."
 
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:249
+#, python-format
+msgid "%d client"
+msgstr "%d cliente"
+
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:249
+#, python-format
+msgid "%d clients"
+msgstr "%d clientes"
+
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:251
+#, python-format
+msgid "%.2f client"
+msgstr "%.2f cliente"
+
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:251
+#, python-format
+msgid "%.2f clients"
+msgstr "%.2f clientes"
+
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:263
+#, python-format
+msgid "%.2f req/min"
+msgstr "%.2f peticiones/min"
+
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:271
+msgid "bit/s"
+msgstr ""
+
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:284
+msgid "Cache"
+msgstr "_Caché"
+
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:1
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:1
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:3
 msgid "<b>Client Consumption</b>"
 msgstr "<b>Consumo del Cliente</b>"
 
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:7
 msgid "URL:"
 msgstr "URL:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:1
+msgid "0"
+msgstr ""
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:2
+msgid "<b>Cache</b>"
+msgstr "<b>Caché</b>"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:5
+msgid "<b>Copies</b>"
+msgstr "<b>Copias</b>"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:6
+msgid "<b>Server</b>"
+msgstr "<b>Servidor</b>"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:8
+msgid "?"
+msgstr ""
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:9
+msgid "Average Bitrate:"
+msgstr "Promedio de transferencia:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:10
+msgid "Average File Read:"
+msgstr "Promedio de ficheros leídos:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:12
+msgid "Canceled:"
+msgstr "Cancelado:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:13
+msgid "Cleanups:"
+msgstr "Limpiezas:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:14
+msgid "Current Bitrate:"
+msgstr "Transferencia actual:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:16
+msgid "Efficiency:"
+msgstr "Eficiencia:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:17
+msgid "Finished:"
+msgstr "Finalizado:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:18
+msgid "From Temp:"
+msgstr "De Temp:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:19
+msgid "Hits:"
+msgstr "Aciertos:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:20
+msgid "Last Cleanup:"
+msgstr "Última limpieza:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:21
+msgid "Misses:"
+msgstr "No encontrados:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:22
+msgid "Outdated:"
+msgstr "Caducado:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:23
+msgid "Peak Bitrate:"
+msgstr "Pico de transferencia:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:25
+msgid "Rate Average:"
+msgstr "Promedio de transferencia:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:26
+msgid "Rate Peak:"
+msgstr "Pico de transferencia:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:27
+msgid "Rate:"
+msgstr "Transferencia:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:28
+msgid "Size:"
+msgstr "Tamaño:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:32
+msgid "Usage:"
+msgstr "Uso:"
 
 #: ../flumotion/component/misc/porter/porter.py:329
 #, python-format
@@ -3637,9 +3764,6 @@ msgstr "Tiempo de comprobación excedido."
 
 #~ msgid "_Authentication Method"
 #~ msgstr "_Método de Autenticación"
-
-#~ msgid "Bit rate:"
-#~ msgstr "Tasa de transferencia:"
 
 #~ msgid "Could not start component."
 #~ msgstr "No he podido iniciar el componente."
