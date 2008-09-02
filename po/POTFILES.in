@@ -256,7 +256,7 @@ flumotion/component/plugs/cortado/cortado.xml
 flumotion/component/plugs/identity.py
 flumotion/component/plugs/__init__.py
 flumotion/component/plugs/lifecycle.py
-flumotion/component/plugs/loggers.py
+flumotion/component/plugs/request.py
 flumotion/component/plugs/manhole.py
 flumotion/component/plugs/streamdata.py
 flumotion/component/producers/audiotest/admin_gtk.py

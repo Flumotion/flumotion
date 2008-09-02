@@ -17,7 +17,7 @@
       </entries>
 
       <sockets>
-        <socket type="flumotion.component.plugs.loggers.RequestLoggerPlug" />
+        <socket type="flumotion.component.plugs.request.RequestLoggerPlug" />
         <socket type="flumotion.component.plugs.base.ComponentPlug" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProviderPlug" />
         <socket type="flumotion.component.plugs.rrd.RRDPlug" />

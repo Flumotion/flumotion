@@ -233,7 +233,7 @@ class TestXMLWriter(testsuite.TestCase):
             '      <property name="type">slave</property>\n'
             '      <plugs>\n'
             '        <plug socket='
-            '"flumotion.component.plugs.loggers.RequestLoggerPlug"\n'
+            '"flumotion.component.plugs.request.RequestLoggerPlug"\n'
             '              type="requestlogger-file">\n'
             '          <property name="logfile">foobar</property>\n'
             '        </plug>\n'

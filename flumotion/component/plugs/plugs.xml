@@ -1,8 +1,8 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.plugs.loggers.RequestLoggerPlug"
+    <plug socket="flumotion.component.plugs.request.RequestLoggerPlug"
           type="requestlogger-file">
-      <entry location="flumotion/component/plugs/loggers.py"
+      <entry location="flumotion/component/plugs/request.py"
              function="RequestLoggerFilePlug"/>
 
       <properties>
@@ -88,13 +88,13 @@
         </directory>
       </directories>
     </bundle>
-    <bundle name="base-plugs-loggers">
+    <bundle name="base-plugs-request">
       <dependencies>
         <dependency name="base-plugs" />
       </dependencies>
       <directories>
         <directory name="flumotion/component/plugs">
-          <filename location="loggers.py" />
+          <filename location="request.py" />
         </directory>
       </directories>
     </bundle>

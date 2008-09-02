@@ -1,5 +1,21 @@
 2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/plugs/plugs.xml:
+	* flumotion/test/test.xml:
+	* flumotion/test/test_component_httpstreamer.py:
+	* flumotion/test/test_http.py:
+	* flumotion/test/test_manager_config.py:
+	* po/POTFILES.in:
+	* flumotion/component/plugs/request.py (added):
+	* flumotion/component/plugs/loggers.py (deleted):
+	  Move loggers.py to request.py.  Part of fixing up after #946.
+
+2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/plugs/Makefile.am:
 	* flumotion/component/plugs/base.py:
 	* flumotion/component/plugs/plugs.xml:

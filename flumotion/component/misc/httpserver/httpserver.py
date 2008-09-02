@@ -294,7 +294,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self._porterUsername = props['porter-username']
             self._porterPassword = props['porter-password']
         self._loggers = self.plugs.get(
-            'flumotion.component.plugs.loggers.RequestLoggerPlug', [])
+            'flumotion.component.plugs.request.RequestLoggerPlug', [])
 
         self.httpauth = httpbase.HTTPAuthentication(self)
         if 'bouncer' in props:

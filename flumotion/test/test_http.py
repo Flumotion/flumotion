@@ -136,7 +136,7 @@ class FakeStreamer:
     def __init__(self, mediumClass=FakeAuthMedium):
         self.medium = mediumClass()
         self.plugs = {
-            'flumotion.component.plugs.loggers.RequestLoggerPlug': {}}
+            'flumotion.component.plugs.request.RequestLoggerPlug': {}}
 
     def get_content_type(self):
         return self.mime
