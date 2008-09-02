@@ -74,3 +74,35 @@ class ManagerPlug(Plug):
     def restart(self, vishnu):
         self.stop(vishnu)
         self.start(vishnu)
+
+
+class ManagerExamplePlug(ManagerPlug):
+    """
+    Example implementation of the ManagerLifecyle socket, just prints
+    things on the console. Pretty stupid!
+    """
+
+    def start(self, vishnu):
+        info = vishnu.connectionInfo
+        print ('started manager running on %s:%d (%s)'
+               % (info['host'], info['port'],
+                  info['using_ssl'] and 'with ssl' or 'without ssl'))
+
+    def stop(self, vishnu):
+        info = vishnu.connectionInfo
+        print ('stopped manager running on %s:%d (%s)'
+               % (info['host'], info['port'],
+                  info['using_ssl'] and 'with ssl' or 'without ssl'))
+
+
+class ComponentExamplePlug(ComponentPlug):
+    """
+    Example implementation of the ComponentLifecyle socket, just prints
+    things on the console. Pretty stupid!
+    """
+
+    def start(self, component):
+        print 'Component has been started'
+
+    def stop(self, component):
+        print 'Component is stopping'

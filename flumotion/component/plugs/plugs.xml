@@ -22,7 +22,7 @@
 
     <plug socket="flumotion.component.plugs.base.ManagerPlug"
           type="manager-example">
-      <entry location="flumotion/component/plugs/lifecycle.py"
+      <entry location="flumotion/component/plugs/base.py"
              function="ManagerExamplePlug"/>
     </plug>
 
@@ -46,7 +46,7 @@
 
     <plug socket="flumotion.component.plugs.base.ComponentPlug"
           type="component-example">
-      <entry location="flumotion/component/plugs/lifecycle.py"
+      <entry location="flumotion/component/plugs/base.py"
              function="ComponentExamplePlug"/>
     </plug>
 
@@ -108,19 +108,8 @@
         </directory>
       </directories>
     </bundle>
-    <bundle name="base-plugs-lifecycle">
-      <dependencies>
-        <dependency name="base-plugs" />
-      </dependencies>
-      <directories>
-        <directory name="flumotion/component/plugs">
-          <filename location="lifecycle.py" />
-        </directory>
-      </directories>
-    </bundle>
     <bundle name="plugs-manager-manhole">
       <dependencies>
-        <dependency name="base-plugs-lifecycle" />
       </dependencies>
       <directories>
         <directory name="flumotion/component/plugs">

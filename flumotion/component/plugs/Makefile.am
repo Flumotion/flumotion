@@ -7,7 +7,6 @@ component_PYTHON = \
 	adminaction.py \
 	base.py \
 	identity.py \
-	lifecycle.py \
 	loggers.py \
 	manhole.py \
 	rrd.py \

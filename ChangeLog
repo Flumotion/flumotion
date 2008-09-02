@@ -1,5 +1,13 @@
 2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/plugs/Makefile.am:
+	* flumotion/component/plugs/base.py:
+	* flumotion/component/plugs/plugs.xml:
+	* flumotion/component/plugs/lifecycle.py (deleted):
+	  Remove lifecycle.py as mentioned in #946.
+
+2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/validate-registry.py:
 	  Validate plug naming.
 
