@@ -1,3 +1,8 @@
+2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/misc/httpserver/httpserver.py:
+	Properly cleanup the uptime update delayed call.
+
 2008-09-01  Sebastien Merle  <sebastien@fluendo.com>
 
 	Merged from svn branch httpserver-caching.

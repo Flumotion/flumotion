@@ -420,6 +420,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         if self._timeoutRequestsCallLater:
             self._timeoutRequestsCallLater.cancel()
             self._timeoutRequestsCallLater = None
+        if self._uptimeCallId:
+            self._uptimeCallId.cancel()
+            self._uptimeCallId = None
         if self._twistedPort:
             self._twistedPort.stopListening()
 
