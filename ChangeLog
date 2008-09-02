@@ -1,5 +1,13 @@
 2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
 
+	* flumotion/component/misc/httpserver/httpfile.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	Moved the response code and content type setting from
+	the CancelableRequest class to the File class,
+	for consistency and to make testing easier.
+
+2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
+
 	* flumotion/component/misc/httpserver/httpserver.py:
 	Properly cleanup the uptime update delayed call.
 

@@ -72,20 +72,9 @@ class CancellableRequest(server.Request):
         self._component.requestStarted(self)
 
     def setResponseRange(self, first, last, size):
-        """
-        Sets the range of the response, and keep range information for logging.
-        If the range is the complete file, the request response code
-        is not changed, and the range header is not added.
-        """
         self._rangeFirstByte = first
         self._rangeLastByte = last
         self._resourceSize = size
-        if (first > 0) or (last < (size - 1)):
-            # FIXME: is it still partial if the request was for the complete
-            # file ? Couldn't find a conclusive answer in the spec.
-            self.setResponseCode(http.PARTIAL_CONTENT)
-            self.setHeader('Content-Range', "bytes %d-%d/%d" %
-                           (first, last, size))
 
     def write(self, data):
         server.Request.write(self, data)
