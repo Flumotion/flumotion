@@ -17,6 +17,44 @@
                   _description="The initial amount of data that can be sent at full speed, in bits." />
       </properties>
     </plug>
+
+    <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProvider"
+          type="local-plug">
+      <entries>
+        <entry type="default"
+               location="flumotion/component/misc/httpserver/localprovider.py"
+               function="LocalPlug" />
+      </entries>
+
+      <properties>
+        <property name="path" type="string" required="true"
+                  description="The base path to map to the mount-point" />
+      </properties>
+    </plug>
+
+    <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProvider"
+          type="cached-local-plug">
+      <entries>
+        <entry type="default"
+               location="flumotion/component/misc/httpserver/cachedprovider.py"
+               function="CachedLocalPlug" />
+      </entries>
+
+      <properties>
+        <property name="path" type="string" required="true"
+                  description="The base path to map to the mount-point (network file system)" />
+        <property name="cache-dir" type="string"
+                  description="The directory where the files are cached" />
+        <property name="cache-size" type="int"
+                  description="The maximum size of the cache directory in MB" />
+        <property name="cleanup-enabled" type="bool"
+                  description="If the cache should be monitored and cleaned up" />
+        <property name="cleanup-threshold" type="int"
+                  description="The cache usage in percentage that trigger a cleanup" />
+        <property name="cleanup-max-usage" type="int"
+                  description="The maximum cache usage in percentage after cleanup" />
+      </properties>
+    </plug>
   </plugs>
 
   <components>
@@ -37,6 +75,7 @@
         <socket type="flumotion.component.plugs.streamdata.StreamDataProvider"/>
         <socket type="flumotion.component.plugs.rrd.RRDPlug" />
         <socket type="flumotion.component.misc.httpserver.ratecontroller.RateController"/>
+        <socket type="flumotion.component.misc.httpserver.fileprovider.FileProvider"/>
       </sockets>
 
       <properties>
@@ -104,8 +143,16 @@
 
         <directories>
             <directory name="flumotion/component/misc/httpserver">
-                <filename location="httpserver.py" />
+                <filename location="fileprovider.py" />
                 <filename location="httpfile.py" />
+                <filename location="httpserver.py" />
+                <filename location="serverstats.py" />
+                <!--
+                  http-server-component depend on localprovider.py because
+                  it's the default file provider used when no plug is specified
+                -->
+                <filename location="localpath.py" />
+                <filename location="localprovider.py" />
             </directory>
         </directories>
     </bundle>
@@ -135,6 +182,29 @@
       </directories>
     </bundle>
 
+    <bundle name="local-provider-plug">
+      <dependencies>
+        <dependency name="http-server-component" />
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/misc/httpserver">
+        </directory>
+      </directories>
+    </bundle>
+
+    <bundle name="cached-provider-plug">
+      <dependencies>
+        <dependency name="http-server-component" />
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/misc/httpserver">
+          <filename location="cachedprovider.py" />
+          <filename location="cachestats.py" />
+        </directory>
+      </directories>
+    </bundle>
 
   </bundles>
 

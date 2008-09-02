@@ -25,48 +25,68 @@ import os
 from twisted.web import resource, server, http
 from twisted.web import error as weberror, static
 from twisted.internet import defer, reactor, error, abstract
-from twisted.python import filepath
 from twisted.cred import credentials
+from twisted.python.failure import Failure
 
 from flumotion.configure import configure
 from flumotion.component import component
 from flumotion.common import log, messages, errors, netutils
 from flumotion.component.component import moods
 from flumotion.component.misc.porter import porterclient
+from flumotion.component.misc.httpserver import fileprovider
 from flumotion.component.base import http as httpbase
 from flumotion.twisted import fdserver
 
 __version__ = "$Rev$"
 
-
-# add our own mime types to the ones parsed from /etc/mime.types
-
-
-def loadMimeTypes():
-    d = static.loadMimeTypes()
-    d['.flv'] = 'video/x-flv'
-    return d
-
-# this file is inspired by/adapted from twisted.web.static
+LOG_CATEGORY = "httpserver"
 
 
-class File(resource.Resource, filepath.FilePath, log.Loggable):
-    contentTypes = loadMimeTypes()
+class BadRequest(weberror.ErrorPage):
+    """
+    Web error for invalid requests
+    """
+
+    def __init__(self, message="Invalid request format"):
+        weberror.ErrorPage.__init__(self, http.BAD_REQUEST,
+                                    "Bad Request", message)
+
+
+class InternalServerError(weberror.ErrorPage):
+    """
+    Web error for internal failures
+    """
+
+    def __init__(self, message="The server failed to complete the request"):
+        weberror.ErrorPage.__init__(self, http.INTERNAL_SERVER_ERROR,
+                                    "Internal Server Error", message)
+
+
+class File(resource.Resource, log.Loggable):
+    """
+    this file is inspired by/adapted from twisted.web.static
+    """
+
+    logCategory = LOG_CATEGORY
+
     defaultType = "application/octet-stream"
 
     childNotFound = weberror.NoResource("File not found.")
+    forbiddenResource = weberror.ForbiddenResource("Access forbidden")
+    badRequest = BadRequest()
+    internalServerError = InternalServerError()
 
     def __init__(self, path, httpauth, mimeToResource=None,
             rateController=None):
         resource.Resource.__init__(self)
-        filepath.FilePath.__init__(self, path)
 
+        self._path = path
         self._httpauth = httpauth
         # mapping of mime type -> File subclass
         self._mimeToResource = mimeToResource or {}
         self._rateController = rateController
         self._factory = MimedFileFactory(httpauth, self._mimeToResource,
-            rateController)
+                                         rateController=rateController)
 
     def getChild(self, path, request):
         self.log('getChild: self %r, path %r', self, path)
@@ -74,70 +94,68 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         if path == '':
             return self
 
-        self.restat()
-
-        if not self.isdir():
+        try:
+            child = self._path.child(path)
+        except fileprovider.NotFoundError:
             return self.childNotFound
+        except fileprovider.AccessError:
+            return self.forbiddenResource
+        except fileprovider.InsecureError:
+            return self.badRequest
 
-        if path:
-            fpath = self.child(path)
-        else:
-            return self.childNotFound
-
-        if not fpath.exists():
-            return self.childNotFound
-
-        return self._factory.create(fpath.path)
-
-    def openForReading(self):
-        """Open a file and return the handle."""
-        f = self.open()
-        self.debug("[fd %5d] opening file %s", f.fileno(), self.path)
-        return f
-
-    def getFileSize(self):
-        """Return file size."""
-        return self.getsize()
+        return self._factory.create(child)
 
     def render(self, request):
         self.debug('[fd %5d] render incoming request %r',
-            request.transport.fileno(), request)
-
-        def terminateSimpleRequest(res, request):
-            if res != server.NOT_DONE_YET:
-                self.debug('finish request %r' % request)
-                request.finish()
-
+                   request.transport.fileno(), request)
         d = self._httpauth.startAuthentication(request)
-        d.addCallback(self.renderAuthenticated, request)
-        d.addCallback(terminateSimpleRequest, request)
-        # Authentication failed; nothing more to do.
-        d.addErrback(lambda x: None)
-
+        d.addCallbacks(self._requestAuthenticated, self._authenticationFailed,
+                       callbackArgs=(request, ), errbackArgs=(request, ))
         return server.NOT_DONE_YET
 
-    def renderAuthenticated(self, _, request):
+    def _authenticationFailed(self, failure):
+        # Authentication failed; nothing more to do, just swallow the failure.
+        pass
+
+    def _requestAuthenticated(self, result, request):
+        d = defer.succeed(result)
+        d.addCallback(self._renderRequest, request)
+        d.addBoth(self._terminateRequest, request)
+        return d
+
+    def _terminateRequest(self, body, request):
+        if body == server.NOT_DONE_YET:
+            # Currently serving the file
+            return
+        if isinstance(body, Failure):
+            # Something goes wrong, log it
+            self.warning("Failure during request rendering: %s",
+                         log.getFailureMessage(body))
+            body = self.internalServerError.render(request)
+        if body:
+            # render result/error page
+            request.write(body)
+        self.debug('Finish request %r' % request)
+        request.finish()
+
+    def _renderRequest(self, _, request):
         # Now that we're authenticated (or authentication wasn't requested),
         # write the file (or appropriate other response) to the client.
         # We override static.File to implement Range requests, and to get
         # access to the transfer object to abort it later; the bulk of this
         # is a direct copy of static.File.render, though.
-        # self.restat()
-        self.debug('renderAuthenticated request %r' % request)
-
-        # make sure we notice changes in the file
-        self.restat()
-
-        ext = os.path.splitext(self.basename())[1].lower()
-        contentType = self.contentTypes.get(ext, self.defaultType)
-
-        if not self.exists():
-            self.debug("Couldn't find resource %s", self.path)
+        self.debug('Render authenticated request %r' % request)
+        try:
+            self.debug("Opening file %s", self._path)
+            provider = self._path.open()
+        except fileprovider.NotFoundError:
+            self.debug("Could not find resource %s", self._path)
             return self.childNotFound.render(request)
-
-        if self.isdir():
-            self.debug("%s is a directory, can't be GET", self.path)
+        except fileprovider.CannotOpenError:
+            self.debug("%s is a directory, can't be GET", self._path)
             return self.childNotFound.render(request)
+        except fileprovider.AccessError:
+            return self.forbiddenResource.render(request)
 
         # Different headers not normally set in static.File...
         # Specify that we will close the connection after this request, and
@@ -149,23 +167,16 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
         # We can do range requests, in bytes.
         request.setHeader('Accept-Ranges', 'bytes')
 
-        if contentType:
-            self.debug('content type %r' % contentType)
-            request.setHeader('content-type', contentType)
-
-        try:
-            f = self.openForReading()
-        except IOError, e:
-            import errno
-            if e[0] == errno.EACCES:
-                return weberror.ForbiddenResource().render(request)
-            else:
-                raise
-
-        if request.setLastModified(self.getmtime()) is http.CACHED:
+        if request.setLastModified(provider.getmtime()) is http.CACHED:
             return ''
 
-        fileSize = self.getFileSize()
+        contentType = provider.mimeType or self.defaultType
+
+        if contentType:
+            self.debug('File content type: %r' % contentType)
+            request.setHeader('content-type', contentType)
+
+        fileSize = provider.getsize()
         # first and last byte offset we will write
         first = 0
         last = fileSize - 1
@@ -211,20 +222,16 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
                 request.setResponseCode(http.REQUESTED_RANGE_NOT_SATISFIABLE)
                 return ''
 
-            # FIXME: is it still partial if the request was for the complete
-            # file ? Couldn't find a conclusive answer in the spec.
-            request.setResponseCode(http.PARTIAL_CONTENT)
-            request.setHeader('Content-Range', "bytes %d-%d/%d" %
-                (first, last, fileSize))
             # Start sending from the requested position in the file
             if first:
                 # TODO: logs suggest this is called with negative values,
                 # figure out how
                 self.debug("Request for range \"%s\" of file, seeking to "
-                    "%d of total file size %d", ranges, first, fileSize)
-                f.seek(first)
+                           "%d of total file size %d", ranges, first, fileSize)
+                provider.seek(first)
 
-        self.do_prepareBody(request, f, first, last)
+        request.setResponseRange(first, last, fileSize)
+        self.do_prepareBody(request, provider, first, last)
 
         if request.method == 'HEAD':
             return ''
@@ -245,13 +252,17 @@ class File(resource.Resource, filepath.FilePath, log.Loggable):
             d = defer.succeed(request)
 
         def attachProxy(consumer):
-            transfer = FileTransfer(f, last + 1, consumer)
+            # Set the provider first, because for very small file
+            # the transfer could terminate right away.
+            request._provider = provider
+            transfer = FileTransfer(provider, last + 1, consumer)
             request._transfer = transfer
+
         d.addCallback(attachProxy)
 
         return server.NOT_DONE_YET
 
-    def do_prepareBody(self, request, f, first, last):
+    def do_prepareBody(self, request, provider, first, last):
         """
         I am called before the body of the response gets written,
         and after generic header setting has been done.
@@ -268,7 +279,9 @@ class MimedFileFactory(log.Loggable):
     """
     I create File subclasses based on the mime type of the given path.
     """
-    contentTypes = loadMimeTypes()
+
+    logCategory = LOG_CATEGORY
+
     defaultType = "application/octet-stream"
 
     def __init__(self, httpauth, mimeToResource=None, rateController=None):
@@ -278,17 +291,15 @@ class MimedFileFactory(log.Loggable):
 
     def create(self, path):
         """
-        Creates and returns an instance of a File subclass based on the mime
-        type/extension of the given path.
+        Creates and returns an instance of a File subclass based
+        on the mime type of the given path.
         """
-
-        self.debug("createMimedFile at %r", path)
-        ext = os.path.splitext(path)[1].lower()
-        mimeType = self.contentTypes.get(ext, self.defaultType)
+        mimeType = path.mimeType or self.defaultType
+        self.debug("Create %s file for %s", mimeType, path)
         klazz = self._mimeToResource.get(mimeType, File)
-        self.debug("mimetype %s, class %r" % (mimeType, klazz))
-        return klazz(path, self._httpauth, mimeToResource=self._mimeToResource,
-            rateController=self._rateController)
+        return klazz(path, self._httpauth,
+                     mimeToResource=self._mimeToResource,
+                     rateController=self._rateController)
 
 
 class FLVFile(File):
@@ -301,7 +312,7 @@ class FLVFile(File):
     """
     header = 'FLV\x01\x01\000\000\000\x09\000\000\000\x09'
 
-    def do_prepareBody(self, request, f, first, last):
+    def do_prepareBody(self, request, provider, first, last):
         self.log('do_prepareBody for FLV')
         length = last - first + 1
 
@@ -311,8 +322,8 @@ class FLVFile(File):
         start = int(request.args.get('start', ['0'])[0])
         # range request takes precedence over our start parsing
         if first == 0 and start:
-            self.debug('start %d passed, seeking', start)
-            f.seek(start)
+            self.debug('Start %d passed, seeking', start)
+            provider.seek(start)
             length = last - start + 1 + len(self.header)
 
         request.setHeader("Content-Length", str(length))
@@ -328,54 +339,82 @@ class FileTransfer(log.Loggable):
     """
     A class to represent the transfer of a file over the network.
     """
+
+    logCategory = LOG_CATEGORY
+
     consumer = None
 
-    def __init__(self, file, size, consumer):
+    def __init__(self, provider, size, consumer):
         """
-        @param file: a file handle
-        @type  file: file
+        @param provider: an asynchronous file provider
+        @type  provider: L{fileprovider.File}
         @param size: file position to which file should be read
         @type  size: int
         @param consumer: consumer to receive the data
         @type  consumer: L{twisted.internet.interfaces.IFinishableConsumer}
         """
-        self.file = file
+        self.provider = provider
         self.size = size
         self.consumer = consumer
-        self.written = self.file.tell()
+        self.written = self.provider.tell()
         self.bytesWritten = 0
+        self._pending = None
+        self._again = False # True if resume was called while waiting for data
         self.debug("Calling registerProducer on %r", consumer)
         consumer.registerProducer(self, 0)
 
     def resumeProducing(self):
         if not self.consumer:
             return
-        data = self.file.read(min(abstract.FileDescriptor.bufferSize,
-            self.size - self.written))
-        if data:
-            self.written += len(data)
-            self.bytesWritten += len(data)
-            # this .write will spin the reactor, calling .doWrite and then
-            # .resumeProducing again, so be prepared for a re-entrant call
-            self.consumer.write(data)
-        if self.consumer and self.file.tell() == self.size:
-            log.debug('file-transfer',
-                      'written entire file of %d bytes from fd %d',
-                      self.size, self.file.fileno())
-            self.consumer.unregisterProducer()
-            self.consumer.finish()
-            self.consumer = None
+        self._produce()
 
     def pauseProducing(self):
         pass
 
     def stopProducing(self):
-        log.debug('file-transfer', 'stop producing from fd %d at %d/%d bytes',
-                  self.file.fileno(), self.file.tell(), self.size)
-        self.file.close()
+        self.debug('Stop producing from %s at %d/%d bytes',
+                   self.provider, self.provider.tell(), self.size)
         # even though it's the consumer stopping us, from looking at
         # twisted code it looks like we still are required to
-        # unregsiter and notify the request that we're done...
+        # unregister and notify the request that we're done...
+        self._terminate()
+
+    def _produce(self):
+        if self._pending:
+            # We already are waiting for data, just remember more is needed
+            self._again = True
+            return
+        self._again = False
+        d = self.provider.read(min(abstract.FileDescriptor.bufferSize,
+                                   self.size - self.written))
+        self._pending = d
+        d.addCallbacks(self._cbGotData, self._ebReadFailed)
+
+    def _cbGotData(self, data):
+        self._pending = None
+        if self.consumer and data:
+            self.written += len(data)
+            self.bytesWritten += len(data)
+            # this .write will spin the reactor, calling .doWrite and then
+            # .resumeProducing again, so be prepared for a re-entrant call
+            self.consumer.write(data)
+        if self.consumer and (self.provider.tell() == self.size):
+            self.debug('Written entire file of %d bytes from %s',
+                       self.size, self.provider)
+            self._terminate()
+        elif self._again:
+            # Continue producing
+            self._produce()
+
+    def _ebReadFailed(self, failure):
+        self._pending = None
+        self.warning('Failure during file %s reading: %s',
+                     self.provider, log.getFailureMessage(failure))
+        self._terminate()
+
+    def _terminate(self):
+        self.provider.close()
+        self.provider = None
         self.consumer.unregisterProducer()
         self.consumer.finish()
         self.consumer = None

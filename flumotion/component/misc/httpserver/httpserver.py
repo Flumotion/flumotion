@@ -34,39 +34,66 @@ from flumotion.common.i18n import N_, gettexter
 from flumotion.component import component
 from flumotion.component.base import http as httpbase
 from flumotion.component.component import moods
-from flumotion.component.misc.httpserver import httpfile
+from flumotion.component.misc.httpserver import httpfile, localprovider
+from flumotion.component.misc.httpserver import serverstats
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
 
 __version__ = "$Rev$"
 T_ = gettexter()
 
+UPTIME_UPDATE_INTERVAL = 5
+
 
 class CancellableRequest(server.Request):
 
     def __init__(self, channel, queued):
         server.Request.__init__(self, channel, queued)
-
+        now = time.time()
+        self.lastTimeWritten = now # Used by HTTPFileStreamer for timeout
         self._component = channel.factory.component
-        self._completed = False
         self._transfer = None
-
-        self._bytes_written = 0
-        self._start_time = time.time()
-        self._lastTimeWritten = self._start_time
+        self._provider = None
+        self._startTime = now
+        self._completionTime = None
+        self._rangeFirstByte = None
+        self._rangeLastByte = None
+        self._resourceSize = None
+        self._bytesWritten = 0L
 
         # we index some things by the fd, so we need to store it so we
         # can still use it (in the connectionLost() handler and in
         # finish()) after transport's fd has been closed
         self._fd = self.transport.fileno()
 
+        # Create the request statistic handler
+        self.stats = serverstats.RequestStatistics(self._component.stats)
+
         self._component.requestStarted(self)
+
+    def setResponseRange(self, first, last, size):
+        """
+        Sets the range of the response, and keep range information for logging.
+        If the range is the complete file, the request response code
+        is not changed, and the range header is not added.
+        """
+        self._rangeFirstByte = first
+        self._rangeLastByte = last
+        self._resourceSize = size
+        if (first > 0) or (last < (size - 1)):
+            # FIXME: is it still partial if the request was for the complete
+            # file ? Couldn't find a conclusive answer in the spec.
+            self.setResponseCode(http.PARTIAL_CONTENT)
+            self.setHeader('Content-Range', "bytes %d-%d/%d" %
+                           (first, last, size))
 
     def write(self, data):
         server.Request.write(self, data)
-
-        self._bytes_written += len(data)
-        self._lastTimeWritten = time.time()
+        size = len(data)
+        self._bytesWritten += size
+        self.lastTimeWritten = time.time()
+        # Update statistics
+        self.stats.onDataSent(size)
 
     def finish(self):
         # it can happen that this method will be called with the
@@ -84,10 +111,36 @@ class CancellableRequest(server.Request):
         self.requestCompleted(self._fd)
 
     def requestCompleted(self, fd):
-        if not self._completed:
-            self._component.requestFinished(self, self._bytes_written,
-                time.time() - self._start_time, fd)
-            self._completed = True
+        if self._completionTime is None:
+            self._completionTime = time.time()
+            # Update statistics
+            self.stats.onCompleted(self._resourceSize)
+            duration = self._completionTime - self._startTime
+            self._component.requestFinished(self, self.stats.bytesSent,
+                                            duration, fd)
+
+    def getLogFields(self):
+        headers = self.getAllHeaders()
+        duration = (self._completionTime or time.time()) - self._startTime
+        requestFields = {'ip': self.getClientIP(),
+                         'method': self.method,
+                         'uri': self.uri,
+                         'get-parameters': self.args,
+                         'clientproto': self.clientproto,
+                         'response': self.code,
+                         'bytes-sent': self._bytesWritten,
+                         'referer': headers.get('referer', None),
+                         'user-agent': headers.get('user-agent', None),
+                         'time-connected': duration,
+                         'resource-size': self._resourceSize,
+                         'range-first': self._rangeFirstByte,
+                         'range-last': self._rangeLastByte}
+        if self._provider:
+            # The request fields have higher priority than provider fields
+            providerFields = self._provider.getLogFields()
+            providerFields.update(requestFields)
+            requestFields = providerFields
+        return requestFields
 
 
 class Site(server.Site):
@@ -97,6 +150,20 @@ class Site(server.Site):
         server.Site.__init__(self, resource)
 
         self.component = component
+
+
+class StatisticsUpdater(object):
+    """
+    I wrap a statistics ui state entry, to allow updates.
+    """
+
+    def __init__(self, state, key):
+        self._state = state
+        self._key = key
+
+    def update(self, name, value):
+        if value != self._state.get(self._key).get(name, None):
+            self._state.setitem(self._key, name, value)
 
 
 class HTTPFileMedium(component.BaseComponentMedium):
@@ -154,10 +221,14 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.type = None
         self.port = None
         self.hostname = None
+        self.stats = None
         self._rateControlPlug = None
+        self._fileProviderPlug = None
         self._loggers = []
         self._logfilter = None
         self.httpauth = None
+        self._startTime = time.time()
+        self._uptimeCallId = None
 
         self._description = 'On-Demand Flumotion Stream'
 
@@ -179,10 +250,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             'video/x-flv': httpfile.FLVFile,
         }
 
-        # store number of connected clients
-        self.uiState.addKey("connected-clients", 0)
-        self.uiState.addKey("bytes-transferred", 0)
         self.uiState.addKey('stream-url', None)
+        self.uiState.addKey('server-uptime', 0)
+        self.uiState.addKey('file-provider', None)
+        self.uiState.addDictKey('request-statistics')
+        self.uiState.addDictKey('provider-statistics')
 
     def do_check(self):
         props = self.config['properties']
@@ -225,7 +297,6 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         if not self.hostname:
             self.hostname = netutils.guess_public_hostname()
 
-        self.filePath = props.get('path')
         self.type = props.get('type', 'master')
         self.port = props.get('port', 8801)
         if self.type == 'slave':
@@ -246,14 +317,25 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             for f in props['ip-filter']:
                 logFilter.addIPFilter(f)
             self._logfilter = logFilter
-
         socket = ('flumotion.component.misc.'
                   'httpserver.ratecontroller.RateController')
         plugs = self.plugs.get(socket, [])
         if plugs:
             # Rate controller factory plug; only one supported.
+            path = props.get('path')
             self._rateControlPlug = self.plugs[socket][-1]
 
+        socket = ('flumotion.component.misc.'
+                  'httpserver.fileprovider.FileProvider')
+        plugs = self.plugs.get(socket, [])
+        if plugs:
+            # FileProvider factory plug; only one supported.
+            self._fileProviderPlug = plugs[-1]
+        else:
+            # Create a default local provider using path property
+            # Delegate the property checks to the plug
+            plugProps = {"properties": {"path": props.get('path', None)}}
+            self._fileProviderPlug = localprovider.LocalPlug(plugProps)
         # Update uiState
         self.uiState.set('stream-url', self.getUrl())
 
@@ -271,6 +353,14 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         site = Site(root, self)
         self._timeoutRequestsCallLater = reactor.callLater(
             self.REQUEST_TIMEOUT, self._timeoutRequests)
+
+        # Create statistics handler and start updating ui state
+        self.stats = serverstats.ServerStatistics()
+        updater = StatisticsUpdater(self.uiState, "request-statistics")
+        self.stats.startUpdates(updater)
+        updater = StatisticsUpdater(self.uiState, "provider-statistics")
+        self._fileProviderPlug.startStatsUpdates(updater)
+        self._updateUptime()
 
         d = defer.Deferred()
         if self.type == 'slave':
@@ -321,6 +411,10 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         return d
 
     def do_stop(self):
+        if self.stats:
+            self.stats.stopUpdates()
+        if self._fileProviderPlug:
+            self._fileProviderPlug.stopStatsUpdates()
         if self.httpauth:
             self.httpauth.stopKeepAlive()
         if self._timeoutRequestsCallLater:
@@ -377,7 +471,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def _timeoutRequests(self):
         now = time.time()
         for request in self._connected_clients.values():
-            if now - request._lastTimeWritten > self.REQUEST_TIMEOUT:
+            if now - request.lastTimeWritten > self.REQUEST_TIMEOUT:
                 self.debug("Timing out connection")
                 # Apparently this is private API. However, calling
                 # loseConnection is not sufficient - it won't drop the
@@ -390,7 +484,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self.REQUEST_TIMEOUT, self._timeoutRequests)
 
     def _getDefaultRootResource(self):
-        if self.filePath is None:
+        node = self._fileProviderPlug.getRootPath()
+        if node is None:
             return None
 
         self.debug('Starting with mount point "%s"' % self.mountPoint)
@@ -398,7 +493,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             mimeToResource=self._mimeToResource,
             rateController=self._rateControlPlug)
 
-        root = factory.create(self.filePath)
+        root = factory.create(node)
         if self.mountPoint != '/':
             root = self._createRootResourceForPath(self.mountPoint, root)
 
@@ -451,41 +546,25 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def requestStarted(self, request):
         fd = request.transport.fileno() # ugly!
         self._connected_clients[fd] = request
-        self.uiState.set("connected-clients", len(self._connected_clients))
 
     def requestFinished(self, request, bytesWritten, timeConnected, fd):
         self.httpauth.cleanupAuth(fd)
-        headers = request.getAllHeaders()
-
         ip = request.getClientIP()
         if not self._logfilter or not self._logfilter.isInRange(ip):
-            args = {'ip': ip,
-                    'time': time.gmtime(),
-                    'method': request.method,
-                    'uri': request.uri,
-                    'username': '-', # FIXME: put the httpauth name
-                    'get-parameters': request.args,
-                    'clientproto': request.clientproto,
-                    'response': request.code,
-                    'bytes-sent': bytesWritten,
-                    'referer': headers.get('referer', None),
-                    'user-agent': headers.get('user-agent', None),
-                    'time-connected': timeConnected}
-
+            fields = request.getLogFields()
+            fields.update({'time': time.gmtime(),
+                           'username': '-'}) # FIXME: put the httpauth name
             l = []
             for logger in self._loggers:
                 l.append(defer.maybeDeferred(
-                    logger.event, 'http_session_completed', args))
+                    logger.event, 'http_session_completed', fields))
             d = defer.DeferredList(l)
         else:
             d = defer.succeed(None)
 
         del self._connected_clients[fd]
 
-        self.uiState.set("connected-clients", len(self._connected_clients))
-
         self._total_bytes_written += bytesWritten
-        self.uiState.set("bytes-transferred", self._total_bytes_written)
 
         def firePendingDisconnect(_):
             self.debug("Logging completed")
@@ -562,3 +641,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         """
         # This is called early, before do_setup()
         return self.config['properties'].get('mount-point')
+
+    def _updateUptime(self):
+        uptime = time.time() - self._startTime
+        self.uiState.set("server-uptime", uptime)
+        self._uptimeCallId = reactor.callLater(UPTIME_UPDATE_INTERVAL,
+                                               self._updateUptime)

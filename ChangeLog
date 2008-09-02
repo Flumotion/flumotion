@@ -1,3 +1,24 @@
+2008-09-01  Sebastien Merle  <sebastien@fluendo.com>
+
+	Merged from svn branch httpserver-caching.
+
+	* flumotion/component/misc/httpserver/Makefile.am:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/misc/httpserver/httpfile.py:
+	* flumotion/component/misc/httpserver/httpserver.glade:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/cachestats.py:
+	* flumotion/component/misc/httpserver/fileprovider.py:
+	* flumotion/component/misc/httpserver/localpath.py:
+	* flumotion/component/misc/httpserver/localprovider.py:
+	* flumotion/component/misc/httpserver/serverstats.py:	
+	Made the file browsing and serving of the httpserver component a plug.
+	Added statistics gathering to the httpserver component.
+	Added a local caching plug for the httpserver component.
+	Fixed the source to pass pep8.py.
+
 2008-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* po/nl.po:

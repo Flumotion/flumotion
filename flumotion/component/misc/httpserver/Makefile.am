@@ -5,8 +5,13 @@ httpserverdir = $(libdir)/flumotion/python/flumotion/component/misc/httpserver
 httpserver_PYTHON =		\
 	__init__.py		\
 	admin_gtk.py		\
+	cachedprovider.py	\
+	cachestats.py		\
+	fileprovider.py		\
 	httpfile.py		\
 	httpserver.py		\
+	localpath.py		\
+	localprovider.py	\
 	ratecontrol.py
 
 httpserver_DATA = 		\
