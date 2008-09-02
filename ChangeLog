@@ -1,5 +1,10 @@
 2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
 
+	* flumotion/test/test_component_httpserver.py:
+	Updated tests to pass with the new httpserver.
+
+2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
+
 	* flumotion/component/misc/httpserver/httpfile.py:
 	If asked for a range that include the whole file,
 	respond with a range (206) as before instead of a normal request (200).

@@ -31,6 +31,7 @@ from twisted.web.static import Data
 from flumotion.common import log
 from flumotion.common import testsuite
 from flumotion.component.misc.httpserver import httpfile, httpserver
+from flumotion.component.misc.httpserver import localprovider
 from flumotion.component.plugs.base import ComponentPlug
 from flumotion.test import test_http
 
@@ -281,6 +282,9 @@ class FakeRequest(test_http.FakeRequest):
     def setLastModified(self, last):
         pass
 
+    def setResponseRange(self, first, last, size):
+        pass
+
     def registerProducer(self, producer, streaming):
         self.producer = producer
         producer.resumeProducing()
@@ -294,6 +298,13 @@ class FakeRequest(test_http.FakeRequest):
 
 class FakeComponent:
 
+    def __init__(self, path):
+        plugProps = {"properties": {"path": path}}
+        self._fileProviderPlug = localprovider.LocalPlug(plugProps)
+
+    def getRoot(self):
+        return self._fileProviderPlug.getRootPath()
+
     def startAuthentication(self, request):
         return defer.succeed(None)
 
@@ -304,8 +315,8 @@ class TestTextFile(testsuite.TestCase):
         fd, self.path = tempfile.mkstemp()
         os.write(fd, 'a text file')
         os.close(fd)
-        self.component = FakeComponent()
-        self.resource = httpfile.File(self.path, self.component)
+        self.component = FakeComponent(self.path)
+        self.resource = httpfile.File(self.component.getRoot(), self.component)
 
     def tearDown(self):
         os.unlink(self.path)
@@ -422,9 +433,9 @@ class TestDirectory(testsuite.TestCase):
         h = open(os.path.join(self.path, 'test.flv'), 'w')
         h.write('a fake FLV file')
         h.close()
-        self.component = FakeComponent()
+        self.component = FakeComponent(self.path)
         # a directory resource
-        self.resource = httpfile.File(self.path, self.component,
+        self.resource = httpfile.File(self.component.getRoot(), self.component,
             {'video/x-flv': httpfile.FLVFile})
 
     def tearDown(self):
