@@ -1,3 +1,8 @@
+2008-09-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/plugs/rrd.py:
+	  Fix header.
+
 2008-09-02  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po:
