@@ -1,5 +1,10 @@
 2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
 
+	* flumotion/component/misc/httpserver/Makefile.am:
+	Added serverstats.py to the makefile.
+
+2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
+
 	* flumotion/test/test_component_httpserver.py:
 	Updated tests to pass with the new httpserver.
 
