@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-import datetime
+import time
 import gettext
 import os
 import webbrowser
@@ -142,16 +142,18 @@ class ServerStatsAdminGtkNode(StatisticsAdminGtkNode):
         self._regReqStat('current-request-count', _formatClientCount)
         self._regReqStat('mean-request-count', _formatClientCount)
         self._regReqStat('request-count-peak', _formatClientCount)
-        self._regReqStat('request-count-peak-time', _formatTimeStamp, "(%s)")
+        self._regReqStat('request-count-peak-time', _formatTimeStamp,
+                         _("at %s"))
         self._regReqStat('current-request-rate', _formatReqRate)
         self._regReqStat('mean-request-rate', _formatReqRate)
         self._regReqStat('request-rate-peak', _formatReqRate)
-        self._regReqStat('request-rate-peak-time', _formatTimeStamp, "(%s)")
+        self._regReqStat('request-rate-peak-time', _formatTimeStamp,
+                         _("at %s"))
         self._regReqStat('total-bytes-sent', _formatBytes)
         self._regReqStat('current-bitrate', _formatBitrate)
         self._regReqStat('mean-bitrate', _formatBitrate)
         self._regReqStat('bitrate-peak', _formatBitrate)
-        self._regReqStat('bitrate-peak-time', _formatTimeStamp, "(%s)")
+        self._regReqStat('bitrate-peak-time', _formatTimeStamp, _("at %s"))
         self._regReqStat('mean-file-read-ratio', _formatPercent)
         return statistics
 
@@ -253,14 +255,11 @@ def _formatClientCount(value):
 
 
 def _formatTimeStamp(value):
-    if value == 0:
-        return "?"
-    dt = datetime.datetime.utcfromtimestamp(value)
-    return dt.strftime("%Y-%m-%d %H:%M %Z")
+    return time.strftime("%c", time.localtime(value))
 
 
 def _formatReqRate(value):
-    return _("%.2f req/min") % float(value * 60)
+    return _("%.2f requests/m") % float(value * 60)
 
 
 def _formatBytes(value):
@@ -281,23 +280,27 @@ class HTTPFileAdminGtk(BaseAdminGtk):
         statistics = ServerStatsAdminGtkNode(self.state, self.admin,
                                              _("Statistics"))
         self.nodes['Statistics'] = statistics
-        cache = CacheStatsAdminGtkNode(self.state, self.admin, _("Cache"))
-        self.nodes["Cache"] = cache
+        #FIXME: We need to figure out how to create or delete
+        #       a nodes after receiving the UI State,
+        #       so we do not have a cache tab when not using a caching plug.
+        #cache = CacheStatsAdminGtkNode(self.state, self.admin, _("Cache"))
+        #self.nodes["Cache"] = cache
         # FIXME: maybe make a protocol instead of overriding
         return BaseAdminGtk.setup(self)
 
     def uiStateChanged(self, state):
         self.nodes['Statistics'].setStats(state)
-        if state:
-            providerName = None
-            providerStats = state.get("provider-statistics")
-            if providerStats:
-                providerName = providerStats.get("provider-name")
-            if providerName and providerName.startswith("cached-"):
-                self.nodes['Cache'].setStats(state)
-                self.nodes["Cache"].show()
-            else:
-                self.nodes["Cache"].hide()
+        #FIXME: Same as for the setup method.
+        #if state:
+        #    providerName = None
+        #    providerStats = state.get("provider-statistics")
+        #    if providerStats:
+        #        providerName = providerStats.get("provider-name")
+        #    if providerName and providerName.startswith("cached-"):
+        #        self.nodes['Cache'].setStats(state)
+        #        self.nodes["Cache"].show()
+        #    else:
+        #        self.nodes["Cache"].hide()
 
 
 GUIClass = HTTPFileAdminGtk

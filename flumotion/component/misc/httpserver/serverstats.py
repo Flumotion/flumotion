@@ -71,7 +71,7 @@ class ServerStatistics(object):
         self.currentBitrate = 0
         self.meanBitrate = 0
         self.bitratePeak = 0
-        self.bitreatePeakTime = now
+        self.bitratePeakTime = now
 
         self._fileReadRatios = 0.0
         self._lastUpdateTime = now
@@ -80,6 +80,9 @@ class ServerStatistics(object):
 
     def startUpdates(self, updater):
         self._updater = updater
+        self._set("bitrate-peak-time", self.bitratePeakTime)
+        self._set("request-rate-peak-time", self.requestRatePeakTime)
+        self._set("request-count-peak-time", self.requestCountPeakTime)
         if self._callId is None:
             self._update()
 
