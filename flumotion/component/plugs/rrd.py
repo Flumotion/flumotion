@@ -33,7 +33,7 @@ except ImportError:
 TIMEOUT_DEFAULT = 60 # timeout in seconds
 
 
-class RRDPlug(base.ComponentPlug):
+class ComponentRRDPlug(base.ComponentPlug):
     """Class to create or update a RRD file with statistics"""
 
     def start(self, component):

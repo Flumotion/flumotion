@@ -55,7 +55,7 @@ _errorLookup = {errno.ENOENT: NotFoundError,
                 errno.EACCES: fileprovider.AccessError}
 
 
-class CachedLocalPlug(fileprovider.FileProvider, log.Loggable):
+class FileProviderLocalCachedPlug(fileprovider.FileProvider, log.Loggable):
     """
 
     WARNING: Currently does not work properly in combination with rate-control.

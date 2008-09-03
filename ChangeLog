@@ -1,5 +1,18 @@
 2008-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/validate-registry.py:
+	  Make sure that all plugs can be instantiated.
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/localprovider.py:
+	* flumotion/component/plugs/rrd.py:
+	* flumotion/test/test_component_httpserver.py:
+	  Further Plug class renaming.
+
+2008-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/plugs/cortado/cortado.py:
 	* flumotion/component/plugs/cortado/cortado.xml:
 	  Properly fix ComponentCortadoPlug naming.

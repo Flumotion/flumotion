@@ -300,7 +300,7 @@ class FakeComponent:
 
     def __init__(self, path):
         plugProps = {"properties": {"path": path}}
-        self._fileProviderPlug = localprovider.LocalPlug(plugProps)
+        self._fileProviderPlug = localprovider.FileProviderLocalPlug(plugProps)
 
     def getRoot(self):
         return self._fileProviderPlug.getRootPath()

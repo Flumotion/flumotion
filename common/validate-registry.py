@@ -7,7 +7,7 @@ import warnings
 # hack for import funkiness together with flumotion.twisted.reflect.namedAny
 from twisted.internet import reactor
 
-from flumotion.common import registry
+from flumotion.common import registry, common
 from flumotion.twisted import reflect
 
 exitCode = 0
@@ -110,6 +110,15 @@ for plug in registry.getPlugs():
     if normalizedType != normalizedClass:
         plugError(plug, 'type %s does not match class %s' % (
             plug.type, function))
+
+    # a plug should be creatable
+    for name, entry in plug.entries.items():
+        moduleName = common.pathToModuleName(entry.location)
+        entryPoint = "%s.%s" % (moduleName, entry.function)
+        try:
+            function = reflect.namedAny(entryPoint)
+        except AttributeError:
+            componentError(c, 'could not import plug %s' % entryPoint)
 
     def propertyError(plug, p, msg):
         global exitCode

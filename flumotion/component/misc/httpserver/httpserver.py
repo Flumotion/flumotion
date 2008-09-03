@@ -324,7 +324,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             # Create a default local provider using path property
             # Delegate the property checks to the plug
             plugProps = {"properties": {"path": props.get('path', None)}}
-            self._fileProviderPlug = localprovider.LocalPlug(plugProps)
+            self._fileProviderPlug = localprovider.FileProviderLocalPlug(
+                plugProps)
         # Update uiState
         self.uiState.set('stream-url', self.getUrl())
 

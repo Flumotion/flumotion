@@ -36,7 +36,7 @@ SEEK_SET = 0
 LOG_CATEGORY = "fileprovider-local"
 
 
-class LocalPlug(fileprovider.FileProvider, log.Loggable):
+class FileProviderLocalPlug(fileprovider.FileProvider, log.Loggable):
     """
     I am a plug that provide local files directly,
     faking the file access is asynchronous.
