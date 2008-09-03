@@ -1,3 +1,11 @@
+2008-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/plugs/manhole.py:
+	  lifecycle module is gone.
+	* flumotion/extern/fdpass/__init__.py:
+	  Insert some magic that makes flumotion.extern.fdpass.fdpass
+	  importable in distcheck mode.
+
 2008-09-03  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/misc/httpserver/admin_gtk.py:

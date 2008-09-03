@@ -22,7 +22,7 @@
 import os
 from twisted.internet import defer
 
-from flumotion.component.plugs import base, lifecycle
+from flumotion.component.plugs import base
 from flumotion.common.manhole import openSSHManhole
 from flumotion.common.manhole import openAnonymousTelnetManhole
 

@@ -20,3 +20,14 @@
 # Headers in this file shall remain intact.
 
 __version__ = "$Rev$"
+
+import os
+
+# in distcheck mode, the built .so module is in another path; make sure
+# it can still be imported as usual
+thisdir = os.path.dirname(__file__)
+srcdir = os.path.abspath(os.path.join(thisdir, '..', '..', '..'))
+
+if os.path.exists(os.path.join(srcdir, '_build')):
+    __path__.append(os.path.join(srcdir, '_build',
+        'flumotion', 'extern', 'fdpass'))
