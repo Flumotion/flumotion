@@ -106,7 +106,7 @@ class CortadoDirectoryResource(Resource):
         return Resource.getChildWithDefault(self, pathEl, request)
 
 
-class CortadoPlug(ComponentPlug):
+class ComponentCortadoPlug(ComponentPlug):
     """I am a component plug for a http-server which plugs in a
     http resource containing a cortado java applet.
     """

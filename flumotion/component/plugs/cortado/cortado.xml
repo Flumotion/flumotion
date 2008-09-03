@@ -5,7 +5,7 @@
       <entries>
         <entry type="default"
                location="flumotion/component/plugs/cortado/cortado.py"
-               function="CortadoPlug" />
+               function="ComponentCortadoPlug" />
         <entry type="wizard"
                location="flumotion/component/plugs/cortado/wizard_gtk.py"
                function="CortadoWizardPlugin" />
