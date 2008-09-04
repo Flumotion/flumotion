@@ -36,7 +36,7 @@ class Identity:
     L{flumotion.component.plugs.adminaction}, so that specific actions
     can be taken when I request to perform a function.
 
-    I serve as a point of extensibility for the IdentityProvider socket,
+    I serve as a point of extensibility for the IdentityProviderPlug socket,
     defined in L{flumotion.component.plugs.identity}.
 
     Subclasses should only implement __str__

@@ -372,7 +372,7 @@ class TestConfig(testsuite.TestCase):
                'properties': {'foo': 'bar'}}],
              'flumotion.component.plugs.base.ManagerPlug':
              [],
-             'flumotion.component.plugs.identity.IdentityProvider':
+             'flumotion.component.plugs.identity.IdentityProviderPlug':
              []})
 
     def testParseManagerWithBogusPlug(self):

@@ -51,7 +51,7 @@ class IdentityProviderPlug(base.ManagerPlug):
 
 class IdentityProviderExamplePlug(IdentityProviderPlug):
     """
-    Example implementation of the IdentityProvider socket, randomly
+    Example implementation of the IdentityProviderPlug socket, randomly
     chooses an identity for the remote host.
     """
 

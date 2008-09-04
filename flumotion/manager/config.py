@@ -639,7 +639,7 @@ class ManagerConfigParser(FlumotionConfigParser):
     MANAGER_SOCKETS = \
         ['flumotion.component.plugs.adminaction.AdminActionPlug',
          'flumotion.component.plugs.base.ManagerPlug',
-         'flumotion.component.plugs.identity.IdentityProvider']
+         'flumotion.component.plugs.identity.IdentityProviderPlug']
 
     def __init__(self, file):
         FlumotionConfigParser.__init__(self, file)

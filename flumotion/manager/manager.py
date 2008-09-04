@@ -328,7 +328,7 @@ class Vishnu(log.Loggable):
         """
         Compute a suitable identity for a remote host. First looks to
         see if there is a
-        flumotion.component.plugs.identity.IdentityProvider plug
+        L{flumotion.component.plugs.identity.IdentityProviderPlug} plug
         installed on the manager, falling back to user@host.
 
         The identity is only used in the adminaction interface. An

@@ -1,5 +1,14 @@
 2008-09-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/identity.py:
+	* flumotion/component/plugs/identity.py:
+	* flumotion/manager/config.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_config.py:
+	  More IdentityProvider -> IdentityProviderPlug renames.
+
+2008-09-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/validate-registry.py:
 	  Add another check, instantiating the socket mentioned by a plug.
 	* flumotion/component/misc/httpserver/cachedprovider.py:
