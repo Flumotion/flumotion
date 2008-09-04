@@ -38,7 +38,7 @@
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.plugs.identity.IdentityProvider"
+    <plug socket="flumotion.component.plugs.identity.IdentityProviderPlug"
           type="identityprovider-example">
       <entry location="flumotion/component/plugs/identity.py"
              function="IdentityProviderExamplePlug"/>
@@ -60,7 +60,7 @@
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.plugs.rrd.RRDPlug" type="component-rrd">
+    <plug socket="flumotion.component.plugs.rrd.ComponentRRDPlug" type="component-rrd">
       <entry location="flumotion/component/plugs/rrd.py"
              function="ComponentRRDPlug"/>
              

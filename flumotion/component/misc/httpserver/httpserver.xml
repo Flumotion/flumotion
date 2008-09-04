@@ -18,7 +18,7 @@
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProvider"
+    <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug"
           type="fileprovider-local">
       <entries>
         <entry type="default"
@@ -32,7 +32,7 @@
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProvider"
+    <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug"
           type="fileprovider-localcached">
       <entries>
         <entry type="default"
@@ -75,7 +75,7 @@
         <socket type="flumotion.component.plugs.streamdata.StreamDataProviderPlug"/>
         <socket type="flumotion.component.plugs.rrd.ComponentRRDPlug" />
         <socket type="flumotion.component.misc.httpserver.ratecontrol.RateControllerPlug"/>
-        <socket type="flumotion.component.misc.httpserver.fileprovider.FileProvider"/>
+        <socket type="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug"/>
       </sockets>
 
       <properties>

@@ -111,6 +111,13 @@ for plug in registry.getPlugs():
         plugError(plug, 'type %s does not match class %s' % (
             plug.type, function))
 
+    # a plug's socket should be creatable
+    try:
+        function = reflect.namedAny(plug.socket)
+    except AttributeError:
+        plugError(plug, 'could not import socket %s' % plug.socket)
+
+
     # a plug should be creatable
     for name, entry in plug.entries.items():
         moduleName = common.pathToModuleName(entry.location)
@@ -118,7 +125,7 @@ for plug in registry.getPlugs():
         try:
             function = reflect.namedAny(entryPoint)
         except AttributeError:
-            componentError(c, 'could not import plug %s' % entryPoint)
+            plugError(plug, 'could not import plug %s' % entryPoint)
 
     def propertyError(plug, p, msg):
         global exitCode

@@ -1,5 +1,16 @@
 2008-09-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/validate-registry.py:
+	  Add another check, instantiating the socket mentioned by a plug.
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/fileprovider.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/localprovider.py:
+	* flumotion/component/plugs/plugs.xml:
+	  Further Plug naming fixes.
+
+2008-09-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/greeter.py:
 	  Since the authentication method was removed, change the string.
 

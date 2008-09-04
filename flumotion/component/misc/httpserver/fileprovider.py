@@ -163,7 +163,7 @@ class File(object):
         """
 
 
-class FileProvider(plugbase.ComponentPlug):
+class FileProviderPlug(plugbase.ComponentPlug):
     """
     I am a plug that provide a root FilePath instance
     that can be used to lookup and open file objects.
