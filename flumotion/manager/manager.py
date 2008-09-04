@@ -346,7 +346,7 @@ class Vishnu(log.Loggable):
                 L{flumotion.common.identity.RemoteIdentity}
         """
 
-        socket = 'flumotion.component.plugs.identity.IdentityProvider'
+        socket = 'flumotion.component.plugs.identity.IdentityProviderPlug'
         if socket in self.plugs:
             for plug in self.plugs[socket]:
                 identity = plug.computeIdentity(keycard, remoteHost)

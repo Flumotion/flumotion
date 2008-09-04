@@ -550,7 +550,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)
 
     def getStreamData(self):
-        socket = 'flumotion.component.plugs.streamdata.StreamDataProvider'
+        socket = 'flumotion.component.plugs.streamdata.StreamDataProviderPlug'
         if self.plugs[socket]:
             plug = self.plugs[socket][-1]
             return plug.getStreamData()

@@ -1,3 +1,12 @@
+2008-09-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/manager/manager.py:
+	  Fix more socket = '...' instances.
+	* flumotion/test/test_component_httpstreamer.py:
+	  Add a test for getStreamData.
+
 2008-09-04  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/POTFILES.in:

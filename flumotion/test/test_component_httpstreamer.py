@@ -24,39 +24,50 @@ from twisted.trial import unittest
 from flumotion.common import testsuite
 from flumotion.component.consumers.httpstreamer import httpstreamer
 
+CONFIG = {
+    'feed': [],
+    'name': 'http-video',
+    'parent': 'default',
+    'eater': {'default': [('muxer-video:default', 'default')]},
+    'source': ['muxer-video:default'],
+    'avatarId': '/default/http-video',
+    'clock-master': None,
+    'plugs': {
+        'flumotion.component.plugs.streamdata.StreamDataProviderPlug': [],
+        'flumotion.component.plugs.request.RequestLoggerPlug': [],
+    },
+    'type': 'http-streamer',
+}
 
-class TestOldProperties(testsuite.TestCase):
+
+class StreamerTestCase(testsuite.TestCase):
+    properties = {}
+    config = CONFIG
 
     def setUp(self):
-        # config and properties copied from an actual log file, which
-        # explains the unicode keys
-        properties = {
-            u'user_limit': 1024,
-            u'mount_point': '/',
-            u'bandwidth_limit': 10,
-            u'port': 8800,
-            u'burst_on_connect': True}
-        config = {
-            'feed': [],
-            'name': 'http-video',
-            'parent': 'default',
-            'eater': {'default': [('muxer-video:default', 'default')]},
-            'source': ['muxer-video:default'],
-            'avatarId': '/default/http-video',
-            'clock-master': None,
-            'plugs': {
-                'flumotion.component.plugs.streamdata.StreamDataProvider': [],
-                'flumotion.component.plugs.request.RequestLoggerPlug': [],
-            },
-            'type': 'http-streamer',
-            'properties': properties
-        }
+        config = self.getConfig()
+        config['properties'] = self.properties.copy()
         self.component = httpstreamer.MultifdSinkStreamer(config)
 
     def tearDown(self):
         return self.component.stop()
 
-    def testConfigure(self):
+    def getConfig(self):
+        # test classes can override this to change/extend config
+        return self.config.copy()
+
+
+class TestOldProperties(StreamerTestCase):
+    "Test that old properties with underscores in the name get converted."
+    properties = {
+        u'user_limit': 1024,
+        u'mount_point': '/',
+        u'bandwidth_limit': 10,
+        u'port': 8800,
+        u'burst_on_connect': True,
+    }
+
+    def testPropertiesConverted(self):
         # test that the old-style properties were renamed to new-style
         props = self.component.config['properties']
         for key in ('user_limit', 'mount_point', 'bandwidth_limit',
@@ -66,6 +77,44 @@ class TestOldProperties(testsuite.TestCase):
         self.assertEquals(props['bandwidth-limit'], 10)
         self.assertEquals(props['mount-point'], '/')
         self.assertEquals(props['burst-on-connect'], True)
+
+
+class TestStreamDataNoPlug(StreamerTestCase):
+
+    def testGetStreamData(self):
+        streamData = self.component.getStreamData()
+        # there's no plug, so we get defaults
+        self.assertEquals(streamData['protocol'], 'HTTP')
+        self.assertEquals(streamData['description'], 'Flumotion Stream')
+        self.failUnless(streamData['url'].startswith('http://'))
+
+
+class TestStreamDataPlug(StreamerTestCase):
+
+    def getConfig(self):
+        config = CONFIG.copy()
+        sType = 'flumotion.component.plugs.streamdata.StreamDataProviderPlug'
+        pType = 'streamdataprovider-example'
+        config['plugs'] = {sType: [
+            {
+                'entries': {
+                    'default': {
+                        'module-name': 'flumotion.component.plugs.streamdata',
+                        'function-name': 'StreamDataProviderExamplePlug',
+                    }
+                }
+            },
+        ]}
+        return config
+
+    def testGetStreamData(self):
+        streamData = self.component.getStreamData()
+        self.assertEquals(streamData['protocol'], 'HTTP')
+        self.assertEquals(streamData['description'], 'Flumotion Stream')
+        self.failUnless(streamData['url'].startswith('http://'))
+    # plug is started before component can do getUrl
+    testGetStreamData.skip = 'See #1137'
+
 
 if __name__ == '__main__':
     unittest.main()

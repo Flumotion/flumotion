@@ -306,16 +306,16 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             for f in props['ip-filter']:
                 logFilter.addIPFilter(f)
             self._logfilter = logFilter
-        socket = ('flumotion.component.misc.'
-                  'httpserver.ratecontrol.RateController')
+        socket = \
+          'flumotion.component.misc.httpserver.ratecontrol.RateControllerPlug'
         plugs = self.plugs.get(socket, [])
         if plugs:
             # Rate controller factory plug; only one supported.
             path = props.get('path')
             self._rateControlPlug = self.plugs[socket][-1]
 
-        socket = ('flumotion.component.misc.'
-                  'httpserver.fileprovider.FileProvider')
+        socket = \
+            'flumotion.component.misc.httpserver.fileprovider.FileProviderPlug'
         plugs = self.plugs.get(socket, [])
         if plugs:
             # FileProvider factory plug; only one supported.
@@ -574,7 +574,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)
 
     def getStreamData(self):
-        socket = 'flumotion.component.plugs.streamdata.StreamDataProvider'
+        socket = 'flumotion.component.plugs.streamdata.StreamDataProviderPlug'
         if self.plugs[socket]:
             plug = self.plugs[socket][-1]
             return plug.getStreamData()
