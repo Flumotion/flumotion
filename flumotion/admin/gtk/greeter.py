@@ -130,7 +130,7 @@ class ConnectToExisting(WizardStep):
 class Authenticate(WizardStep):
     name = 'authenticate'
     title = _('Authentication')
-    text = _('Please select among the following authentication methods.')
+    text = _('Please enter your username and password.')
     auth_method_combo = user_entry = passwd_entry = None
     next_pages = []
     authenticate = None
