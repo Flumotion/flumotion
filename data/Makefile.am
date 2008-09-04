@@ -8,7 +8,8 @@ pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = image/flumotion.png
 
 xsldir = $(pkgdatadir)
-xsl_DATA = upgrade-to-0.2.0.xsl upgrade-to-0.3.2.xsl upgrade-to-0.4.1.xsl
+xsl_DATA = upgrade-to-0.2.0.xsl upgrade-to-0.3.2.xsl upgrade-to-0.4.1.xsl \
+	upgrade=to-0.5.3.xsl
 
 scriptdir = $(pkgdatadir)
 script_DATA = make-dummy-cert

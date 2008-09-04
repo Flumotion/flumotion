@@ -1,5 +1,12 @@
 2008-09-04  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* data/Makefile.am:
+	* data/upgrade-to-0.5.3.xsl:
+	* data/upgrade-to-0.5.3.xsl (added):
+	  Add first stab at an upgrade xsl script.
+
+2008-09-04  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/identity.py:
 	* flumotion/component/plugs/identity.py:
 	* flumotion/manager/config.py:
