@@ -1,3 +1,9 @@
+2008-09-04  Pedro Gracia  <pedro@flumotion.com>
+
+	* po/POTFILES.in:
+	Deleted "flumotion/component/plugs/lifecycle.py" entry.
+	Removed in r7354.
+
 2008-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/plugs/manhole.py:
