@@ -1,6 +1,11 @@
 2008-09-05  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/configure/configure.py:
+	Increase process termination timeouts, for now...
+
+2008-09-05  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/configure/configure.py:
 	* flumotion/common/medium.py (PingingMedium):
 	* flumotion/twisted/pb.py (PingableAvatar):
 	Unhardcode and (temporarily) increase the ping timeout multiplier.

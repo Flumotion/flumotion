@@ -143,8 +143,8 @@ version = _config['version']
 versionTuple = _versionStringToTuple(version)
 branchName = 'trunk'
 
-processTermWait = 10
-processKillWait = 5
+processTermWait = 20
+processKillWait = 10
 heartbeatInterval = 5
 # FIXME: bring pingTimeoutMultiplier back to 2.5 once the ping
 # problems are fixed properly (possibly that value won't be needed at
