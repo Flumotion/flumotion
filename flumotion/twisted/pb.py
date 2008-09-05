@@ -762,7 +762,8 @@ class Avatar(pb.Avatar, flog.Loggable):
 
 
 class PingableAvatar(Avatar):
-    _pingCheckInterval = configure.heartbeatInterval * 2.5
+    _pingCheckInterval = (configure.heartbeatInterval *
+                          configure.pingTimeoutMultiplier)
 
     def perspective_ping(self):
         self._lastPing = time.time()

@@ -236,7 +236,8 @@ class BaseMedium(fpb.Referenceable):
 
 class PingingMedium(BaseMedium):
     _pingInterval = configure.heartbeatInterval
-    _pingCheckInterval = configure.heartbeatInterval * 2.5
+    _pingCheckInterval = (configure.heartbeatInterval *
+                          configure.pingTimeoutMultiplier)
     _pingDC = None
 
     def startPinging(self, disconnect):

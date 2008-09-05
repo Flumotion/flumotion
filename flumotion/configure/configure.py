@@ -86,6 +86,10 @@ different configdir, logdir and rundir.
 @type processKillWait int
 @var  heartbeatInterval: component heartbeat interval, in seconds
 @type heartbeatInterval: int
+@var  pingTimeoutMultiplier: how long to wait before assuming a lost
+                             connection, specified as a multiple of the
+                             heartbeatInterval
+@type pingTimeoutMultiplier: float
 '''
 
 # Note: This module is loaded very early on, so
@@ -142,3 +146,7 @@ branchName = 'trunk'
 processTermWait = 10
 processKillWait = 5
 heartbeatInterval = 5
+# FIXME: bring pingTimeoutMultiplier back to 2.5 once the ping
+# problems are fixed properly (possibly that value won't be needed at
+# that point at all)
+pingTimeoutMultiplier = 6.0
