@@ -1,7 +1,8 @@
 <registry>
   <plugs>
     <plug socket="flumotion.component.plugs.base.ComponentPlug"
-          type="component-cortado">
+          type="component-cortado"
+          _description="Serves the embedded Cortado Java player.">
       <entries>
         <entry type="default"
                location="flumotion/component/plugs/cortado/cortado.py"
