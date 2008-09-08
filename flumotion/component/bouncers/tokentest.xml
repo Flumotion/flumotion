@@ -19,8 +19,7 @@
   </components>
   <plugs>
     <plug socket="flumotion.component.bouncers.plug.BouncerPlug"
-          type="bouncer-testtoken"
-               _description="A test bouncer plug that only allows one token.">
+          type="bouncer-testtoken">
       <entry location="flumotion/component/bouncers/tokentest.py"
              function="BouncerTestTokenPlug"/>
       <properties>

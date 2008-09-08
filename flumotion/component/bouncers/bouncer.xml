@@ -1,8 +1,7 @@
 <registry>
   <plugs>
     <plug socket="flumotion.component.bouncers.plug.BouncerPlug"
-          type="bouncer-trivial"
-          _description="A bouncer plug that always accepts authentication requests.">
+          type="bouncer-trivial">
       <entry location="flumotion/component/bouncers/plug.py"
              function="BouncerTrivialPlug"/>
     </plug>
