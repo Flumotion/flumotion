@@ -1,66 +1,81 @@
 <registry>
   <plugs>
     <plug socket="flumotion.component.plugs.request.RequestLoggerPlug"
-          type="requestlogger-file">
+          type="requestlogger-file"
+          _description="Logs all stream requests to a W3C-compatible log file.">
       <entry location="flumotion/component/plugs/request.py"
              function="RequestLoggerFilePlug"/>
 
       <properties>
-        <property name="logfile" type="string" required="true"/>
+        <property name="logfile" type="string" required="true"
+                  _description="Path to log file to which to log requests." />
       </properties>
     </plug>
 
     <plug socket="flumotion.component.plugs.adminaction.AdminActionPlug"
-          type="adminaction-loggerfile">
+          type="adminaction-loggerfile"
+          _description="Logs all actions made by admin clients to a log file.">
       <entry location="flumotion/component/plugs/adminaction.py"
              function="AdminActionLoggerFilePlug"/>
 
       <properties>
-        <property name="logfile" type="string" required="true"/>
+        <property name="logfile" type="string" required="true"
+                  _description="Path to log file to which to log admin actions." />
       </properties>
     </plug>
 
     <plug socket="flumotion.component.plugs.base.ManagerPlug"
-          type="manager-example">
+          type="manager-example"
+          _description="Shows how a manager plug works by printing on console.">
       <entry location="flumotion/component/plugs/base.py"
              function="ManagerExamplePlug"/>
     </plug>
 
     <plug socket="flumotion.component.plugs.base.ManagerPlug"
-          type="manager-manhole">
+          type="manager-manhole"
+          _description="Creates a manhole to a manager to which you can log in over telnet or ssh.">
       <entry location="flumotion/component/plugs/manhole.py"
              function="ManagerManholePlug"/>
 
       <properties>
-        <property name="ssh-authorized-keys-file" type="string" required="false"/>
-        <property name="initially-open" type="bool" required="false"/>
-        <property name="port" type="int" required="false"/>
+        <property name="ssh-authorized-keys-file" type="string" required="false"
+                  _description="Path to a file containing authorized keys for SSH login" />
+        <property name="initially-open" type="bool" required="false"
+                  _description="Whether the SSH port is open from the start" />
+        <property name="port" type="int" required="false"
+                  _description="The port to listen on for incoming manhole connections" />
       </properties>
     </plug>
 
     <plug socket="flumotion.component.plugs.identity.IdentityProviderPlug"
-          type="identityprovider-example">
+          type="identityprovider-example"
+          _description="Shows how an identityprovider plug works.">
       <entry location="flumotion/component/plugs/identity.py"
              function="IdentityProviderExamplePlug"/>
     </plug>
 
     <plug socket="flumotion.component.plugs.base.ComponentPlug"
-          type="component-example">
+          type="component-example"
+          _description="Shows how a component plug works by printing to console.">
       <entry location="flumotion/component/plugs/base.py"
              function="ComponentExamplePlug"/>
     </plug>
 
     <plug socket="flumotion.component.plugs.streamdata.StreamDataProviderPlug"
-          type="streamdataprovider-example">
+          type="streamdataprovider-example"
+          _description="Shows how a streamdataprovider plug works.">
       <entry location="flumotion/component/plugs/streamdata.py"
              function="StreamDataProviderExamplePlug"/>
 
       <properties>
-        <property name="description" type="string" required="true"/>
+        <property name="description" type="string" required="true"
+                  _description="Description of the stream" />
       </properties>
     </plug>
 
-    <plug socket="flumotion.component.plugs.rrd.ComponentRRDPlug" type="component-rrd">
+    <plug socket="flumotion.component.plugs.rrd.ComponentRRDPlug"
+          type="component-rrd"
+          _description="Logs clients connected and bytes transferred to an RRD file.">
       <entry location="flumotion/component/plugs/rrd.py"
              function="ComponentRRDPlug"/>
              

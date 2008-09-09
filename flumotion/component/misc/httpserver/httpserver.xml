@@ -1,7 +1,8 @@
 <registry>
   <plugs>
     <plug socket="flumotion.component.misc.httpserver.ratecontrol.RateControllerPlug"
-          type="ratecontroller-fixed">
+          type="ratecontroller-fixed"
+          _description="Rate controls on demand streaming using a fixed bitrate.">
       <entries>
         <entry type="default"
                location="flumotion/component/misc/httpserver/ratecontrol.py"
@@ -19,7 +20,8 @@
     </plug>
 
     <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug"
-          type="fileprovider-local">
+          type="fileprovider-local"
+          _description="Provides files from a local file system.">
       <entries>
         <entry type="default"
                location="flumotion/component/misc/httpserver/localprovider.py"
@@ -33,7 +35,8 @@
     </plug>
 
     <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug"
-          type="fileprovider-localcached">
+          type="fileprovider-localcached"
+          _description="Provides files from a local file system, witch caching.">
       <entries>
         <entry type="default"
                location="flumotion/component/misc/httpserver/cachedprovider.py"
