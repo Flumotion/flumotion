@@ -80,11 +80,11 @@
              function="ComponentRRDPlug"/>
              
       <properties>
-          <property name="timeout" type="int" required="false"
+          <property name="poll-interval" type="int" required="false"
                     _description="time (in seconds) to update the RRD files"/>
-          <property name="clients-filename" type="string" required="true"
+          <property name="clients-connected-file" type="string" required="true"
                     _description="absolute path to the RRD clients file"/>
-          <property name="bytes-filename" type="string" required="true"
+          <property name="bytes-transferred-file" type="string" required="true"
                     _description="absolute path to the RRD bytes transfered file"/>
       </properties>
     </plug>

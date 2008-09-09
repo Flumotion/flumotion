@@ -1,5 +1,6 @@
 2008-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/plugs/plugs.xml:
 	* flumotion/component/plugs/rrd.py:
 	  Rename plug properties.  See #1111.
 
