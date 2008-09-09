@@ -49,7 +49,7 @@ fi
 
 while true; do
   flumotion-command -m $MANAGER $EXTRAOPT \
-                    showworkers 2> /dev/null
+                    worker list 2> /dev/null
   EXITCODE=$?
   if test "$EXITCODE" = "0"; then
     echo "Manager and Worker are ready and waiting. ($PROTOCOL/$PORT)"
