@@ -100,8 +100,8 @@ for plug in registry.getPlugs():
         plugError(plug, 'contains capitals')
     if plug.type.find('_') > -1:
         plugError(plug, 'contains underscores')
-    #if not plug.description:
-    #    plugError(plug, 'is missing a description')
+    if not plug.description:
+        plugError(plug, 'is missing a description')
 
     # a plug type and its class name should match too
     normalizedType = ''.join(plug.type.split('-')) + 'plug'
@@ -135,11 +135,11 @@ for plug in registry.getPlugs():
 
     for p in plug.getProperties():
         if p.name != p.name.lower():
-            propertyError(c, p, "contains capitals")
+            propertyError(plug, p, "contains capitals")
         if p.name.find('_') > -1:
-            propertyError(c, p, "contains underscores")
-        #if not p.description:
-        #    propertyError(c, p, "is missing a description")
+            propertyError(plug, p, "contains underscores")
+        if not p.description:
+            propertyError(plug, p, "is missing a description")
 
     #import code; code.interact(local=locals())
 

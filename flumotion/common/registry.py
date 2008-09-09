@@ -179,24 +179,28 @@ class RegistryEntryPlug:
     I represent a <plug> entry in the registry
     """
 
-    def __init__(self, filename, type, socket, entries, properties, wizards):
+    def __init__(self, filename, type,
+                 description, socket, entries, properties, wizards):
         """
-        @param filename:   name of the XML file this plug is parsed from
-        @type  filename:   str
-        @param type:       the type of plug
-        @type  type:       str
-        @param socket:     the fully qualified class name of the socket this
-                           plug can be plugged in to
-        @type  socket:     str
-        @param entries:    entry points for instantiating the plug
-        @type  entries:    list of L{RegistryEntryEntry}
-        @param properties: properties of the plug
-        @type  properties: dict of str -> L{RegistryEntryProperty}
-        @param wizards:    list of wizard entries
-        @type  wizards:    list of L{RegistryEntryWizard}
+        @param filename:    name of the XML file this plug is parsed from
+        @type  filename:    str
+        @param type:        the type of plug
+        @type  type:        str
+        @param description: the translatable description of the plug
+        @type  description: str
+        @param socket:      the fully qualified class name of the socket this
+                            plug can be plugged in to
+        @type  socket:      str
+        @param entries:     entry points for instantiating the plug
+        @type  entries:     list of L{RegistryEntryEntry}
+        @param properties:  properties of the plug
+        @type  properties:  dict of str -> L{RegistryEntryProperty}
+        @param wizards:     list of wizard entries
+        @type  wizards:     list of L{RegistryEntryWizard}
         """
         self.filename = filename
         self.type = type
+        self.description = description
         self.socket = socket
         self.entries = entries
         self.properties = properties
@@ -232,6 +236,9 @@ class RegistryEntryPlug:
 
     def getType(self):
         return self.type
+
+    def getDescription(self):
+        return self.description
 
     def getSocket(self):
         return self.socket
@@ -793,14 +800,25 @@ class RegistryParser(fxml.Parser):
         return entries
 
     def _parsePlug(self, node):
-        # <plug socket="..." type="...">
+        # <plug socket="..." type="..." _description="...">
         #   <entries>
         #   <entry>
         #   <properties>
         #   <wizard>
         # </plug>
 
-        plugType, socket = self.parseAttributes(node, ('type', 'socket'))
+        # F0.8: make _description be required
+        plugType, socket, description = \
+            self.parseAttributes(node, required=('type', 'socket'),
+                optional=('_description', ))
+
+        if not description:
+            import warnings
+            warnings.warn(
+                "Please add '_description=...' attribute to plug '%s'" %
+                    plugType,
+                DeprecationWarning)
+            description = 'TODO'
 
         entries = {}
         properties = {}
@@ -820,7 +838,7 @@ class RegistryParser(fxml.Parser):
             raise fxml.ParserError(
                 "<plug> %s needs a default <entry>" % plugType)
 
-        return RegistryEntryPlug(self.filename, plugType,
+        return RegistryEntryPlug(self.filename, plugType, description,
                                  socket, entries, properties,
                                  wizards)
 
@@ -1331,8 +1349,8 @@ class RegistryWriter(log.Loggable):
         w(2, '<plugs>')
         w(0, '')
         for plug in self.plugs:
-            w(4, '<plug type="%s" socket="%s">'
-              % (plug.getType(), plug.getSocket()))
+            w(4, '<plug type="%s" socket="%s" _description="%s">'
+              % (plug.getType(), plug.getSocket(), plug.getDescription()))
 
             _dump_entries(6, plug.getEntries())
 

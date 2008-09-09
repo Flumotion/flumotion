@@ -174,6 +174,9 @@ def main(args):
             p = r.getPlug(cname)
             print '\nPlug type:'
             print '  %s' % cname
+            desc = p.getDescription()
+            if desc:
+                print '  %s' % desc
             print '\nEntry:'
             e = p.getEntry()
             print '  %s() in %s' % (e.getFunction(), e.getModuleName())

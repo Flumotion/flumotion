@@ -274,7 +274,7 @@ class TestRegistry(testsuite.TestCase):
     </component>
   </components>
   <plugs>
-    <plug type="baz" socket="frogger">
+    <plug type="baz" socket="frogger" _description="a frog">
       <entries>
         <entry type="default" location="loc" function="main"/>
       </entries>
@@ -319,7 +319,7 @@ class TestRegistry(testsuite.TestCase):
 
   <plugs>
 
-    <plug type="baz" socket="frogger">
+    <plug type="baz" socket="frogger" _description="a frog">
       <entries>
         <entry type="default" location="loc" function="main"/>
       </entries>
@@ -419,7 +419,7 @@ class TestRegistry(testsuite.TestCase):
     </component>
   </components>
   <plugs>
-    <plug type="baz" socket="frogger">
+    <plug type="baz" socket="frogger" _description="a frog">
       <entry location="loc" function="main"/>
       <properties>
         <property name="qux" type="string" _description="a quxy property"/>
@@ -475,7 +475,7 @@ class TestRegistry(testsuite.TestCase):
 
   <plugs>
 
-    <plug type="baz" socket="frogger">
+    <plug type="baz" socket="frogger" _description="a frog">
       <entries>
         <entry type="default" location="loc" function="main"/>
       </entries>
