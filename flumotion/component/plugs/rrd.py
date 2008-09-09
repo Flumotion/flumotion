@@ -30,7 +30,7 @@ try:
 except ImportError:
     rrdtool = False
 
-TIMEOUT_DEFAULT = 60 # timeout in seconds
+POLL_INTERVAL = 60 # in seconds
 
 
 class ComponentRRDPlug(base.ComponentPlug):
@@ -46,9 +46,9 @@ class ComponentRRDPlug(base.ComponentPlug):
 
         self.component = component
         properties = self.args['properties']
-        self.timeout = properties.get('timeout', TIMEOUT_DEFAULT)
-        self.clients = properties['clients-filename']
-        self.bytes = properties['bytes-filename']
+        self.timeout = properties.get('poll-interval', POLL_INTERVAL)
+        self.clients = properties['clients-connected-file']
+        self.bytes = properties['bytes-transferred-file']
         self.ready = self.check_rrd()
         self.lastbytes = 0
         # call to update_rrd with a config timeout

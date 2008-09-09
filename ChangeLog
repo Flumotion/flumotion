@@ -1,5 +1,10 @@
 2008-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/plugs/rrd.py:
+	  Rename plug properties.  See #1111.
+
+2008-09-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/validate-registry.py:
 	* flumotion/common/registry.py:
 	* flumotion/launch/inspect.py:
