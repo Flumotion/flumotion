@@ -200,6 +200,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._componentList = None # ComponentList
         self._componentStates = None # name -> planet.AdminComponentState
         self._componentView = None
+        self._componentNameToSelect = None
         self._debugEnabled = False
         self._debugActions = None
         self._debugEnableAction = None
@@ -658,6 +659,8 @@ class AdminWindow(Loggable, GladeDelegate):
         self._clearMessages()
         self._statusbar.clear(None)
         self._updateComponentActions()
+        scenario = assistant.getScenario()
+        self._componentNameToSelect = scenario.getSelectComponentName()
         self.show()
 
     def _getComponentBy(self, componentType):
@@ -827,7 +830,8 @@ class AdminWindow(Loggable, GladeDelegate):
         self._addFormatAction.set_sensitive(hasProducer)
 
     def _updateComponents(self):
-        self._componentList.clearAndRebuild(self._componentStates)
+        self._componentList.clearAndRebuild(self._componentStates,
+                                            self._componentNameToSelect)
         self._trayicon.update(self._componentStates)
 
     def _hasProducerComponent(self):

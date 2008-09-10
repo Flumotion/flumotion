@@ -92,6 +92,8 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         self._iters = {} # componentState -> model iter
         self._lastStates = None
+        self._model = None
+        self._view = None
         self._moodPixbufs = self._getMoodPixbufs()
         self._createUI(treeView)
 
@@ -216,13 +218,14 @@ class ComponentList(log.Loggable, gobject.GObject):
             canStop = canStop and moodname != 'sleeping'
         return canStop
 
-    def clearAndRebuild(self, components):
+    def clearAndRebuild(self, components, componentNameToSelect=None):
         """
         Update the components view by removing all old components and
         showing the new ones.
 
         @param components: dictionary of name ->
                            L{flumotion.common.component.AdminComponentState}
+        @param componentNameToSelect: name of the component to select or None
         """
         # remove all Listeners
         self._model.foreach(self._removeListenerForeach)
@@ -260,13 +263,18 @@ class ComponentList(log.Loggable, gobject.GObject):
                 self._setMoodValue(titer, mood)
 
             self._model.set(titer, COL_STATE, component)
-
-            self._model.set(titer, COL_NAME, getComponentLabel(component))
+            componentName = getComponentLabel(component)
+            self._model.set(titer, COL_NAME, componentName)
 
             pid = component.get('pid')
             self._model.set(titer, COL_PID, (pid and str(pid)) or '')
 
             self._updateWorker(titer, component)
+            if (componentNameToSelect is not None and
+                componentName == componentNameToSelect):
+                selection = self._view.get_selection()
+                selection.select_iter(titer)
+
         self.debug('updated components view')
 
         self._updateStartStop()

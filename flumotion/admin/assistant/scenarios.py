@@ -136,12 +136,20 @@ class Scenario(object):
         raise NotImplementedError("%s.save" % (
             self.__class__.__name__, ))
 
+    def getSelectComponentName(self):
+        raise NotImplementedError("%s.getSelectComponentName" % (
+            self.__class__.__name__, ))
+
 
 class LiveScenario(Scenario):
     short = _("Stream live")
     description = _(
         """Allows you to create a live stream from a device or a file.
         """)
+
+    def __init__(self, wizard):
+        Scenario.__init__(self, wizard)
+        self._defaultConsumer = None
 
     # Scenario
 
@@ -184,13 +192,15 @@ class LiveScenario(Scenario):
                 assert httpPorter.exists, httpPorter
             saver.addPorter(httpPorter, 'http')
 
-        for step in self._getConsumptionSteps():
+        steps = list(self._getConsumptionSteps())
+        for step in steps:
             consumerType = step.getConsumerType()
             consumer = step.getConsumerModel()
             if httpPorter is not None:
                 consumer.setPorter(httpPorter)
             saver.addConsumer(consumer, consumerType)
-
+            if not self._defaultConsumer:
+                self._defaultConsumer = consumer
             for server in step.getServerConsumers():
                 saver.addServerConsumer(server, consumerType)
 
@@ -200,6 +210,9 @@ class LiveScenario(Scenario):
                 saver.setUseCCLicense(True)
 
         return saver
+
+    def getSelectComponentName(self):
+        return self._defaultConsumer.name
 
     # Private
 
@@ -217,6 +230,10 @@ class OnDemandScenario(Scenario):
     short = _("Stream files on demand")
     description = _("""Allows you to serve a collection of files from disk.""")
 
+    def __init__(self, wizard):
+        Scenario.__init__(self, wizard)
+        self._consumer = None
+
     # Scenario
 
     def addSteps(self):
@@ -229,4 +246,8 @@ class OnDemandScenario(Scenario):
         ondemandStep = self.wizard.getStep('Demand')
         consumer = ondemandStep.getServerConsumer()
         saver.addServerConsumer(consumer, 'ondemand')
+        self._consumer = consumer
         return saver
+
+    def getSelectComponentName(self):
+        return self._consumer.name
