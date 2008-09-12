@@ -1,3 +1,9 @@
+2008-09-12  Arek Korbik  <arkadini@gmail.com>
+
+	* common/validate-config.py:
+	Make the script actually validate the whole flow file, not only
+	the manager-specific parts.
+
 2008-09-10  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/assistant/scenarios.py:
