@@ -141,7 +141,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
     # my methods
 
-    def addMessage(self, level, id, format, *args, **kwargs):
+    def addMessage(self, level, mid, format, *args, **kwargs):
         """
         Convenience message to construct a message and add it to the
         component state. `format' should be marked as translatable in
@@ -157,7 +157,7 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         self.addMessageObject(messages.Message(level,
                                                T_(format, *args),
-                                               id=id, **kwargs))
+                                               mid=mid, **kwargs))
 
     def addMessageObject(self, message):
         """

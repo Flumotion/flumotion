@@ -188,7 +188,7 @@ def check1394(mid):
         if not os.path.exists('/dev/raw1394'):
             m = messages.Error(T_(N_(
                 "Neither device node /dev/fw0 nor /dev/raw1394 exists.")),
-            id=mid)
+            mid=mid)
         result.add(m)
         return defer.succeed(result)
 

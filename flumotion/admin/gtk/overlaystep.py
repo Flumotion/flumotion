@@ -143,7 +143,7 @@ class OverlayStep(WorkerWizardStep):
                     "Worker '%s' is missing GStreamer elements '%s'.",
                     len(elements))
                 message = messages.Warning(
-                    T_(f, self.worker, "', '".join(elements)), id='overlay')
+                    T_(f, self.worker, "', '".join(elements)), mid='overlay')
                 message.add(
                     T_(
                     N_("\n\nClick \"Forward\" to proceed without overlay.")))

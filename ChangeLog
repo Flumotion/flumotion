@@ -1,3 +1,22 @@
+2008-09-15  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/admin/gtk/httpstreamersteps.py (checkElements):
+	* flumotion/admin/gtk/overlaystep.py (checkElements):
+	* flumotion/component/bouncers/ipbouncer.py (IPBouncer.do_setup):
+	* flumotion/component/combiners/switch/switch.py (Switch.addWarning):
+	* flumotion/component/converters/overlay/overlay.py
+	  (Overlay.configure_pipeline):
+	* flumotion/component/plugs/rrd.py (ComponentRRDPlug._check_import):
+	* flumotion/worker/checks/check.py (checkPlugin):
+	* flumotion/worker/checks/gst010.py (do_check):
+	Remove deprecated use of 'id' keyword argument in calls of
+	constructor of Message classes, use 'mid' instead.
+
+	* flumotion/manager/component.py (ComponentAvatar.addMessage):
+	* flumotion/manager/manager.py (Vishnu.addMessage):
+	Rename the non-keyword 'id' argument to 'mid' in addMessage()
+	methods.
+
 2008-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/Makefile.am:

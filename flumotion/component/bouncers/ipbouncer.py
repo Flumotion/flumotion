@@ -58,7 +58,7 @@ class IPBouncer(bouncer.Bouncer):
                     m = messages.Error(
                         T_(N_("Invalid value for property %r: %s"), p, s),
                         log.getExceptionMessage(e),
-                        id='match-type')
+                        mid='match-type')
                     self.addMessage(m)
                     raise errors.ComponentSetupHandledError()
 

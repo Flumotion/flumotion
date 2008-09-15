@@ -229,7 +229,7 @@ def checkPlugin(pluginName, packageName, minimumVersion=None,
             or (featureCheck and not featureCheck(byname[featureName]))):
             m = messages.Error(T_(
                 N_("Your '%s' GStreamer plug-in is too old.\n"), pluginName),
-                id = 'plugin-%s-check' % pluginName)
+                mid = 'plugin-%s-check' % pluginName)
             m.add(T_(N_(
                 "Please upgrade '%s' to version %s or higher."),
                 packageName, ".".join([str(x) for x in minimumVersion])))
@@ -238,7 +238,7 @@ def checkPlugin(pluginName, packageName, minimumVersion=None,
         m = messages.Error(T_(
             N_("Version %s of the '%s' GStreamer plug-in is too old.\n"),
                ".".join([str(x) for x in version]), pluginName),
-            id = 'plugin-%s-check' % pluginName)
+            mid = 'plugin-%s-check' % pluginName)
         m.add(T_(N_(
             "Please upgrade '%s' to version %s."), packageName,
                ".".join([str(x) for x in minimumVersion])))

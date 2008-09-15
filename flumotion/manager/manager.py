@@ -279,7 +279,7 @@ class Vishnu(log.Loggable):
             self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
         return self.bundlerBasket
 
-    def addMessage(self, level, id, format, *args, **kwargs):
+    def addMessage(self, level, mid, format, *args, **kwargs):
         """
         Convenience message to construct a message and add it to the
         planet state. `format' should be marked as translatable in the
@@ -295,7 +295,7 @@ class Vishnu(log.Loggable):
         """
         self.addMessageObject(messages.Message(level,
                                                T_(format, *args),
-                                               id=id, **kwargs))
+                                               mid=mid, **kwargs))
 
     def addMessageObject(self, message):
         """

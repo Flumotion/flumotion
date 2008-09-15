@@ -60,7 +60,7 @@ class ComponentRRDPlug(base.ComponentPlug):
             mesg = messages.Warning("rrdtool module is not present "
                                     "in your system. This plug [rrd] "
                                     "is disabled now.",
-                                    id='rrdtool-import-error')
+                                    mid='rrdtool-import-error')
             component.addMessage(mesg)
             return False
         return True

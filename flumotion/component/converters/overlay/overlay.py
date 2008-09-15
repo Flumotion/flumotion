@@ -75,13 +75,13 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         if textOverflowed:
             m = messages.Warning(
                 T_(N_("Overlayed text '%s' too wide for the video image."),
-                   text), id="text-too-wide")
+                   text), mid="text-too-wide")
             self.addMessage(m)
 
         if imagesOverflowed:
             m = messages.Warning(
                 T_(N_("Overlayed logotypes too wide for the video image.")),
-                id="image-too-wide")
+                mid="image-too-wide")
             self.addMessage(m)
 
         source = self.get_element('source')
@@ -92,7 +92,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
                 T_(N_("The 'videomixer' GStreamer element has a bug in this "
                       "version (0.10.7). You may see many errors in the debug "
                       "output, but it should work correctly anyway.")),
-                id = "videomixer-bug")
+                mid="videomixer-bug")
             self.addMessage(m)
 
     def do_stop(self):

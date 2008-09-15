@@ -349,7 +349,7 @@ class HTTPSpecificStep(ConsumerStep):
                     len(elements))
                 message = messages.Warning(
                     T_(f, self.worker, "', '".join(elements)),
-                    id='httpstreamer')
+                    mid='httpstreamer')
                 self.wizard.add_msg(message)
                 self.wizard.taskFinished(True)
                 return defer.fail(errors.FlumotionError(

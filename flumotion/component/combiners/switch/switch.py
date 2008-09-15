@@ -123,7 +123,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
     def addWarning(self, id, format, *args, **kwargs):
         self.warning(format, *args)
         m = messages.Message(messages.WARNING, T_(format, *args),
-                             id=id, **kwargs)
+                             mid=id, **kwargs)
         self.addMessage(m)
 
     def clearWarning(self, id):
