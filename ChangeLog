@@ -1,5 +1,10 @@
 2008-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/monitor/nagios/Makefile.am:
+	  Actually dist stream.py
+
+2008-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/monitor/nagios/util.py:
 	  Add constructors for Nagios Exceptions.
 	* flumotion/monitor/nagios/main.py:

@@ -6,8 +6,9 @@ flumotion_PYTHON =	\
 	__init__.py	\
 	log.py		\
 	util.py		\
+	main.py 	\
 	process.py	\
-	main.py
+	stream.py
 
 TAGS_FILES = $(flumotion_PYTHON)
 ETAGS_ARGS = --lang=python $(flumotion_PYTHON)
