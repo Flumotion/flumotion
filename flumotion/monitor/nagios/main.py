@@ -23,6 +23,8 @@
 main for flumotion-nagios
 """
 
+import sys
+
 from twisted.internet import reactor, defer
 
 from flumotion.common import common, errors, planet, log
@@ -258,6 +260,11 @@ class Nagios(util.LogCommand):
 
 def main(args):
     c = Nagios()
-    ret = c.parse(args[1:])
+    try:
+        ret = c.parse(args[1:])
+    except util.NagiosException, e:
+        sys.stderr.write('%s\n' % e.message)
+        return e.exitStatus
+
 
     return ret

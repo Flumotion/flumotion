@@ -1,3 +1,17 @@
+2008-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/util.py:
+	  Add constructors for Nagios Exceptions.
+	* flumotion/monitor/nagios/main.py:
+	  Catch them from parsing.
+	* flumotion/monitor/nagios/stream.py:
+	  Make sure self._url is unchanged from the properties, so that
+	  the script reports what URL was requested.
+	  Check audio and video mime type against the encoded ones, which
+	  is what we are interested in.
+	  Only print one line in the case of a 404.
+	  Document/comment.
+
 2008-09-12  Arek Korbik  <arkadini@gmail.com>
 
 	* common/validate-config.py:

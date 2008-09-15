@@ -98,16 +98,28 @@ def unknown(msg):
 
 
 class NagiosException(Exception):
-    pass
+    message = None
+    exitStatus = None
+
+    def __init__(self, message, exitStatus):
+        self.message = message
+        self.exitStatus = exitStatus
+        self.args = (message, exitStatus)
 
 
 class NagiosWarning(NagiosException):
-    pass
+
+    def __init__(self, message):
+        NagiosException.__init__(self, 'WARNING: %s' % message, 1)
 
 
 class NagiosCritical(NagiosException):
-    pass
+
+    def __init__(self, message):
+        NagiosException.__init__(self, 'CRITICAL: %s' % message, 2)
 
 
 class NagiosUnknown(NagiosException):
-    pass
+
+    def __init__(self, message):
+        NagiosException.__init__(self, 'UNKNOWN: %s' % message, 3)

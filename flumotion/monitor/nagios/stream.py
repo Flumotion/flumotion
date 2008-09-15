@@ -28,6 +28,8 @@ import re
 import time
 import gst
 import gobject
+
+from flumotion.extern.log import log
 from flumotion.monitor.nagios import util
 
 URLFINDER = 'http://[^\s"]*' # to search urls in playlists
@@ -46,6 +48,7 @@ class Check(util.LogCommand):
         self._isVideo = False
         self._isPlaylist = True
         self._url = None
+        self._streamurl = None
 
         util.LogCommand.__init__(self, parentCommand, **kwargs)
 
@@ -66,7 +69,7 @@ class Check(util.LogCommand):
             help='Video pixel aspect ratio (fraction)')
         self.parser.add_option('-M', '--videomimetype',
             action="store", dest="videomimetype",
-            help='Video mimetype')
+            help='Mime type of the encoded video')
 
         # audio options
         self.parser.add_option('-s', '--audiosamplerate',
@@ -83,15 +86,16 @@ class Check(util.LogCommand):
             help='Audio depth')
         self.parser.add_option('-m', '--audiomimetype',
             action="store", dest="audiomimetype",
-            help='Audio mimetype')
+            help='Mime type of the encoded audio')
 
         # general option
         self.parser.add_option('-D', '--duration',
             action="store", dest="duration", default='5',
-            help='Check duration (default 5 seconds)')
+            help='Minimum duration of decoded data (default 5 seconds)')
         self.parser.add_option('-t', '--timeout',
             action="store", dest="timeout", default='10',
-            help='Number of seconds to timeout.')
+            help='Number of seconds before timing out and failing '
+                '(default 10 seconds)')
         self.parser.add_option('-p', '--playlist',
             action="store_true", dest="playlist",
             help='is a playlist')
@@ -133,8 +137,9 @@ class Check(util.LogCommand):
         if self._url.endswith('.m3u') or self._url.endswith('.asx'):
             self.options.playlist = True
 
+        self._streamurl = self._url
         if self.options.playlist:
-            self._url = self.getURLFromPlaylist(self._url)
+            self._streamurl = self.getURLFromPlaylist(self._url)
 
         result = self.checkStream()
         return result
@@ -142,19 +147,24 @@ class Check(util.LogCommand):
     def getURLFromPlaylist(self, url):
         playlist = urllib.urlopen(self._url).read()
         if playlist.startswith('404'):
-            return util.critical(playlist)
+            raise util.NagiosCritical(playlist)
+
         urls = re.findall(URLFINDER, playlist)
         return urls[-1] # new (the last) url to check
 
     def checkStream(self):
         """Launch the pipeline and compare values with the expecteds"""
+        url = self._url
         while self._isPlaylist: #use gstreamer to detect the playlist
+            self.debug('checking url %s', url)
             gstinfo = GSTInfo(int(self.options.timeout),
-                              int(self.options.duration), self._url)
+                              int(self.options.duration), url)
             elements = gstinfo.getElements()
             self._isPlaylist = gstinfo.isPlaylist()
             if self._isPlaylist:
-                self._url = self.getURLFromPlaylist(self._url) #replace the url
+                url = self.getURLFromPlaylist(url)
+
+        self._streamurl = url
 
         running = gstinfo.getRunning() # seconds running gstinfo
         counter = gstinfo.getCounter() # seconds getting media data
@@ -163,73 +173,25 @@ class Check(util.LogCommand):
             caps = i.get_caps()
             if caps == 'ANY' or not caps:
                 if gstinfo.getError():
-                    return self.critical(gstinfo.getError())
+                    return self.critical("GStreamer error: %s" %
+                        gstinfo.getError())
                 else:
-                    return self.critical("There aren't caps in this stream.")
+                    return self.critical("The stream has no caps.")
 
-        for i in elements['decoder'].src_pads():
-            caps = i.get_caps()
-            mime = caps.to_string().split(', ')[0]
-            # tests for audio
-            if 'audio' in caps.to_string():
-                self._isAudio = True
-                if self.options.audiomimetype:
-                    if self.options.audiomimetype != mime:
-                        return self.critical('Audio mime type fail: '
-                        'EXPECTED: %s, ACTUAL: %s' %
-                        (self.options.audiomimetype, mime))
-                if self.options.audiosamplerate:
-                    if int(self.options.audiosamplerate) != caps[0]['rate']:
-                        return self.critical('Audio sample rate fail: '
-                        'EXPECTED: %s, ACTUAL: %s' %
-                        (self.options.audiosamplerate, caps[0]['rate']))
-                if self.options.audiowidth:
-                    if int(self.options.audiowidth) != caps[0]['width']:
-                        return self.critical('Audio width fail: '
-                        'EXPECTED: %s, ACTUAL: %s' %
-                        (self.options.audiowidth, caps[0]['width']))
-                if self.options.audiodepth:
-                    if int(self.options.audiodepth) != caps[0]['depth']:
-                        return self.critical('Audio depth fail: '
-                        'EXPECTED: %s, ACTUAL: %s' %
-                        (self.options.audiodepth, caps[0]['depth']))
-                if self.options.audiochannels:
-                    if int(self.options.audiochannels) != caps[0]['channels']:
-                        return self.critical('Audio channels fail: '
-                        'EXPECTED: %s, ACTUAL: %s' %
-                        (self.options.audiochannels, caps[0]['channels']))
-            # tests for video
-            if 'video' in caps.to_string():
-                self._isVideo = True
-                if self.options.videomimetype:
-                    if self.options.videomimetype != mime:
-                        return self.critical('Video mime type fail: '
-                        'EXPECTED: %s, ACTUAL: %s' %
-                        (self.options.videomimetype, mime))
-                if self.options.videowidth:
-                    if int(self.options.videowidth) != caps[0]['width']:
-                        return self.critical('Video width fail: '
-                        'EXPECTED: %s, ACTUAL: %s' %
-                        (self.options.videowidth, caps[0]['width']))
-                if self.options.videoheight:
-                    if int(self.options.videoheight) != caps[0]['height']:
-                        return self.critical('Video height fail: '
-                        'EXPECTED: %s, ACTUAL: %s' %
-                        (self.options.videoheight, caps[0]['height']))
-                if self.options.videoframerate:
-                    value = caps[0]['framerate']
-                    if self.options.videoframerate != '%i/%i' % \
-                        (value.num, value.denom):
-                        return self.critical('Video framerate fail: '
-                        'EXPECTED: %s, ACTUAL: %i/%i' %
-                        (self.options.videoframerate, value.num, value.denom))
-                if self.options.videopar:
-                    value = caps[0]['pixel-aspect-ratio']
-                    if self.options.videopar != '%i/%i' % \
-                        (value.num, value.denom):
-                        return self.critical('Video height fail: '
-                        'EXPECTED: %s, ACTUAL: %i/%i' %
-                        (self.options.videopar, value.num, value.denom))
+        # loop through all elements in the decoder bin, finding the actual
+        # decoders
+        for element in elements['decoder']:
+            for pad in element.src_pads():
+                caps = pad.get_caps()
+                name = caps[0].get_name()
+                if name.startswith('audio/x-raw-'):
+                    ret = self._verifyAudioOptions(element, caps)
+                    if ret:
+                        return ret
+                if name.startswith('video/x-raw-'):
+                    ret = self._verifyVideoOptions(element, caps)
+                    if ret:
+                        return ret
 
         # is audio and/or video missing?
         if self._expectAudio != self._isAudio:
@@ -248,30 +210,136 @@ class Check(util.LogCommand):
         gstinfo.setState(gst.STATE_NULL)
         if self._expectAudio and self._expectVideo:
             return self.ok('Got %i seconds of audio and video in '
-                           '%i seconds of runtime.' % (counter, running))
+                           '%.2f seconds of runtime.' % (counter, running))
         elif self._expectAudio:
             return self.ok('Got %i seconds of audio in '
-                           '%i seconds of runtime.' % (counter, running))
+                           '%.2f seconds of runtime.' % (counter, running))
         elif self._expectVideo:
             return self.ok('Got %i seconds of video in '
-                           '%i seconds of runtime.' % (counter, running))
-        else: # impossible condition?
-            return self.critical("All appears OK, but the stream haven't"
-                                 "audio or video data.")
+                           '%.2f seconds of runtime.' % (counter, running))
+        else:
+            # There was no audio or video, and no options were given to check.
+            # Still, this is probably an error on the nagios user's part.
+            return self.critical("The stream does not have audio or video.")
+
+    def _verifyAudioOptions(self, element, caps):
+        self.debug('verifying audio options against element %r with caps %s',
+            element, caps.to_string())
+        # match the audio options against the given element and src caps
+        self._isAudio = True
+        if self.options.audiomimetype:
+            # mime type should be gotten from the sink pad of the encoder
+            mime = None
+            for pad in element.sink_pads():
+                mime = pad.get_caps()[0].get_name()
+
+            if self.options.audiomimetype != mime:
+                return self.critical(
+                    'Audio mime type fail: EXPECTED: %s, ACTUAL: %s' % (
+                        self.options.audiomimetype, mime))
+
+        if self.options.audiosamplerate:
+            if int(self.options.audiosamplerate) != caps[0]['rate']:
+                return self.critical(
+                    'Audio sample rate fail: EXPECTED: %s, ACTUAL: %s' % (
+                        self.options.audiosamplerate, caps[0]['rate']))
+
+        if self.options.audiowidth:
+            if int(self.options.audiowidth) != caps[0]['width']:
+                return self.critical(
+                    'Audio width fail: EXPECTED: %s, ACTUAL: %s' % (
+                        self.options.audiowidth, caps[0]['width']))
+
+        if self.options.audiodepth:
+            if int(self.options.audiodepth) != caps[0]['depth']:
+                return self.critical(
+                    'Audio depth fail: EXPECTED: %s, ACTUAL: %s' % (
+                        self.options.audiodepth, caps[0]['depth']))
+
+        if self.options.audiochannels:
+            if int(self.options.audiochannels) != caps[0]['channels']:
+                return self.critical(
+                    'Audio channels fail: EXPECTED: %s, ACTUAL: %s' % (
+                        self.options.audiochannels, caps[0]['channels']))
+
+    def _verifyVideoOptions(self, element, caps):
+        self.debug('verifying video options against element %r with caps %s',
+            element, caps.to_string())
+        # match the video options against the given element and src caps
+        self._isVideo = True
+
+        if self.options.videomimetype:
+            # mime type should be gotten from the sink pad of the encoder
+            mime = None
+            for pad in element.sink_pads():
+                mime = pad.get_caps()[0].get_name()
+            if self.options.videomimetype != mime:
+                return self.critical(
+                    'Video mime type fail: EXPECTED: %s, ACTUAL: %s' % (
+                        self.options.videomimetype, mime))
+
+        if self.options.videowidth:
+            print caps
+            if int(self.options.videowidth) != caps[0]['width']:
+                return self.critical(
+                    'Video width fail: EXPECTED: %s, ACTUAL: %s' % (
+                        self.options.videowidth, caps[0]['width']))
+
+        if self.options.videoheight:
+            if int(self.options.videoheight) != caps[0]['height']:
+                return self.critical(
+                    'Video height fail: EXPECTED: %s, ACTUAL: %s' % (
+                        self.options.videoheight, caps[0]['height']))
+
+        if self.options.videoframerate:
+            value = caps[0]['framerate']
+            if self.options.videoframerate != '%i/%i' % \
+                (value.num, value.denom):
+                return self.critical(
+                    'Video framerate fail: EXPECTED: %s, ACTUAL: %i/%i' % (
+                        self.options.videoframerate, value.num, value.denom))
+
+        if self.options.videopar:
+            value = caps[0]['pixel-aspect-ratio']
+            if self.options.videopar != '%i/%i' % \
+                (value.num, value.denom):
+                return self.critical(
+                    'Video height fail: EXPECTED: %s, ACTUAL: %i/%i' % (
+                        self.options.videopar, value.num, value.denom))
 
 
-class GSTInfo:
-    """Get info from stream using a gstreamer pipeline"""
+class GSTInfo(log.Loggable):
+    """
+    Get info from a given URL using a gstreamer pipeline.
+
+    @param timeout:  maximum actual runtime before timing out
+    @param duration: the minimum duration of decoded data to get in the timeout
+                     interval
+    @param url:      the url of the stream/playlist
+    """
+
+    # FIXME: duration is interpreted wrong in this object.
+    # Instead, what should happen is:
+    # for each kind of decoded stream, save the first decoded buffer timestamp
+    # keep checking buffer timestamps + offsets
+    # as soon as each stream has duration's worth of decoded data, this
+    # object can return a value
+
+    # FIXME: running a main loop in the constructor is not a hot idea
 
     def __init__(self, timeout, duration, url):
         self._mainloop = gobject.MainLoop()
-        self._counter = 0 # counter to track the playing state
+
+        gobject.timeout_add(timeout * 1000, self.endTimeout)
+        self._duration = duration
+        self._url = url
+
         _pipeline = 'souphttpsrc name=httpsrc ! ' \
                     'typefind name=typefinder ! ' \
                     'decodebin name=decoder ! ' \
                     'fakesink'
-        self._duration = duration
-        self._url = url
+
+        self._counter = 0 # counter to track the playing state
         self._error = ''
         self._playlist = False
         self._timeout = True
@@ -284,7 +352,6 @@ class GSTInfo:
         bus.add_watch(self.busWatch)
         self._elements['httpsrc'].set_property('location', url)
         self._pipeline.set_state(gst.STATE_PLAYING)
-        gobject.timeout_add(timeout * 1000, self.endTimeout)
 
         self._mainloop.run()
 
@@ -301,17 +368,24 @@ class GSTInfo:
         return self._playlist
 
     def getRunning(self):
+        """
+        Gets the running time.  only available after the pipeline has quit.
+
+        @returns: the time spent running the pipeline
+        @rtype: float
+        """
         return self._running
 
     def getCounter(self):
         return self._counter
 
     def quit(self):
-        self._running = int(time.time() - self._startime)
+        self._running = time.time() - self._startime
         self._mainloop.quit()
 
     def busWatch(self, bus, message):
         """Capture messages in pipeline bus"""
+        self.log('busWatch: message %r', message)
         if message.type == gst.MESSAGE_EOS:
             self._pipeline.set_state(gst.STATE_NULL)
         elif message.type == gst.MESSAGE_ERROR:
