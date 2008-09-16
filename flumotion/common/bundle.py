@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -23,18 +23,39 @@
 bundles of files used to implement caching over the network
 """
 
+import StringIO
 import errno
 import md5
 import os
-import zipfile
+import sys
 import tempfile
-import StringIO
+import zipfile
 
 from flumotion.common import errors, dag
 from flumotion.common.python import makedirs
 
 __all__ = ['Bundle', 'Bundler', 'Unbundler', 'BundlerBasket']
 __version__ = "$Rev$"
+
+
+def rename(source, dest):
+    return os.rename(source, dest)
+
+
+def _win32Rename(source, dest):
+    # rename a source to dest.
+    # ignores the destination if it already exists
+    # removes source if destination already exists
+    try:
+        return os.rename(source, dest)
+    except WindowsError, e:
+        import winerror
+        if e.errno == winerror.ERROR_ALREADY_EXISTS:
+            os.unlink(source)
+
+
+if sys.platform == 'win32':
+    rename = _win32Rename
 
 
 class BundledFile:
@@ -177,7 +198,7 @@ class Unbundler:
             handle = os.fdopen(fd, 'wb')
             handle.write(data)
             handle.close()
-            os.rename(tempname, path)
+            rename(tempname, path)
         return directory
 
 

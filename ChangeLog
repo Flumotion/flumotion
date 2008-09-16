@@ -1,5 +1,8 @@
 2008-09-16  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/bundle.py: Make sure that renaming
+	a temporary file in a bundle works on win32.
+
 	* flumotion/common/netutils.py: Do nested import of fcntl,
 	since it's not available on all platforms.
 
