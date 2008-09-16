@@ -1,3 +1,5 @@
+.. contents:: Table of Contents
+
 ============================================
  Developer introduction guide for Flumotion
 ============================================
