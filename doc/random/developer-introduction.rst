@@ -96,6 +96,7 @@ community and thus there is plenty of freely available training material
 on the web.
 
 The following material is recommended to get started:
+
 - http://docs.python.org/tut/tut.html Official Python tutorial
 - http://diveintopython.org/toc/index.html Dive Into Python
 - http://openbookproject.net/thinkCSpy/index.xhtml
@@ -104,6 +105,7 @@ C
 -
 A small part of Flumotion is written in C. There are mainly two reasons for
 not writing the code in Python:
+
  - There are no existing python bindings available for a C library
  - Performance, Python cannot do it efficiently.
 
@@ -121,6 +123,7 @@ GLib & GObject
 --------------
 GLib and GObject provides the foundation to both Gtk and GStreamer.
 Things which are important to understand here are:
+
 - signal connection and callbacks
 - property access and modification
 - general event loop understanding (idle, timeout, io input)
@@ -164,16 +167,21 @@ Twisted
 Twisted is an asynchronous framework for Python.
 It's an integral part of Flumotion and is used for many different things.
 This is what you need to know:
+
 - deferreds
 - reactor:
+
   - mainloop integration
   - calllater
   - listenTCP
+
 - spread/pb:
+
   - callRemote
   - perspective/view_ methods
   - jelly registration
   - clientfactory/serverfactory
+
 - cred: portal/realm
 - python: namedAny, log
 - trial: invoking, deferred tests
