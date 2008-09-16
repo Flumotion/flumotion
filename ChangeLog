@@ -1,3 +1,9 @@
+2008-09-16  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/stream.py:
+	  gst.element_factory_make() raises gst.PluginNotFoundError, so
+	  handle it.
+
 2008-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/stream.py:

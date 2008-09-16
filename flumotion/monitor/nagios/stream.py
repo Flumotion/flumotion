@@ -337,8 +337,11 @@ class GSTInfo(log.Loggable):
         # it's fine to not have any of them and then have pipeline parsing
         # fail trying to use the last option
         for factory in ['souphttpsrc', 'neonhttpsrc', 'gnomevfssrc']:
-            if gst.element_factory_make(factory):
+            try:
+                gst.element_factory_make(factory)
                 break
+            except gst.PluginNotFoundError:
+                pass
 
         _pipeline = '%s name=httpsrc ! ' \
                     'typefind name=typefinder ! ' \
