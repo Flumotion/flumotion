@@ -131,24 +131,26 @@ Things which are important to understand here are:
 
 Gtk
 ---
-Boxing model from gtk+, vbox/hbox/table/alignment
-Dialogs/MessageDialogs
-UIManager/ActionGroup/Action
-FileChooser
-Packing
-Mnemonics/Keyboard accelerators
-Label/Pango Markup Stock icons
-Treeview (model, view, columns, cellrenderers)
-Textview (buffers, iters)
+
+- Boxing model from gtk+, vbox/hbox/table/alignment
+- Dialogs/MessageDialogs
+- UIManager/ActionGroup/Action
+- FileChooser
+- Packing
+- Mnemonics/Keyboard accelerators
+- Label/Pango Markup Stock icons
+- Treeview (model, view, columns, cellrenderers)
+- Textview (buffers, iters)
 
 
 GStreamer
 ---------
-Elements
-Pipeline
-parse launch syntax
-Playing states
-Bus + Messages
+
+- Elements
+- Pipeline
+- parse launch syntax
+- Playing states
+- Bus + Messages
 
 
 Glade 
@@ -178,7 +180,7 @@ This is what you need to know:
 - spread/pb:
 
   - callRemote
-  - perspective/view_ methods
+  - perspective\_ and view\_ methods
   - jelly registration
   - clientfactory/serverfactory
 
