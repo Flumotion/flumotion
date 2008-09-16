@@ -1,3 +1,11 @@
+2008-09-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/stream.py:
+	  Also parse ELEMENT messages for missing-plugin.
+	  Makes the checks work with neonhttpsrc and gnomevfssrc too.
+	  Select the source element from a list of possibilities.
+	  Import flumotion.common.log, easier to backport.
+
 2008-09-15  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/admin/gtk/httpstreamersteps.py (checkElements):

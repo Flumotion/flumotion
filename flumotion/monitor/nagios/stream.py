@@ -29,7 +29,7 @@ import time
 import gst
 import gobject
 
-from flumotion.extern.log import log
+from flumotion.common import log
 from flumotion.monitor.nagios import util
 
 URLFINDER = 'http://[^\s"]*' # to search urls in playlists
@@ -159,6 +159,7 @@ class Check(util.LogCommand):
             self.debug('checking url %s', url)
             gstinfo = GSTInfo(int(self.options.timeout),
                               int(self.options.duration), url)
+            self.debug('checked url %s', url)
             elements = gstinfo.getElements()
             self._isPlaylist = gstinfo.isPlaylist()
             if self._isPlaylist:
@@ -279,7 +280,6 @@ class Check(util.LogCommand):
                         self.options.videomimetype, mime))
 
         if self.options.videowidth:
-            print caps
             if int(self.options.videowidth) != caps[0]['width']:
                 return self.critical(
                     'Video width fail: EXPECTED: %s, ACTUAL: %s' % (
@@ -334,10 +334,16 @@ class GSTInfo(log.Loggable):
         self._duration = duration
         self._url = url
 
-        _pipeline = 'souphttpsrc name=httpsrc ! ' \
+        # it's fine to not have any of them and then have pipeline parsing
+        # fail trying to use the last option
+        for factory in ['souphttpsrc', 'neonhttpsrc', 'gnomevfssrc']:
+            if gst.element_factory_make(factory):
+                break
+
+        _pipeline = '%s name=httpsrc ! ' \
                     'typefind name=typefinder ! ' \
                     'decodebin name=decoder ! ' \
-                    'fakesink'
+                    'fakesink' % factory
 
         self._counter = 0 # counter to track the playing state
         self._error = ''
@@ -385,9 +391,20 @@ class GSTInfo(log.Loggable):
 
     def busWatch(self, bus, message):
         """Capture messages in pipeline bus"""
-        self.log('busWatch: message %r', message)
+        self.log('busWatch: message %r, type %r', message, message.type)
         if message.type == gst.MESSAGE_EOS:
+            self.info('busWatch: eos')
             self._pipeline.set_state(gst.STATE_NULL)
+        elif message.type == gst.MESSAGE_ELEMENT:
+            s = message.structure
+            if s.get_name() == 'missing-plugin':
+                caps = s['detail']
+                if caps[0].get_name() == 'text/uri-list':
+                    # we don't have a plug-in but we know it's a playlist
+                    self.info('text/uri-list but missing plugin')
+                    self._playlist = True
+                    self.quit()
+
         elif message.type == gst.MESSAGE_ERROR:
             self._error = message.parse_error()[0].message
             self._pipeline.set_state(gst.STATE_NULL)
