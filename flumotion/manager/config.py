@@ -23,6 +23,8 @@
 parsing of manager configuration files
 """
 
+import warnings
+
 from flumotion.common import log, errors, common, registry
 from flumotion.common import config as fluconfig
 from flumotion.common.xmlwriter import cmpComponentType, XMLWriter
@@ -422,6 +424,8 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
         #   <plugs>...</plugs>*
         #   <virtual-feed name="foo" real="bar"/>*
         # </component>
+        # F0.8
+        # source tag is deprecated
 
         attrs = self.parseAttributes(node, ('name', 'type'),
                 ('label', 'worker', 'project', 'version', ))
@@ -463,6 +467,12 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
             isClockMaster = clockmasters[0]
         else:
             raise errors.ConfigError("Only one <clock-master> node allowed")
+
+        if sources:
+            msg = ('"source" tag has been deprecated in favor of "eater",'
+                   ' please update your configuration file (found in'
+                   ' component %r)' % name)
+            warnings.warn(msg, DeprecationWarning)
 
         for feedId in sources:
             # map old <source> nodes to new <eater> nodes

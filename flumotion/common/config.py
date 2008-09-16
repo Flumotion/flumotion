@@ -26,6 +26,7 @@ Base classes for parsing of flumotion configuration files
 import os
 import locale
 import sys
+import warnings
 
 from flumotion.common import log, common, registry, fxml
 from flumotion.common.errors import ConfigError
@@ -232,9 +233,16 @@ class BaseConfigParser(fxml.Parser):
         def parsePlug(node):
             # <plug type=...>
             #   <property>
+            # F0.8
             # socket is unneeded and deprecated; we don't use it.
             plugType, socket = self.parseAttributes(
                 node, ('type', ), ('socket', ))
+            if socket is not None:
+                msg = ('"socket" attribute of plug tag is not used'
+                       ' and has been deprecated, please update your'
+                       ' configuration file (found offending plug of type'
+                       ' %r)' % plugType)
+                warnings.warn(msg, DeprecationWarning)
             properties = []
             parsers = {'property': (self._parseProperty, properties.append),
                        'compound-property': (self._parseCompoundProperty,
