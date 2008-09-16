@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -24,11 +24,10 @@
 
 import array
 import errno
-import fcntl
+import platform
 import re
 import socket
 import struct
-import platform
 
 from twisted.internet import address
 
@@ -58,6 +57,7 @@ def find_all_interface_names():
     """
     Find the names of all available network interfaces
     """
+    import fcntl
     ptr_size = len(struct.pack('P', 0))
     size = 24 + 2 * (ptr_size)
     max_possible = 128  # arbitrary. raise if needed.
@@ -70,13 +70,14 @@ def find_all_interface_names():
         struct.pack('iP', bytes, names.buffer_info()[0])))[0]
     namestr = names.tostring()
     return [namestr[i:i+size].split('\0', 1)[0]
-            for i in range(0, outbytes, size)]
+                for i in range(0, outbytes, size)]
 
 
 def get_address_for_interface(ifname):
     """
     Get the IP address for an interface
     """
+    import fcntl
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),

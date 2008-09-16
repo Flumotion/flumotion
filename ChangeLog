@@ -1,3 +1,8 @@
+2008-09-16  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/common/netutils.py: Do nested import of fcntl,
+	since it's not available on all platforms.
+
 2008-09-15  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/common/config.py (parsePlug):
