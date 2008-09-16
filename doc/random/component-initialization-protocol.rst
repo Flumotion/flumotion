@@ -1,3 +1,5 @@
+.. contents::
+
 =================================
 Component Initialization Protocol
 =================================
