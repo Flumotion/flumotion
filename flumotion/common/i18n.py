@@ -277,5 +277,11 @@ def installGettext():
     log.debug("locale", "Loading locales from %s" % localedir)
     gettext.bindtextdomain(configure.PACKAGE, localedir)
     gettext.textdomain(configure.PACKAGE)
-    locale.bindtextdomain(configure.PACKAGE, localedir)
-    locale.textdomain(configure.PACKAGE)
+    # Some platforms such as win32 lacks localse.bindtextdomin/textdomain.
+    # bindtextdomain/textdomain are undocumented functions only available
+    # in the posix _locale module. We use them to avoid having to import
+    # gtk.glade here and thus import gtk/create a connection to X.
+    if hasattr(locale, 'bindtextdomain'):
+        locale.bindtextdomain(configure.PACKAGE, localedir)
+    if hasattr(locale, 'textdomain'):
+        locale.textdomain(configure.PACKAGE)

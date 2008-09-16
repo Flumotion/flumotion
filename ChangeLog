@@ -1,5 +1,9 @@
 2008-09-16  Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/common/i18n.py (installGettext):
+	Check if bindtextdomain & textdomain are available before
+	calling them.
+
 	* flumotion/common/bundle.py: Make sure that renaming
 	a temporary file in a bundle works on win32.
 
