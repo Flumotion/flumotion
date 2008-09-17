@@ -367,7 +367,7 @@ class GSTInfo(log.Loggable):
                     'fakesink' % factory
 
         self._counter = 0 # counter to track the playing state
-        self._error = ''
+        self._gsterror = None
         self._playlist = False
         self._timeout = True
         self._startime = time.time()

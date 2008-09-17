@@ -1,6 +1,11 @@
 2008-09-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/stream.py:
+	  Initialize self._gsterror
+
+2008-09-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/stream.py:
 	  Default to using gnomevfssrc, it's the oldest element and thus
 	  more available, it's actually in base, and it throws a halfway
 	  decent error on a 401, in contrast with the other two.
