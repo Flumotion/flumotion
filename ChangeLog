@@ -1,3 +1,13 @@
+2008-09-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/stream.py:
+	  Default to using gnomevfssrc, it's the oldest element and thus
+	  more available, it's actually in base, and it throws a halfway
+	  decent error on a 401, in contrast with the other two.
+	  Add an option to treat resource read errors as OK; this is a
+	  stopgap until this code gets changed to take a manager's bouncer
+	  state for that streamer into account.
+
 2008-09-16  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/i18n.py (installGettext):

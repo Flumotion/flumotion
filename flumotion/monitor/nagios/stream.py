@@ -99,6 +99,10 @@ class Check(util.LogCommand):
         self.parser.add_option('-p', '--playlist',
             action="store_true", dest="playlist",
             help='is a playlist')
+        self.parser.add_option('', '--allow-resource-error-read',
+            action="store_true", dest="allow_resource_error_read",
+            help='Return OK when the resource cannot be read. '
+                 'This option will go away in the future.')
 
     def handleOptions(self, options):
         #Determine if this stream would have audio/video
@@ -167,17 +171,31 @@ class Check(util.LogCommand):
 
         self._streamurl = url
 
+        gsterror = gstinfo.getGStreamerError()
+        if gsterror:
+            if gsterror.domain == 'gst-resource-error-quark':
+                if gsterror.code == gst.RESOURCE_ERROR_OPEN_READ:
+                    # a 401 gives a RESOURCE READ error with gnomevfssrc;
+                    # for now, treat it as OK
+                    # FIXME: instead, this check should be able to crosscheck
+                    # with the bouncer
+                    if self.options.allow_resource_error_read:
+                        return self.ok("Cannot read the resource, "
+                            "but OK according to options")
+                    else:
+                        return self.critical("GStreamer error: %s" %
+                            gsterror.message)
+            else:
+                return self.critical("GStreamer error: %s" %
+                    gsterror.message)
+
         running = gstinfo.getRunning() # seconds running gstinfo
         counter = gstinfo.getCounter() # seconds getting media data
 
         for i in elements['typefinder'].src_pads():
             caps = i.get_caps()
             if caps == 'ANY' or not caps:
-                if gstinfo.getError():
-                    return self.critical("GStreamer error: %s" %
-                        gstinfo.getError())
-                else:
-                    return self.critical("The stream has no caps.")
+                return self.critical("The stream has no caps.")
 
         # loop through all elements in the decoder bin, finding the actual
         # decoders
@@ -336,7 +354,7 @@ class GSTInfo(log.Loggable):
 
         # it's fine to not have any of them and then have pipeline parsing
         # fail trying to use the last option
-        for factory in ['souphttpsrc', 'neonhttpsrc', 'gnomevfssrc']:
+        for factory in ['gnomevfssrc', 'neonhttpsrc', 'souphttpsrc']:
             try:
                 gst.element_factory_make(factory)
                 break
@@ -370,8 +388,8 @@ class GSTInfo(log.Loggable):
     def getElements(self):
         return self._elements
 
-    def getError(self):
-        return self._error
+    def getGStreamerError(self):
+        return self._gsterror
 
     def isPlaylist(self):
         return self._playlist
@@ -409,12 +427,14 @@ class GSTInfo(log.Loggable):
                     self.quit()
 
         elif message.type == gst.MESSAGE_ERROR:
-            self._error = message.parse_error()[0].message
+            self._gsterror = message.parse_error()[0]
             self._pipeline.set_state(gst.STATE_NULL)
-            code = message.parse_error()[0].code
-            if code == gst.STREAM_ERROR_CODEC_NOT_FOUND:
-                if 'text/uri-list' in message.parse_error()[0].message:
-                    self._playlist = True
+            domain = self._gsterror.domain
+            code = self._gsterror.code
+            if domain == 'gst-stream-error-quark':
+                if code == gst.STREAM_ERROR_CODEC_NOT_FOUND:
+                    if 'text/uri-list' in self._gsterror.message:
+                        self._playlist = True
             self.quit()
         elif message.type == gst.MESSAGE_STATE_CHANGED:
             new = message.parse_state_changed()[1]
