@@ -1,5 +1,12 @@
 .. contents:: Table of Contents
 
+.. _Open a new Ticket: https://code.fluendo.com/flumotion/trac/newticket 
+.. _Wiki: https://code.fluendo.com/flumotion/trac/wiki
+.. _Code Browser: https://code.fluendo.com/flumotion/trac/browser 
+.. _Timeline: https://code.fluendo.com/flumotion/trac/timeline
+.. _Style guide: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/styleguide
+.. _Existing tickets: https://code.fluendo.com/flumotion/trac/report 
+
 ============================================
  Developer introduction guide for Flumotion
 ============================================
@@ -17,43 +24,45 @@ and running.
 Getting your development environment installed
 ----------------------------------------------
 
-Create a directory tree to work in::
+Once you have gstreamer installed on an uninstalled directory, you need to install flumotion the
+same way. This time though, you get the code from subversion directly as this is the most up to date
+code. So, let's start. create a folder and check it out::
 
-  $ cd; mkdir -p flu/unstable.stable; cd flu/unstable.stable
+  svn checkout https://code.fluendo.com/flumotion/svn/flumotion/trunk/ flumotion
 
-Check out jhbuild from cvs and install it::
+First the build environment needs to be prepared::
 
-  $ svn co http://svn.gnome.org/svn/jhbuild/trunk jhbuild && cd jhbuild && make -f Makefile.plain instal
+  ./autogen.sh
 
-Download the jhbuildrc file::
+Autogen might fail if you miss some dependencies. Normally you need the following:
+- C compiler
+- make
+- libtool
+- autoconf
+- automake
+- python
+- gtk
+- gstreamer
+- pygobject
+- pygtk
+- gst-python
+- kiwi
 
-  $ cd; wget --no-check-certificate -O .jhbuildrc.flu "https://code.fluendo.com/flumotion/trac/file/flumotion/trunk/misc/jhbuildrc.flu?format=txt"
+When the autogen script runs, you're almost ready, you just need to type::
 
-Download the correct modules file::
+  make
 
-  $ cd ~/flu/; wget --no-check-certificate -O flu.unstable.stable.modules "https://code.fluendo.com/flumotion/trac/file/flumotion/trunk/misc/flu.unstable.stable.modules?format=txt"
+This will do a bunch of stuff, one of them is creating a script called **env** that is a small shell
+script which prepares the environment to run flumotion properly.
 
-Run::
+So, once make is finished, type::
 
-  $ cd; bin/jhbuild -f .jhbuildrc.flu build flumotion
+  $HOME/workdir/flumotion/env
 
-When this is done, you can start a shell in your new environment::
+and your environment is set up.
 
-  $ bin/jhbuild -f .jhbuildrc.flu shell
 
-From here you can run the server, the admin, flumotion-inspect, ...
-
-If you want to test if you have a good build of flumotion, you can do (inside the jhbuild shell)::
-
-  cd flu/$flavor/src/flumotion; make check
-
-If later on you want to update to the latest code, you should repeat step 4 to update the modules file, and step 5 to rebuild everything.
-
-To make it easier on your typing fingers, add this to your .bash_profile::
-
- alias jhb-flu="jhbuild -f $HOME/.jhbuildrc.flu.unstable.stable"
-
-Then you can use jhb-flu as a shortcut that's easier to remember. 
+If you want to check out an installed flumotion, use the instructions found in the FIXME-JHBuild wiki page.
 
 Running a Manager with a worker
 -------------------------------
@@ -202,7 +211,9 @@ Build system
 Makefile
 Basic Autotools
 
-Shell / M4
+http://en.wikipedia.org/wiki/Automake
+
+Shell / M
 ----------
 Shell and M4 are languages used in minor places in the Flumotion code base.
 Mainly by the build process, which forms a part of autotools.
@@ -258,7 +269,7 @@ Mailing lists
 
 If you're a contributor to Flumotion you should subscribe to both the flumotion-devel and the 
 flumotion-commit mailing lists.
-The web interface for subscribing to the mailing lists can be found `here
+The web interface for subscribing to the `mailing lists
 <http://lists.fluendo.com/mailman/listinfo/>`_.
 
 Creating a ticket
@@ -271,7 +282,25 @@ Links: `Open a new Ticket`_
 
 Generating a patch
 ------------------
-FIXME
+To generate a patch use the svn diff command from the project root directory::
+
+  svn diff
+
+Review it carefully, it's usually easiest to do this by piping via colordiff and less::
+
+  svn diff | colordiff | less -R 
+
+If you have created new files, they won't show up. So remember to add them by doing::
+
+  svn add new_file
+
+When you're satisfied with the changes, save the patch to disk::
+
+  svn diff > filename
+
+filename can be anything, but it's recommended that you use a naming convention which scales.
+For instance use **XX_vY.diff** where **XX** is the name of the bug and **Y** is an incremental counter.
+For instance, if you're submitting the first patch to bug 2249 you will call it 2249_v1.diff
 
 Reviewboard
 -----------
@@ -304,9 +333,255 @@ The last part of the commit message, "Fixes #263" is a directive to trac. It mea
 this commit solves the specified issue. It'll close the ticket and add a comment to it
 referencing the commit. Always include this directive if the commit closes a real bug.
 
-.. _Open a new Ticket: https://code.fluendo.com/flumotion/trac/newticket 
-.. _Wiki: https://code.fluendo.com/flumotion/trac/wiki
-.. _Code Browser: https://code.fluendo.com/flumotion/trac/browser 
-.. _Timeline: https://code.fluendo.com/flumotion/trac/timeline
-.. _Style guide: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/styleguide
-.. _Existing tickets: https://code.fluendo.com/flumotion/trac/report 
+
+
+Jordi's material
+================
+
+FIXME: This should be moved and incorporated in sections above
+
+
+How to try stuff
+----------------
+Once you have your environment setup, you may want to try stuff and to debug it.
+The easiest thing to do is to start an admin. Then, from the GUI, you can create a manager and
+worker, and then a flow from the wizard. See how to start an admin section for more information.
+When you want to do more interesting things, you start a manager and, at least, a worker by
+yourself, and then start an admin that connects to the manager. See how to start a manager and how
+to start a worker section. Then, you import the flow you want to test.
+Trick: An easy way to create flow examples is to run the wizard and then to export that flow. Then
+you can modify it and import it. You can also find good examples in the flumotion-flowtester
+project, in the data/flows directory. You can check that project from subversion::
+
+  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-flowtester/trunk/ flumotion-flowtester
+
+In order to see more or less information, you can set the environment debug variable::
+
+  export FLU_DEBUG=level
+
+where level is one of 1,2,3,4,5
+if you set it to 4 (FLU_DEBUG=4) it will output everything except info messages (4 is the debug
+level). With 5, it will output even the info messages. 1 will output only errors.
+Then, what you do is edit the .py files and write stuff to the debug level on the log. This way you
+can localize the problem and see some values.
+In order to write to the debug, you will usually do::
+
+  self.debug(message)
+
+as almost every object inherits from the Logger class.
+When looking for a gstreamer problem, you should try to find the pipeline. This is usually created
+on the component at the get_pipeline_string function. You can get it from there or write it to the log.
+Then, you can run the pipeline using the gst-launch to see if this is the problem (see some things
+more about gstreamer).
+
+
+How to setup external projects
+------------------------------
+If you have external projects, you have to set up an additional variable, that is the
+FLU_PROJECT_PATH, that should contain your project directory, for example::
+
+  FLU_PROJECT_PATH=$HOME/workdir/myproject
+
+This way the components of the project will be available on the manager and workers.
+How to start a manager
+This is the command line for starting a manager with maximum debug level, provided that you had
+set up the right environment::
+
+  FLU_DEBUG=5 flumotion-manager conf/managers/default/planet.xml > /tmp/flumotion-manager.log 2>&1
+
+after that, open another console and do::
+
+  tail -f /tmp/flumotion-manager.log
+
+to see the output.
+
+How to start a worker
+---------------------
+This is the command line for starting a worker with maximum debug level, provided that you had
+set up the right environment and that you had already started a manager::
+
+  FLU_DEBUG=5 flumotion-worker -u user -p test -n worker1 --random-feederports >/tmp/flumotion-worker1.log 2>&1
+
+How to start an admin
+---------------------
+This is the command line for starting an admin with maximum debug level, provided that you had
+set up the right environment::
+
+ FLU_DEBUG=5 flumotion-admin > /tmp/flumotion-admin.log 2>&1
+
+If you had started a manager, you can connect to it from the admin. Otherwise, you can create a
+manager and worker from the admin.
+When no flows has been set up, the admin will start the wizard. If you want to create a test flow,
+you can use the wizard. If you already have a flow you want to test, skip the wizard and import the
+flow.
+From the admin, you can use the debug and write debug marker options in order to change the
+debug level of components and to write a mark on the log. This last thing is very useful as the log
+contains lots of lines and you may be interested in only one part. Moreover, when not all the
+workers are at the same computer, the clock may not be synchronized and this marker will help you
+localize the error.
+
+Updating translation
+--------------------
+I have not found a tool that I like more than using emacs. Emacs has a po menu that is loaded when
+you open a .po file that helps you go to the next untranslated message or to the next fuzzy message.
+Translations, as in many open source linux projects, are in .po files. These files should be updated
+with the new code and then translated. So the right way to do it is:
+go to the po directory and write::
+
+  make update-po
+
+edit with emacs the po you want to edit (ca.po is for catalan, es.po is for spanish, etc.)
+Write the new translations and update the fuzzy ones. The fuzzy ones comes from merging the
+previous po with the actual code. Some of them may be correct and some don't, so you need to
+review them.
+
+  make update-po
+
+you do it again to see if you have left any or if you did any syntax error.
+Then, in order to test it, go to the flumotion project directory and type::
+
+  make 
+
+then, set your language variable before running the admin (example for catalan)::
+
+  LANG=ca_ES.UTF-8 flumotion-admin
+
+Changing the mood of a component
+--------------------------------
+Components have different moods:
+
+- sleeping
+- waking
+- happy
+- hungry
+- lost
+- sad
+
+Some times you want a component to be in a specific mood for testing purposes. Here are a couple
+of tricks:
+How to make a component:
+
+- **sad**: send a kill SIGSEV (11) to its job
+- **lost**: send a STOP signal to its job
+- **sleeping**: send a TERM signal to its job
+- **hungry**: connect it to a lost component
+
+In order to know the pid of the job that is running the component, you have two options:
+1. Open the admin and look the pid column on the UI interface.
+2. Do a "ps aux | grep flumotion-job" and find out which is the process you want to send a signal.
+
+Running unittests
+-----------------
+Flumotion has a set of unit tests than must success before releasing the software. 
+The examples below assumes that you are in the flumotion project root.
+
+You can run them by::
+
+  trial flumotion.test
+
+If you want to run a specific suite, for example the one in the test_parts.py::
+
+  trial flumotion.test.test_parts
+
+Trial is a twisted facility for running pyunits (unit tests in python) that contains twisted code.
+Note: First time I run the tests, I got a “not permission exception” so I did a chmod
+777 /usr/lib/python2.5/site-packages/twisted -R <- not very nice but it works. It seems to be
+something related to a cache that it creates.
+
+How to run pychecker
+--------------------
+For every commit, a tool called pychecker is run against the code in order to find bugs on it. So, it is
+a good idea to run it against your code before any commit. I would recommend to install pychecker from CVS 
+as there are a couple of bugs that has been fixed there that flumotion uses. 
+See more info at the `pychecker homepage <http://pychecker.sourceforge.net/>`_.
+
+The way to run it is::
+
+  make pychecker
+
+Replace flumotion/admin/gtk/client.py for the path to the file you want to check.
+
+Generating API documentation
+----------------------------
+By default, flumotion contains documentation for the basic classes as html pages. This
+documentation, very useful when writing new components, is not that useful when debugging or
+learning the internals, so you may want to have all the classes in the project documented as html
+pages, with tree hierarchies, links, etc.
+All this documentation is generated using epydoc. In order to change the input files for the epydoc,
+you have to edit the doc/reference/Makefile.am file and modify the MODULE_FILES variable as :
+
+  MODULE_FILES = $(shell cd $(top_srcdir) && find flumotion | grep
+
+3I am sorry I can not give more information on this specific topic, but I did not take notes when I installed pychecker
+and applied the patches, so I can not give a better advice.
+
+  py | grep -v .svn | grep -v cache | grep -v pyc | grep -v __init__ | grep -v "~" | sort)
+
+Do not commit this changes as this is only for you to understand the internals of flumotion.
+
+Invoking remote component methods
+---------------------------------
+As you learn flumotion, you'll realized that components have a remote interface that can be called.
+This remote interface is usually for the manager but you can also call it from the command line by
+using the flumotion-command utility. For example, for calling the method setFluDebugMarker on
+the producer-video component, you could open a terminal and type::
+
+  flumotion-command -m user:test@localhost:7531 invoke /default/producer-video setFluDebugMarker s "HOLA"
+
+This will make the producer-video component to write “HOLA” on the log. user and test are the
+username and the password for logging into the manager that is running on localhost and listening
+on the port 7531.
+Flumotion-inspect
+Like gstreamer-inspect, flumotion-inspect show you a list of configured values and modules that are
+registered::
+
+  flumotion-inspect
+
+You can also call flumotion-inspect on a component in order to know more about it::
+
+  flumotion-inspect component
+
+Applying a patch
+----------------
+If the patch has been created as explained before, you can patch the project as:
+
+  patch -p0 < /tmp/flumotion-##.patch
+
+You can always revert to trunk by using svn revert.
+
+How to use moap (checking in changes)
+-------------------------------------
+For committing changes to subversion, we use moap4. Moap is a tool that generates a Changelog
+file from all the changes and, after we edit that file, it commits to the repository the changes (and
+the Changelog itself). Moap does more things than that, but these are the features we are interested
+now.
+So, once we have changes that had to be committed, we generate the Changelog by:
+
+  moap changelog prepare
+
+Then we edit the Changelog file by using our preferred editor. If there are files we do not want to
+commit, we just have to remove them from the latest entry in the Changelog file. Moap will only
+commit the files that are in the latest entry of the Changelog.
+If you created new files, you'll realize that they do not appear on the Changelog. You need to add
+them before to the repository, by doing svn add.
+Once you are ready, you commit by::
+
+  moap changelog checkin
+
+Take in mind that, if you are writing a patch for a ticket in the trac, writing "Fixes #x" on the
+Changelog file, where x is the ticket number, will update the trac ticket.
+If you decide not to commit anything, you can always revert the Changelog file to the previous one
+by doing svn revert.
+
+Further documentation
+---------------------
+On the svn flumotion project there is a random docs directory. Some info there is very useful and
+some may be outdated. You can read it from your checkout directory or online from `here
+<https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/>`_.
+
+Also, you could checkout the flumotion-doc project and build the most up to date documentation
+yourself (by using autogen.sh and make, as usual)::
+
+  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-doc/trunk flumotion-doc
+
+
