@@ -86,8 +86,15 @@ configuration assistant which allows you to create a new flow.
 
 Click on Forward until the assistant is finished at which point you should have a working flow.
 
+Languages and Frameworks 
+========================
+
+This is a list of languages, frameworks and external libraries we use inside of Flumotion.
+The list presented below includes a list of essential parts which are required to know to
+efficiently contribute to Flumotion.
+
 Python
-======
+------
 
 Python is the primary programming language used to develop Flumotion.
 Proficiency in Python is essential to be able to understand and extend
@@ -99,9 +106,11 @@ on the web.
 
 The following material is recommended to get started:
 
-- http://docs.python.org/tut/tut.html Official Python tutorial
-- http://diveintopython.org/toc/index.html Dive Into Python
-- http://openbookproject.net/thinkCSpy/index.xhtml
+- `Official Python tutorial <http://docs.python.org/tut/tut.html>`_ 
+- `Dive Into Python <http://diveintopython.org/toc/index.html>`_
+- `Think like a Computer Scientist <http://openbookproject.net/thinkCSpy/index.xhtml>`_
+
+Remember that all newly written Python code written must follow the `Style Guide`_.
 
 C
 -
@@ -114,12 +123,6 @@ not writing the code in Python:
 The general policy is that you should avoid writing code in C before you have
 profiled the Python code and know that it's going to be part of a performance 
 sensitive part. Do not use C unless you have a very good reason to do so.
-
-Frameworks / External libraries
-===============================
-
-This is a list of frameworks and external libraries we use inside of Flumotion.
-The list presented below includes a list of essential
 
 GLib & GObject
 --------------
@@ -199,7 +202,6 @@ Build system
 Makefile
 Basic Autotools
 
-
 Shell / M4
 ----------
 Shell and M4 are languages used in minor places in the Flumotion code base.
@@ -207,6 +209,7 @@ Mainly by the build process, which forms a part of autotools.
 
 Makefile
 --------
+FIXME
 
 
 Subversion
@@ -232,26 +235,47 @@ Trac
 Trac is web interface and a central point of the development process.
 The most important parts of the trac are:
 
-- Timeline: https://code.fluendo.com/flumotion/trac/timeline
-- Code browser: https://code.fluendo.com/flumotion/trac/browser 
-- Reporting a new ticket: https://code.fluendo.com/flumotion/trac/newticket 
-- Searching for existing tickets: https://code.fluendo.com/flumotion/trac/report 
-- Wiki: https://code.fluendo.com/flumotion/trac/wiki
+- Timeline: `Timeline`_
+- Code browser: `Code Browser`_
+- Reporting a new ticket: `Open a new Ticket`_
+- Searching for existing tickets: `Existing tickets`_
+- Wiki: Wiki_
 
 Pastebin
 --------
+FIXME
 
-IRC / Mailing lists
--------------------
+IRC
+---
+Most of the development discussion takes place on the #fluendo channel on the 
+`Freenode <http://www.freenode.net/>`_ IRC network.
+There's a irc interface to the buildbot interface called **flubber** which will inform you when 
+the build brakes. The logic to find out who broke the build is rather fragile and the buildbot 
+will sometimes blame the wrong person.
 
-Creating a bug report
----------------------
+Mailing lists
+-------------
+
+If you're a contributor to Flumotion you should subscribe to both the flumotion-devel and the 
+flumotion-commit mailing lists.
+The web interface for subscribing to the mailing lists can be found `here
+<http://lists.fluendo.com/mailman/listinfo/>`_.
+
+Creating a ticket
+-----------------
+
+If you found a problem or if you already fixed a problem you should create a new ticket.
+Before opening a ticket remember to check if there is any existing tickets open already.
+  
+Links: `Open a new Ticket`_
 
 Generating a patch
 ------------------
+FIXME
 
 Reviewboard
 -----------
+FIXME
 
 Committing
 ----------
@@ -280,6 +304,9 @@ The last part of the commit message, "Fixes #263" is a directive to trac. It mea
 this commit solves the specified issue. It'll close the ticket and add a comment to it
 referencing the commit. Always include this directive if the commit closes a real bug.
 
-Style guide
------------
-Link to url: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/styleguide
+.. _Open a new Ticket: https://code.fluendo.com/flumotion/trac/newticket 
+.. _Wiki: https://code.fluendo.com/flumotion/trac/wiki
+.. _Code Browser: https://code.fluendo.com/flumotion/trac/browser 
+.. _Timeline: https://code.fluendo.com/flumotion/trac/timeline
+.. _Style guide: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/styleguide
+.. _Existing tickets: https://code.fluendo.com/flumotion/trac/report 
