@@ -229,6 +229,14 @@ Pay special attention to the Basic Work Cycle in the third Chapter:
 
 Trac
 ----
+Trac is web interface and a central point of the development process.
+The most important parts of the trac are:
+
+- Timeline: https://code.fluendo.com/flumotion/trac/timeline
+- Code browser: https://code.fluendo.com/flumotion/trac/browser 
+- Reporting a new ticket: https://code.fluendo.com/flumotion/trac/newticket 
+- Searching for existing tickets: https://code.fluendo.com/flumotion/trac/report 
+- Wiki: https://code.fluendo.com/flumotion/trac/wiki
 
 Pastebin
 --------
@@ -244,6 +252,33 @@ Generating a patch
 
 Reviewboard
 -----------
+
+Committing
+----------
+
+When you have your code reviewed you're ready to check it into subversion.
+First, generate a changelog using either prepare-ChangeLog::
+
+  $ prepare-ChangeLog
+
+or moap::
+
+  $ moap cl pr
+
+You should now end up with an auto-generated entry in the ChangeLog file.
+Open it with your favorite editor and describe what you've just done, an example
+of a good ChangeLog entry is::
+
+ 2006-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/client.py:
+	privatize and rename self._sidepane
+	clear the sidepane when a component goes to sleeping.
+	Fixes #263.
+
+The last part of the commit message, "Fixes #263" is a directive to trac. It means that
+this commit solves the specified issue. It'll close the ticket and add a comment to it
+referencing the commit. Always include this directive if the commit closes a real bug.
 
 Style guide
 -----------
