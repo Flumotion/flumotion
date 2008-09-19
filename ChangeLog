@@ -1,3 +1,14 @@
+2008-09-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Arek Korbik
+
+	* flumotion/component/combiners/switch/switch.py:
+	Use pad monitors for the sink pads in switch to check for active or
+	inactive eaters.
+	Rewrite new segment events coming in after an eater goes inactive to
+	have a start time same as first buffer to avoid massive timestamp
+	jumps in output of switch.
+
 2008-09-17  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/stream.py:

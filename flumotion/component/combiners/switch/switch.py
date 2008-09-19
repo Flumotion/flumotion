@@ -30,6 +30,7 @@ from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
 from flumotion.component import feedcomponent
 from flumotion.component.base import scheduler
+from flumotion.component.padmonitor import PadMonitor
 from flumotion.component.plugs import base
 from flumotion.worker.checks import check
 
@@ -120,6 +121,19 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
         self.idealFeed = None
         self.activeFeed = None
 
+        # store of new segment events consumed on switch pads
+        # due to them having gone inactive
+        # eater alias -> event
+        self.newSegmentEvents = {}
+
+        # probe ids
+        # pad -> probe handler id
+        self.eventProbeIds = {}
+        self.bufferProbeIds = {}
+
+        # pad monitors for switch sink pads
+        self._padMonitors = {}
+
     def addWarning(self, id, format, *args, **kwargs):
         self.warning(format, *args)
         m = messages.Message(messages.WARNING, T_(format, *args),
@@ -207,6 +221,8 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
         self.do_switch()
 
+    # add pad monitors on switch sink pads before we set them eaters active
+
     def install_logical_feed_watches(self):
 
         def eaterSetActive(eaterAlias):
@@ -219,15 +235,51 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
 
         def eaterSetInactive(eaterAlias):
             for feed, aliases in self.logicalFeeds.items():
-                if eaterAlias in aliases:
-                    if feed in activeFeeds:
-                        activeFeeds.remove(feed)
-                        self.feedSetInactive(feed)
+                if eaterAlias in aliases and feed in activeFeeds:
+                    activeFeeds.remove(feed)
+                    self.feedSetInactive(feed)
+                    # add an event and buffer probe to the switch pad
+                    # so we can rewrite the newsegment that comes
+                    # when eater is active again
+                    # Not rewriting it causes the pad running time
+                    # to be wrong due to the new segment having a start
+                    # time being much lower than any subsequent buffers.
+                    pad = self.switchPads[eaterAlias][0]
+                    self.eventProbeIds[pad] = \
+                        pad.add_event_probe(self._eventProbe)
+                    self.bufferProbeIds[pad] = \
+                        pad.add_buffer_probe(self._bufferProbe)
                     return
 
         activeFeeds = []
         for alias in self.eaters:
-            self.eaters[alias].addWatch(eaterSetActive, eaterSetInactive)
+            self._padMonitors[alias] = PadMonitor(self.switchPads[alias][0],
+                alias, eaterSetActive, eaterSetInactive)
+
+    def _eventProbe(self, pad, event):
+        # called from GStreamer threads
+        ret = True
+        if event.type == gst.EVENT_NEWSEGMENT:
+            ret = False
+            self.newSegmentEvents[pad] = event
+        if self.eventProbeIds[pad]:
+            pad.remove_event_probe(self.eventProbeIds[pad])
+            del self.eventProbeIds[pad]
+        return ret
+
+    def _bufferProbe(self, pad, buffer):
+        # called from GStreamer threads
+        ts = buffer.timestamp
+        if pad in self.newSegmentEvents:
+            parsed = self.newSegmentEvents[pad].parse_new_segment()
+            newEvent = gst.event_new_new_segment(parsed[0], parsed[1],
+                parsed[2], ts, parsed[4], parsed[5])
+            pad.push_event(newEvent)
+            del self.newSegmentEvents[pad]
+        if pad in self.bufferProbeIds:
+            pad.remove_buffer_probe(self.bufferProbeIds[pad])
+            del self.bufferProbeIds[pad]
+        return True
 
     def get_switch_elements(self, pipeline):
         raise errors.NotImplementedError('subclasses should implement '
