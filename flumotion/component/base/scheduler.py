@@ -48,7 +48,7 @@ class Scheduler(log.Loggable):
         self._nextStart = 0
 
     def _addEvent(self, event):
-        self.debug("adding event %s", event.uid)
+        self.debug("adding event %s with content %s", event.uid, event.content)
         uid = event.uid
         if uid not in self._eventSets:
             self._eventSets[uid] = EventSet(uid)
@@ -167,7 +167,8 @@ class Scheduler(log.Loggable):
                 if event not in currentEvents:
                     self._removeEvent(event)
         for event in events:
-            self.debug("adding event %r", event.uid)
+            self.debug("adding event %s with content %s",
+                event.uid, event.content)
             if event.start > now or event.rrule:
                 self._addEvent(event)
             else:
@@ -213,7 +214,8 @@ class Scheduler(log.Loggable):
             which = None
             result = None
             for event in self.getCurrentEvents(now, self.windowSize):
-                self.debug("current event %s", event.uid)
+                self.debug("current event %s with content %s",
+                    event.uid, event.content)
                 if event.currentStart < earliest and event.currentStart > now:
                     earliest = event.currentStart
                     which = 'start'
@@ -246,19 +248,23 @@ class Scheduler(log.Loggable):
         if event:
             if which == 'start':
                 self.debug(
-                    "schedule start event at %s",
-                    str(event.currentStart - now))
+                    "schedule start event %s in %s at %s",
+                    event.content,
+                    str(event.currentStart - now),
+                    event.currentStart)
                 seconds = toSeconds(event.currentStart - now)
                 dc = reactor.callLater(seconds, doStart, event)
             elif which == 'end':
                 self.debug(
-                    "schedule end event at %s",
-                    str(event.currentEnd - now))
+                    "schedule end event %s in %s at %s",
+                    event.content,
+                    str(event.currentEnd - now),
+                    event.currentEnd)
                 seconds = toSeconds(event.currentEnd - now)
                 dc = reactor.callLater(seconds, doEnd, event)
         else:
             self.debug(
-                "schedule rescheduling at %s", str(self.windowSize))
+                "schedule rescheduling in %s", str(self.windowSize))
             seconds = toSeconds(self.windowSize)
             dc = reactor.callLater(seconds, self._reschedule)
         self._nextStart = seconds
