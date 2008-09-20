@@ -32,7 +32,7 @@ from flumotion.configure import configure
 __version__ = "$Rev$"
 
 
-class TestCase(unittest.TestCase):
+class TestCase(unittest.TestCase, log.Loggable):
 
     # TestCase in Twisted 2.0 doesn't define failUnlessFailure method.
     if not hasattr(unittest.TestCase, 'failUnlessFailure'):
@@ -48,6 +48,11 @@ class TestCase(unittest.TestCase):
                 return failure.value
             return deferred.addCallbacks(_cb, _eb)
         assertFailure = failUnlessFailure
+
+    # Loggable and TestCase both have a debug method; prefer ours
+
+    def debug(self, *args, **kwargs):
+        log.Loggable.debug(self, *args, **kwargs)
 
 # test objects to be used in unittests to simulate the processes
 # subclass them to add your own methods
