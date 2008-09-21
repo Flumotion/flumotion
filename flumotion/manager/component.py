@@ -716,6 +716,16 @@ class ComponentHeaven(base.ManagerHeaven):
                 self._connectEaters(comp, ffid)
 
     def mapNetFeed(self, fromAvatar, toAvatar):
+        """
+        @param fromAvatar: the avatar to connect from
+        @type  fromAvatar: L{ComponentAvatar}
+        @param fromAvatar: the avatar to connect to
+        @type  toAvatar:   L{ComponentAvatar}
+
+        @returns: the host and port on which to make the connection to
+                  toAvatar from fromAvatar
+        @rtype:   tuple of (str, int or None)
+        """
         toHost = toAvatar.getClientAddress()
         toPort = toAvatar.getFeedServerPort() # can be None
 
@@ -729,6 +739,8 @@ class ComponentHeaven(base.ManagerHeaven):
         if fromHost == toHost:
             toHost = '127.0.0.1'
 
+        self.debug('mapNetFeed from %r to %r: %s:%d', fromAvatar, toAvatar,
+            toHost, toPort)
         return toHost, toPort
 
     def _connectFeederToEater(self, fromComp, fromFeed,
