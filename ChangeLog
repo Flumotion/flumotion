@@ -1,5 +1,13 @@
 2008-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/test/test_component_httpserver.py:
+	* flumotion/test/test_comptest.py:
+	* flumotion/test/test_manager_component.py:
+	* flumotion/test/test_manager_manager.py:
+	  Fix MRO.
+
+2008-09-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/consumers/disker/disker.py:
 	  Add some debugging to help fix a problem.
 

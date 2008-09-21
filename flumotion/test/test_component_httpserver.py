@@ -36,7 +36,7 @@ from flumotion.component.plugs.base import ComponentPlug
 from flumotion.test import test_http
 
 
-class MountTest(log.Loggable, testsuite.TestCase):
+class MountTest(testsuite.TestCase):
 
     def setUp(self):
         self.path = tempfile.mkdtemp(suffix=".flumotion.test")

@@ -334,7 +334,7 @@ class FakeComponentMind(FakeMind):
         return
 
 
-class TestVishnu(log.Loggable, testsuite.TestCase):
+class TestVishnu(testsuite.TestCase):
 
     logCategory = "TestVishnu"
 

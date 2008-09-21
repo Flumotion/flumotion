@@ -125,7 +125,7 @@ class FakeVishnu(log.Loggable):
     running = True
 
 
-class TestComponentHeaven(log.Loggable, testsuite.TestCase):
+class TestComponentHeaven(testsuite.TestCase):
 
     def setUp(self):
         self.vishnu = v = FakeVishnu()

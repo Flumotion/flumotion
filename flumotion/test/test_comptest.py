@@ -33,7 +33,7 @@ from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
      ComponentUnitTestMixin, pipeline_src, pipeline_cnv
 
 
-class CompTestTestCase(log.Loggable, testsuite.TestCase,
+class CompTestTestCase(testsuite.TestCase,
                        ComponentUnitTestMixin):
     logCategory = 'comptest-test'
 
