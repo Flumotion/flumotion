@@ -72,6 +72,11 @@ Every source file should be tagged with a test case that tests the given file;
 example:
 # -*- Mode: Python; test-case-name: flumotion.test.test_manager_manager -*-
 
+- If you use failIf, make sure you use the second argument to give an
+  indication of what is wrong
+- don't use failIf to do comparisons.  Instead, use assertEquals or
+  failIfEquals
+
 NAMING
 ------
 - classes should be named with CapitalizedWords
