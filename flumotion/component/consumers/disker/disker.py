@@ -317,6 +317,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self._startFilenameTemplate = self._defaultFilenameTemplate
         icalfn = properties.get('ical-schedule')
         if HAS_ICAL and icalfn:
+            self.debug('Parsing iCalendar file %s' % icalfn)
             from flumotion.component.base import scheduler
             try:
                 self.icalScheduler = scheduler.ICalScheduler(open(
@@ -325,9 +326,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                     self.eventEnded)
                 currentEvents = self.icalScheduler.getCurrentEvents()
                 if currentEvents:
+                    self.debug('Event %s is in progress, start recording' %
+                        currentEvents[0].content)
                     self._startFilenameTemplate = currentEvents[0].content
                     self._recordAtStart = True
                 else:
+                    self.debug('No events in progress')
                     self._recordAtStart = False
             except ValueError:
                 m = messages.Warning(T_(N_(
