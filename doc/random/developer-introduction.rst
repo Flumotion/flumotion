@@ -358,10 +358,14 @@ or when you just type::
 If you want to test your translation and see how your application looks like, do the
 following after making sure they are compiled::
 
-  LANG=xx_XX.UTF-8 flumotion-admin
+  LANG=xx_YY.ZZ flumotion-admin
 
-Where xx_XX is a language code, for instance::
+Where xx_YY is code combined of:
+  - xx: the language (ISO-639)
+  - YY: the geographical providing (ISO-3166)
+  - ZZ: the encoding, usually UTF-8
 
+Some common examples:
   - ca_ES: Catalan (as spoken in Spain)
   - en_US: English (as spoken in USA), the default
   - es_ES: Spanish (as spoken in Spain)
