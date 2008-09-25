@@ -11,6 +11,9 @@
 .. _Twisted: http://twistedmatrix.com/
 .. _Gtk: http://www.gtk.org/
 .. _JHBuildWiki: https://code.fluendo.com/flumotion/trac/wiki/UsingJHBuild
+.. _GLib: http://library.gnome.org/devel/glib/
+.. _GObject: http://library.gnome.org/devel/gobject/
+.. _GStreamer: http://www.gstreamer.net/
 
 ============================================
  Developer introduction guide for Flumotion
@@ -141,7 +144,7 @@ sensitive part. Do not use C unless you have a very good reason to do so.
 
 GLib & GObject
 --------------
-GLib and GObject provides the foundation to both Gtk and GStreamer.
+GLib_ and GObject_ provides the foundation to both Gtk_ and GStreamer_.
 Things which are important to understand here are:
 
 - signal connection and callbacks
