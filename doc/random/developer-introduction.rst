@@ -14,6 +14,7 @@
 .. _GLib: http://library.gnome.org/devel/glib/
 .. _GObject: http://library.gnome.org/devel/gobject/
 .. _GStreamer: http://www.gstreamer.net/
+.. _PEP8: http://www.python.org/dev/peps/pep-0008/
 
 ============================================
  Developer introduction guide for Flumotion
@@ -215,9 +216,6 @@ This is what you need to know:
 - trial: invoking, deferred tests
 - zope.interfaces: implement new interfaces
 
-Development process
-===================
-
 Build system
 ------------
 Makefile
@@ -234,6 +232,8 @@ Makefile
 --------
 FIXME
 
+Resources and Tools
+===================
 
 Subversion
 ----------
@@ -253,6 +253,7 @@ Pay special attention to the Basic Work Cycle in the third Chapter:
   * update
   * commit
 
+
 Trac
 ----
 Trac is web interface and a central point of the development process.
@@ -263,10 +264,6 @@ The most important parts of the trac are:
 - Reporting a new ticket: `Open a new Ticket`_
 - Searching for existing tickets: `Existing tickets`_
 - Wiki: Wiki_
-
-Pastebin
---------
-FIXME
 
 IRC
 ---
@@ -283,6 +280,38 @@ If you're a contributor to Flumotion you should subscribe to both the flumotion-
 flumotion-commit mailing lists.
 The web interface for subscribing to the `mailing lists
 <http://lists.fluendo.com/mailman/listinfo/>`_.
+
+Pastebin
+--------
+FIXME
+
+Codereview
+-----------
+FIXME
+
+Source code analysis 
+--------------------
+There are mainly two different tools which are analyzing the source to improve
+quality and provide consistency across the code base.
+PEP8_ is a Python document explaining the python coding style, it is generally
+adopted in the whole Python community and as it is deemed important to write code
+that follows it a test and a pre-commit verifying the consistency is used.
+If you want to invoke it manually you can type the following::
+
+  make check-local-pep8
+
+PEP8 doesn't do any analysis of the code itself, instead another tool called
+PyChecker is used for that. It is important that you have a recent version installed as
+there are often improvements coming directly from the flumotion developers.
+
+To run a pychecker test on your source code, type the following::
+
+  make pycheck
+
+See more info at the `pychecker homepage <http://pychecker.sourceforge.net/>`_.
+
+Development process
+===================
 
 Creating a ticket
 -----------------
@@ -314,10 +343,6 @@ filename can be anything, but it's recommended that you use a naming convention 
 For instance use **XX_vY.diff** where **XX** is the name of the bug and **Y** is 
 an incremental counter. For instance, if you're submitting the first patch to bug 2249 
 you will call it 2249_v1.diff
-
-Reviewboard
------------
-FIXME
 
 Committing
 ----------
@@ -511,36 +536,13 @@ In order to know the pid of the job that is running the component, you have two 
 1. Open the admin and look the pid column on the UI interface.
 2. Do a "ps aux | grep flumotion-job" and find out which is the process you want to send a signal.
 
-How to run pychecker
---------------------
-For every commit, a tool called pychecker is run against the code in order to find bugs on it. So, it is
-a good idea to run it against your code before any commit. I would recommend to install pychecker from CVS 
-as there are a couple of bugs that has been fixed there that flumotion uses. 
-See more info at the `pychecker homepage <http://pychecker.sourceforge.net/>`_.
-
-The way to run it is::
-
-  make pychecker
-
-Replace flumotion/admin/gtk/client.py for the path to the file you want to check.
-
 Generating API documentation
 ----------------------------
 By default, flumotion contains documentation for the basic classes as html pages. This
 documentation, very useful when writing new components, is not that useful when debugging or
-learning the internals, so you may want to have all the classes in the project documented as html
-pages, with tree hierarchies, links, etc.
-All this documentation is generated using epydoc. In order to change the input files for the epydoc,
-you have to edit the doc/reference/Makefile.am file and modify the MODULE_FILES variable as :
-
-  MODULE_FILES = $(shell cd $(top_srcdir) && find flumotion | grep
-
-3I am sorry I can not give more information on this specific topic, but I did not take notes when I installed pychecker
-and applied the patches, so I can not give a better advice.
-
-  py | grep -v .svn | grep -v cache | grep -v pyc | grep -v __init__ | grep -v "~" | sort)
-
-Do not commit this changes as this is only for you to understand the internals of flumotion.
+learning the internals, so you may want to have all the classes in the project 
+documented as html pages, with tree hierarchies, links, etc.
+All this documentation is generated using epydoc.
 
 Invoking remote component methods
 ---------------------------------
