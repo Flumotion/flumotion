@@ -7,6 +7,10 @@
 .. _Style guide: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/styleguide
 .. _Existing tickets: https://code.fluendo.com/flumotion/trac/report 
 .. _Buildbot: http://build.fluendo.com:8070/
+.. _Trial: http://twistedmatrix.com/trac/wiki/TwistedTrial
+.. _Twisted: http://twistedmatrix.com/
+.. _Gtk: http://www.gtk.org/
+.. _JHBuildWiki: https://code.fluendo.com/flumotion/trac/wiki/UsingJHBuild
 
 ============================================
  Developer introduction guide for Flumotion
@@ -19,15 +23,15 @@ contribute to the Flumotion project.
 Getting started
 ===============
 
-This section describes how you'll get started as a developer. It means fetching the sources, building,
-and running.
+This section describes how you'll get started as a developer. It means fetching the sources, 
+building, and running.
 
 Getting your development environment installed
 ----------------------------------------------
 
 Once you have gstreamer installed on an uninstalled directory, you need to install flumotion the
-same way. This time though, you get the code from subversion directly as this is the most up to date
-code. So, let's start. create a folder and check it out::
+same way. This time though, you get the code from subversion directly as this is the most 
+up to date code. So, let's start. create a folder and check it out::
 
   svn checkout https://code.fluendo.com/flumotion/svn/flumotion/trunk/ flumotion
 
@@ -53,8 +57,8 @@ When the autogen script runs, you're almost ready, you just need to type::
 
   make
 
-This will do a bunch of stuff, one of them is creating a script called **env** that is a small shell
-script which prepares the environment to run flumotion properly.
+This will do a bunch of stuff, one of them is creating a script called **env** that 
+is a small shell script which prepares the environment to run flumotion properly.
 
 So, once make is finished, type::
 
@@ -63,7 +67,8 @@ So, once make is finished, type::
 and your environment is set up.
 
 
-If you want to check out an installed flumotion, use the instructions found in the FIXME-JHBuild wiki page.
+If you want to check out an installed flumotion, use the instructions found in the 
+JHBuildWiki_ wiki page.
 
 Running a Manager with a worker
 -------------------------------
@@ -147,6 +152,9 @@ Things which are important to understand here are:
 Gtk
 ---
 
+Gtk_ is a graphical toolkit, mainly known from the GNOME desktop environment.
+It's used as the graphical interface for Flumotion.
+
 - Boxing model from gtk+, vbox/hbox/table/alignment
 - Dialogs/MessageDialogs
 - UIManager/ActionGroup/Action
@@ -181,7 +189,7 @@ Proxy/View/Delegate
 
 Twisted
 -------
-Twisted is an asynchronous framework for Python.
+Twisted_ is an asynchronous framework for Python.
 It's an integral part of Flumotion and is used for many different things.
 This is what you need to know:
 
@@ -300,8 +308,9 @@ When you're satisfied with the changes, save the patch to disk::
   svn diff > filename
 
 filename can be anything, but it's recommended that you use a naming convention which scales.
-For instance use **XX_vY.diff** where **XX** is the name of the bug and **Y** is an incremental counter.
-For instance, if you're submitting the first patch to bug 2249 you will call it 2249_v1.diff
+For instance use **XX_vY.diff** where **XX** is the name of the bug and **Y** is 
+an incremental counter. For instance, if you're submitting the first patch to bug 2249 
+you will call it 2249_v1.diff
 
 Reviewboard
 -----------
@@ -361,11 +370,13 @@ following after making sure they are compiled::
   LANG=xx_YY.ZZ flumotion-admin
 
 Where xx_YY is code combined of:
+
   - xx: the language (ISO-639)
   - YY: the geographical providing (ISO-3166)
   - ZZ: the encoding, usually UTF-8
 
 Some common examples:
+
   - ca_ES: Catalan (as spoken in Spain)
   - en_US: English (as spoken in USA), the default
   - es_ES: Spanish (as spoken in Spain)
@@ -377,7 +388,7 @@ Flumotion comes with set of unit tests that are automatically run by BuildBot_ u
 each commit. It's highly recommended that you run all the tests before committing,
 to avoid being embarrassed at buildbot when he complains that your checkin broke the build.
 
-The tool to run unittests in python is called Trial, and is a part of the twisted framework.
+The tool to run unittests in python is called Trial_, and is a part of the twisted framework.
 
 You can the tests by typing the following::
 
