@@ -6,6 +6,7 @@
 .. _Timeline: https://code.fluendo.com/flumotion/trac/timeline
 .. _Style guide: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/styleguide
 .. _Existing tickets: https://code.fluendo.com/flumotion/trac/report 
+.. _Buildbot: http://build.fluendo.com:8070/
 
 ============================================
  Developer introduction guide for Flumotion
@@ -333,7 +334,62 @@ The last part of the commit message, "Fixes #263" is a directive to trac. It mea
 this commit solves the specified issue. It'll close the ticket and add a comment to it
 referencing the commit. Always include this directive if the commit closes a real bug.
 
+Updating translation
+--------------------
+To update the translations you can either use your normal editor (emacs,vim,eclipse etc)
+or a specialized application for just translation (gtranslate)
+Translations using gettext are stored in text-form in .**po** files and compiled into
+.**gmo**/.**mo** files which used in runtime by applications.
+The .**po** files are extracted from the source code, where special markers are used to
+say that a string should be translated.
 
+To update the .**po** files from the source code, issue the following command::
+
+  make update-po
+
+After that the translation should be up to date, normally just update one translation
+at a time, so revert the changes to the .po files you are not interested in.
+The flumotion.pot file is a template used for creating new translations.
+The translations will be built (eg, compiled in .**gmo** files) when you install flumotion 
+or when you just type::
+
+  make 
+
+If you want to test your translation and see how your application looks like, do the
+following after making sure they are compiled::
+
+  LANG=xx_XX.UTF-8 flumotion-admin
+
+Where xx_XX is a language code, for instance::
+
+  - ca_ES: Catalan (as spoken in Spain)
+  - en_US: English (as spoken in USA), the default
+  - es_ES: Spanish (as spoken in Spain)
+  - sv_SE: Swedish (as spoken in Sweden)
+
+Running unittests
+-----------------
+Flumotion comes with set of unit tests that are automatically run by BuildBot_ upon
+each commit. It's highly recommended that you run all the tests before committing,
+to avoid being embarrassed at buildbot when he complains that your checkin broke the build.
+
+The tool to run unittests in python is called Trial, and is a part of the twisted framework.
+
+You can the tests by typing the following::
+
+  trial flumotion.test
+
+Running the whole testsuite usually takes a couple of minutes, even on a fast machine,
+running a part of it can be done by specifying a filename(s) or module name(s) as argument
+to trial::
+
+  trial flumotion.test.test_parts
+  trial flumotion/test/test_parts.py
+
+The commands above will do the same thing, running all tests in the tests_part.py file.
+You can also run just a specific test of a specific test class::
+
+  trial flumotion.test.test_parts.TestAdminStatusbar.testPushRemove
 
 Jordi's material
 ================
@@ -395,13 +451,6 @@ after that, open another console and do::
 
 to see the output.
 
-How to start a worker
----------------------
-This is the command line for starting a worker with maximum debug level, provided that you had
-set up the right environment and that you had already started a manager::
-
-  FLU_DEBUG=5 flumotion-worker -u user -p test -n worker1 --random-feederports >/tmp/flumotion-worker1.log 2>&1
-
 How to start an admin
 ---------------------
 This is the command line for starting an admin with maximum debug level, provided that you had
@@ -419,32 +468,6 @@ debug level of components and to write a mark on the log. This last thing is ver
 contains lots of lines and you may be interested in only one part. Moreover, when not all the
 workers are at the same computer, the clock may not be synchronized and this marker will help you
 localize the error.
-
-Updating translation
---------------------
-I have not found a tool that I like more than using emacs. Emacs has a po menu that is loaded when
-you open a .po file that helps you go to the next untranslated message or to the next fuzzy message.
-Translations, as in many open source linux projects, are in .po files. These files should be updated
-with the new code and then translated. So the right way to do it is:
-go to the po directory and write::
-
-  make update-po
-
-edit with emacs the po you want to edit (ca.po is for catalan, es.po is for spanish, etc.)
-Write the new translations and update the fuzzy ones. The fuzzy ones comes from merging the
-previous po with the actual code. Some of them may be correct and some don't, so you need to
-review them.
-
-  make update-po
-
-you do it again to see if you have left any or if you did any syntax error.
-Then, in order to test it, go to the flumotion project directory and type::
-
-  make 
-
-then, set your language variable before running the admin (example for catalan)::
-
-  LANG=ca_ES.UTF-8 flumotion-admin
 
 Changing the mood of a component
 --------------------------------
@@ -469,24 +492,6 @@ How to make a component:
 In order to know the pid of the job that is running the component, you have two options:
 1. Open the admin and look the pid column on the UI interface.
 2. Do a "ps aux | grep flumotion-job" and find out which is the process you want to send a signal.
-
-Running unittests
------------------
-Flumotion has a set of unit tests than must success before releasing the software. 
-The examples below assumes that you are in the flumotion project root.
-
-You can run them by::
-
-  trial flumotion.test
-
-If you want to run a specific suite, for example the one in the test_parts.py::
-
-  trial flumotion.test.test_parts
-
-Trial is a twisted facility for running pyunits (unit tests in python) that contains twisted code.
-Note: First time I run the tests, I got a “not permission exception” so I did a chmod
-777 /usr/lib/python2.5/site-packages/twisted -R <- not very nice but it works. It seems to be
-something related to a cache that it creates.
 
 How to run pychecker
 --------------------
