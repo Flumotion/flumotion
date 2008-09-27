@@ -144,20 +144,17 @@ class AdminCommand(util.LogCommand):
 
         @rtype: L{defer.Deferred} firing L{flumotion.admin.admin.AdminModel}
         """
-       # FIXME: we should be able to get a remote authenticator
-        # the cluster should fill the connectionInfo with a remoteref
         from flumotion.twisted import pb as fpb
-        #a = fpb.RemoteAuthenticator(self.getRootCommand().medium)
-        a = fpb.Authenticator(
-            username=connection.username,
-            password=connection.password,
-            address=connection.host)
-        connection.authenticator = a
+        if not connection.authenticator:
+            connection.authenticator = fpb.Authenticator(
+                username=connection.username,
+                password=connection.password,
+                address=connection.host)
         # platform-3/trunk compatibility stuff to guard against
         # gratuitous changes
         try:
             # platform-3
-            adminMedium = admin.AdminModel(a)
+            adminMedium = admin.AdminModel(connection.authenticator)
             self.debug("code is platform-3")
         except TypeError:
             # trunk
