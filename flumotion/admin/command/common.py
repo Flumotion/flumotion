@@ -28,6 +28,7 @@ import sys
 # we need to have the unjelliers registered
 # FIXME: why is this not in flumotion.admin.admin ?
 from flumotion.common import componentui, common
+from flumotion.admin import admin
 
 # FIXME: move
 from flumotion.monitor.nagios import util
@@ -134,6 +135,57 @@ class AdminCommand(util.LogCommand):
         """
         raise NotImplementedError(
             "subclass %r should implement doCallback" % self.__class__)
+
+    def connectToManager(self, connection, args):
+        """
+        Connect to a manager.
+
+        @type  connection: L{flumotion.common.connection.PBConnectionInfo}
+
+        @rtype: L{defer.Deferred} firing L{flumotion.admin.admin.AdminModel}
+        """
+       # FIXME: we should be able to get a remote authenticator
+        # the cluster should fill the connectionInfo with a remoteref
+        from flumotion.twisted import pb as fpb
+        #a = fpb.RemoteAuthenticator(self.getRootCommand().medium)
+        a = fpb.Authenticator(
+            username=connection.username,
+            password=connection.password,
+            address=connection.host)
+        connection.authenticator = a
+        # platform-3/trunk compatibility stuff to guard against
+        # gratuitous changes
+        try:
+            # platform-3
+            adminMedium = admin.AdminModel(a)
+            self.debug("code is platform-3")
+        except TypeError:
+            # trunk
+            adminMedium = admin.AdminModel()
+            self.debug("code is trunk")
+
+        if hasattr(adminMedium, 'connectToHost'):
+            # platform-3
+            d = adminMedium.connectToHost(connection.host,
+                connection.port, not connection.use_ssl)
+        else:
+            d = adminMedium.connectToManager(connection)
+
+        d.addCallback(self._connectToManagerCb, adminMedium)
+        d.addErrback(self._connectToManagerEb)
+
+        return d
+
+    def _connectToManagerCb(self, result, adminMedium):
+        self.debug('Connected to manager.')
+        return adminMedium
+
+    def _connectToManagerEb(self, failure):
+        if failure.check(errors.ConnectionFailedError):
+            self.stderr.write("Unable to connect to manager.\n")
+        if failure.check(errors.ConnectionRefusedError):
+            self.stderr.write("Manager refused connection.\n")
+        return failure
 
 
 class Exited(Exception):

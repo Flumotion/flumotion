@@ -1,3 +1,8 @@
+2008-09-27  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/command/common.py:
+	  Add a method to connect to a manager.
+
 2008-09-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/component.py:
