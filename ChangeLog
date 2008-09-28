@@ -1,3 +1,10 @@
+2008-09-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/disker/disker_plug.py:
+	  Change recording_started/_stopped to recordingStarted/Stopped to
+	  conform to naming guidelines.
+
 2008-09-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/command/common.py:

@@ -29,7 +29,7 @@ class DiskerPlug(base.ComponentPlug):
     Base class for disker plugs.
     """
 
-    def recording_started(self, file, location):
+    def recordingStarted(self, file, location):
         """
         Called before disker starts writing data to a new file.
 
@@ -40,7 +40,7 @@ class DiskerPlug(base.ComponentPlug):
         """
         pass
 
-    def recording_stopped(self, file, location):
+    def recordingStopped(self, file, location):
         """
         Called after disker stops writing data to a file.
 
