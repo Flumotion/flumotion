@@ -136,7 +136,7 @@ class AdminCommand(util.LogCommand):
         raise NotImplementedError(
             "subclass %r should implement doCallback" % self.__class__)
 
-    def connectToManager(self, connection, args):
+    def connectToManager(self, connection):
         """
         Connect to a manager.
 
