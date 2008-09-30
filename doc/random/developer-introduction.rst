@@ -15,6 +15,12 @@
 .. _GObject: http://library.gnome.org/devel/gobject/
 .. _GStreamer: http://www.gstreamer.net/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
+.. _TwistedManual: http://twistedmatrix.com/projects/core/documentation/howto/index.html
+.. _GStreamerManual: http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/
+.. _KiwiHowto: http://www.async.com.br/projects/kiwi/howto/
+.. _Glade2Tutorial: http://www.kplug.org/glade_tutorial/glade2_tutorial/glade2_introduction.html
+.. _PyGTKManual: http://www.pygtk.org/docs/pygtk/
+.. _GtkManual: http://library.gnome.org/devel/gtk/stable/
 
 ============================================
  Developer introduction guide for Flumotion
@@ -169,6 +175,7 @@ It's used as the graphical interface for Flumotion.
 - Treeview (model, view, columns, cellrenderers)
 - Textview (buffers, iters)
 
+Use the PyGTKManual_ and the GtkManual_ as the main sources for information.
 
 GStreamer
 ---------
@@ -179,22 +186,27 @@ GStreamer
 - Playing states
 - Bus + Messages
 
+The GStreamerManual_ explains this pretty good, while it is aimed at the C API it can
+easily be reused by python programmers as the Python bindings are straight-forward.
 
 Glade 
 ------
 Defining signals. Avoiding hardcoding of width/height
 Reading the HIG and applying it consistently within the project
 
+Check out the Glade2Tutorial_ for some help to get started.
 
 Kiwi
 ----
 Proxy/View/Delegate
 
+The KiwiHowto_ is pretty good here, even though it might be a bit outdated.
 
 Twisted
 -------
 Twisted_ is an asynchronous framework for Python.
 It's an integral part of Flumotion and is used for many different things.
+
 This is what you need to know:
 
 - deferreds
@@ -215,6 +227,8 @@ This is what you need to know:
 - python: namedAny, log
 - trial: invoking, deferred tests
 - zope.interfaces: implement new interfaces
+
+The TwistedManual_ explains most, if not all of these concepts.
 
 Build system
 ------------
@@ -309,6 +323,17 @@ To run a pychecker test on your source code, type the following::
   make pycheck
 
 See more info at the `pychecker homepage <http://pychecker.sourceforge.net/>`_.
+
+Flumotion documentation
+-----------------------
+In the svn flumotion project there is a random docs directory. Some info there is very useful and
+some may be outdated. You can read it from your checkout directory or online from `here
+<https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/>`_.
+
+Also, you could checkout the flumotion-doc project and build the most up to date documentation
+yourself (by using autogen.sh and make, as usual)::
+
+  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-doc/trunk flumotion-doc
 
 Development process
 ===================
@@ -597,16 +622,3 @@ Take in mind that, if you are writing a patch for a ticket in the trac, writing 
 Changelog file, where x is the ticket number, will update the trac ticket.
 If you decide not to commit anything, you can always revert the Changelog file to the previous one
 by doing svn revert.
-
-Further documentation
----------------------
-On the svn flumotion project there is a random docs directory. Some info there is very useful and
-some may be outdated. You can read it from your checkout directory or online from `here
-<https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/>`_.
-
-Also, you could checkout the flumotion-doc project and build the most up to date documentation
-yourself (by using autogen.sh and make, as usual)::
-
-  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-doc/trunk flumotion-doc
-
-
