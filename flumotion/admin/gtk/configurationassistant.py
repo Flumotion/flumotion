@@ -19,6 +19,35 @@
 
 # Headers in this file shall remain intact.
 
+"""Configuration Assistant - A graphical user interface to create a stream.
+
+
+This simple drawing explains the basic user interface:
+
+  +----------+---------------------------------+
+  |          |             Title               |
+  | Sidebar  |---------------------------------+
+  |          |                                 |
+  |          |                                 |
+  |          |                                 |
+  |          |         WizardStep              |
+  |          |                                 |
+  |          |                                 |
+  |          |                                 |
+  |          |                                 |
+  |          |                                 |
+  |          +---------------------------------+
+  |          |            Buttons              |
+  +----------+---------------------------------+
+
+Sidebar shows the available and visited steps, it allows you to quickly
+navigate back to a previous step.
+Title and the sidebar name contains text / icon the wizard step can set.
+Buttons contain navigation and help.
+
+Most WizardSteps are loaded over the network from the manager (to the admin
+client where the code runs).
+"""
 import gettext
 import os
 import sets
@@ -60,6 +89,10 @@ def _fraction_from_float(number, denominator):
 
 
 class WelcomeStep(WizardStep):
+    """
+    This step is showing an informative description which introduces
+    the user to the configuration assistant.
+    """
     name = "Welcome"
     title = _('Welcome')
     section = _('Welcome')
@@ -74,6 +107,11 @@ class WelcomeStep(WizardStep):
 
 
 class ScenarioStep(WizardStep):
+    """
+    This step is showing a list of possible scenarios.
+    The user will select the scenario he want to use,
+    then the scenario itself will decide the future steps.
+    """
     name = "Scenario"
     title = _('Scenario')
     section = _('Scenario')
@@ -131,6 +169,17 @@ class ScenarioStep(WizardStep):
 
 
 class ConfigurationAssistant(SectionWizard):
+    """This is the main configuration assistant class,
+    it is responsible for::
+    - executing tasks which will block the ui
+    - showing a worker list in the UI
+    - communicating with the manager, fetching bundles
+      and registry information
+    - running check defined by a step in a worker, for instance
+      querying for hardware devices and their capabilities
+    It extends SectionWizard which provides the basic user interface, such
+    as sidebar, buttons, title bar and basic step navigation.
+    """
     gsignal('finished', str)
 
     def __init__(self, parent=None):

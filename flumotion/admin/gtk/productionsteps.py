@@ -38,6 +38,10 @@ _ = gettext.gettext
 
 
 class LiveProductionStep(WizardStep):
+    """This step is showing a list of available audio and video production
+    components. The list of component are queried from the manager
+    by a remote call (getWizardEntries) which will populate the combos.
+    """
     name = 'Production'
     title = _('Production')
     section = _('Production')
