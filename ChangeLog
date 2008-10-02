@@ -1,3 +1,8 @@
+2008-10-02  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/command/common.py:
+	  Impot missing module.
+
 2008-10-01  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/configurationassistant.py:

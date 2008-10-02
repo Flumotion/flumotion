@@ -27,7 +27,7 @@ import sys
 
 # we need to have the unjelliers registered
 # FIXME: why is this not in flumotion.admin.admin ?
-from flumotion.common import componentui, common
+from flumotion.common import componentui, common, errors
 from flumotion.admin import admin
 
 # FIXME: move
