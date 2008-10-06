@@ -68,6 +68,8 @@ class Connections(GladeWidget):
         self._connections.set_size_request(-1, 160)
         self.page.pack_start(self._connections)
         self.page.reorder_child(self._connections, 0)
+        self._connections.get_treeview().set_search_equal_func(
+            self._searchEqual)
         self._connections.show()
         self._updateButtons()
 
@@ -75,6 +77,14 @@ class Connections(GladeWidget):
         canClear = hasRecentConnections()
         self.button_clear.set_sensitive(canClear)
         self.button_clear_all.set_sensitive(canClear)
+
+    def _searchEqual(self, model, column, key, iter):
+        connection = model.get(iter, column)[0]
+        if key in connection.name:
+            return False
+
+        # True means doesn't match
+        return True
 
     def _clear_all(self):
         for conn in self._connections:

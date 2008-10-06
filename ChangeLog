@@ -1,7 +1,13 @@
+2008-10-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/gtk/connections.py:
+	  Make typeahead actually useful by matching on 'contains', not
+	  'starts with'.
+
 2008-10-02  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/command/common.py:
-	  Impot missing module.
+	  Import missing module.
 
 2008-10-01  Johan Dahlin  <johan@flumotion.com>
 
