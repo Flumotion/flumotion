@@ -71,8 +71,8 @@ class BaseAdminGtkNode(log.Loggable):
         self.statusbar = None
         self.title = title
         self.nodes = util.OrderedDict()
-        self.wtree = None
-        self.widget = None
+        self.wtree = None # glade.XML instance (optionally set)
+        self.widget = None # the top level widget that will be visible
         self.uiState = None # set if we are listening
         self._pendingUIState = None # set if we are waiting for the ui
                                     # to load
