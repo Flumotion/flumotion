@@ -1,3 +1,8 @@
+2008-10-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/common.py:
+	  Assertions need to have a reason.
+
 2008-10-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/base/baseadminnode.py:

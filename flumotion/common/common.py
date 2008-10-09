@@ -167,7 +167,7 @@ def parseFullFeedId(fullFeedId):
     @return: tuple of (flowName, componentName, feedName)
     """
     parts = fullFeedId.split(":")
-    assert len(parts) == 2
+    assert len(parts) == 2, "%r should have exactly one column" % fullFeedId
     flowName, componentName = parseComponentId(parts[0])
     return (flowName, componentName, parts[1])
 
