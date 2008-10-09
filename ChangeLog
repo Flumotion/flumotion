@@ -1,5 +1,10 @@
 2008-10-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* scripts/check-sync-on-feeds:
+	  Show me nicer timestamps.
+
+2008-10-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/common.py:
 	  Assertions need to have a reason.
 

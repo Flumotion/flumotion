@@ -101,7 +101,9 @@ def sendNewsegments():
 
     if not sentNewsegment:
         sentNewsegment = True
-        log.debug("check-sync-on-feeds", "new segment created with timestamp %d", lowestTimestamp)
+        log.debug("check-sync-on-feeds",
+            "new segment created with timestamp %d (%s)",
+            lowestTimestamp, gst.TIME_ARGS(lowestTimestamp))
         newseg = gst.event_new_new_segment(False, 1.0, gst.FORMAT_TIME, lowestTimestamp, -1, 0)
         vsinkpad = pipe.get_by_name("vsinkpad").get_pad("sink")
         asinkpad = pipe.get_by_name("asinkpad").get_pad("sink")
@@ -115,8 +117,9 @@ def videoBufferProbe(pad, buffer):
     global haveAudioBuffer
     global lowestTimestamp
     haveVideoBuffer = True
-    log.debug("check-sync-on-feeds", "video buffer arrived with timestamp %d",
-        buffer.timestamp)
+    log.debug("check-sync-on-feeds",
+        "video buffer arrived with timestamp %d (%s)",
+        buffer.timestamp, gst.TIME_ARGS(buffer.timestamp))
     if haveAudioBuffer:
         if lowestTimestamp > buffer.timestamp:
             lowestTimestamp = buffer.timestamp
@@ -130,9 +133,9 @@ def audioBufferProbe(pad, buffer):
     global haveAudioBuffer
     global lowestTimestamp
     haveAudioBuffer = True
-    log.debug("check-sync-on-feeds", "audio buffer arrived with timestamp %d",
-        buffer.timestamp)
-
+    log.debug("check-sync-on-feeds",
+        "audio buffer arrived with timestamp %d (%s)",
+        buffer.timestamp, gst.TIME_ARGS(buffer.timestamp))
     if haveVideoBuffer:
         if lowestTimestamp > buffer.timestamp:
             lowestTimestamp = buffer.timestamp
