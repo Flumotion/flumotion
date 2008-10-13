@@ -1,5 +1,11 @@
 2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/test/test_comptest.py:
+	Work around broken Twisted < 2.5.0 trial, which has None as the default
+	argument for TestCase.__init__
+
+2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/common/testsuite.py:
 	Fix the build by checking for specific function signature instead of
 	relying on the Twisted version number, which is not provided in SVN

@@ -40,7 +40,7 @@ class TestCompTestGtk2Reactorness(testsuite.TestCase):
 
         class TestCompTestSupportedReactors(CompTestTestCase):
             pass
-        obj = TestCompTestSupportedReactors()
+        obj = TestCompTestSupportedReactors('runTest')
         if not isinstance(sys.modules['twisted.internet.reactor'],
                           gtk2reactor.Gtk2Reactor):
             # not running with a gtk2reactor, the TestCompTestSupportedReactors
