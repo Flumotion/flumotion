@@ -202,7 +202,7 @@ AC_CONFIG_FILES([bin/flumotion-tester], [chmod +x bin/flumotion-tester])
 AC_CONFIG_FILES([bin/flumotion-worker], [chmod +x bin/flumotion-worker])
 AC_CONFIG_FILES([bin/runtest], [chmod +x bin/runtest])
 AC_CONFIG_FILES([misc/flumotion-verify-config], [chmod +x misc/flumotion-verify-config])
-AC_CONFIG_FILES([misc/flumotion-trial], [chmod +x misc/flumotion-trial])
+AC_CONFIG_FILES([common/flumotion-trial], [chmod +x common/flumotion-trial])
 
 dnl output stuff
 AC_OUTPUT(

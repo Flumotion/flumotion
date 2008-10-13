@@ -1,5 +1,17 @@
 2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* common/flumotion-trial.in (added):
+	* misc/flumotion-trial.in (deleted):
+	Move flumotion-trial from misc/ to common/ in roder to have it picked
+	up in flumotion-template
+
+	* common/common.mk:
+	* common/trial.mk:
+	* configure.ac:
+	Change the paths to flumotion-trial from misc/ to common/
+
+2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/test/comptest.py:
 	* flumotion/test/test_comptest.py:
 	Adapt comptest to the recent changes in component initialization
