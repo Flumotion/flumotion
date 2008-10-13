@@ -1,6 +1,13 @@
 2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/testsuite.py:
+	Fix the build by checking for specific function signature instead of
+	relying on the Twisted version number, which is not provided in SVN
+	Twisted checkouts.
+
+2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/testsuite.py:
 	Fix the build by supporting Twisted versions < 2.5.0
 
 2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
