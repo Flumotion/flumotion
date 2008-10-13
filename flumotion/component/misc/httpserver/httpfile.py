@@ -113,7 +113,7 @@ class File(resource.Resource, log.Loggable):
                        callbackArgs=(request, ), errbackArgs=(request, ))
         return server.NOT_DONE_YET
 
-    def _authenticationFailed(self, failure):
+    def _authenticationFailed(self, failure, request):
         # Authentication failed; nothing more to do, just swallow the failure.
         pass
 
