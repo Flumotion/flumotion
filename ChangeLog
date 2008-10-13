@@ -1,3 +1,36 @@
+2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/test/comptest.py:
+	* flumotion/test/test_comptest.py:
+	Adapt comptest to the recent changes in component initialization
+	protocol.
+	* flumotion/common/testsuite.py:
+	Extend flumotion.common.testsuite.TestCase to allow choosing supported
+	reactors for each test case. Running a test case with a reactor that's
+	not supported by it will result in a skip.
+	* configure.ac:
+	* misc/flumotion-trial.in:
+	Add a wrapper script for Twisted trial to support an additional
+	parameter --saved-coverage. It should point to a file which will store
+	intermediate coverage results between consecutive trial runs. For more
+	see http://docs.python.org/library/trace.html and the Trace class
+	`infile' and `outfile' params.
+	* common/common.mk:
+	* common/trial.mk:
+	Change the `check' and `coverage' make targets to take advantage of the
+	new features. There will now be two separate flumotion-trial runs, with
+	different reactors, and intermediate coverage results will get stored
+	in a file. This allows for running test cases that require different
+	reactors and still getting total coverage results.
+	* flumotion/test/test_component_disker.py:
+	Add a test for the Disker component using new comptest features.
+	* flumotion/component/consumers/disker/disker.py:
+	Fix confusing log message.
+	* flumotion/component/padmonitor.py:
+	Fix a bug in EaterPadMonitor where stopping the component inside a
+	EaterPadMonitor.setInactive() call would result in the reactor ending
+	up in an unclean state.
+
 2008-10-13  Sebastien Merle  <sebastien@fluendo.com>
 
     * flumotion/component/misc/httpserver/httpfile.py:

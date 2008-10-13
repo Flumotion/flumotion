@@ -21,7 +21,7 @@
 
 import sys
 
-from twisted.internet import defer, reactor, gtk2reactor
+from twisted.internet import defer, reactor, selectreactor, gtk2reactor
 
 from flumotion.common import testsuite
 from flumotion.common import log, errors
@@ -30,43 +30,36 @@ from flumotion.component.producers.pipeline.pipeline import Producer
 from flumotion.component.converters.pipeline.pipeline import Converter
 from flumotion.test import comptest
 from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
-     ComponentUnitTestMixin, pipeline_src, pipeline_cnv
-
-
-class CompTestTestCase(testsuite.TestCase,
-                       ComponentUnitTestMixin):
-    logCategory = 'comptest-test'
+    CompTestTestCase, ComponentSad, pipeline_src, pipeline_cnv
 
 
 class TestCompTestGtk2Reactorness(testsuite.TestCase):
+    supportedReactors = []
 
-    def test_mixin_class(self):
+    def test_gtk2_supportness(self):
 
-        class TestCompTestUnitTestMixin(testsuite.TestCase,
-                                        ComponentUnitTestMixin):
+        class TestCompTestSupportedReactors(CompTestTestCase):
             pass
+        obj = TestCompTestSupportedReactors()
         if not isinstance(sys.modules['twisted.internet.reactor'],
                           gtk2reactor.Gtk2Reactor):
-            # not running with a gtk2reactor, TestCompTestUnitTestMixin
-            # class should have .skip attribute
-            self.failUnless(hasattr(TestCompTestUnitTestMixin, 'skip'),
-                            "ComponentUnitTestMixin doesn't set .skip"
+            # not running with a gtk2reactor, the TestCompTestSupportedReactors
+            # instance should have a 'skip' attribute
+            self.failUnless(hasattr(obj, 'skip'),
+                            "setting supportedReactors doesn't set 'skip'"
                             " correctly.")
         else:
-            self.failIf(hasattr(TestCompTestUnitTestMixin, 'skip'),
-                        "ComponentUnitTestMixin sets .skip incorrectly.")
-
-    def test_have_gtk2reactor(self):
-        if not isinstance(sys.modules['twisted.internet.reactor'],
-                          gtk2reactor.Gtk2Reactor):
-            # not running with a gtk2reactor, comptest.HAVE_GTK2REACTOR
-            # should be False
-            self.assertEquals(comptest.HAVE_GTK2REACTOR, False)
-        else:
-            self.failIfEquals(comptest.HAVE_GTK2REACTOR, False)
+            self.failIf(hasattr(obj, 'skip'),
+                        "setting supportedReactors sets 'skip' incorrectly.")
 
 
 class TestComponentWrapper(testsuite.TestCase):
+
+    def tearDown(self):
+        # The components a.t.m. don't cleanup after
+        # themselves too well, remove when fixed.
+        # See also a similar snippet in TestCompTestFlow.tearDown()
+        comptest.cleanup_reactor()
 
     def test_get_unique_name(self):
         self.failIfEquals(ComponentWrapper.get_unique_name(),
@@ -112,24 +105,26 @@ class TestComponentWrapper(testsuite.TestCase):
                                        ('fwp:audio', 'default-bis')]})
 
     def test_instantiate_errors(self):
+        # this passes None as the class name for ComponentWrapper,
+        # i.e. it tries to dynamically subclass None. Throws a "cannot
+        # instantiate None" error
         pp = ComponentWrapper('pipeline-producer', None, name='pp')
-        self.failUnlessRaises(TypeError, pp.instantiate) # None()!?
-        pp = ComponentWrapper('pipeline-producer', Producer, name='pp')
+        self.failUnlessRaises(TypeError, pp.instantiate)
 
-        pp.instantiate()
-        # sad because missing mandatory pipeline property
-        d = pp.wait_for_mood(moods.sad)
-        d.addCallback(lambda _: pp.stop())
-        return d
+        # missing mandatory pipeline property
+        pp = ComponentWrapper('pipeline-producer', Producer,
+                              name='pp')
+        d = pp.instantiate()
+        # See the comment in test_setup_fail_gst_linking()
+        return self.failUnlessFailure(d, ComponentSad)
 
     def test_gstreamer_error(self):
         pp = ComponentWrapper('pipeline-producer', Producer,
                               name='pp', props={'pipeline': 'fakesink'})
 
-        pp.instantiate()
-        d = pp.wait_for_mood(moods.sad)
-        d.addCallback(lambda _: pp.stop())
-        return d
+        d = pp.instantiate()
+        # See the comment in test_setup_fail_gst_linking()
+        return self.failUnlessFailure(d, ComponentSad)
 
 
 class TestCompTestSetup(CompTestTestCase):
@@ -143,7 +138,16 @@ class TestCompTestSetup(CompTestTestCase):
         self.p = ComponentTestHelper()
 
     def tearDown(self):
-        return defer.DeferredList([c.stop() for c in self.components])
+        d = defer.DeferredList([c.stop() for c in self.components])
+        # The components a.t.m. don't cleanup after
+        # themselves too well, remove when fixed.
+        # See also a similar snippet in TestCompTestFlow.tearDown()
+        d.addCallback(comptest.cleanup_reactor)
+        return d
+
+    def test_trivial(self):
+        # This fails without having cleanup_reactor() in tearDown()
+        return defer.succeed(None)
 
     def test_success(self):
         pp = ComponentWrapper('pipeline-producer', Producer,
@@ -151,8 +155,8 @@ class TestCompTestSetup(CompTestTestCase):
                                                 'audiotestsrc is-live=1'},
                               cfg={'clock-master': '/default/pp'})
 
-        pp.instantiate()
-        d = pp.wait_for_mood(moods.happy)
+        d = pp.instantiate()
+        d.addCallback(lambda _: pp.wait_for_mood(moods.happy))
         d.addCallback(lambda _: pp.stop())
         return d
 
@@ -264,17 +268,32 @@ class TestCompTestFlow(CompTestTestCase):
                 gst.debug_set_default_threshold(old_debug_level)
                 return rf
             d.addBoth(_restore_gst_debug_level)
-        return self.failUnlessFailure(d, errors.ComponentSetupHandledError)
+        # Because component setup errors get swallowed in
+        # BaseComponent.setup() we won't get the exact error that will
+        # be thrown, i.e. PipelineParseError. Instead, the component
+        # will turn sad and we will get a ComponentSad failure from
+        # the ComponentWrapper.
+        return self.failUnlessFailure(d, ComponentSad)
 
     def test_setup_started_and_happy(self):
-        self.p.set_flow([self.prod, self.cnv1, self.cnv2])
+        flow = [self.prod, self.cnv1, self.cnv2]
+        self.p.set_flow(flow)
         d = self.p.start_flow()
 
+        def wait_for_happy(_):
+            self.debug('Waiting for happiness')
+            d = defer.DeferredList(
+                [c.wait_for_mood(moods.happy) for c in flow])
+            d.addCallback(check_happy)
+            return d
+
         def check_happy(_):
-            for c in (self.prod, self.cnv1, self.cnv2):
+            self.debug('Checking for happiness')
+            for c in flow:
                 self.assertEquals(moods.get(c.comp.getMood()), moods.happy)
             return _
-        d.addCallback(check_happy)
+
+        d.addCallback(wait_for_happy)
         return d
 
     def test_run_fail_gst_linking(self):
@@ -295,7 +314,8 @@ class TestCompTestFlow(CompTestTestCase):
                 gst.debug_set_default_threshold(old_debug_level)
                 return rf
             d.addBoth(_restore_gst_debug_level)
-        return self.failUnlessFailure(d, errors.ComponentSetupHandledError)
+        # See the comment in test_setup_fail_gst_linking()
+        return self.failUnlessFailure(d, ComponentSad)
 
     def test_run_start_timeout(self):
         start_delay_time = 5.0
@@ -303,8 +323,8 @@ class TestCompTestFlow(CompTestTestCase):
 
         class LingeringCompWrapper(ComponentWrapper):
 
-            def start(self, *a, **kw):
-                d = ComponentWrapper.start(self, *a, **kw)
+            def instantiate(self, *a, **kw):
+                d = ComponentWrapper.instantiate(self, *a, **kw)
 
                 def delay_start(result):
                     dd = defer.Deferred()
@@ -319,11 +339,11 @@ class TestCompTestFlow(CompTestTestCase):
         return self.failUnlessFailure(d, comptest.StartTimeout)
 
     def test_run_with_delays(self):
+        flow = [self.prod, self.cnv1, self.cnv2]
         self.p.start_delay = 0.5
 
-        self.p.set_flow([self.prod, self.cnv1, self.cnv2])
-        d = self.p.run_flow(self.duration)
-        return d
+        self.p.set_flow(flow)
+        return self.p.run_flow(self.duration)
 
     def test_run_provides_clocking(self):
         p2_pp = ('videotestsrc is-live=true ! '

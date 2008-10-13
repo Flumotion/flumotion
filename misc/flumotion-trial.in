@@ -1,0 +1,63 @@
+#!/usr/bin/python
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+#
+# Flumotion - a streaming media server
+# Copyright (C) 2008 Fluendo, S.L. (www.fluendo.com).
+# All rights reserved.
+
+# This file may be distributed and/or modified under the terms of
+# the GNU General Public License version 2 as published by
+# the Free Software Foundation.
+# This file is distributed without any warranty; without even the implied
+# warranty of merchantability or fitness for a particular purpose.
+# See "LICENSE.GPL" in the source distribution for more information.
+
+# Licensees having purchased or holding a valid Flumotion Advanced
+# Streaming Server license may use this file in accordance with the
+# Flumotion Advanced Streaming Server Commercial License Agreement.
+# See "LICENSE.Flumotion" in the source distribution for more information.
+
+# Headers in this file shall remain intact.
+
+# This is a trial replacement with support for storing the
+# intermediate coverage results in a file. Useful for running trial a
+# couple of times with different reactors and building up the final
+# coverage.
+
+import os
+import sys
+
+from optparse import OptionParser
+from twisted.python import usage
+
+import twisted.scripts.trial
+
+# Store the class we'll be overriding in local namespace
+_Options = twisted.scripts.trial.Options
+
+
+class FOptions(_Options):
+
+    optParameters = [['saved-coverage', None, None,
+                      'Filename to store coverage results.'
+                      ' Can only be used with --coverage.']]
+
+    def postOptions(self):
+        _Options.postOptions(self)
+        if self['saved-coverage'] and not self.tracer:
+            raise usage.UsageError(
+                "Cannot specify --saved-coverage without --coverage")
+        if self['saved-coverage'] and self.tracer:
+            # need to replace the tracer with one using our saved-coverage file
+            print 'Saving coverage in', self['saved-coverage']
+            import trace
+            self.tracer = trace.Trace(count=1, trace=0,
+                                      infile=self['saved-coverage'],
+                                      outfile=self['saved-coverage'])
+            sys.settrace(self.tracer.globaltrace)
+
+twisted.scripts.trial.Options = FOptions
+
+from twisted.scripts.trial import run
+run()

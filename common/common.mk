@@ -16,8 +16,11 @@ check-local-pep8:
 	find $(top_srcdir)/flumotion -name \*.py | sort | uniq | xargs $(PYTHON) $(top_srcdir)/common/pep8.py --repeat
 	find $(top_srcdir)/flumotion -name \*.py.in | sort | uniq | xargs $(PYTHON) $(top_srcdir)/common/pep8.py --repeat
 
+# run our hacked-up version of trial with all the reactors that we actually use and build up the final result
 coverage:
-	@$(top_builddir)/env bash -c "trial --temp-directory=_trial_coverage --coverage flumotion.test"
+	rm -f flu-saved-coverage.pickle
+	@$(top_builddir)/env bash -c "misc/flumotion-trial --reactor select --temp-directory=_trial_coverage --coverage --saved-coverage=flu-saved-coverage.pickle flumotion.test"
+	@$(top_builddir)/env bash -c "misc/flumotion-trial --reactor gtk2   --temp-directory=_trial_coverage --coverage --saved-coverage=flu-saved-coverage.pickle flumotion.test"
 	make show-coverage
 
 show-coverage:
@@ -78,4 +81,5 @@ locale-uninstalled:
 
 locale-uninstalled-clean:
 	@-rm -rf _trial_temp
+	@-rm -f flu-saved-coverage.pickle
 	@-rm -rf $(top_builddir)/locale

@@ -40,6 +40,7 @@ class PadMonitor(log.Loggable):
         self.name = name
         self._active = False
         self._first = True
+        self._running = True
 
         self._doSetActive = []
         self._doSetInactive = []
@@ -68,6 +69,7 @@ class PadMonitor(log.Loggable):
     def detach(self):
         self.check_poller.stop()
         self.watch_poller.stop()
+        self._running = False
 
         # implementation closely tied to _check_timeout wrt to GIL
         # tricks, threadsafety, and getting the probe deferred to
@@ -170,20 +172,36 @@ class EaterPadMonitor(PadMonitor):
     def setInactive(self):
         PadMonitor.setInactive(self)
 
-        # If an eater received a buffer before being marked as disconnected,
-        # and still within the buffer check interval, the next eaterCheck
-        # call could accidentally think the eater was reconnected properly.
-        # Setting this to 0 here avoids that happening in eaterCheck.
-        self._last_data_time = 0
+        # It might be that we got detached while calling
+        # PadMonitor.setInactive() For example someone might have
+        # stopped the component as it went hungry, which would happen
+        # inside the PadMonitor.setInactive() call. The component
+        # would then detach us and the reconnect poller would get
+        # stopped. If that happened don't bother restarting it, as it
+        # will result in the reactor ending up in an unclean state.
+        #
+        # A prominent example of such situation is
+        # flumotion.test.test_component_disker, where the component
+        # gets stopped right after it goes hungry
+        if self._running:
+            # If an eater received a buffer before being marked as
+            # disconnected, and still within the buffer check
+            # interval, the next eaterCheck call could accidentally
+            # think the eater was reconnected properly.  Setting this
+            # to 0 here avoids that happening in eaterCheck.
+            self._last_data_time = 0
 
-        self._reconnectPoller.start(immediately=True)
+            self.debug('starting the reconnect poller')
+            self._reconnectPoller.start(immediately=True)
 
     def setActive(self):
         PadMonitor.setActive(self)
+        self.debug('stopping the reconnect poller')
         self._reconnectPoller.stop()
 
     def detach(self):
         PadMonitor.detach(self)
+        self.debug('stopping the reconnect poller')
         self._reconnectPoller.stop()
 
 

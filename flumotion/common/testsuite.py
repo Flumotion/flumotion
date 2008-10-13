@@ -23,7 +23,7 @@
 """
 
 from twisted.spread import pb
-from twisted.internet import reactor, defer
+from twisted.internet import reactor, defer, selectreactor
 from twisted.trial import unittest
 
 from flumotion.common import log
@@ -33,6 +33,11 @@ __version__ = "$Rev$"
 
 
 class TestCase(unittest.TestCase, log.Loggable):
+
+    # A sequence of reactors classes that this test supports, can be
+    # overridden in subclasses. You can also set this to an empty
+    # sequence, which means "any reactor"
+    supportedReactors = [selectreactor.SelectReactor]
 
     # TestCase in Twisted 2.0 doesn't define failUnlessFailure method.
     if not hasattr(unittest.TestCase, 'failUnlessFailure'):
@@ -48,6 +53,15 @@ class TestCase(unittest.TestCase, log.Loggable):
                 return failure.value
             return deferred.addCallbacks(_cb, _eb)
         assertFailure = failUnlessFailure
+
+    def __init__(self, methodName='runTest'):
+        # skip the test if the class specifies supportedReactors and
+        # the current reactor is not among them
+        if (self.supportedReactors and
+            type(reactor) not in self.supportedReactors):
+            self.skip = "this test case does not support " \
+                "running with %s as the reactor" % reactor
+        unittest.TestCase.__init__(self, methodName)
 
     # Loggable and TestCase both have a debug method; prefer ours
 

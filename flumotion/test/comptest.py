@@ -21,27 +21,20 @@
 
 import new
 import os
-import sys
-
-from twisted.internet import gtk2reactor
-HAVE_GTK2REACTOR = True
-try:
-    gtk2reactor.install(useGtk=False)
-except AssertionError:
-    if not isinstance(sys.modules['twisted.internet.reactor'],
-                      gtk2reactor.Gtk2Reactor):
-        HAVE_GTK2REACTOR = False
 
 from twisted.python import failure
-from twisted.internet import reactor, defer, interfaces
+from twisted.internet import reactor, defer, interfaces, gtk2reactor
 
-from flumotion.common import registry, log, common
+from flumotion.common import registry, log, testsuite, common
+from flumotion.common.planet import moods
+from flumotion.component import feedcomponent
 from flumotion.component.producers.pipeline.pipeline import Producer
 from flumotion.component.converters.pipeline.pipeline import Converter
 from flumotion.twisted import flavors
 
-__all__ = ['ComponentTestHelper', 'ComponentUnitTestMixin', 'pipeline_src',
-           'pipeline_cnv']
+__all__ = ['ComponentTestHelper', 'ComponentWrapper',
+           'CompTestTestCase', 'ComponentSad',
+           'delayed_d', 'pipeline_src', 'pipeline_cnv']
 
 
 class ComponentTestException(Exception):
@@ -61,6 +54,10 @@ class FlowTimeout(ComponentTestException):
 
 
 class StopTimeout(ComponentTestException):
+    pass
+
+
+class ComponentSad(ComponentTestException):
     pass
 
 
@@ -84,6 +81,12 @@ def call_and_passthru_callback(result, callable_, *args, **kwargs):
     """Invoke the callable_ and passthrough the original result."""
     callable_(*args, **kwargs)
     return result
+
+
+class CompTestTestCase(testsuite.TestCase):
+    supportedReactors = [gtk2reactor.Gtk2Reactor]
+
+    logCategory = 'comptest-test'
 
 
 class ComponentWrapper(object, log.Loggable):
@@ -161,7 +164,39 @@ class ComponentWrapper(object, log.Loggable):
     get_unique_name = classmethod(get_unique_name)
 
     def instantiate(self):
-        self.comp = self.comp_class(self.cfg)
+        # Define a successful instantiation as one that makes a
+        # component fire it's setup_completed() method and an
+        # unsuccessful as one that makes it sad.
+        # We need to hijack the component's setup_completed() and
+        # setMood() methods with this bit of ugliness.
+        d = defer.Deferred()
+
+        cls = self.comp_class
+
+        self.debug('Dynamically creating a subclass of %r', cls)
+
+        class klass(cls):
+
+            def setup_completed(self):
+                # call superclass
+                cls.setup_completed(self)
+                # fire the deferred returned from instantiate()
+                d.callback(self)
+
+            def setMood(self, mood):
+                self.debug('hijacked setMood %r on component %r', mood, self)
+                current = self.state.get('mood')
+                # call superclass
+                cls.setMood(self, mood)
+
+                if (current != moods.sad.value
+                    and mood.value == moods.sad.value):
+                    # The component went sad and it wasn't sad before,
+                    # fire the deferred returned from instantiate()
+                    d.errback(ComponentSad())
+
+        self.comp = klass(self.cfg)
+
         self.debug('instantiate:: %r' % self.comp.state)
 
         def append(instance, key, value):
@@ -172,6 +207,7 @@ class ComponentWrapper(object, log.Loggable):
                     self.debug_msgs.append(value.debug)
             flavors.StateCacheable.append(instance, key, value)
         self.comp.state.append = new.instancemethod(append, self.comp.state)
+        return d
 
     def wait_for_mood(self, mood):
         if self.comp.state.get('mood') == mood.value:
@@ -191,14 +227,11 @@ class ComponentWrapper(object, log.Loggable):
     def feed(self, sink_comp, links=None):
         if links is None:
             links = [('default', 'default')]
-        sink_name = sink_comp.name
         for feeder, eater in links:
             if feeder not in self.cfg['feed']:
                 raise ComponentTestException('Invalid feeder specified: %r' %
                                              feeder)
-            #self.cfg['feed'].append('%s:%s' % (sink_name, eater))
             sink_comp.add_feeder(self, '%s:%s' % (self.name, feeder), eater)
-            #self.auto_link = False
 
     def add_feeder(self, src_comp, feeder_name, eater):
         self.cfg['source'].append(feeder_name)
@@ -214,12 +247,13 @@ class ComponentWrapper(object, log.Loggable):
         self.debug('feedToFD(feedName=%s, %d (%s))' % (feedName, fd, eaterId))
         return self.comp.feedToFD(feedName, fd, os.close, eaterId)
 
-    def eatFromFD(self, feedId, fd):
-        self.debug('eatFromFD(feedId=%s, %d)' % (feedId, fd))
-        return self.comp.eatFromFD(feedId, fd)
+    def eatFromFD(self, eaterAlias, feedId, fd):
+        self.debug('eatFromFD(eaterAlias=%s, feedId=%s, %d)',
+                   eaterAlias, feedId, fd)
+        return self.comp.eatFromFD(eaterAlias, feedId, fd)
 
     def set_master_clock(self, ip, port, base_time):
-        self.debug('eatFromFD(%s, %d, %d)', ip, port, base_time)
+        self.debug('set_master_clock(%s, %d, %d)', ip, port, base_time)
         return self.comp.set_master_clock(ip, port, base_time)
 
     def stop(self):
@@ -323,25 +357,25 @@ class ComponentTestHelper(object, log.Loggable):
             return None
 
         def add_delay(value):
-            self.debug('** 3: add_delay: %r' % (value, ))
+            self.debug('** 3: add_delay: %r, %r' % (delay, value))
             if delay:
                 return delayed_d(delay, value)
             return defer.succeed(value)
 
         def do_start(clocking, c):
             self.debug('** 4: do_start_cb: %r, %r' % (clocking, c))
-            for src in c.cfg['source']:
-                r_fd, feed_starter = self._fds[src]
-                c.eatFromFD(src, r_fd)
-                feed_starter()
+            for feeds in c.cfg['eater'].values():
+                for feedId, eaterAlias in feeds:
+                    r_fd, feed_starter = self._fds[feedId]
+                    c.eatFromFD(eaterAlias, feedId, r_fd)
+                    feed_starter()
             if clocking and c.sync:
                 ip, port, base_time = clocking
                 c.set_master_clock(ip, port, base_time)
 
-            # if component starts ok, repeat/pass clocking info to a
-            # subsequent component
-            d.addCallback(override_value_callback, clocking)
-            return d
+            # we know that the component is already happy, so just
+            # pass the clocking to the next component
+            return defer.succeed(clocking)
 
         def do_stop(failure):
             self.debug('** X: do_stop: %r' % failure)
@@ -386,8 +420,6 @@ class ComponentTestHelper(object, log.Loggable):
 
     def run_flow(self, duration, tasks=None,
                  start_d=None, start_flow=True, stop_flow=True):
-        if not HAVE_GTK2REACTOR:
-            raise WrongReactor("gtk2reactor isn't available")
 
         self.debug('run_flow: tasks: %r' % (tasks, ))
         flow_d = start_d
@@ -408,7 +440,6 @@ class ComponentTestHelper(object, log.Loggable):
         stop_d = defer.Deferred()
         stop_timeout_d = defer.Deferred()
         chained_d = None
-        immediate_d = None
 
         callids = [None, None, None] # callLater ids: stop_d,
                                      # timeout_d, fire_chained
@@ -466,7 +497,7 @@ class ComponentTestHelper(object, log.Loggable):
                     callids[i] = None
             return result
 
-        flow_d.addCallbacks(start_complete)
+        flow_d.addCallback(start_complete)
         flow_d.addCallback(flow_complete)
 
         guard_d = defer.DeferredList([flow_d, timeout_d], consumeErrors=1,
@@ -512,14 +543,7 @@ class ComponentTestHelper(object, log.Loggable):
         return guard_d
 
 
-class ComponentUnitTestMixin:
-    if not HAVE_GTK2REACTOR:
-        skip = 'gtk2reactor is required for this test case'
-
-
 def cleanup_reactor(force=False):
-    if not HAVE_GTK2REACTOR and not force:
-        return
     log.debug('comptest', 'running cleanup_reactor...')
     delayed = reactor.getDelayedCalls()
     for dc in delayed:

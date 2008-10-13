@@ -230,7 +230,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     def update_symlink(self, src, dest):
         if not dest.startswith('/'):
             dest = os.path.join(self.directory, dest)
-        self.debug("updating symbolic link %s to point to %s", src, dest)
+        # this should read:
+        # "updating symbolic link /tmp/current to point to /tmp/video-XXX.data"
+        # hence the order of parameters should be dest, src
+        self.debug("updating symbolic link %s to point to %s", dest, src)
         try:
             try:
                 os.symlink(src, dest)
