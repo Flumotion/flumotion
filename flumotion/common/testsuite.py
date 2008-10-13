@@ -22,6 +22,7 @@
 """testsuite base classes and helpers for diffing strings
 """
 
+import twisted.copyright
 from twisted.spread import pb
 from twisted.internet import reactor, defer, selectreactor
 from twisted.trial import unittest
@@ -32,7 +33,7 @@ from flumotion.configure import configure
 __version__ = "$Rev$"
 
 
-class TestCase(unittest.TestCase, log.Loggable):
+class BaseTestCase(unittest.TestCase, log.Loggable):
 
     # A sequence of reactors classes that this test supports, can be
     # overridden in subclasses. You can also set this to an empty
@@ -57,16 +58,53 @@ class TestCase(unittest.TestCase, log.Loggable):
     def __init__(self, methodName='runTest'):
         # skip the test if the class specifies supportedReactors and
         # the current reactor is not among them
+        self.maybe_skip()
+        unittest.TestCase.__init__(self, methodName)
+
+    def maybe_skip(self):
         if (self.supportedReactors and
             type(reactor) not in self.supportedReactors):
             self.skip = "this test case does not support " \
                 "running with %s as the reactor" % reactor
-        unittest.TestCase.__init__(self, methodName)
 
     # Loggable and TestCase both have a debug method; prefer ours
 
     def debug(self, *args, **kwargs):
         log.Loggable.debug(self, *args, **kwargs)
+
+
+# Twisted changed the TestCase.__init__ signature several
+# times.
+#
+# In versions older than 2.1.0 there was no __init__ method.
+#
+# In versions 2.1.0 up to 2.4.0 there is a __init__ method
+# with a methodName kwarg that has a default value of None.
+#
+# In version 2.5.0 the default value of the kwarg was changed
+# to "runTest".
+#
+# In versions above 2.5.0 God only knows what's the default
+# value, as we do not currently support them.
+twisted_version = tuple(map(int, twisted.copyright.version.split('.')))
+
+if twisted_version < (2, 1, 0):
+
+    class TestCase(BaseTestCase):
+
+        def __init__(self):
+            self.maybe_skip()
+            unittest.TestCase.__init__(self)
+elif twisted_version < (2, 5, 0):
+
+    class TestCase(BaseTestCase):
+
+        def __init__(self, methodName=None):
+            BaseTestCase.__init__(self, methodName)
+else:
+
+    class TestCase(BaseTestCase):
+        pass
 
 # test objects to be used in unittests to simulate the processes
 # subclass them to add your own methods
