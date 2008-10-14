@@ -1,3 +1,12 @@
+2008-10-14  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/testsuite.py:
+	Add more workarounds for ancient Twisted versions.
+
+	* flumotion/test/test_comptest.py:
+	Define an empty runTest method in the dummy TestCase so trial won't
+	complain when it will try to instantiate it.
+
 2008-10-13  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/test/test_comptest.py:

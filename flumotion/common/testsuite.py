@@ -58,12 +58,16 @@ class TestCase(unittest.TestCase, log.Loggable):
     # notice the two spaces and read the following comment
 
     def __init__(self, methodName=' impossible-name '):
-        # skip the test if the class specifies supportedReactors and
-        # the current reactor is not among them
+        # Skip the test if the class specifies supportedReactors and
+        # the current reactor is not among them.  Use
+        # reactor.__class__ rather than type(reactor), because in old
+        # Twisted the reactor was not a new-style class and
+        # type(reactor) returns 'instance'
         if (self.supportedReactors and
-            type(reactor) not in self.supportedReactors):
+            reactor.__class__ not in self.supportedReactors):
             self.skip = "this test case does not support " \
                 "running with %s as the reactor" % reactor
+
         # Twisted changed the TestCase.__init__ signature several
         # times.
         #
@@ -78,14 +82,15 @@ class TestCase(unittest.TestCase, log.Loggable):
         # In versions above 2.5.0 God only knows what's the default
         # value, as we do not currently support them.
         import inspect
-        defaults = inspect.getargspec(unittest.TestCase.__init__)[3]
-        if defaults is None:
+        if not inspect.ismethod(unittest.TestCase.__init__):
             # it's Twisted < 2.1.0
             unittest.TestCase.__init__(self)
         else:
+            # it's Twisted >= 2.1.0
             if methodName == ' impossible-name ':
                 # we've been called with no parameters, use the
-                # default from the superclass
+                # default parameter value from the superclass
+                defaults = inspect.getargspec(unittest.TestCase.__init__)[3]
                 methodName = defaults[0]
             unittest.TestCase.__init__(self, methodName=methodName)
 
