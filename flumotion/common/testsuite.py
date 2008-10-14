@@ -22,7 +22,6 @@
 """testsuite base classes and helpers for diffing strings
 """
 
-import twisted.copyright
 from twisted.spread import pb
 from twisted.internet import reactor, defer, selectreactor
 from twisted.trial import unittest
@@ -65,7 +64,10 @@ class TestCase(unittest.TestCase, log.Loggable):
         # type(reactor) returns 'instance'
         if (self.supportedReactors and
             reactor.__class__ not in self.supportedReactors):
-            self.skip = "this test case does not support " \
+            # Set the 'skip' attribute on the class rather than on the
+            # instance, because otherwise Twisted 2.0.1 refuses to
+            # ignore the testcase
+            self.__class__.skip = "this test case does not support " \
                 "running with %s as the reactor" % reactor
 
         # Twisted changed the TestCase.__init__ signature several

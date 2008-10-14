@@ -1,6 +1,13 @@
 2008-10-14  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/testsuite.py:
+	Set the skip attribute on the testcase class instead of setting it on
+	the instance. This is a workaround for Twisted 2.0.1.
+	svn:ignore flu-saved-coverage.pickle
+
+2008-10-14  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/testsuite.py:
 	Add more workarounds for ancient Twisted versions.
 
 	* flumotion/test/test_comptest.py:
