@@ -1,5 +1,12 @@
 2008-10-14  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* Makefile.am:
+	Temporarily add misc/flumotion-trial to CLEANFILES, because
+	flumotion-trial.in has been moved from misc/ to common/ which might
+	have left a stale generated file in old trees.
+
+2008-10-14  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/common/testsuite.py:
 	Set the skip attribute on the testcase class instead of setting it on
 	the instance. This is a workaround for Twisted 2.0.1.
