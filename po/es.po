@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-09-02 15:04+0200\n"
-"PO-Revision-Date: 2008-09-02 15:18+0200\n"
+"POT-Creation-Date: 2008-10-14 13:38+0200\n"
+"PO-Revision-Date: 2008-10-14 13:42+0200\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -486,11 +486,11 @@ msgstr "Comercial"
 msgid "Summary"
 msgstr "Sumario"
 
-#: ../flumotion/admin/assistant/scenarios.py:141
+#: ../flumotion/admin/assistant/scenarios.py:145
 msgid "Stream live"
 msgstr "Flujo en vivo"
 
-#: ../flumotion/admin/assistant/scenarios.py:143
+#: ../flumotion/admin/assistant/scenarios.py:147
 msgid ""
 "Allows you to create a live stream from a device or a file.\n"
 "        "
@@ -498,221 +498,221 @@ msgstr ""
 "Le permite crear un flujo en vivo desde un dispositivo o un fichero.\n"
 "        "
 
-#: ../flumotion/admin/assistant/scenarios.py:217
+#: ../flumotion/admin/assistant/scenarios.py:230
 msgid "Stream files on demand"
 msgstr "Flujo de ficheros bajo demanda."
 
-#: ../flumotion/admin/assistant/scenarios.py:218
+#: ../flumotion/admin/assistant/scenarios.py:231
 msgid "Allows you to serve a collection of files from disk."
 msgstr "Esta opción permite servir una colección de ficheros desde el disco."
 
-#: ../flumotion/admin/gtk/adminwindow.py:286
+#: ../flumotion/admin/gtk/adminwindow.py:287
 #, python-format
 msgid "Worker %s logged in."
 msgstr "El 'worker' %s está conectado."
 
-#: ../flumotion/admin/gtk/adminwindow.py:291
+#: ../flumotion/admin/gtk/adminwindow.py:292
 #, python-format
 msgid "Worker %s logged out."
 msgstr "El 'worker' %s está desconectado."
 
 #. Connection
-#: ../flumotion/admin/gtk/adminwindow.py:355
+#: ../flumotion/admin/gtk/adminwindow.py:356
 msgid "_Connection"
 msgstr "_Conexión"
 
-#: ../flumotion/admin/gtk/adminwindow.py:356
+#: ../flumotion/admin/gtk/adminwindow.py:357
 msgid "_Open Recent Connection..."
 msgstr "_Abrir la conexión reciente..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:357
+#: ../flumotion/admin/gtk/adminwindow.py:358
 msgid "Connect to a recently used connection"
 msgstr "Conectar usando una conexión reciente"
 
-#: ../flumotion/admin/gtk/adminwindow.py:359
+#: ../flumotion/admin/gtk/adminwindow.py:360
 msgid "Connect to _running manager..."
 msgstr "Conectar con con un \"manager\" en _funcionamiento"
 
-#: ../flumotion/admin/gtk/adminwindow.py:360
+#: ../flumotion/admin/gtk/adminwindow.py:361
 msgid "Connect to an previously used connection"
 msgstr "Conectar a una conexión usada anteriormente"
 
-#: ../flumotion/admin/gtk/adminwindow.py:362
+#: ../flumotion/admin/gtk/adminwindow.py:363
 msgid "_Import Configuration..."
 msgstr "_Importar la configuración...."
 
-#: ../flumotion/admin/gtk/adminwindow.py:363
+#: ../flumotion/admin/gtk/adminwindow.py:364
 msgid "Import configuration from a file"
 msgstr "Importar la configuración desde un fichero"
 
-#: ../flumotion/admin/gtk/adminwindow.py:365
+#: ../flumotion/admin/gtk/adminwindow.py:366
 msgid "_Export Configuration..."
 msgstr "_Exportar la configuración..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:366
+#: ../flumotion/admin/gtk/adminwindow.py:367
 msgid "Export current configuration to a file"
 msgstr "Exportar la configuración actual a un fichero"
 
-#: ../flumotion/admin/gtk/adminwindow.py:368
+#: ../flumotion/admin/gtk/adminwindow.py:369
 msgid "_Quit"
 msgstr "_Salir"
 
-#: ../flumotion/admin/gtk/adminwindow.py:369
+#: ../flumotion/admin/gtk/adminwindow.py:370
 msgid "Quit the application and disconnect from the manager"
 msgstr "Salir de la aplicación y desconectarse desde el manager"
 
 #. Manage
-#: ../flumotion/admin/gtk/adminwindow.py:373
+#: ../flumotion/admin/gtk/adminwindow.py:374
 msgid "_Manage"
 msgstr "_Administrar"
 
-#: ../flumotion/admin/gtk/adminwindow.py:374
+#: ../flumotion/admin/gtk/adminwindow.py:375
 msgid "_Start Component(s)"
 msgstr "_Iniciar componente(s)"
 
-#: ../flumotion/admin/gtk/adminwindow.py:375
+#: ../flumotion/admin/gtk/adminwindow.py:376
 msgid "Start the selected component(s)"
 msgstr "Iniciar el/los componente(s) seleccionado(s)"
 
-#: ../flumotion/admin/gtk/adminwindow.py:377
+#: ../flumotion/admin/gtk/adminwindow.py:378
 msgid "St_op Component(s)"
 msgstr "Pa_rar el/los componente/s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:378
+#: ../flumotion/admin/gtk/adminwindow.py:379
 msgid "Stop the selected component(s)"
 msgstr "Parar el/los componente/s seleccionado/s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:380
+#: ../flumotion/admin/gtk/adminwindow.py:381
 msgid "_Delete Component(s)"
 msgstr "_Eliminar el/los componente/s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:381
+#: ../flumotion/admin/gtk/adminwindow.py:382
 msgid "Delete the selected component(s)"
 msgstr "Eliminar el/los componente/s seleccionado/s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:383
+#: ../flumotion/admin/gtk/adminwindow.py:384
 msgid "Start _All"
 msgstr "Arrancar _Todos"
 
-#: ../flumotion/admin/gtk/adminwindow.py:384
+#: ../flumotion/admin/gtk/adminwindow.py:385
 msgid "Start all components"
 msgstr "Iniciar todos los componentes"
 
-#: ../flumotion/admin/gtk/adminwindow.py:386
+#: ../flumotion/admin/gtk/adminwindow.py:387
 msgid "Stop A_ll"
 msgstr "Parar To_dos"
 
-#: ../flumotion/admin/gtk/adminwindow.py:387
+#: ../flumotion/admin/gtk/adminwindow.py:388
 msgid "Stop all components"
 msgstr "Parar todos losl componentes"
 
-#: ../flumotion/admin/gtk/adminwindow.py:389
+#: ../flumotion/admin/gtk/adminwindow.py:390
 msgid "_Clear All"
 msgstr "_Despejar Todos"
 
-#: ../flumotion/admin/gtk/adminwindow.py:390
+#: ../flumotion/admin/gtk/adminwindow.py:391
 msgid "Remove all components"
 msgstr "Quitar todos los componentes"
 
-#: ../flumotion/admin/gtk/adminwindow.py:392
+#: ../flumotion/admin/gtk/adminwindow.py:393
 msgid "Add new encoding _format..."
 msgstr "Añadir un nuevo _formato de codificación..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:394
+#: ../flumotion/admin/gtk/adminwindow.py:395
 msgid "Add a new format to the current stream"
 msgstr "Añadir un nuevo formato al flujo actual"
 
-#: ../flumotion/admin/gtk/adminwindow.py:397
+#: ../flumotion/admin/gtk/adminwindow.py:398
 msgid "Run _Assistant"
 msgstr "Ejecutar el _asistente"
 
-#: ../flumotion/admin/gtk/adminwindow.py:398
+#: ../flumotion/admin/gtk/adminwindow.py:399
 msgid "Run the configuration assistant"
 msgstr "Ejecutar el asistente para la configuración"
 
 #. Debug
-#: ../flumotion/admin/gtk/adminwindow.py:402
+#: ../flumotion/admin/gtk/adminwindow.py:403
 msgid "_Debug"
 msgstr "_Depuración"
 
 #. Help
-#: ../flumotion/admin/gtk/adminwindow.py:405
+#: ../flumotion/admin/gtk/adminwindow.py:406
 msgid "_Help"
 msgstr "_Ayuda"
 
-#: ../flumotion/admin/gtk/adminwindow.py:406
+#: ../flumotion/admin/gtk/adminwindow.py:407
 msgid "_Contents"
 msgstr "_Contenidos"
 
-#: ../flumotion/admin/gtk/adminwindow.py:407
+#: ../flumotion/admin/gtk/adminwindow.py:408
 msgid "Open the flumotion manual"
 msgstr "Arbir el manual de Flumotion"
 
-#: ../flumotion/admin/gtk/adminwindow.py:409
+#: ../flumotion/admin/gtk/adminwindow.py:410
 msgid "_About"
 msgstr "_Acerca de"
 
-#: ../flumotion/admin/gtk/adminwindow.py:410
+#: ../flumotion/admin/gtk/adminwindow.py:411
 msgid "Displays an about dialog"
 msgstr "Mostrar un diálogo 'acerca de'"
 
 #. Only in context menu
-#: ../flumotion/admin/gtk/adminwindow.py:414
+#: ../flumotion/admin/gtk/adminwindow.py:415
 msgid "_Kill Component"
 msgstr "_Matar el componente"
 
-#: ../flumotion/admin/gtk/adminwindow.py:415
+#: ../flumotion/admin/gtk/adminwindow.py:416
 msgid "Kills the currently selected component"
 msgstr "_Eliminar el componente seleccionado"
 
-#: ../flumotion/admin/gtk/adminwindow.py:420
+#: ../flumotion/admin/gtk/adminwindow.py:421
 msgid "Enable _Debugging"
 msgstr "Activar el '_Debugging'"
 
-#: ../flumotion/admin/gtk/adminwindow.py:421
+#: ../flumotion/admin/gtk/adminwindow.py:422
 msgid "Enable debugging in the admin interface"
 msgstr "Activar el 'debugging' en la interfaz administrativa"
 
 #. Debug
-#: ../flumotion/admin/gtk/adminwindow.py:431
+#: ../flumotion/admin/gtk/adminwindow.py:432
 msgid "Start _Shell"
 msgstr "Lanzar una consola"
 
-#: ../flumotion/admin/gtk/adminwindow.py:432
+#: ../flumotion/admin/gtk/adminwindow.py:433
 msgid "Start an interactive debugging shell"
 msgstr "Comenzar una 'shell' interactiva de 'debugging'."
 
-#: ../flumotion/admin/gtk/adminwindow.py:435
+#: ../flumotion/admin/gtk/adminwindow.py:436
 msgid "Dump configuration"
 msgstr "Volcar la configuración"
 
-#: ../flumotion/admin/gtk/adminwindow.py:436
+#: ../flumotion/admin/gtk/adminwindow.py:437
 msgid "Dumps the current manager configuration"
 msgstr "Volcar la actual configuración del \"manager\""
 
-#: ../flumotion/admin/gtk/adminwindow.py:439
+#: ../flumotion/admin/gtk/adminwindow.py:440
 msgid "Write debug marker..."
 msgstr "Escribir el marcador de depuración..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:440
+#: ../flumotion/admin/gtk/adminwindow.py:441
 msgid "Writes a debug marker to all the logs"
 msgstr "Escribe una marca de depuración en todos los logs"
 
-#: ../flumotion/admin/gtk/adminwindow.py:485
+#: ../flumotion/admin/gtk/adminwindow.py:486
 msgid "Flumotion: Not connected"
 msgstr "Flumotion: No conectado"
 
-#: ../flumotion/admin/gtk/adminwindow.py:559
+#: ../flumotion/admin/gtk/adminwindow.py:560
 #, python-format
 msgid "Flumotion: Connecting to %s:%s"
 msgstr "Flumotion: Conectando a %s:%s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:608
+#: ../flumotion/admin/gtk/adminwindow.py:609
 #, python-format
 msgid "Connect to the manager on %s"
 msgstr "Conectar al \"manager\" en %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:753
+#: ../flumotion/admin/gtk/adminwindow.py:756
 msgid ""
 "Cannot run the configuration assistant since there is at least one component "
 "in the lost state"
@@ -720,7 +720,7 @@ msgstr ""
 "No puedo ejecutar el asistente para la configuración desde que al menos uno "
 "de los componentes está en estado perdido."
 
-#: ../flumotion/admin/gtk/adminwindow.py:757
+#: ../flumotion/admin/gtk/adminwindow.py:760
 msgid ""
 "Running the Configuration Assistant again will remove all components from "
 "the current stream and create a new one."
@@ -728,19 +728,19 @@ msgstr ""
 "Ejecutando el asistente de configuración de nuevo eliminará todos los "
 "componentes del flujo actual y creará uno nuevo."
 
-#: ../flumotion/admin/gtk/adminwindow.py:761
+#: ../flumotion/admin/gtk/adminwindow.py:764
 msgid "Keep the current stream"
 msgstr "Mantener el actual \"stream\""
 
-#: ../flumotion/admin/gtk/adminwindow.py:763
+#: ../flumotion/admin/gtk/adminwindow.py:766
 msgid "Run the Assistant anyway"
 msgstr "Ejecutar el asistente de todas formas"
 
-#: ../flumotion/admin/gtk/adminwindow.py:777
+#: ../flumotion/admin/gtk/adminwindow.py:780
 msgid "The assistant cannot be run because no workers are logged in."
 msgstr "El asistente no puede funcionar porque no hay \"workers\" conectados."
 
-#: ../flumotion/admin/gtk/adminwindow.py:926
+#: ../flumotion/admin/gtk/adminwindow.py:930
 msgid ""
 "Some component(s) are still busy and cannot be removed.\n"
 "Try again later."
@@ -750,23 +750,23 @@ msgstr ""
 
 #. first %s is one of Stopping/Starting/Deleting
 #. second %s is a component name like "audio-producer"
-#: ../flumotion/admin/gtk/adminwindow.py:1006
-#: ../flumotion/admin/gtk/adminwindow.py:1034
+#: ../flumotion/admin/gtk/adminwindow.py:1010
+#: ../flumotion/admin/gtk/adminwindow.py:1038
 #, python-format
 msgid "%s component %s"
 msgstr "%s componente %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1013
+#: ../flumotion/admin/gtk/adminwindow.py:1017
 #, python-format
 msgid "Failed to %(action)s component %(name)s."
 msgstr "Falló %(action)s en el componente %(name)s."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1021
+#: ../flumotion/admin/gtk/adminwindow.py:1025
 #, python-format
 msgid "%s components."
 msgstr "%s componentes."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1028
+#: ../flumotion/admin/gtk/adminwindow.py:1032
 #, python-format
 msgid "Failed to %s some components."
 msgstr "Falló %s en algunos componentes."
@@ -774,82 +774,82 @@ msgstr "Falló %s en algunos componentes."
 #. first %s is one of Stopping/Starting/Deleting
 #. second %s is a list of component names, like
 #. "audio-producer, video-producer"
-#: ../flumotion/admin/gtk/adminwindow.py:1038
+#: ../flumotion/admin/gtk/adminwindow.py:1042
 #, python-format
 msgid "%s components %s"
 msgstr "%s componentes %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1126
+#: ../flumotion/admin/gtk/adminwindow.py:1130
 #, python-format
 msgid "Component %s is sad. "
 msgstr "El componente %s está triste."
 
 #. FIXME: have a method for this
-#: ../flumotion/admin/gtk/adminwindow.py:1153
+#: ../flumotion/admin/gtk/adminwindow.py:1157
 #, python-format
 msgid "%s - Flumotion Administration"
 msgstr "%s - Administración de Flumotion"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1155
+#: ../flumotion/admin/gtk/adminwindow.py:1159
 #, python-format
 msgid "Flumotion: %s"
 msgstr "Flumotion: %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1189
+#: ../flumotion/admin/gtk/adminwindow.py:1193
 msgid "Reconnecting ..."
 msgstr "Reconectando..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1190
+#: ../flumotion/admin/gtk/adminwindow.py:1194
 #, python-format
 msgid "Lost connection to manager %s, reconnecting ..."
 msgstr "Conexión perdida con el manager %s, volviendo a conectar ..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1213
+#: ../flumotion/admin/gtk/adminwindow.py:1217
 #, python-format
 msgid "Connection to manager on %s was refused."
 msgstr "La conexión al \"manager\" en %s fue rechazada."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1215
+#: ../flumotion/admin/gtk/adminwindow.py:1219
 #, python-format
 msgid "Connection to %s was refused"
 msgstr "La conexión con %s fue rechazada"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1224
+#: ../flumotion/admin/gtk/adminwindow.py:1228
 #: ../flumotion/admin/gtk/dialogs.py:184
 #, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "La conexión con el \"manager\" en %s falló (%s)."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1226
+#: ../flumotion/admin/gtk/adminwindow.py:1230
 #, python-format
 msgid "Connection to %s failed"
 msgstr "La conexión a %s falló."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1262
+#: ../flumotion/admin/gtk/adminwindow.py:1266
 msgid "Import Configuration..."
 msgstr "Importar la configuración..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1265
+#: ../flumotion/admin/gtk/adminwindow.py:1269
 msgid "Import"
 msgstr "Importar"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1269
+#: ../flumotion/admin/gtk/adminwindow.py:1273
 msgid "Flumotion XML Configuration files"
 msgstr "Ficheros de configuración XML de Flumotion"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1273
+#: ../flumotion/admin/gtk/adminwindow.py:1277
 msgid "All files"
 msgstr "Todos los ficheros"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1289
+#: ../flumotion/admin/gtk/adminwindow.py:1293
 msgid "Export Configuration..."
 msgstr "Exportar la configuración..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1292
+#: ../flumotion/admin/gtk/adminwindow.py:1296
 msgid "Export"
 msgstr "Exportar"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1306
+#: ../flumotion/admin/gtk/adminwindow.py:1310
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -857,7 +857,7 @@ msgstr ""
 "El archivo ya existe.\n"
 "¿Desea sobreescribirlo?"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1379
+#: ../flumotion/admin/gtk/adminwindow.py:1383
 msgid "Cannot find a program to display the flumotion manual."
 msgstr "No puedo encontrar un programa para mostrar el manual de Flumotion."
 
@@ -865,10 +865,10 @@ msgstr "No puedo encontrar un programa para mostrar el manual de Flumotion."
 #: ../flumotion/admin/gtk/basesteps.py:40
 #: ../flumotion/admin/gtk/ondemandstep.py:68
 #: ../flumotion/admin/gtk/overlaystep.py:71
-#: ../flumotion/admin/gtk/productionsteps.py:42
-#: ../flumotion/admin/gtk/productionsteps.py:43
-#: ../flumotion/admin/gtk/productionsteps.py:238
-#: ../flumotion/admin/gtk/productionsteps.py:239
+#: ../flumotion/admin/gtk/productionsteps.py:46
+#: ../flumotion/admin/gtk/productionsteps.py:47
+#: ../flumotion/admin/gtk/productionsteps.py:242
+#: ../flumotion/admin/gtk/productionsteps.py:243
 msgid "Production"
 msgstr "Producción"
 
@@ -912,24 +912,24 @@ msgstr "Hambriento"
 msgid "Lost"
 msgstr "Perdido"
 
-#: ../flumotion/admin/gtk/componentlist.py:124
+#: ../flumotion/admin/gtk/componentlist.py:126
 #: ../flumotion/component/base/componentnode.py:49
 msgid "Component"
 msgstr "Componente"
 
-#: ../flumotion/admin/gtk/componentlist.py:129
+#: ../flumotion/admin/gtk/componentlist.py:131
 msgid "Worker"
 msgstr "\"Worker\""
 
-#: ../flumotion/admin/gtk/componentlist.py:135
+#: ../flumotion/admin/gtk/componentlist.py:137
 msgid "PID"
 msgstr "PID"
 
-#: ../flumotion/admin/gtk/componentlist.py:326
+#: ../flumotion/admin/gtk/componentlist.py:334
 msgid "[any worker]"
 msgstr "[cualquier \"worker\"]"
 
-#: ../flumotion/admin/gtk/componentlist.py:408
+#: ../flumotion/admin/gtk/componentlist.py:416
 #, python-format
 msgid "Component is %s"
 msgstr "El componente está %s"
@@ -953,24 +953,24 @@ msgstr "El componente '%s' está aún durmiendo."
 msgid "Component '%s' has a UI bug."
 msgstr "El componente '%s' tiene un fallo de IU."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:64
-#: ../flumotion/admin/gtk/configurationassistant.py:65
+#: ../flumotion/admin/gtk/configurationassistant.py:97
+#: ../flumotion/admin/gtk/configurationassistant.py:98
 msgid "Welcome"
 msgstr "Bienvenido"
 
-#: ../flumotion/admin/gtk/configurationassistant.py:78
-#: ../flumotion/admin/gtk/configurationassistant.py:79
+#: ../flumotion/admin/gtk/configurationassistant.py:116
+#: ../flumotion/admin/gtk/configurationassistant.py:117
 msgid "Scenario"
 msgstr "Escenario"
 
-#: ../flumotion/admin/gtk/configurationassistant.py:419
+#: ../flumotion/admin/gtk/configurationassistant.py:468
 #: ../flumotion/admin/gtk/httpstreamersteps.py:347
 #: ../flumotion/admin/gtk/overlaystep.py:142
-#, python-format
+#, fuzzy, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgstr "El \"Worker\" '%s' no tiene el elemento de GStreamer '%s'."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:424
+#: ../flumotion/admin/gtk/configurationassistant.py:473
 msgid ""
 "\n"
 "Please install the necessary GStreamer plug-ins that provide these elements "
@@ -980,8 +980,8 @@ msgstr ""
 "Por favor, instale todos los complementos de GStreamer necesarios que "
 "proporcionen estos elementos y reinicie el \"worker\"."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:427
-#: ../flumotion/admin/gtk/configurationassistant.py:489
+#: ../flumotion/admin/gtk/configurationassistant.py:476
+#: ../flumotion/admin/gtk/configurationassistant.py:538
 msgid ""
 "\n"
 "\n"
@@ -991,7 +991,7 @@ msgstr ""
 "\n"
 "No será capaz de avanzar más usando este \"worker\"."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:481
+#: ../flumotion/admin/gtk/configurationassistant.py:530
 #: ../flumotion/admin/gtk/httpstreamersteps.py:331
 #: ../flumotion/admin/gtk/ondemandstep.py:114
 #: ../flumotion/admin/gtk/overlaystep.py:120
@@ -999,7 +999,7 @@ msgstr ""
 msgid "Worker '%s' cannot import module '%s'."
 msgstr "El \"Worker\" '%s' no puede importar el módulo '%s'."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:484
+#: ../flumotion/admin/gtk/configurationassistant.py:533
 #: ../flumotion/admin/gtk/overlaystep.py:123
 #, python-format
 msgid ""
@@ -1009,7 +1009,7 @@ msgstr ""
 "\n"
 "Este módulo es parte de '%s'."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:487
+#: ../flumotion/admin/gtk/configurationassistant.py:536
 #: ../flumotion/admin/gtk/httpstreamersteps.py:335
 #: ../flumotion/admin/gtk/ondemandstep.py:118
 #: ../flumotion/admin/gtk/overlaystep.py:126
@@ -1021,12 +1021,12 @@ msgstr ""
 "\n"
 "La página web del proyecto es %s"
 
-#: ../flumotion/admin/gtk/configurationassistant.py:534
-#: ../flumotion/admin/gtk/configurationassistant.py:562
+#: ../flumotion/admin/gtk/configurationassistant.py:583
+#: ../flumotion/admin/gtk/configurationassistant.py:611
 msgid "Internal error: could not run check code on worker."
 msgstr "Error interno: no puede ejecutar código de pruebas en el \"worker\"."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:707
+#: ../flumotion/admin/gtk/configurationassistant.py:756
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
@@ -1179,9 +1179,8 @@ msgid "Authentication"
 msgstr "Autenticación"
 
 #: ../flumotion/admin/gtk/greeter.py:133
-msgid "Please select among the following authentication methods."
-msgstr ""
-"Por favor, seleccione uno entre los siguientes métodos de la autenticación."
+msgid "Please enter your username and password."
+msgstr "Por favor, introduzca su nombre de usuario y contraseña."
 
 #: ../flumotion/admin/gtk/greeter.py:168
 msgid "Recent Connections"
@@ -1362,13 +1361,13 @@ msgstr ""
 "\n"
 "Elija \"Siguiente\" para seguir sin \"overlay\"."
 
-#: ../flumotion/admin/gtk/productionsteps.py:138
-#: ../flumotion/admin/gtk/productionsteps.py:305
+#: ../flumotion/admin/gtk/productionsteps.py:142
+#: ../flumotion/admin/gtk/productionsteps.py:309
 msgid "Select this if you want to stream video"
 msgstr "Selecciones esto si desea un flujo de video"
 
-#: ../flumotion/admin/gtk/productionsteps.py:140
-#: ../flumotion/admin/gtk/productionsteps.py:307
+#: ../flumotion/admin/gtk/productionsteps.py:144
+#: ../flumotion/admin/gtk/productionsteps.py:311
 msgid "Select this if you want to stream audio"
 msgstr "Selecciones ésto si desea un flujo de audio"
 
@@ -1546,9 +1545,9 @@ msgstr "Funcionando desde:"
 #: ../flumotion/component/base/properties.glade.h:2
 #: ../flumotion/component/consumers/httpstreamer/admin_gtk.py:141
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:11
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:282
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:281
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:5
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:29
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:28
 msgid "Statistics"
 msgstr "Estadísticas"
 
@@ -1558,7 +1557,7 @@ msgstr "Tipo:"
 
 #: ../flumotion/component/base/component.glade.h:10
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:13
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:31
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:30
 msgid "Uptime:"
 msgstr "Tiempo de funcionamiento:"
 
@@ -1692,7 +1691,7 @@ msgstr "\"Eater\" <b>%s</b>"
 #: ../flumotion/component/base/eatersnode.py:77
 #: ../flumotion/component/base/feedersnode.py:85
 #: ../flumotion/component/base/feedersnode.py:99
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:267
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:266
 msgid "Byte"
 msgstr "Byte"
 
@@ -1768,15 +1767,15 @@ msgstr ""
 "El valor suministrado por el \"eater\" con marcadores de \"stream debe ser "
 "video-backup o video-master."
 
-#: ../flumotion/component/combiners/switch/switch.py:75
-#: ../flumotion/component/consumers/disker/disker.py:334
+#: ../flumotion/component/combiners/switch/switch.py:76
+#: ../flumotion/component/consumers/disker/disker.py:341
 #, python-format
 msgid "Error parsing ical file %s, so not scheduling any events."
 msgstr ""
 "Error leyendo el fichero ical %s, así que no se puede programar ningún "
 "evento."
 
-#: ../flumotion/component/combiners/switch/switch.py:79
+#: ../flumotion/component/combiners/switch/switch.py:80
 msgid ""
 "An ical file has been specified for scheduling, but the necessary modules "
 "are not installed."
@@ -1784,7 +1783,7 @@ msgstr ""
 "Un fichero \"ical\" ha sido elegido para la programación, pero los módulos "
 "necesariosno están instalados."
 
-#: ../flumotion/component/combiners/switch/switch.py:292
+#: ../flumotion/component/combiners/switch/switch.py:344
 #, python-format
 msgid ""
 "Tried to switch to %s, but feed is unavailable. Will retry when the feed is "
@@ -1793,14 +1792,14 @@ msgstr ""
 "Se ha intentado cambiar a %s, pero el 'feed' no está disponible. Se "
 "reintentará cuando el 'feed' esté disponible."
 
-#: ../flumotion/component/combiners/switch/switch.py:329
+#: ../flumotion/component/combiners/switch/switch.py:381
 #, python-format
 msgid "When switching to %s, feed timestamps out of sync by %us"
 msgstr ""
 "Cuando se ha cambiado al feed %s, los 'timestamps' está fuera de sincronismo "
 "por %us"
 
-#: ../flumotion/component/combiners/switch/switch.py:397
+#: ../flumotion/component/combiners/switch/switch.py:449
 #, python-format
 msgid "%s parameter(s) were specified but not all. Missing parameters are: %r"
 msgstr ""
@@ -1857,17 +1856,17 @@ msgstr ""
 "No puedo abrir el fichero de salida'%s' para escritura. Compruebe los "
 "permisos sobre el fichero."
 
-#: ../flumotion/component/consumers/disker/disker.py:246
+#: ../flumotion/component/consumers/disker/disker.py:249
 #, python-format
 msgid "Failed to update symbolic link %s. Check your permissions."
 msgstr "Fallo al actualizar en el enlace simbólico %s. Compruebe sus permisos."
 
-#: ../flumotion/component/consumers/disker/disker.py:303
+#: ../flumotion/component/consumers/disker/disker.py:306
 #, python-format
 msgid "Error writing to file %s.  Maybe disk is full."
 msgstr "Error al escribir el fichero %s. El disco duro podría estar lleno."
 
-#: ../flumotion/component/consumers/disker/disker.py:342
+#: ../flumotion/component/consumers/disker/disker.py:349
 #, python-format
 msgid ""
 "An iCal file has been specified for scheduling, but the '%s' module is not "
@@ -1876,7 +1875,7 @@ msgstr ""
 "Un fichero \"Ical\" ha sido seleccionado para la programación, pero el "
 "módulo '%s' no está instalado.\n"
 
-#: ../flumotion/component/consumers/disker/disker.py:426
+#: ../flumotion/component/consumers/disker/disker.py:433
 #, python-format
 msgid "Failed expanding filename prefix: %r <-- %r."
 msgstr "Fallo al expandir el prefijo del nombre del fichero: %r <-- %r."
@@ -1925,13 +1924,13 @@ msgid "Mime type:"
 msgstr "Tipo MIME:"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:10
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:24
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:25
 msgid "Peak:"
 msgstr "Pico:"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:12
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:6
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:30
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:29
 msgid "Total bytes:"
 msgstr "Bytes totales:"
 
@@ -1975,7 +1974,7 @@ msgid "Learn how to increase the maximum number of clients."
 msgstr "Aprenda cómo incrementar el número máximo de clientes."
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:798
-#: ../flumotion/component/misc/httpserver/httpserver.py:386
+#: ../flumotion/component/misc/httpserver/httpserver.py:387
 #: ../flumotion/component/misc/porter/porter.py:356
 #, python-format
 msgid "Network error: TCP port %d is not available."
@@ -2355,38 +2354,41 @@ msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 "Error del GStreamer: no se ha podido analizar la tubería del componente."
 
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:249
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:146
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:151
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:156
+#, python-format
+msgid "at %s"
+msgstr "en %s"
+
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:251
 #, python-format
 msgid "%d client"
 msgstr "%d cliente"
 
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:249
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:251
 #, python-format
 msgid "%d clients"
 msgstr "%d clientes"
 
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:251
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:253
 #, python-format
 msgid "%.2f client"
 msgstr "%.2f cliente"
 
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:251
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:253
 #, python-format
 msgid "%.2f clients"
 msgstr "%.2f clientes"
 
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:263
-#, python-format
-msgid "%.2f req/min"
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:262
+#, fuzzy, python-format
+msgid "%.2f requests/m"
 msgstr "%.2f peticiones/min"
 
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:271
+#: ../flumotion/component/misc/httpserver/admin_gtk.py:270
 msgid "bit/s"
 msgstr ""
-
-#: ../flumotion/component/misc/httpserver/admin_gtk.py:284
-msgid "Cache"
-msgstr "_Caché"
 
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:1
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:3
@@ -2414,16 +2416,17 @@ msgid "<b>Server</b>"
 msgstr "<b>Servidor</b>"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:8
-msgid "?"
-msgstr ""
-
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:9
 msgid "Average Bitrate:"
 msgstr "Promedio de transferencia:"
 
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:10
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:9
 msgid "Average File Read:"
 msgstr "Promedio de ficheros leídos:"
+
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:10
+#, fuzzy
+msgid "Average Rate:"
+msgstr "Promedio de transferencia:"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:12
 msgid "Canceled:"
@@ -2469,23 +2472,20 @@ msgstr "Caducado:"
 msgid "Peak Bitrate:"
 msgstr "Pico de transferencia:"
 
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:25
-msgid "Rate Average:"
-msgstr "Promedio de transferencia:"
-
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:26
-msgid "Rate Peak:"
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:24
+#, fuzzy
+msgid "Peak Rate:"
 msgstr "Pico de transferencia:"
 
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:27
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:26
 msgid "Rate:"
 msgstr "Transferencia:"
 
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:28
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:27
 msgid "Size:"
 msgstr "Tamaño:"
 
-#: ../flumotion/component/misc/httpserver/httpserver.glade.h:32
+#: ../flumotion/component/misc/httpserver/httpserver.glade.h:31
 msgid "Usage:"
 msgstr "Uso:"
 
@@ -2554,40 +2554,45 @@ msgid "Publish embedded Java player page"
 msgstr "Publicar la página con el player java integrado."
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:3
+#, fuzzy
+msgid "Serves the embedded Cortado Java player."
+msgstr "Publicar la página con el player java integrado."
+
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:4
 msgid "The URL to the stream we are displaying."
 msgstr "Dirección (URL) del flujo que estamos viendo."
 
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:4
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:5
 msgid "The base URL used to fetch the cortado applet code."
 msgstr ""
 "Direción base de la URL usada para obtener el código del \"applet\" cortado."
 
 #. FIXME: What is this? murrayc
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:6
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:7
 msgid "The frame rate used in the cortado applet."
 msgstr "Tasa de fotogramas usado en el \"applet\" cortado."
 
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:7
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:8
 msgid "The height of the cortado applet."
 msgstr "Altura del \"applet\" cortado."
 
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:8
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:9
 msgid "The name of the index file. The default is index.html."
 msgstr "Nombre del fichero índice. Por defecto es index.html."
 
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:9
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:10
 msgid "The size of the buffer in the cortado applet."
 msgstr "Tamaño del \"buffer\" en el \"applet\" cortado."
 
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:10
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:11
 msgid "The width of the cortado applet."
 msgstr "Ancho del \"applet\" cortado."
 
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:11
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:12
 msgid "Whether audio should be streamed."
 msgstr "Qué audio debiera estar en \"stream\"."
 
-#: ../flumotion/component/plugs/cortado/cortado.xml.h:12
+#: ../flumotion/component/plugs/cortado/cortado.xml.h:13
 msgid "Whether video should be streamed."
 msgstr "Si el vídeo debiera ser \"streamed\"."
 
@@ -3334,13 +3339,13 @@ msgstr "Soy una cadena traducida"
 
 #. use our "fake" ngettext so it gets picked up
 #: ../flumotion/test/test_i18n.py:111 ../flumotion/test/test_i18n.py:116
-#, python-format
+#, fuzzy, python-format
 msgid "I can translate %d thing"
 msgstr "Puedo traducir %d"
 
 #. use the "real" ngettext, from the module, also gets picked up
 #: ../flumotion/test/test_i18n.py:114 ../flumotion/test/test_i18n.py:118
-#, python-format
+#, fuzzy, python-format
 msgid "I translated %d thing"
 msgstr "Traduje %d"
 
@@ -3351,7 +3356,7 @@ msgstr "%s puede ser transladado"
 
 #. Andy 3 is a droid in the Andy series and doesn't need translating
 #: ../flumotion/test/test_i18n.py:151
-#, python-format
+#, fuzzy, python-format
 msgid "%s %d has %d thing"
 msgstr "%s %d tiene %d"
 
@@ -3475,6 +3480,20 @@ msgstr "No se ha podido probar el dispositivo Firewire."
 #: ../flumotion/worker/job.py:334
 msgid "Check timed out."
 msgstr "Tiempo de comprobación excedido."
+
+#~ msgid "Please select among the following authentication methods."
+#~ msgstr ""
+#~ "Por favor, seleccione uno entre los siguientes métodos de la "
+#~ "autenticación."
+
+#~ msgid "Cache"
+#~ msgstr "_Caché"
+
+#~ msgid "Rate Average:"
+#~ msgstr "Promedio de transferencia:"
+
+#~ msgid "Rate Peak:"
+#~ msgstr "Pico de transferencia:"
 
 #~ msgid "_URL:"
 #~ msgstr "_URL:"

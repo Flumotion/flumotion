@@ -1,3 +1,8 @@
+2008-10-15  Pedro Gracia  <pedro@flumotion.com>
+
+	* po/es.po:
+	Update Spanish translation.
+
 2008-10-14  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* Makefile.am:
