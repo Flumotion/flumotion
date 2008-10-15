@@ -137,7 +137,7 @@ class Check(util.LogCommand):
         if parse[0] != 'http':
             return self.critical('URL type is not valid.')
 
-        # Simple playlist detection.
+        # Simple playlist detection
         if self._url.endswith('.m3u') or self._url.endswith('.asx'):
             self.options.playlist = True
 
@@ -158,7 +158,7 @@ class Check(util.LogCommand):
 
     def checkStream(self):
         """Launch the pipeline and compare values with the expecteds"""
-        url = self._url
+        url = self._streamurl
         while self._isPlaylist: #use gstreamer to detect the playlist
             self.debug('checking url %s', url)
             gstinfo = GSTInfo(int(self.options.timeout),
@@ -167,9 +167,7 @@ class Check(util.LogCommand):
             elements = gstinfo.getElements()
             self._isPlaylist = gstinfo.isPlaylist()
             if self._isPlaylist:
-                url = self.getURLFromPlaylist(url)
-
-        self._streamurl = url
+                self._streamurl = self.getURLFromPlaylist(url)
 
         gsterror = gstinfo.getGStreamerError()
         if gsterror:
@@ -343,11 +341,7 @@ class GSTInfo(log.Loggable):
     # as soon as each stream has duration's worth of decoded data, this
     # object can return a value
 
-    # FIXME: running a main loop in the constructor is not a hot idea
-
     def __init__(self, timeout, duration, url):
-        self._mainloop = gobject.MainLoop()
-
         gobject.timeout_add(timeout * 1000, self.endTimeout)
         self._duration = duration
         self._url = url
@@ -379,7 +373,10 @@ class GSTInfo(log.Loggable):
         bus.add_watch(self.busWatch)
         self._elements['httpsrc'].set_property('location', url)
         self._pipeline.set_state(gst.STATE_PLAYING)
+        self.run()
 
+    def run(self):
+        self._mainloop = gobject.MainLoop()
         self._mainloop.run()
 
     def setState(self, state):

@@ -1,5 +1,10 @@
 2008-10-15  Pedro Gracia  <pedro@flumotion.com>
 
+	* flumotion/monitor/nagios/stream.py:
+	Fixed an error that makes this script fail with playlists.
+
+2008-10-15  Pedro Gracia  <pedro@flumotion.com>
+
 	* po/es.po:
 	Update Spanish translation.
 
