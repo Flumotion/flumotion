@@ -1,3 +1,8 @@
+2008-10-15  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* common/Makefile.am:
+	Add flumotion-trial to EXTRA_DIST in common/Makefile.am.
+
 2008-10-15  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:
