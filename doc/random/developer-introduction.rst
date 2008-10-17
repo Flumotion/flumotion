@@ -111,6 +111,15 @@ configuration assistant which allows you to create a new flow.
 
 Click on Forward until the assistant is finished at which point you should have a working flow.
 
+How to setup external projects
+------------------------------
+If you have external projects (such as flumotion-dvb), you have to set up an additional variable, 
+that is the FLU_PROJECT_PATH, that should contain your project directory, for example::
+
+  FLU_PROJECT_PATH=path/to/directory/
+
+This way the components of the project will be available on the manager and workers. 
+
 Languages and Frameworks 
 ========================
 
@@ -537,26 +546,6 @@ Jordi's material
 ================
 
 FIXME: This should be moved and incorporated in sections above
-
-How to setup external projects
-------------------------------
-If you have external projects, you have to set up an additional variable, that is the
-FLU_PROJECT_PATH, that should contain your project directory, for example::
-
-  FLU_PROJECT_PATH=$HOME/workdir/myproject
-
-This way the components of the project will be available on the manager and workers.
-How to start a manager
-This is the command line for starting a manager with maximum debug level, provided that you had
-set up the right environment::
-
-  FLU_DEBUG=5 flumotion-manager conf/managers/default/planet.xml > /tmp/flumotion-manager.log 2>&1
-
-after that, open another console and do::
-
-  tail -f /tmp/flumotion-manager.log
-
-to see the output.
 
 Changing the mood of a component
 --------------------------------
