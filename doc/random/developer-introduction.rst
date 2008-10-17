@@ -443,6 +443,13 @@ The last part of the commit message, "Fixes #263" is a directive to trac. It mea
 this commit solves the specified issue. It'll close the ticket and add a comment to it
 referencing the commit. Always include this directive if the commit closes a real bug.
 
+To commit, type the following::
+
+  $ svn commit
+
+Which will open up your editor of choice (configurable through the SVN_EDITOR variable).
+Always use the complete ChangeLog entry as the checkin message when you committing.
+
 Updating translation
 --------------------
 To update the translations you can either use your normal editor (emacs,vim,eclipse etc)
@@ -614,26 +621,3 @@ If the patch has been created as explained before, you can patch the project as:
 
 You can always revert to trunk by using svn revert.
 
-How to use moap (checking in changes)
--------------------------------------
-For committing changes to subversion, we use moap4. Moap is a tool that generates a Changelog
-file from all the changes and, after we edit that file, it commits to the repository the changes (and
-the Changelog itself). Moap does more things than that, but these are the features we are interested
-now.
-So, once we have changes that had to be committed, we generate the Changelog by:
-
-  moap changelog prepare
-
-Then we edit the Changelog file by using our preferred editor. If there are files we do not want to
-commit, we just have to remove them from the latest entry in the Changelog file. Moap will only
-commit the files that are in the latest entry of the Changelog.
-If you created new files, you'll realize that they do not appear on the Changelog. You need to add
-them before to the repository, by doing svn add.
-Once you are ready, you commit by::
-
-  moap changelog checkin
-
-Take in mind that, if you are writing a patch for a ticket in the trac, writing "Fixes #x" on the
-Changelog file, where x is the ticket number, will update the trac ticket.
-If you decide not to commit anything, you can always revert the Changelog file to the previous one
-by doing svn revert.
