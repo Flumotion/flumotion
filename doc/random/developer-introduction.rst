@@ -303,6 +303,15 @@ Codereview
 -----------
 FIXME
 
+API documentation
+-----------------
+Newly written code should be documented in the form of doc strings.
+Check the API DOCS section of the `Style Guide`_ for more information.
+
+The API documentation requires the use of epydoc and is generated during
+a normal build if epydoc is installed.
+
+
 Source code analysis 
 --------------------
 There are mainly two different tools which are analyzing the source to improve
@@ -542,14 +551,6 @@ How to make a component:
 In order to know the pid of the job that is running the component, you have two options:
 1. Open the admin and look the pid column on the UI interface.
 2. Do a "ps aux | grep flumotion-job" and find out which is the process you want to send a signal.
-
-Generating API documentation
-----------------------------
-By default, flumotion contains documentation for the basic classes as html pages. This
-documentation, very useful when writing new components, is not that useful when debugging or
-learning the internals, so you may want to have all the classes in the project 
-documented as html pages, with tree hierarchies, links, etc.
-All this documentation is generated using epydoc.
 
 Invoking remote component methods
 ---------------------------------
