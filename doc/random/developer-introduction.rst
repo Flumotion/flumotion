@@ -361,7 +361,6 @@ yourself (by using autogen.sh and make, as usual)::
 
   svn checkout https://code.fluendo.com/flumotion/svn/flumotion-doc/trunk flumotion-doc
 
-
 Flowtester
 ----------
 
@@ -381,6 +380,7 @@ The idea is that the tool is used to maintain a large amount of flows which can 
 The testing (QA) is done by the developer/user of the program by connecting to the stream and
 verify that the stream is correct. A URL is provided to the stream which can be used to point
 a web browser or a media player to.
+
 
 Development process
 ===================
@@ -612,12 +612,3 @@ registered::
 You can also call flumotion-inspect on a component in order to know more about it::
 
   flumotion-inspect component
-
-Applying a patch
-----------------
-If the patch has been created as explained before, you can patch the project as:
-
-  patch -p0 < /tmp/flumotion-##.patch
-
-You can always revert to trunk by using svn revert.
-
