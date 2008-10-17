@@ -519,24 +519,6 @@ after that, open another console and do::
 
 to see the output.
 
-How to start an admin
----------------------
-This is the command line for starting an admin with maximum debug level, provided that you had
-set up the right environment::
-
- FLU_DEBUG=5 flumotion-admin > /tmp/flumotion-admin.log 2>&1
-
-If you had started a manager, you can connect to it from the admin. Otherwise, you can create a
-manager and worker from the admin.
-When no flows has been set up, the admin will start the wizard. If you want to create a test flow,
-you can use the wizard. If you already have a flow you want to test, skip the wizard and import the
-flow.
-From the admin, you can use the debug and write debug marker options in order to change the
-debug level of components and to write a mark on the log. This last thing is very useful as the log
-contains lots of lines and you may be interested in only one part. Moreover, when not all the
-workers are at the same computer, the clock may not be synchronized and this marker will help you
-localize the error.
-
 Changing the mood of a component
 --------------------------------
 Components have different moods:
