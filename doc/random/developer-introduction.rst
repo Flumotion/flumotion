@@ -513,39 +513,30 @@ You can also run just a specific test of a specific test class::
 
   trial flumotion.test.test_parts.TestAdminStatusbar.testPushRemove
 
+Debugging
+---------
+
+All flumotion projects include plenty of debug messages, these are under normal conditions suppressed, but
+can be enabled by setting an environment variable::
+
+  export FLU_DEBUG=level
+
+Where level is a number between 1 and 5. The higher the level, the more messages will be printed.
+Debug level 1 will only output errors and 5 everything, including debug messages
+
+In order to write to the debug, make sure that you subclass Logger.
+Then you can just call::
+
+  self.debug(message)
+
+For a debugging message, or for an info message::
+
+  self.info(message)
+
 Jordi's material
 ================
 
 FIXME: This should be moved and incorporated in sections above
-
-How to try stuff
-----------------
-Once you have your environment setup, you may want to try stuff and to debug it.
-The easiest thing to do is to start an admin. Then, from the GUI, you can create a manager and
-worker, and then a flow from the wizard. See how to start an admin section for more information.
-When you want to do more interesting things, you start a manager and, at least, a worker by
-yourself, and then start an admin that connects to the manager. See how to start a manager and how
-to start a worker section. Then, you import the flow you want to test.
-
-In order to see more or less information, you can set the environment debug variable::
-
-  export FLU_DEBUG=level
-
-where level is one of 1,2,3,4,5
-if you set it to 4 (FLU_DEBUG=4) it will output everything except info messages (4 is the debug
-level). With 5, it will output even the info messages. 1 will output only errors.
-Then, what you do is edit the .py files and write stuff to the debug level on the log. This way you
-can localize the problem and see some values.
-In order to write to the debug, you will usually do::
-
-  self.debug(message)
-
-as almost every object inherits from the Logger class.
-When looking for a gstreamer problem, you should try to find the pipeline. This is usually created
-on the component at the get_pipeline_string function. You can get it from there or write it to the log.
-Then, you can run the pipeline using the gst-launch to see if this is the problem (see some things
-more about gstreamer).
-
 
 How to setup external projects
 ------------------------------
