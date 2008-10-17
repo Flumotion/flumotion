@@ -297,11 +297,28 @@ The web interface for subscribing to the `mailing lists
 
 Pastebin
 --------
-FIXME
+Pastebin is an online collaboration tool.
+It allows you to easily distribute a piece of code to other developers so they can quickly
+review it.
+If you use ubuntu or debian it's strongly recommended that you install the package pastebinit
+which can accept data from a pipe. Eg, to send a diff of your changes to pastebin it for review,
+issue the following command:
 
-Codereview
+  svn diff | pastebinit
+
+Which will output an url point to its pastebin entry.
+
+Code Review
 -----------
-FIXME
+Codereview, or Reitveld is a free web tool for reviewing and discussion of a patch.
+It requires a Google account for both uploader and reviewer. There's a script in the flumotion 
+module which facilities this.
+To upload your changes in the current svn directory, issue the following command::
+
+  python tools/codereview-upload.py
+
+It will prompt you for your Google account information and a topic for the patch.
+After that go to http://codereview.appspot.com and find the url for the patch.
 
 API documentation
 -----------------
