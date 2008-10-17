@@ -21,6 +21,7 @@
 .. _Glade2Tutorial: http://www.kplug.org/glade_tutorial/glade2_tutorial/glade2_introduction.html
 .. _PyGTKManual: http://www.pygtk.org/docs/pygtk/
 .. _GtkManual: http://library.gnome.org/devel/gtk/stable/
+.. _Moods: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/moods
 
 ============================================
  Developer introduction guide for Flumotion
@@ -119,6 +120,43 @@ that is the FLU_PROJECT_PATH, that should contain your project directory, for ex
   FLU_PROJECT_PATH=path/to/directory/
 
 This way the components of the project will be available on the manager and workers. 
+
+Flowtester
+----------
+
+Flowtester is a tool to easily test flumotion flows.
+Flows can be handwritten or created by the configuration assistant.
+The code lives in the "flumotion-flowtester" module::
+
+  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-flowtester/trunk/ flumotion-flowtester
+
+To run flowtester, just type::
+
+  bin/flumotion-flowtester
+
+From the build after checking out.
+The main interface is a list of flows and buttons to create process and import different flows.
+The idea is that the tool is used to maintain a large amount of flows which can be easily started.
+The testing (QA) is done by the developer/user of the program by connecting to the stream and
+verify that the stream is correct. A URL is provided to the stream which can be used to point
+a web browser or a media player to.
+
+Changing the mood of a component
+--------------------------------
+
+Components have different moods, see `Moods`_ for a complete description.
+
+Some times you want a component to be in a specific mood for testing purposes. Here are a couple
+of tricks on how to change the mood of a component:
+
+- **sad**: send a SIGSEV (11) signal
+- **lost**: send a SIGSTOP (17) signal
+- **sleeping**: send a SIGTERM (15) signal
+- **hungry**: make the component to the right side lost
+
+In order to know the pid of the job that is running the component, you have two options:
+1. Open the admin and look the pid column on the UI interface.
+2. Do a "ps aux | grep flumotion-job" and find out which is the process you want to send a signal.
 
 Languages and Frameworks 
 ========================
@@ -370,27 +408,6 @@ yourself (by using autogen.sh and make, as usual)::
 
   svn checkout https://code.fluendo.com/flumotion/svn/flumotion-doc/trunk flumotion-doc
 
-Flowtester
-----------
-
-Flowtester is a tool to easily test flumotion flows.
-Flows can be handwritten or created by the configuration assistant.
-The code lives in the "flumotion-flowtester" module::
-
-  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-flowtester/trunk/ flumotion-flowtester
-
-To run flowtester, just type::
-
-  bin/flumotion-flowtester
-
-From the build after checking out.
-The main interface is a list of flows and buttons to create process and import different flows.
-The idea is that the tool is used to maintain a large amount of flows which can be easily started.
-The testing (QA) is done by the developer/user of the program by connecting to the stream and
-verify that the stream is correct. A URL is provided to the stream which can be used to point
-a web browser or a media player to.
-
-
 Development process
 ===================
 
@@ -541,54 +558,3 @@ Then you can just call::
 For a debugging message, or for an info message::
 
   self.info(message)
-
-Jordi's material
-================
-
-FIXME: This should be moved and incorporated in sections above
-
-Changing the mood of a component
---------------------------------
-Components have different moods:
-
-- sleeping
-- waking
-- happy
-- hungry
-- lost
-- sad
-
-Some times you want a component to be in a specific mood for testing purposes. Here are a couple
-of tricks:
-How to make a component:
-
-- **sad**: send a kill SIGSEV (11) to its job
-- **lost**: send a STOP signal to its job
-- **sleeping**: send a TERM signal to its job
-- **hungry**: connect it to a lost component
-
-In order to know the pid of the job that is running the component, you have two options:
-1. Open the admin and look the pid column on the UI interface.
-2. Do a "ps aux | grep flumotion-job" and find out which is the process you want to send a signal.
-
-Invoking remote component methods
----------------------------------
-As you learn flumotion, you'll realized that components have a remote interface that can be called.
-This remote interface is usually for the manager but you can also call it from the command line by
-using the flumotion-command utility. For example, for calling the method setFluDebugMarker on
-the producer-video component, you could open a terminal and type::
-
-  flumotion-command -m user:test@localhost:7531 invoke /default/producer-video setFluDebugMarker s "HOLA"
-
-This will make the producer-video component to write “HOLA” on the log. user and test are the
-username and the password for logging into the manager that is running on localhost and listening
-on the port 7531.
-Flumotion-inspect
-Like gstreamer-inspect, flumotion-inspect show you a list of configured values and modules that are
-registered::
-
-  flumotion-inspect
-
-You can also call flumotion-inspect on a component in order to know more about it::
-
-  flumotion-inspect component
