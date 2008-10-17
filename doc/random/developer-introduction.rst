@@ -344,6 +344,27 @@ yourself (by using autogen.sh and make, as usual)::
 
   svn checkout https://code.fluendo.com/flumotion/svn/flumotion-doc/trunk flumotion-doc
 
+
+Flowtester
+----------
+
+Flowtester is a tool to easily test flumotion flows.
+Flows can be handwritten or created by the configuration assistant.
+The code lives in the "flumotion-flowtester" module::
+
+  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-flowtester/trunk/ flumotion-flowtester
+
+To run flowtester, just type::
+
+  bin/flumotion-flowtester
+
+From the build after checking out.
+The main interface is a list of flows and buttons to create process and import different flows.
+The idea is that the tool is used to maintain a large amount of flows which can be easily started.
+The testing (QA) is done by the developer/user of the program by connecting to the stream and
+verify that the stream is correct. A URL is provided to the stream which can be used to point
+a web browser or a media player to.
+
 Development process
 ===================
 
@@ -473,7 +494,6 @@ Jordi's material
 
 FIXME: This should be moved and incorporated in sections above
 
-
 How to try stuff
 ----------------
 Once you have your environment setup, you may want to try stuff and to debug it.
@@ -482,11 +502,6 @@ worker, and then a flow from the wizard. See how to start an admin section for m
 When you want to do more interesting things, you start a manager and, at least, a worker by
 yourself, and then start an admin that connects to the manager. See how to start a manager and how
 to start a worker section. Then, you import the flow you want to test.
-Trick: An easy way to create flow examples is to run the wizard and then to export that flow. Then
-you can modify it and import it. You can also find good examples in the flumotion-flowtester
-project, in the data/flows directory. You can check that project from subversion::
-
-  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-flowtester/trunk/ flumotion-flowtester
 
 In order to see more or less information, you can set the environment debug variable::
 
