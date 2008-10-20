@@ -51,6 +51,7 @@ First the build environment needs to be prepared::
   ./autogen.sh
 
 Autogen might fail if you miss some dependencies. Normally you need the following:
+
 - C compiler
 - make
 - libtool
@@ -189,8 +190,8 @@ C
 A small part of Flumotion is written in C. There are mainly two reasons for
 not writing the code in Python:
 
- - There are no existing python bindings available for a C library
- - Performance, Python cannot do it efficiently.
+- There are no existing python bindings available for a C library
+- Performance, Python cannot do it efficiently.
 
 The general policy is that you should avoid writing code in C before you have
 profiled the Python code and know that it's going to be part of a performance 
@@ -307,12 +308,12 @@ Understand and query information from the web frontend.
 
 Pay special attention to the Basic Work Cycle in the third Chapter:
 
-  * checkout: FIXME link
-  * status
-  * diff
-  * revert
-  * update
-  * commit
+* checkout: FIXME link
+* status
+* diff
+* revert
+* update
+* commit
 
 
 Trac
@@ -504,16 +505,16 @@ following after making sure they are compiled::
 
 Where xx_YY is code combined of:
 
-  - xx: the language (ISO-639)
-  - YY: the geographical providing (ISO-3166)
-  - ZZ: the encoding, usually UTF-8
+- xx: the language (ISO-639)
+- YY: the geographical providing (ISO-3166)
+- ZZ: the encoding, usually UTF-8
 
 Some common examples:
 
-  - ca_ES: Catalan (as spoken in Spain)
-  - en_US: English (as spoken in USA), the default
-  - es_ES: Spanish (as spoken in Spain)
-  - sv_SE: Swedish (as spoken in Sweden)
+- ca_ES: Catalan (as spoken in Spain)
+- en_US: English (as spoken in USA), the default
+- es_ES: Spanish (as spoken in Spain)
+- sv_SE: Swedish (as spoken in Sweden)
 
 Running unittests
 -----------------
