@@ -372,10 +372,10 @@ class AdminWindow(Loggable, GladeDelegate):
 
             # Manage
             ('Manage', None, _('_Manage')),
-            ('StartComponent', 'flumotion-play', _('_Start Component(s)'),
+            ('StartComponent', gtk.STOCK_MEDIA_PLAY, _('_Start Component(s)'),
               None, _('Start the selected component(s)'),
              self._manage_start_component_cb),
-            ('StopComponent', 'flumotion-stop', _('St_op Component(s)'),
+            ('StopComponent', gtk.STOCK_MEDIA_STOP, _('St_op Component(s)'),
               None, _('Stop the selected component(s)'),
              self._manage_stop_component_cb),
             ('DeleteComponent', gtk.STOCK_DELETE, _('_Delete Component(s)'),

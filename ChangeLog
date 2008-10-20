@@ -2,6 +2,28 @@
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
+	* data/image/16x16/Makefile.am:
+	* data/image/24x24/Makefile.am:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/ui/icons.py:
+	Replaced the custom play/stop icons for the stock ones.
+	* data/image/24x24/pause.png (deleted):
+	* data/image/24x24/play.png (deleted):
+	* data/image/24x24/stop.png (deleted):
+	* data/image/24x24/about.png (deleted):
+	* data/image/16x16/pause.png (deleted):
+	* data/image/16x16/play.png (deleted):
+	* data/image/16x16/stop.png (deleted):
+	* data/image/16x16/about.png (deleted):
+	Custom images deleted from the tree as they are
+	no longer used.
+	Fixes #1014
+	
+
+2008-10-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
+
 	* flumotion/ui/glade.py:
 	A temporal workaround, added a signal to GladeDelegate.
 	Fixes #1124
