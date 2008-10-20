@@ -45,6 +45,7 @@ class Connections(GladeWidget):
 
     gsignal('have-connection', bool)
     gsignal('connection-activated', object)
+    gsignal('connections-cleared')
 
     def __init__(self):
         GladeWidget.__init__(self)
@@ -77,6 +78,8 @@ class Connections(GladeWidget):
         canClear = hasRecentConnections()
         self.button_clear.set_sensitive(canClear)
         self.button_clear_all.set_sensitive(canClear)
+        if not canClear:
+            self.emit('connections-cleared')
 
     def _searchEqual(self, model, column, key, iter):
         connection = model.get(iter, column)[0]
@@ -118,6 +121,7 @@ class Connections(GladeWidget):
 
     def on_button_clear_all_clicked(self, button):
         self._clear_all()
+        self._updateButtons()
 
     def _on_objectlist_row_activated(self, connections, connection):
         self.emit('connection-activated', connection)
@@ -145,6 +149,9 @@ class ConnectionsDialog(GladeWindow):
 
     def on_delete_event(self, dialog, event):
         self.destroy()
+
+    def on_connections_cleared(self, widget):
+        self.button_ok.set_sensitive(False)
 
 gobject.type_register(ConnectionsDialog)
 

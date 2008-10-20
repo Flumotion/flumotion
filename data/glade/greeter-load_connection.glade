@@ -32,6 +32,7 @@
 	  <property name="int2">0</property>
 	  <property name="last_modification_time">Tue, 08 Mar 2005 16:34:52 GMT</property>
 	  <signal name="connection-activated" handler="on_connection_activated" last_modification_time="Tue, 08 Feb 2005 16:05:40 GMT"/>
+	  <signal name="connections-cleared" handler="on_connections_cleared" last_modification_time="Tue, 14 Oct 2008 17:14:40 GMT"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>

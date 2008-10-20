@@ -187,6 +187,9 @@ class LoadConnection(WizardStep):
     def on_connection_activated(self, widget, state):
         self.button_next.emit('clicked')
 
+    def on_connections_cleared(self, widget):
+        self.button_next.set_sensitive(False)
+
 
 class StartNew(WizardStep):
     name = 'start_new'

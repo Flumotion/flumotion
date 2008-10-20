@@ -1,3 +1,15 @@
+2008-10-20  Xavier Queralt Mateu <xquearlt@flumotion.com>
+
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
+
+	* data/glade/connection-dialog.glade:
+	* data/glade/greeter-load_connection.glade:
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/admin/gtk/greeter.py:
+	Disables the connect button when the recent 
+	connections list is cleared.
+	Fixes #1051
+
 2008-10-20  Xavier Queralt  <xqueralt@flumotion.com>
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
