@@ -790,6 +790,7 @@ class AdminWindow(Loggable, GladeDelegate):
         if httpPorter:
             assistant.setHTTPPorter(httpPorter)
         assistant.connect('finished', self._assistant_finished_cb)
+        assistant.connect('destroy', self.on_assistant_destroy)
         assistant.run(main=False)
 
     def _clearAdmin(self):
@@ -1172,6 +1173,7 @@ class AdminWindow(Loggable, GladeDelegate):
             not self._configurationAssistantIsRunning):
             self.debug('no components detected, running assistant')
             # ensure our window is shown
+            self._componentList.clearAndRebuild(self._componentStates)
             self.show()
             self._configurationAssistantIsRunning = True
             self._runConfigurationAssistant()
@@ -1425,6 +1427,9 @@ You can do remote component calls using:
 
     def _assistant_finished_cb(self, assistant, configuration):
         self._assistantFinshed(assistant, configuration)
+
+    def on_assistant_destroy(self, assistant):
+        self._configurationAssistantIsRunning = False
 
     def _window_delete_event_cb(self, window, event):
         self._quit()

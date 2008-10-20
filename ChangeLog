@@ -1,3 +1,13 @@
+2008-10-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Clear the component list when connecting to a new 
+	manager and allow the wizard to reapear when it is 
+	closed without finishing the configuration.
+	Fixes #695
+
 2008-10-20  Xavier Queralt Mateu <xquearlt@flumotion.com>
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
