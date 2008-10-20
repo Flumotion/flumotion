@@ -1,3 +1,4 @@
+
 .. contents:: Table of Contents
 
 .. _Open a new Ticket: https://code.fluendo.com/flumotion/trac/newticket 
@@ -539,6 +540,12 @@ The commands above will do the same thing, running all tests in the tests_part.p
 You can also run just a specific test of a specific test class::
 
   trial flumotion.test.test_parts.TestAdminStatusbar.testPushRemove
+
+Note, some tests cannot be run under the default (select) reactor, since they
+depend on the integration of the glib/gtk eventloop. If the test you tried
+to run cannot be run, you need to specify the reactor, for instance::
+
+  trial -r gtk2 flumotion.test.test_component_disker
 
 Debugging
 ---------
