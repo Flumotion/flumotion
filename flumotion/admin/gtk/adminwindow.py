@@ -534,6 +534,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self.debug('setting model')
 
         if self._adminModel is not None:
+            self._adminModel.disconnectFromManager()
             self.debug('Connecting to new model %r' % model)
 
         self._adminModel = model

@@ -179,9 +179,36 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         self.planet = None
         self._workerHeavenState = None
 
+    def disconnectFromManager(self):
+        """
+        Disconnects from the actual manager and frees the connection.
+        """
+        if self.clientFactory:
+            # We are disconnecting, so we don't want to be
+            # notified by the model about it.
+            self.remote.dontNotifyOnDisconnect(self._remoteDisconnected)
+
+            self.clientFactory.stopTrying()
+
+            self.clientFactory.disconnect()
+            self.clientFactory = None
+
     def connectToManager(self, connectionInfo, keepTrying=False,
                          writeConnection=True):
-        'Connect to a host.'
+        """
+        Connects to the specified manager.
+
+        @param connectionInfo:  data for establishing the connection
+        @type  connectionInfo:  a L{PBConnectionInfo}
+        @param keepTrying:      when this is L{True} the Factory will try to
+                                reconnect when it loses the connection
+        @type  keepTrying:      bool
+        @param writeConnection: when this is L{True} the connection is saved
+                                for future uses on cache
+        @type  writeConnection: bool
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
         assert self.clientFactory is None
 
         self.connectionInfo = connectionInfo
@@ -396,12 +423,7 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
         # fixme: push the disconnect notification upstream
 
-        def remoteDisconnected(remoteReference):
-            self.debug("emitting disconnected")
-            self.connected = False
-            self.emit('disconnected')
-            self.debug("emitted disconnected")
-        self.remote.notifyOnDisconnect(remoteDisconnected)
+        self.remote.notifyOnDisconnect(self._remoteDisconnected)
 
         d = self.callRemote('getPlanetState')
         d.addCallback(gotPlanetState)
@@ -503,3 +525,9 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     def getWorkerHeavenState(self):
         return self._workerHeavenState
+
+    def _remoteDisconnected(self, remoteReference):
+        self.debug("emitting disconnected")
+        self.connected = False
+        self.emit('disconnected')
+        self.debug("emitted disconnected")
