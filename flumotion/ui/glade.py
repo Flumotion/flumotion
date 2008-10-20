@@ -26,6 +26,7 @@ from kiwi.environ import environ
 from kiwi.ui.delegates import GladeDelegate
 from twisted.python.reflect import namedAny
 
+from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
 from flumotion.ui.kiwipatches import install_patches
 
@@ -112,6 +113,8 @@ class GladeWidget(gtk.VBox, GladeBacked):
     Remember to chain up if you customize __init__().
 
     '''
+
+    gsignal('validation-changed', bool)
 
     def __init__(self):
         GladeBacked.__init__(self)
