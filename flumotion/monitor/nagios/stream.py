@@ -22,7 +22,7 @@
 """
 check streams for flumotion-nagios
 """
-import urllib
+from urllib2 import urlopen, URLError
 import urlparse
 import re
 import time
@@ -33,6 +33,19 @@ from flumotion.common import log
 from flumotion.monitor.nagios import util
 
 URLFINDER = 'http://[^\s"]*' # to search urls in playlists
+
+
+def getURLFromPlaylist(url):
+    try:
+        playlist = urlopen(url)
+    except URLError, e:
+        raise util.NagiosCritical(e)
+
+    urls = re.findall(URLFINDER, playlist.read())
+    if urls:
+        return urls[-1] # new (the last) url to check
+    else:
+        raise util.NagiosCritical('No URLs into the playlist.')
 
 
 class Check(util.LogCommand):
@@ -46,7 +59,7 @@ class Check(util.LogCommand):
         self._expectVideo = False
         self._isAudio = False
         self._isVideo = False
-        self._isPlaylist = True
+        self._playlist = False
         self._url = None
         self._streamurl = None
 
@@ -119,9 +132,6 @@ class Check(util.LogCommand):
     def critical(self, message):
         return util.critical('%s: %s' % (self._url, message))
 
-    def ok(self, message):
-        return util.ok('%s: %s' % (self._url, message))
-
     def do(self, args):
         """Check URL and perfom the stream check"""
         if not args:
@@ -143,31 +153,19 @@ class Check(util.LogCommand):
 
         self._streamurl = self._url
         if self.options.playlist:
-            self._streamurl = self.getURLFromPlaylist(self._url)
-
+            self._streamurl = getURLFromPlaylist(self._url)
         result = self.checkStream()
         return result
 
-    def getURLFromPlaylist(self, url):
-        playlist = urllib.urlopen(self._url).read()
-        if playlist.startswith('404'):
-            raise util.NagiosCritical(playlist)
-
-        urls = re.findall(URLFINDER, playlist)
-        return urls[-1] # new (the last) url to check
-
     def checkStream(self):
         """Launch the pipeline and compare values with the expecteds"""
-        url = self._streamurl
-        while self._isPlaylist: #use gstreamer to detect the playlist
-            self.debug('checking url %s', url)
-            gstinfo = GSTInfo(int(self.options.timeout),
-                              int(self.options.duration), url)
-            self.debug('checked url %s', url)
-            elements = gstinfo.getElements()
-            self._isPlaylist = gstinfo.isPlaylist()
-            if self._isPlaylist:
-                self._streamurl = self.getURLFromPlaylist(url)
+        self.debug('checking url %s', self._streamurl)
+        gstinfo = GSTInfo(self.options, self._streamurl)
+        self.debug('checked url %s', self._streamurl)
+        self._playlist = gstinfo.isPlaylist()
+        if self._playlist:
+            self._streamurl = getURLFromPlaylist(self._streamurl)
+            gstinfo = GSTInfo(self.options, self._streamurl)
 
         gsterror = gstinfo.getGStreamerError()
         if gsterror:
@@ -186,18 +184,146 @@ class Check(util.LogCommand):
             else:
                 return self.critical("GStreamer error: %s" %
                     gsterror.message)
+        gstinfo.checkStream()
 
-        running = gstinfo.getRunning() # seconds running gstinfo
-        counter = gstinfo.getCounter() # seconds getting media data
 
-        for i in elements['typefinder'].src_pads():
+class GSTInfo(log.Loggable):
+    """
+    Get info from a given URL using a gstreamer pipeline.
+
+    @param timeout:  maximum actual runtime before timing out
+    @param duration: the minimum duration of decoded data to get in the timeout
+                     interval
+    @param url:      the url of the stream/playlist
+    """
+
+    # FIXME: duration is interpreted wrong in this object.
+    # Instead, what should happen is:
+    # for each kind of decoded stream, save the first decoded buffer timestamp
+    # keep checking buffer timestamps + offsets
+    # as soon as each stream has duration's worth of decoded data, this
+    # object can return a value
+
+    def __init__(self, options, url):
+        self._expectAudio = False
+        self._expectVideo = False
+        self._isAudio = False
+        self._isVideo = False
+        self._error = False
+        self._last = False
+        self.options = options
+        timeout = int(options.timeout)
+        duration = int(options.duration)
+        gobject.timeout_add(timeout * 1000, self.endTimeout)
+        self._duration = duration
+        self._url = url
+
+        # it's fine to not have any of them and then have pipeline parsing
+        # fail trying to use the last option
+        for factory in ['gnomevfssrc', 'neonhttpsrc', 'souphttpsrc']:
+            try:
+                gst.element_factory_make(factory)
+                break
+            except gst.PluginNotFoundError:
+                pass
+
+        _pipeline = '%s name=httpsrc ! ' \
+                    'typefind name=typefinder ! ' \
+                    'decodebin name=decoder ! ' \
+                    'fakesink' % factory
+
+        self._counter = 0 # counter to track the playing state
+        self._gsterror = None
+        self._playlist = False
+        self._timeout = True
+        self._startime = time.time()
+        self._running = 0
+        self._pipeline = gst.parse_launch(_pipeline)
+        self.elements = dict((e.get_name(), e) for e in \
+                                              self._pipeline.elements())
+        bus = self._pipeline.get_bus()
+        bus.add_watch(self.busWatch)
+        self.elements['httpsrc'].set_property('location', url)
+        self._pipeline.set_state(gst.STATE_PLAYING)
+
+        self.handleOptions()
+        self.run()
+
+    def run(self):
+        self._mainloop = gobject.MainLoop()
+        self._mainloop.run()
+        #self.checkStream()
+
+    def getGStreamerError(self):
+        return self._gsterror
+
+    def isPlaylist(self):
+        return self._playlist
+
+    def quit(self):
+        self._running = time.time() - self._startime
+        self._mainloop.quit()
+
+    def busWatch(self, bus, message):
+        """Capture messages in pipeline bus"""
+        self.log('busWatch: message %r, type %r', message, message.type)
+        if message.type == gst.MESSAGE_EOS:
+            self.info('busWatch: eos')
+            self._pipeline.set_state(gst.STATE_NULL)
+        elif message.type == gst.MESSAGE_ELEMENT:
+            s = message.structure
+            if s.get_name() == 'missing-plugin':
+                caps = s['detail']
+                if caps[0].get_name() == 'text/uri-list':
+                    # we don't have a plug-in but we know it's a playlist
+                    self.info('text/uri-list but missing plugin')
+                    self._playlist = True
+            self.quit()
+        elif message.type == gst.MESSAGE_ERROR:
+            self._gsterror = message.parse_error()[0]
+            domain = self._gsterror.domain
+            code = self._gsterror.code
+            if domain == 'gst-stream-error-quark':
+                if code == 5: #gst.STREAM_ERROR_CODEC_NOT_FOUND:
+                    if 'text' in self._gsterror.message:
+                        self._playlist = True
+            self.quit()
+        elif message.type == gst.MESSAGE_STATE_CHANGED:
+            new = message.parse_state_changed()[1]
+            if message.src == self._pipeline and new == gst.STATE_PLAYING:
+                result = self.checkStream()
+                if result == 0:
+                    self._timeout = False
+                    self._last = True
+                    gobject.timeout_add(1000, self.isPlaying)
+                else:
+                    self.quit()
+        return True
+
+    def isPlaying(self):
+        """Check the stream is playing every second"""
+        ret, cur, pen = self._pipeline.get_state()
+        if ret == gst.STATE_CHANGE_SUCCESS and cur == gst.STATE_PLAYING:
+            self._counter += 1
+            if self._counter == self._duration:
+                self.quit()
+        return True
+
+    def endTimeout(self):
+        """End of time to do the check"""
+        if self._timeout:
+            self.quit()
+
+    def checkStream(self):
+        """Check stream properties"""
+        for i in self.elements['typefinder'].src_pads():
             caps = i.get_caps()
             if caps == 'ANY' or not caps:
                 return self.critical("The stream has no caps.")
 
         # loop through all elements in the decoder bin, finding the actual
         # decoders
-        for element in elements['decoder']:
+        for element in self.elements['decoder']:
             for pad in element.src_pads():
                 caps = pad.get_caps()
                 name = caps[0].get_name()
@@ -224,16 +350,15 @@ class Check(util.LogCommand):
                 return self.critical('Did not expect video, '
                     'but video in stream')
 
-        gstinfo.setState(gst.STATE_NULL)
         if self._expectAudio and self._expectVideo:
             return self.ok('Got %i seconds of audio and video in '
-                           '%.2f seconds of runtime.' % (counter, running))
+            '%.2f seconds of runtime.' % (self._counter, self._running))
         elif self._expectAudio:
             return self.ok('Got %i seconds of audio in '
-                           '%.2f seconds of runtime.' % (counter, running))
+            '%.2f seconds of runtime.' % (self._counter, self._running))
         elif self._expectVideo:
             return self.ok('Got %i seconds of video in '
-                           '%.2f seconds of runtime.' % (counter, running))
+            '%.2f seconds of runtime.' % (self._counter, self._running))
         else:
             # There was no audio or video, and no options were given to check.
             # Still, this is probably an error on the nagios user's part.
@@ -323,133 +448,24 @@ class Check(util.LogCommand):
                     'Video height fail: EXPECTED: %s, ACTUAL: %i/%i' % (
                         self.options.videopar, value.num, value.denom))
 
+    def handleOptions(self):
+        #Determine if this stream would have audio/video
+        if self.options.videowidth or self.options.videoheight or \
+           self.options.videoframerate or self.options.videopar or \
+           self.options.videomimetype:
+            self._expectVideo = True
+        if self.options.audiosamplerate or self.options.audiochannels or \
+           self.options.audiowidth or self.options.audiodepth or \
+           self.options.audiomimetype:
+            self._expectAudio = True
 
-class GSTInfo(log.Loggable):
-    """
-    Get info from a given URL using a gstreamer pipeline.
+    def critical(self, message):
+        if not self._error:
+            self._error = True
+            return util.critical('%s: %s' % (self._url, message))
+        return -1
 
-    @param timeout:  maximum actual runtime before timing out
-    @param duration: the minimum duration of decoded data to get in the timeout
-                     interval
-    @param url:      the url of the stream/playlist
-    """
-
-    # FIXME: duration is interpreted wrong in this object.
-    # Instead, what should happen is:
-    # for each kind of decoded stream, save the first decoded buffer timestamp
-    # keep checking buffer timestamps + offsets
-    # as soon as each stream has duration's worth of decoded data, this
-    # object can return a value
-
-    def __init__(self, timeout, duration, url):
-        gobject.timeout_add(timeout * 1000, self.endTimeout)
-        self._duration = duration
-        self._url = url
-
-        # it's fine to not have any of them and then have pipeline parsing
-        # fail trying to use the last option
-        for factory in ['gnomevfssrc', 'neonhttpsrc', 'souphttpsrc']:
-            try:
-                gst.element_factory_make(factory)
-                break
-            except gst.PluginNotFoundError:
-                pass
-
-        _pipeline = '%s name=httpsrc ! ' \
-                    'typefind name=typefinder ! ' \
-                    'decodebin name=decoder ! ' \
-                    'fakesink' % factory
-
-        self._counter = 0 # counter to track the playing state
-        self._gsterror = None
-        self._playlist = False
-        self._timeout = True
-        self._startime = time.time()
-        self._running = 0
-        self._pipeline = gst.parse_launch(_pipeline)
-        self._elements = dict((e.get_name(), e) for e in \
-                                              self._pipeline.elements())
-        bus = self._pipeline.get_bus()
-        bus.add_watch(self.busWatch)
-        self._elements['httpsrc'].set_property('location', url)
-        self._pipeline.set_state(gst.STATE_PLAYING)
-        self.run()
-
-    def run(self):
-        self._mainloop = gobject.MainLoop()
-        self._mainloop.run()
-
-    def setState(self, state):
-        self._pipeline.set_state(state)
-
-    def getElements(self):
-        return self._elements
-
-    def getGStreamerError(self):
-        return self._gsterror
-
-    def isPlaylist(self):
-        return self._playlist
-
-    def getRunning(self):
-        """
-        Gets the running time.  only available after the pipeline has quit.
-
-        @returns: the time spent running the pipeline
-        @rtype: float
-        """
-        return self._running
-
-    def getCounter(self):
-        return self._counter
-
-    def quit(self):
-        self._running = time.time() - self._startime
-        self._mainloop.quit()
-
-    def busWatch(self, bus, message):
-        """Capture messages in pipeline bus"""
-        self.log('busWatch: message %r, type %r', message, message.type)
-        if message.type == gst.MESSAGE_EOS:
-            self.info('busWatch: eos')
-            self._pipeline.set_state(gst.STATE_NULL)
-        elif message.type == gst.MESSAGE_ELEMENT:
-            s = message.structure
-            if s.get_name() == 'missing-plugin':
-                caps = s['detail']
-                if caps[0].get_name() == 'text/uri-list':
-                    # we don't have a plug-in but we know it's a playlist
-                    self.info('text/uri-list but missing plugin')
-                    self._playlist = True
-                    self.quit()
-
-        elif message.type == gst.MESSAGE_ERROR:
-            self._gsterror = message.parse_error()[0]
-            self._pipeline.set_state(gst.STATE_NULL)
-            domain = self._gsterror.domain
-            code = self._gsterror.code
-            if domain == 'gst-stream-error-quark':
-                if code == gst.STREAM_ERROR_CODEC_NOT_FOUND:
-                    if 'text/uri-list' in self._gsterror.message:
-                        self._playlist = True
-            self.quit()
-        elif message.type == gst.MESSAGE_STATE_CHANGED:
-            new = message.parse_state_changed()[1]
-            if message.src == self._pipeline and new == gst.STATE_PLAYING:
-                self._timeout = False
-                gobject.timeout_add(1000, self.isPlaying)
-        return True
-
-    def isPlaying(self):
-        """Check the stream is playing every second"""
-        ret, cur, pen = self._pipeline.get_state()
-        if ret == gst.STATE_CHANGE_SUCCESS and cur == gst.STATE_PLAYING:
-            self._counter += 1
-            if self._counter == self._duration:
-                self.quit()
-        return True
-
-    def endTimeout(self):
-        """End of time to do the check"""
-        if self._timeout:
-            self.quit()
+    def ok(self, message):
+        if self._last:
+            return util.ok('%s: %s' % (self._url, message))
+        return 0
