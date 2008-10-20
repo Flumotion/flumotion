@@ -2,6 +2,15 @@
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
+	* flumotion/admin/gtk/componentview.py:
+	Delete the notebooks each time we open a new one, 
+	this way we don't have multiple notebooks.
+	Fixes #1070
+
+2008-10-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
+
 	* data/image/16x16/Makefile.am:
 	* data/image/24x24/Makefile.am:
 	* flumotion/admin/gtk/adminwindow.py:

@@ -250,6 +250,7 @@ class ComponentView(gtk.VBox, log.Loggable):
 
         widget = placeholder.getWidget()
         widget.show()
+        map(self.remove, self.get_children())
         self.pack_start(widget, True, True)
 
         placeholder.setDebugEnabled(self._debugEnabled)
