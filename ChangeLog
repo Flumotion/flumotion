@@ -1,3 +1,9 @@
+2008-10-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* misc/jhbuildrc.flu:
+	  JHBuild was changed, and apparently any variable without a _ prefix
+	  is considered as an unknown parameter.
+
 2008-10-20  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:

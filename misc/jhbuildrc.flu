@@ -7,17 +7,17 @@
 import os
 import sys
 
-me = os.path.basename(__file__)
-prefix = '.jhbuildrc.flu.'
+_me = os.path.basename(__file__)
+_prefix = '.jhbuildrc.flu.'
 
-if not me.startswith(prefix):
+if not _me.startswith(_prefix):
     print "%s does not start with %s" % (
-        os.path.basename(__file__), prefix)
+        os.path.basename(__file__), _prefix)
     sys.exit(1)
 
-flavor = me[len(prefix):]
+_flavor = _me[len(prefix):]
 
-moduleset = os.path.join(os.environ['HOME'], 'flu', 'flu.%s.modules' % flavor)
+moduleset = os.path.join(os.environ['HOME'], 'flu', 'flu.%s.modules' % _flavor)
 modules = ['flumotion']
-checkoutroot = os.path.join(os.environ['HOME'], 'flu', flavor, 'src')
-prefix = os.path.join(os.environ['HOME'], 'flu', flavor, 'prefix')
+checkoutroot = os.path.join(os.environ['HOME'], 'flu', _flavor, 'src')
+prefix = os.path.join(os.environ['HOME'], 'flu', _flavor, 'prefix')
