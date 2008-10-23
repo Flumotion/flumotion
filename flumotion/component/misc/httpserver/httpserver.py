@@ -51,6 +51,11 @@ class CancellableRequest(server.Request):
         server.Request.__init__(self, channel, queued)
         now = time.time()
         self.lastTimeWritten = now # Used by HTTPFileStreamer for timeout
+        # we index some things by the fd, so we need to store it so we
+        # can still use it (in the connectionLost() handler and in
+        # finish()) after transport's fd has been closed
+        self.fd = self.transport.fileno()
+
         self._component = channel.factory.component
         self._transfer = None
         self._provider = None
@@ -60,11 +65,6 @@ class CancellableRequest(server.Request):
         self._rangeLastByte = None
         self._resourceSize = None
         self._bytesWritten = 0L
-
-        # we index some things by the fd, so we need to store it so we
-        # can still use it (in the connectionLost() handler and in
-        # finish()) after transport's fd has been closed
-        self._fd = self.transport.fileno()
 
         # Create the request statistic handler
         self.stats = serverstats.RequestStatistics(self._component.stats)
@@ -91,13 +91,13 @@ class CancellableRequest(server.Request):
         server.Request.finish(self)
         # We sent Connection: close, so we must close the connection
         self.transport.loseConnection()
-        self.requestCompleted(self._fd)
+        self.requestCompleted(self.fd)
 
     def connectionLost(self, reason):
         # this is called _after_ the self.transport.fileno() is not
         # valid anymore, so we use the stored fd number
         server.Request.connectionLost(self, reason)
-        self.requestCompleted(self._fd)
+        self.requestCompleted(self.fd)
 
     def requestCompleted(self, fd):
         if self._completionTime is None:
@@ -465,7 +465,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         now = time.time()
         for request in self._connected_clients.values():
             if now - request.lastTimeWritten > self.REQUEST_TIMEOUT:
-                self.debug("Timing out connection")
+                self.debug("Timing out connection on request for [fd %5d]",
+                    request.fd)
                 # Apparently this is private API. However, calling
                 # loseConnection is not sufficient - it won't drop the
                 # connection until the send queue is empty, which might never

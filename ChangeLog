@@ -1,3 +1,10 @@
+2008-10-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpserver/httpserver.py:
+	  Make Request.fd public so the request can be identified.
+	  When we time out sessions, give us a clue which session we're timing
+	  out.
+
 2008-10-21  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* misc/jhbuildrc.flu:
