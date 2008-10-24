@@ -46,7 +46,7 @@ import time
 
 from flumotion.admin import multi
 from flumotion.common import log, common
-from flumotion.common.eventcalendar import LOCAL
+from flumotion.common import eventcalendar
 from flumotion.component.base import scheduler
 
 # register the unjellyable
@@ -134,15 +134,15 @@ class RRDMonitor(log.Loggable):
 
     def startScheduler(self, sources):
         r = random.Random()
-        now = datetime.datetime.now(LOCAL)
+        now = datetime.datetime.now(eventcalendar.LOCAL)
 
-        def eventStarted(event):
-            self.pollData(*event.content)
+        def eventInstanceStarted(eventInstance):
+            self.pollData(*eventInstance.event.content)
 
-        def eventStopped(event):
+        def eventStopped(eventInstance):
             pass
 
-        self.scheduler.subscribe(eventStarted, eventStopped)
+        self.scheduler.subscribe(eventInstanceStarted, eventInstanceStopped)
 
         for source in sources:
             freq = sourceGetSampleFrequency(source)
@@ -156,10 +156,13 @@ class RRDMonitor(log.Loggable):
                     sourceGetName(source),
                     sourceGetFileName(source))
 
-            self.scheduler.addEvent(now.isoformat(), now+offset,
-                                    now+offset+datetime.timedelta(seconds=1),
-                                    data,
-                                    datetime.timedelta(seconds=freq))
+            # FIXME: Event never actually allowed a timedelta as rrule,
+            # so I doubt this refactoring of scheduler ever worked
+            calendar = eventcalendar.Calendar()
+            calendar.addEvent(now.isoformat(),
+                now + offset, now + offset + datetime.timedelta(seconds=1),
+                data, rrule=datetime.timedelta(seconds=freq))
+            self.scheduler.setCalendar(calendar)
 
     def pollData(self, managerId, componentId, uiStateKey, dsName,
                  rrdFile):

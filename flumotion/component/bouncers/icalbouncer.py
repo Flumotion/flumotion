@@ -67,25 +67,21 @@ class IcalBouncer(bouncer.Bouncer):
 
         # need to check if inside an event time
         # FIXME: think of a strategy for handling overlapping events
-        currentEvents = self.icalScheduler.getCurrentEvents()
-        if currentEvents:
-            event = currentEvents[0]
+        cal = self.iCalScheduler.getCalendar()
+        eventInstances = cal.getActiveEventInstances()
+        if eventInstances:
+            instance = eventInstances[0]
             keycard.state = keycards.AUTHENTICATED
-            now = datetime.now()
-            nowInTz = datetime(now.year, now.month, now.day,
-                                  now.hour, now.minute, now.second,
-                                  tzinfo=scheduler.LOCAL)
-            end = event.currentEnd
-            duration = end - nowInTz
+            now = datetime.now(scheduler.LOCAL)
+            end = instance.end
+            duration = end - now
             durationSecs = duration.days * 86400 + duration.seconds
             keycard.duration = durationSecs
             self.addKeycard(keycard)
-            self.info("authenticated login")
+            self.info("authenticated login, duration %d seconds", durationSecs)
             return keycard
         self.info("failed in authentication, outside hours")
         return None
 
     def do_stop(self):
-        self.icalScheduler.stopWatchingIcalFile()
-        for event in self.icalScheduler.getCurrentEvents():
-            self.icalScheduler.removeEvent(event)
+        self.icalScheduler.cleanup()

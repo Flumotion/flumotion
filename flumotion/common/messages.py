@@ -121,6 +121,8 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
         # -3 is in the caller
         log.doLog(log.DEBUG, None, 'messages',
             'creating message %r', self, where=-3)
+        log.doLog(log.DEBUG, None, 'messages',
+            'message debug %s', debug)
         self.add(translatable)
 
     def __repr__(self):

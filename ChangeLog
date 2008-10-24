@@ -1,3 +1,66 @@
+2008-10-24  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/messages.py:
+	  also log debug if it's there.
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/combiners/switch/switch.py:
+	* flumotion/component/bouncers/icalbouncer.py:
+	  Use calendar to get event instances.
+	  Change to use eventInstanceStarted/Ended callbacks.
+	* flumotion/component/base/scheduler.py:
+	  Based on the mtime of a previous recording, decide whether to
+	  overwrite (if it was part of a previous event) or change filename
+	  (if it is part of the current event).
+	  Add a simple duration check to the rescheduling, and complain
+	  if it is more than half a second.
+	  (It used to be 7 seconds for the simple urgent.ics test case.)
+	  Compare old and new active events only by content, since
+	  start and end times might have changed of the currently active
+	  event.
+	  Add self._calendar, getCalendar and setCalendar.
+	  Remove removeEvent, calendars always keep their events and
+	  schedule with instances.
+	  Remove replaceEvents.
+	  Change subscribe to take functions that notify about instances
+	  starting and ending, instead of events.
+	  Change the core, getNextEvent, to a function that gets the next
+	  points, so that all points at that time get handled, not just
+	  one.
+	  Schedule handling of the next set of points as a group in one
+	  callLater.
+	* flumotion/test/test_component_base_scheduler.py:
+	* flumotion/test/test_common_eventcalendar.py:
+	* flumotion/common/eventcalendar.py:
+	  Fix bug in getActiveInstances where it was ignoring events with
+	  a RECURRENCE-ID that should specialize the rrule.
+	  Switch to UTC for interpreting tz-less dates, since most likely
+	  a file with no tz information will not magically happen to be
+	  in the same time zone as the server that will run the component.
+	  Add a new Calendar object to collect the EventSets parsed from
+	  an iCalendarfile.
+	  Make Points naturally sort end first.
+	  Make clipping getPoints to start and end optional, because
+	  you don't want asking the Calendar for points to be clipping.
+	* flumotion/component/consumers/disker/disker.py:
+	  Add next-points to the uiState, keeping track of the next
+	  points on the schedule in the disker's window.
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	  Expose the next-points with a kiwi object-list that gets updated
+	  when the disker reschedules.
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_component_base_vevent.py:
+	  Remove.
+	* flumotion/admin/rrdmon/rrdmon.py:
+	  Update to use new calendar interface, though I doubt the scheduler
+	  ever worked for this program, since the rrule was passed as a
+	  timedelta but nothing handled it as a timedelta.
+	* flumotion/test/urgent.ics (added):
+	  Add test ics from #821.
+
+	  Merging branch ticket-1143
+
+	  Fixes #1143 and #821.
+
 2008-10-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpserver/httpserver.py:

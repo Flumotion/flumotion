@@ -70,7 +70,7 @@ class ICalSwitchPlug(base.ComponentPlug):
             filename = self.args['properties']['ical-schedule']
             self.sched = scheduler.ICalScheduler(open(filename, 'r'))
             self._sid = self.sched.subscribe(eventStarted, eventEnded)
-            if self.sched.getCurrentEvents():
+            if self.sched.getCalendar().getActiveEventInstances():
                 component.idealFeed = "backup"
         except ValueError:
             fmt = N_("Error parsing ical file %s, so not scheduling "

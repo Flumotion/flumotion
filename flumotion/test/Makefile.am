@@ -24,6 +24,7 @@ EXTRA_DIST = 					\
 	test_common_bundle.py			\
 	test_common_componentui.py		\
 	test_common_connection.py		\
+	test_common_eventcalendar.py		\
 	test_common_format.py			\
 	test_common_gstreamer.py		\
 	test_common_messages.py			\
@@ -36,7 +37,6 @@ EXTRA_DIST = 					\
 	test_common_vfs.py			\
 	test_common_xmlwriter.py		\
 	test_component_base_scheduler.py	\
-	test_component_base_vevent.py	\
 	test_component_base_watcher.py		\
 	test_component_bouncers_bouncer.py	\
 	test_component_bouncers_component.py	\
@@ -87,8 +87,9 @@ EXTRA_DIST = 					\
 	test_workerconfig.py			\
 	test_worker_job.py			\
 	test_worker_medium.py			\
-	test_worker_worker.py	\
-	test-exdate.ics	\
+	test_worker_worker.py			\
+	urgent.ics				\
+	test-exdate.ics				\
 	test-google.ics
 
 check-local: trial

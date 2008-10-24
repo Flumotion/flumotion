@@ -20,14 +20,68 @@
 # Headers in this file shall remain intact.
 
 import os
+import gettext
+
 import gtk
 
-from flumotion.common import errors
+from flumotion.common import errors, format
 
 from flumotion.component.base.admin_gtk import BaseAdminGtk
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 
+from flumotion.common.eventcalendar import LOCAL, UTC
+
+_ = gettext.gettext
+
 __version__ = "$Rev$"
+
+
+from kiwi.ui import objectlist
+
+
+class Point:
+
+    def __init__(self, when, which, what):
+        """
+        @param when:  a naive datetime representing UTC
+        @type  when:  L{datetime.datetime}
+        @type  which: str
+        @type  what:  str
+        """
+        self.when = when
+        # when is in UTC, but show it in local timezone instead
+        when = when.replace(tzinfo=UTC).astimezone(LOCAL)
+
+        self.whenLocal = format.formatTimeStamp(when.timetuple())
+        self.which = which
+        self.what = what
+
+
+class PointList(objectlist.ObjectList):
+
+    def __init__(self, parent, uiState):
+        objectlist.ObjectList.__init__(self, [
+            objectlist.Column("whenLocal", title=_("When")),
+            objectlist.Column("which", title=_("Which")),
+            objectlist.Column("what", title=_("What")),
+        ])
+        self._parent = parent
+        self.setUIState(uiState)
+
+    def setUIState(self, uiState):
+        self._uiState = uiState
+        self.clear()
+        for pointTuple in uiState.get('next-points'):
+            self.appendTuple(pointTuple)
+
+    def appendTuple(self, pointTuple):
+        point = Point(*pointTuple)
+        self.append(point)
+
+    def removeTuple(self, pointTuple):
+        for point in self:
+            if (point.when, point.which, point.what) == pointTuple:
+                self.remove(point)
 
 
 class FilenameNode(BaseAdminGtkNode):
@@ -51,6 +105,7 @@ class FilenameNode(BaseAdminGtkNode):
         self.stopbutton.connect('clicked', self.cb_stop_button_clicked)
         if self.hasIcal:
             self.addScheduleWidget()
+            self.addNextPointsWidget()
 
     def cb_changefile_button_clicked(self, button):
         d = self.callRemote("changeFilename")
@@ -94,6 +149,15 @@ class FilenameNode(BaseAdminGtkNode):
             self.hasIcal = True
             if self.widget:
                 self.addScheduleWidget()
+                self.addNextPointsWidget()
+
+    def stateAppend(self, state, key, value):
+        if key == 'next-points':
+            self._pointList.appendTuple(value)
+
+    def stateRemove(self, state, key, value):
+        if key == 'next-points':
+            self._pointList.removeTuple(value)
 
     def addScheduleWidget(self):
         self.filechooser = gtk.FileChooserButton("Upload a schedule")
@@ -111,6 +175,13 @@ class FilenameNode(BaseAdminGtkNode):
             xoptions=0, yoptions=0, xpadding=6, ypadding=6)
         self.widget.attach(self.filechooser, 1, 2, 1, 2,
             xoptions = gtk.EXPAND|gtk.FILL, yoptions=0, xpadding=6, ypadding=6)
+
+    def addNextPointsWidget(self):
+        self._pointList = PointList(self.widget, self.uiState)
+        self.widget.attach(self._pointList, 0, 2, 3, 4,
+            xoptions=gtk.FILL, yoptions=gtk.FILL | gtk.EXPAND,
+            xpadding=6, ypadding=6)
+        self._pointList.show()
 
     def cb_schedule_recordings(self, widget):
         filename = self.filechooser.get_filename()
@@ -132,7 +203,7 @@ class FilenameNode(BaseAdminGtkNode):
 class DiskerAdminGtk(BaseAdminGtk):
 
     def setup(self):
-        filename = FilenameNode(self.state, self.admin, "Filename")
+        filename = FilenameNode(self.state, self.admin, _("Filename"))
         self.nodes['Filename'] = filename
         return BaseAdminGtk.setup(self)
 

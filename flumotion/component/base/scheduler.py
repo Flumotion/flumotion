@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
-# Copyright (C) 2006,2007 Fluendo, S.L. (www.fluendo.com).
+# Copyright (C) 2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
 # All rights reserved.
 
 # This file may be distributed and/or modified under the terms of
@@ -19,256 +19,247 @@
 
 # Headers in this file shall remain intact.
 
-from datetime import datetime, timedelta
+import time
+import datetime
 
 from twisted.internet import reactor
 
-from flumotion.common import log
+from flumotion.common import log, eventcalendar
 from flumotion.component.base import watcher
-from flumotion.common.eventcalendar import parseCalendar, parseCalendarFromFile
-from flumotion.common.eventcalendar import Event, LOCAL, EventSet
 
 __version__ = "$Rev$"
 
 
+def _timedeltaToSeconds(td):
+    return max(td.days * 24 * 60 * 60 + td.seconds + td.microseconds / 1e6, 0)
+
+
 class Scheduler(log.Loggable):
     """
-    I keep track of upcoming events.
+    I provide notifications when events start and end.
+    I use a L{eventcalendar.Calendar} for scheduling.
 
-    I can provide notifications when events end and start, and maintain
-    a set of current events.
+    @cvar windowSize: how much time to look ahead when scheduling
+    @type windowSize: L{datetime.timedelta}
     """
-    windowSize = timedelta(days=1)
+    windowSize = datetime.timedelta(days=1)
 
     def __init__(self):
-        self._delayedCall = None
-        self._subscribeId = 0
-        self.subscribers = {}
-        self._eventSets = {}
-        self._nextStart = 0
+        self._delayedCall = None # tracks next call for scheduling
+        self._subscribeId = 0    # counter fo unique sid's
+        self._subscribers = {}   # sid -> tuple of callable
+        self._nextStart = 0      # only used in testsuite
+        self._calendar = None    # our currently active calendar
 
-    def _addEvent(self, event):
-        self.debug("adding event %s with content %s", event.uid, event.content)
-        uid = event.uid
-        if uid not in self._eventSets:
-            self._eventSets[uid] = EventSet(uid)
-        self._eventSets[uid].addEvent(event)
-        if event.start < event.now < event.end:
-            self._eventStarted(event)
+    ### public API
 
-    def addEvent(self, uid, start, end, content, rrule=None, now=None,
-                 exdates=None):
-        """Add a new event to the scheduler
-
-        @param uid:     uid of event
-        @type  uid:     str
-        @param start:   wall-clock time of event start
-        @type  start:   datetime
-        @param end:     wall-clock time of event end
-        @type  end:     datetime
-        @param content: content of this event
-        @type  content: str
-        @param rrule:   recurrence rule, either as a string parseable by
-                        datetime.rrule.rrulestr or as a datetime.timedelta
-        @type rrule:     None, str, or datetime.timedelta
-
-        @returns:       an Event that can later be passed to removeEvent, if
-                        so desired. The event will be removed or rescheduled
-                        automatically when it ends.
+    def getCalendar(self):
         """
+        Return the calendar used for scheduling.
 
-        if now is None:
-            now = datetime.now(LOCAL)
-        event = Event(uid, start, end, content, rrule=rrule, exdates=exdates,
-                      now=now)
-        if event.end < now and not rrule:
-            self.warning('attempted to schedule event in the past: %r',
-                         event)
-            return event
-
-        self._addEvent(event)
-        self._reschedule()
-        return event
-
-    def removeEvent(self, event):
-        """Remove an event from the scheduler.
-
-        @param event: an event, as returned from addEvent()
-        @type  event: Event
+        @rtype: L{eventcalendar.Calendar}
         """
-        self._removeEvent(event)
-        self._reschedule()
+        return self._calendar
 
-    def _removeEvent(self, event):
-        uid = event.uid
-        if uid not in self._eventSets:
-            return
-        current = self.getCurrentEvents()
-        if event in current:
-            self._eventEnded(event)
-        self._eventSets[uid].removeEvent(event)
-
-    def getCurrentEvents(self, now=None, windowSize=None):
-        """Get a list of current events.
-        @param now: Use now as localtime. If not set the local time is used.
-        @type now: datetime
-        @param windowSize: get events on this window. If not set, the returned
-                            events will be on the class windowSize member.
-        @type windowSize: timedelta
-
-        @return: Events that are being run.
-        @rtype: L{Event}
+    def setCalendar(self, calendar, when=None):
         """
-        if now is None:
-            now = datetime.now(LOCAL)
-        if windowSize is None:
-            windowSize = timedelta(seconds=0)
-        current = []
-        for eventSet in self._eventSets.values():
-            points = eventSet.getPoints(now, now + windowSize)
-            for point in points:
-                event = point.eventInstance.event
-                event.currentStart = point.eventInstance.currentStart
-                event.currentEnd = point.eventInstance.currentEnd
-                if not event in current:
-                    current.append(event)
-        return current
+        Set the given calendar to use for scheduling.
 
-    def addEvents(self, events):
+        This function will send start notifications for all new events that
+        should currently be in progress, if they were not registered in
+        the old calendar or if there was no old calendar.
+
+        If the scheduler previously had a calendar, it will send end
+        notifications for all events currently in progress that are not in the
+        new calendar.
+
+        @param calendar: the new calendar to set
+        @type  calendar: L{eventcalendar.Calendar}
+        @param when:     the time at which to consider the calendar to be set;
+                         defaults to now
+        @type  when:     L{datetime.datetime}
         """
-        Add a new list of events to the schedule.
+        if not self._calendar:
+            self.debug('Setting new calendar %r', calendar)
+        else:
+            self.debug('Replacing existing calendar %r with new %r',
+                self._calendar, calendar)
 
-        @param events: the new events
-        @type  events: list of Event
-        """
-        result = []
-        for event in events:
-            e = self._addEvent(event)
-            result.append(e)
-        self._reschedule()
-        return result
+        # we want to make sure we use the same when for getting old and new
+        # instances if it wasn't specified
+        if not when:
+            when = datetime.datetime.now(eventcalendar.UTC)
 
-    def replaceEvents(self, events, now=None):
-        """Replace the set of events in the scheduler.
+        # FIXME: convert Content lists to dicts to speed things up
+        # because they are used as a lookup inside loops
+        oldInstances = []
+        if self._calendar:
+            oldInstances = self._calendar.getActiveEventInstances(when)
+        oldInstancesContent = [i.event.content for i in oldInstances]
 
-        This function is different than simply removing all events then
-        adding new ones, because it tries to avoid spurious
-        ended/started notifications.
+        newInstances = calendar.getActiveEventInstances(when)
+        newInstancesContent = [i.event.content for i in newInstances]
 
-        @param events: the new events
-        @type  events: a sequence of Event
-        """
-        if now is None:
-            now = datetime.now(LOCAL)
-        currentEvents = self.getCurrentEvents()
-        for _, eventSet in self._eventSets.iteritems():
-            eventsToRemove = eventSet.getEvents()[:]
-            for event in eventsToRemove:
-                if event not in currentEvents:
-                    self._removeEvent(event)
-        for event in events:
-            self.debug("adding event %s with content %s",
-                event.uid, event.content)
-            if event.start > now or event.rrule:
-                self._addEvent(event)
-            else:
-                self.debug("event is a past event and it is not added")
+        # we do comparison of instances by content, since, while the timing
+        # information may have changed, if the content is still the same,
+        # then the event is still considered 'active'
+        for instance in oldInstances:
+            if instance.event.content not in newInstancesContent:
+                self.debug(
+                    'old active %r for %r not in new calendar, ending',
+                    instance, instance.event.content)
+                self._eventInstanceEnded(instance)
+
+        for instance in newInstances:
+            if instance.event.content not in oldInstancesContent:
+                self.debug(
+                    'new active %r for %r not in old calendar, starting',
+                    instance, instance.event.content)
+                self._eventInstanceStarted(instance)
+
+        self._calendar = calendar
         self._reschedule()
 
-    def subscribe(self, eventStarted, eventEnded):
+    def getPoints(self, when=None):
+        """
+        Get all points on this scheduler's event horizon.
+        """
+        if not when:
+            when = datetime.datetime.now(eventcalendar.LOCAL)
+
+        self.debug('getPoints at %s', str(when))
+        earliest = when + self.windowSize
+
+        points = self._calendar.getPoints(when, self.windowSize)
+
+        self.debug('%d points in given windowsize %s',
+            len(points), str(self.windowSize))
+
+        return points
+
+    def cleanup(self):
+        """
+        Clean up all resources used by this scheduler.
+
+        This cancels all pending scheduling calls.
+        """
+        self._cancelScheduledCalls()
+
+    ### subscription interface
+
+    def subscribe(self, eventInstanceStarted, eventInstanceEnded):
         """
         Subscribe to event happenings in the scheduler.
 
-        @param eventStarted: function that will be called when an event starts
-        @type  eventStarted: function taking L{Event}
-        @param eventEnded:   function that will be called when an event ends
-        @type  eventEnded:   function taking L{Event}
+        @param eventInstanceStarted: function that will be called when an
+                                     event instance starts
+        @type  eventInstanceStarted: function with signature L{EventInstance}
+        @param eventInstanceEnded:   function that will be called when an
+                                     event instance ends
+        @type  eventInstanceEnded:   function with signature L{EventInstance}
 
+        @rtype:   int
         @returns: A subscription ID that can later be passed to
                   unsubscribe().
         """
         sid = self._subscribeId
         self._subscribeId += 1
-        self.subscribers[sid] = (eventStarted, eventEnded)
+        self._subscribers[sid] = (eventInstanceStarted, eventInstanceEnded)
         return sid
 
     def unsubscribe(self, id):
-        """Unsubscribe from event happenings in the scheduler.
+        """
+        Unsubscribe from event happenings in the scheduler.
 
+        @type  id: int
         @param id: Subscription ID received from subscribe()
         """
-        del self.subscribers[id]
+        del self._subscribers[id]
 
-    def _eventStarted(self, event):
-        for started, _ in self.subscribers.values():
-            started(event)
+    def _eventInstanceStarted(self, eventInstance):
+        self.debug('notifying %d subscribers of start of instance %r',
+            len(self._subscribers), eventInstance)
+        for started, _ in self._subscribers.values():
+            started(eventInstance)
 
-    def _eventEnded(self, event):
-        for _, ended in self.subscribers.values():
-            ended(event)
+    def _eventInstanceEnded(self, eventInstance):
+        self.debug('notifying %d subscribers of end of instance %r',
+            len(self._subscribers), eventInstance)
+        for _, ended in self._subscribers.values():
+            ended(eventInstance)
+
+    ### private API
 
     def _reschedule(self):
 
-        def _getNextEvent(now):
-            earliest = now + self.windowSize
-            which = None
-            result = None
-            for event in self.getCurrentEvents(now, self.windowSize):
-                self.debug("current event %s with content %s",
-                    event.uid, event.content)
-                if event.currentStart < earliest and event.currentStart > now:
-                    earliest = event.currentStart
-                    which = 'start'
-                    result = event
-                if event.currentEnd < earliest:
-                    earliest = event.currentEnd
-                    which = 'end'
-                    result = event
-            return result, which
+        start = time.time()
 
-        def doStart(e):
-            self._eventStarted(e)
-            self._reschedule()
-
-        def doEnd(e):
-            self._eventEnded(e)
-            self._eventSets[e.uid].removeEvent(e)
-            self._reschedule()
-
-        self.debug("schedule events")
+        self.debug("reschedule events")
         self._cancelScheduledCalls()
 
-        now = datetime.now(LOCAL)
+        now = datetime.datetime.now(eventcalendar.LOCAL)
 
-        event, which = _getNextEvent(now)
+        def _getNextPoints():
+            # get the next list of points in time that all start at the same
+            # time
+            self.debug('_getNextPoints at %s', str(now))
+            result = []
 
-        def toSeconds(td):
-            return max(td.days*24*3600 + td.seconds + td.microseconds/1e6, 0)
+            points = self.getPoints(now)
 
-        if event:
-            if which == 'start':
+            if not points:
+                return result
+
+            earliest = points[0].dt
+            for point in points:
+                if point.dt > earliest:
+                    break
+                result.append(point)
+
+            if result:
+                self.debug('%d points at %s, first point is for %r',
+                    len(result), str(result[0].dt),
+                    result[0].eventInstance.event.content)
+
+            return result
+
+        def _handlePoints(points):
+            for point in points:
                 self.debug(
-                    "schedule start event %s in %s at %s",
-                    event.content,
-                    str(event.currentStart - now),
-                    event.currentStart)
-                seconds = toSeconds(event.currentStart - now)
-                dc = reactor.callLater(seconds, doStart, event)
-            elif which == 'end':
-                self.debug(
-                    "schedule end event %s in %s at %s",
-                    event.content,
-                    str(event.currentEnd - now),
-                    event.currentEnd)
-                seconds = toSeconds(event.currentEnd - now)
-                dc = reactor.callLater(seconds, doEnd, event)
+                    "handle %s event %r in %s at %s",
+                    point.which,
+                    point.eventInstance.event.content,
+                    str(point.dt - now),
+                    point.dt)
+                if point.which == 'start':
+                    self._eventInstanceStarted(point.eventInstance)
+                elif point.which == 'end':
+                    self._eventInstanceEnded(point.eventInstance)
+
+            self._reschedule()
+
+        points = _getNextPoints()
+
+        if points:
+            seconds = _timedeltaToSeconds(points[0].dt - now)
+            self.debug(
+                "schedule next point at %s in %.2f seconds",
+                    str(points[0].dt), seconds)
+            dc = reactor.callLater(seconds, _handlePoints, points)
+
         else:
             self.debug(
-                "schedule rescheduling in %s", str(self.windowSize))
-            seconds = toSeconds(self.windowSize)
+                "schedule rescheduling in %s", str(self.windowSize / 2))
+            seconds = _timedeltaToSeconds(self.windowSize / 2)
             dc = reactor.callLater(seconds, self._reschedule)
         self._nextStart = seconds
         self._delayedCall = dc
+
+        delta = time.time() - start
+        if delta < 0.5:
+            self.debug('_reschedule took %.3f seconds', delta)
+        else:
+            self.warning('Rescheduling took more than half a second')
 
     def _cancelScheduledCalls(self):
         if self._delayedCall:
@@ -279,45 +270,52 @@ class Scheduler(log.Loggable):
 
 class ICalScheduler(Scheduler):
 
+    watcher = None
+
+    # FIXME: having fileObj in the constructor causes events to be sent
+    # before anything can subscribe
+    # FIXME: this class should also be able to handle watching a URL
+    # and downloading it when it changes
+
     def __init__(self, fileObj):
         """
         I am a scheduler that takes its data from an ical file and watches
-        that file every timeout. Very important: only future events will
-        be added, not past nor present.
+        that file every timeout.
+
         @param fileObj: The fileObj. It must be already opened.
-        @type fileObj: open file.
+        @type  fileObj: file handle
         """
         Scheduler.__init__(self)
+
+        self.watcher = None
+
         if not fileObj:
             return
 
-        def parseFromFile(f):
-            eventSets = parseCalendarFromFile(f)
-            self._setEventSets(eventSets)
-        parseFromFile(fileObj)
+        self._parseFromFile(fileObj)
 
         if hasattr(fileObj, 'name'):
 
-            def fileChanged(f):
-                self.debug("ics file changed")
-                parseFromFile(open(f, 'r'))
-        self.watcher = watcher.FilesWatcher([fileObj.name])
-        self.watcher.subscribe(fileChanged=fileChanged)
-        self.watcher.start()
+            def fileChanged(filename):
+                self.info("ics file %s changed", filename)
+                self._parseFromFile(open(filename, 'r'))
 
-    def _setEventSets(self, eventSets):
-        events = []
-        for eventSet in eventSets:
-            self.debug("add eventset %s", eventSet.uid)
-            events.extend(eventSet.getEvents())
-        self.replaceEvents(events)
-
-    def parseCalendar(self, calendar):
-        eventSets = parseCalendar(calendar)
-        self._setEventSets(eventSets)
+            self.watcher = watcher.FilesWatcher([fileObj.name])
+            fileObj.close()
+            self.watcher.subscribe(fileChanged=fileChanged)
+            self.watcher.start()
 
     def stopWatchingIcalFile(self):
         """
         Stop watching the ical file.
         """
-        self.watcher.stop()
+        if self.watcher:
+            self.watcher.stop()
+
+    def cleanup(self):
+        Scheduler.cleanup(self)
+        self.stopWatchingIcalFile()
+
+    def _parseFromFile(self, f):
+        calendar = eventcalendar.fromFile(f)
+        self.setCalendar(calendar)
