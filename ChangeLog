@@ -1,3 +1,12 @@
+2008-10-26  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/test/test_common_eventcalendar.py:
+	  Add a test that shows the length of an event spanning a
+	  daylight savings time change is correct.
+	  Remove an assert that fails only during winter time due to
+	  a possible bug in python-iCalendar; see
+	  https://thomas.apestaart.org/thomas/trac/browser/tests/icalendar/
+
 2008-10-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/messages.py:
