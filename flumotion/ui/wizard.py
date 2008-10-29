@@ -43,7 +43,7 @@ _ = gettext.gettext
 # or the extra args we name in callbacks
 
 
-def escape(text):
+def _escape(text):
     return text.replace('&', '&amp;')
 
 
@@ -95,6 +95,34 @@ class _WalkableStack(object):
 
 
 class WizardStep(GladeWidget, log.Loggable):
+    """I am a base class wizard steps, all steps should inherit from me.
+    Subclasses should define class attributes mentioned here. Not all
+    of them are mandatory. There are also a couple of hooks provided here
+    which the step can use to do custom setup/activation hooks.
+    @cvar name: step name
+    @type name: str
+    @cvar title: step title
+    @type title: str
+    @cvar section: sidebar section for this step
+    @type section: str
+    @cvar icon: icon to display for this step
+    @type icon: str
+    @cvar sidebarName: name of this step to be displayed in the sidebar,
+      if this is None, title will be used instead.
+    @type sidebarName: str or None
+    @cvar docSection: documentation section, which part of the
+      documentation is this wizard step displaying
+    @type docSection: str
+    @cvar docAnchor: documentation anchor, usually a html anchor
+    @type docAnchor: str
+    @cvar docVersion: which documentation version should be used,
+      either local or remote::
+      - local, get the documentation installed locally, eg this is
+        used for wizard steps which are shipped with the gtk admin client
+      - remote, get the documentation from the manager, this is used
+        for wizard steps constructed by parts sent from the manager.
+    @type docVersion: str
+    """
     gladeTypedict = ProxyWidgetMapping()
 
     # set by subclasses
@@ -150,7 +178,7 @@ class WizardStep(GladeWidget, log.Loggable):
         do some logic, eg setup the default state"""
 
 
-class SidebarButton(gtk.Button):
+class _SidebarButton(gtk.Button):
 
     def __init__(self, name, padding=0):
         self.bg = None
@@ -170,7 +198,7 @@ class SidebarButton(gtk.Button):
         self.add(a)
         self.set_relief(gtk.RELIEF_NONE)
         self.set_property('can_focus', False) # why?
-        self.connect_after('realize', SidebarButton.on_realize)
+        self.connect_after('realize', _SidebarButton.on_realize)
         self.set_sensitive(True)
 
     def on_realize(self):
@@ -211,10 +239,10 @@ class SidebarButton(gtk.Button):
         self.label.set_markup(m)
 
         gtk.Button.set_sensitive(self, sensitive)
-gobject.type_register(SidebarButton)
+gobject.type_register(_SidebarButton)
 
 
-class SidebarSection(gtk.VBox):
+class _SidebarSection(gtk.VBox):
     gsignal('step-chosen', str)
 
     def __init__(self, title, name):
@@ -223,7 +251,7 @@ class SidebarSection(gtk.VBox):
         self.set_name(title)
         self.buttons = []
 
-        self.title = SidebarButton(title, 10)
+        self.title = _SidebarButton(title, 10)
         self.title.show()
         self.title.set_sensitive(False)
         self.pack_start(self.title, False, False)
@@ -251,7 +279,7 @@ class SidebarSection(gtk.VBox):
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
 
-        button = SidebarButton(step_title, 20)
+        button = _SidebarButton(step_title, 20)
         button.connect('clicked', clicked_cb, step_name)
         self.pack_start(button, False, False)
         button.show()
@@ -260,10 +288,10 @@ class SidebarSection(gtk.VBox):
     def pop_step(self):
         b = self.buttons.pop()
         self.remove(b)
-gobject.type_register(SidebarSection)
+gobject.type_register(_SidebarSection)
 
 
-class WizardSidebar(gtk.EventBox, log.Loggable):
+class _WizardSidebar(gtk.EventBox, log.Loggable):
     gsignal('step-chosen', str)
 
     logCategory = 'wizard'
@@ -304,7 +332,7 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
 
-        section = SidebarSection(title, name)
+        section = _SidebarSection(title, name)
         section.connect('step-chosen', clicked_cb)
         section.show()
         section.set_active(False)
@@ -523,10 +551,16 @@ class WizardSidebar(gtk.EventBox, log.Loggable):
         style = self.get_style()
         self.modify_bg(gtk.STATE_NORMAL, style.bg[gtk.STATE_SELECTED])
 
-gobject.type_register(WizardSidebar)
+gobject.type_register(_WizardSidebar)
 
 
 class SectionWizard(GladeWindow, log.Loggable):
+    """I am a section wizard which consists of the following elements::
+    - header: showing step title and icon
+    - sidebar should a list of step hierarchal sections
+    - step area: step dependent area
+    - footer: buttons; help, back, forward/finish.
+    """
     gsignal('destroy')
     gsignal('help-clicked', str, str, str) # section, anchor, version
 
@@ -545,7 +579,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         self.window.connect_after('realize', self.on_window_realize)
         self.window.connect('destroy', self.on_window_destroy)
 
-        self.sidebar = WizardSidebar(self)
+        self.sidebar = _WizardSidebar(self)
         self.sidebar.connect('step-chosen', self.on_sidebar_step_chosen)
         self.sidebar.set_size_request(160, -1)
         self.hbox_main.pack_start(self.sidebar, False, False)
@@ -638,7 +672,7 @@ class SectionWizard(GladeWindow, log.Loggable):
         @type description: string
         """
         self.label_description.set_markup(
-            '<i>%s</i>' % escape(description or ''))
+            '<i>%s</i>' % _escape(description or ''))
 
     def blockNext(self, block):
         self.button_next.set_sensitive(not block)
@@ -706,7 +740,7 @@ class SectionWizard(GladeWindow, log.Loggable):
 
     def _setStepTitle(self, title):
         self.label_title.set_markup(
-            '<span size="x-large">%s</span>' % escape(title or ''))
+            '<span size="x-large">%s</span>' % _escape(title or ''))
 
     def _helpClicked(self):
         step = self.getCurrentStep()

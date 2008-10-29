@@ -1,3 +1,10 @@
+2008-10-29  Johan Dahlin  <johan@flumotion.com>
+
+	* flumotion/ui/wizard.py:
+	Document WizardStep & SectionWizard.
+	Make ui elements only used by section wizard private
+	to avoid other modules importing them.
+
 2008-10-29  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/bouncers/icalbouncer.py:
