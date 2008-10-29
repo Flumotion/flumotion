@@ -1,3 +1,11 @@
+2008-10-29  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/bouncers/icalbouncer.py:
+
+	Fix a typo described in #1173. Use UTC time instead of local time for
+	comparisions (the attempt at using local time was broken anyway, as it
+	caused an import error).
+
 2008-10-26  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/test/test_common_eventcalendar.py:
