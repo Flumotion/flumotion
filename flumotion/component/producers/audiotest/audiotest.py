@@ -21,10 +21,13 @@
 
 import gst
 
+from twisted.internet import defer
+
 from flumotion.common import errors, gstreamer, messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.effects.volume import volume
+from flumotion.worker.checks import check
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -54,6 +57,14 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         self.uiState.addKey('wave', 0)
         self.uiState.addKey('frequency', 440)
         self.uiState.addKey('rate', 8000)
+
+    def do_check(self):
+        levelD = check.do_check(self, check.checkPlugin, 'level', 'level')
+        audiotestD = check.do_check(self, check.checkPlugin, 'audiotestsrc',
+            'audiotestsrc')
+        volumeD = check.do_check(self, check.checkPlugin, 'volume', 'volume')
+        dl = defer.DeferredList([levelD, audiotestD, volumeD])
+        return dl
 
     def get_pipeline_string(self, properties):
         rate = properties.get('rate', 8000)

@@ -1,3 +1,10 @@
+2008-10-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/audiotest/audiotest.py:
+	There was no check on the elements' existence.
+	This would cause, if there was for example no level, the only
+	error reported to be a failure in providing master clock.
+
 2008-10-29  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/wizard.py:
