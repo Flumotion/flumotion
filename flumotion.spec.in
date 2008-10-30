@@ -116,10 +116,11 @@ install -m 755 \
 	doc/redhat/flumotion \
 	$RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
 
-# create log and run and cache directory
+# create log and run and cache and lib rrd directory
 install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
 install -d $RPM_BUILD_ROOT%{_localstatedir}/run/flumotion
 install -d $RPM_BUILD_ROOT%{_localstatedir}/cache/flumotion
+install -d $RPM_BUILD_ROOT%{_localstatedir}/lib/flumotion/rrd
 
 # Install the logrotate entry
 %{__install} -m 0644 -D doc/redhat/flumotion.logrotate \
@@ -267,10 +268,14 @@ fi
 %attr(750,root,flumotion) %{_sysconfdir}/flumotion
 %attr(770,root,flumotion) %{_localstatedir}/run/flumotion
 %attr(770,root,flumotion) %{_localstatedir}/log/flumotion
+%attr(770,root,flumotion) %{_localstatedir}/lib/flumotion/rrd
 %attr(770,flumotion,flumotion) %{_localstatedir}/cache/flumotion
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Thu Oct 30 2008 Thomas Vander Stichele <thomas at apestaart dot org>
+- Add directory for rrd databases now that we have a plug for it.
+
 * Tue Jul 22 2008 Thomas Vander Stichele <thomas at apestaart dot org>
 - Add gettext buildrequires; looks like on RHEL5 intltool doesn't pull it in.
 

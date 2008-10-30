@@ -1,5 +1,10 @@
 2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion.spec.in:
+	  Add a directory for rrd databases that the group can write to.
+
+2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/plugs/plugs.xml:
 	* flumotion/component/plugs/rrd.py:
 	  Make it 8 days/weeks/months/years instead of 2.
