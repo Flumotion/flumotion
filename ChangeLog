@@ -1,5 +1,10 @@
 2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/Makefile.am:
+	  Dist the source flumotion-trial.in, not the generated version.
+
+2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/plugs/plugs.xml:
 	  Add 'step-size' property.  Cleanups.
 	* flumotion/component/plugs/rrd.py:
