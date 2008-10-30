@@ -1,5 +1,11 @@
 2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/consumers/disker/disker.py:
+	  Only import eventcalendar where we need it, so we don't always
+	  drag in python-icalendar.
+
+2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion.spec.in:
 	  Add a directory for rrd databases that the group can write to.
 
