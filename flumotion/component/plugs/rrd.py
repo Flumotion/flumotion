@@ -110,10 +110,10 @@ class ComponentRRDPlug(base.ComponentPlug):
                 try:
                     DAY = 60 * 60 * 24
                     count = [
-                        2 * DAY // self._stepSize,
-                        15 * DAY // (self._stepSize * 6),
-                        63 * DAY // (self._stepSize * 24),
-                        740 * DAY // (self._stepSize * 288),
+                        8 * DAY // self._stepSize,
+                        56 * DAY // (self._stepSize * 6),
+                        250 * DAY // (self._stepSize * 24),
+                        3000 * DAY // (self._stepSize * 288),
                     ]
 
                     rrdtool.create(path,

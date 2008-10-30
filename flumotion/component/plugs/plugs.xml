@@ -75,7 +75,7 @@
 
     <plug socket="flumotion.component.plugs.rrd.ComponentRRDPlug"
           type="component-rrd"
-          _description="Logs clients connected and bytes transferred to an RRD file. The RRD has 4 RRA's, roughly corresponding to 2 days, weeks, months, and years.">
+          _description="Logs clients connected and bytes transferred to an RRD file. The RRD has 4 RRA's, roughly corresponding to 8 days, weeks, months, and years.">
       <entry location="flumotion/component/plugs/rrd.py"
              function="ComponentRRDPlug" />
              

@@ -1,5 +1,11 @@
 2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/plugs/plugs.xml:
+	* flumotion/component/plugs/rrd.py:
+	  Make it 8 days/weeks/months/years instead of 2.
+
+2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/Makefile.am:
 	  Dist the source flumotion-trial.in, not the generated version.
 
