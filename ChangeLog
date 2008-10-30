@@ -1,3 +1,8 @@
+2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/plugs/rrd.py:
+	  Various style cleanups, logging changes, translation.
+
 2008-10-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/audiotest/audiotest.py:

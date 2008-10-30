@@ -19,18 +19,24 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.component.plugs import base
-from flumotion.common import common, messages
-from flumotion.common.poller import Poller
 import types
 import os
 
 try:
     import rrdtool
 except ImportError:
-    rrdtool = False
+    rrdtool = None
 
-POLL_INTERVAL = 60 # in seconds
+from flumotion.component.plugs import base
+from flumotion.common import common, messages, i18n
+from flumotion.common.poller import Poller
+
+from flumotion.common.i18n import N_
+T_ = i18n.gettexter()
+
+_DEFAULT_POLL_INTERVAL = 60 # in seconds
+
+__version__ = "$Rev: 7162 $"
 
 
 class ComponentRRDPlug(base.ComponentPlug):
@@ -41,12 +47,12 @@ class ComponentRRDPlug(base.ComponentPlug):
         self._rrdpoller = None
         self.ready = []
 
-        if not self._check_import(component):
+        if not self._hasImport(component):
             return
 
         self.component = component
         properties = self.args['properties']
-        self.timeout = properties.get('poll-interval', POLL_INTERVAL)
+        self.timeout = properties.get('poll-interval', _DEFAULT_POLL_INTERVAL)
         self.clients = properties['clients-connected-file']
         self.bytes = properties['bytes-transferred-file']
         self.ready = self.check_rrd()
@@ -54,14 +60,15 @@ class ComponentRRDPlug(base.ComponentPlug):
         # call to update_rrd with a config timeout
         self._rrdpoller = Poller(self.update_rrd, self.timeout)
 
-    def _check_import(self, component):
+    def _hasImport(self, component):
         """Check rrdtool availability"""
         if not rrdtool:
-            mesg = messages.Warning("rrdtool module is not present "
-                                    "in your system. This plug [rrd] "
-                                    "is disabled now.",
+            m = messages.Warning(T_(N_(
+                "Cannot import module '%s'.\n"), 'rrdtool'),
                                     mid='rrdtool-import-error')
-            component.addMessage(mesg)
+            m.add(T_(N_(
+                "The RRD plug for this component is disabled.")))
+            component.addMessage(m)
             return False
         return True
 
@@ -79,9 +86,9 @@ class ComponentRRDPlug(base.ComponentPlug):
             elif item == self.bytes:
                 value = self.component.getBytesSent()
             if type(value) == types.IntType:
-                rrdtool.update(item, 'N:%i'%value)
-                self.info('RRD file [%s] updated with value: %s'%
-                    (item, value))
+                rrdtool.update(item, 'N:%i' % value)
+                self.debug('RRD file [%s] updated with value: %s' % (
+                    item, value))
 
     def check_rrd(self):
         """Create the RRD file using the CACTI standard configuration
