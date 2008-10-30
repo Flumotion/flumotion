@@ -42,23 +42,26 @@ __version__ = "$Rev: 7162 $"
 class ComponentRRDPlug(base.ComponentPlug):
     """Class to create or update a RRD file with statistics"""
 
+    ### ComponentPlug methods
+
     def start(self, component):
-        """start values to update and/or create a RRD file"""
         self._rrdpoller = None
-        self.ready = []
 
         if not self._hasImport(component):
             return
 
         self.component = component
         properties = self.args['properties']
-        self.timeout = properties.get('poll-interval', _DEFAULT_POLL_INTERVAL)
-        self.clients = properties['clients-connected-file']
-        self.bytes = properties['bytes-transferred-file']
-        self.ready = self.check_rrd()
-        self.lastbytes = 0
-        # call to update_rrd with a config timeout
-        self._rrdpoller = Poller(self.update_rrd, self.timeout)
+        self._clientsPath = properties['clients-connected-file']
+        self._bytesPath = properties['bytes-transferred-file']
+        self._RRDPaths = self._getRRDPaths()
+        # call to update_rrd with a poll interval
+        timeout = properties.get('poll-interval', _DEFAULT_POLL_INTERVAL)
+        self._rrdpoller = Poller(self._updateRRD, timeout)
+
+    def stop(self, component):
+        if self._rrdpoller:
+            self._rrdpoller.stop()
 
     def _hasImport(self, component):
         """Check rrdtool availability"""
@@ -72,49 +75,52 @@ class ComponentRRDPlug(base.ComponentPlug):
             return False
         return True
 
-    def stop(self, component):
-        """Stop the poller"""
-        if self._rrdpoller:
-            self._rrdpoller.stop()
-
-    def update_rrd(self):
+    def _updateRRD(self):
         """Update data in RRD file"""
-        for item in self.ready:
+        for path in self._RRDPaths:
             value = None
-            if item == self.clients:
+            if path == self._clientsPath:
                 value = self.component.getClients()
-            elif item == self.bytes:
+            elif path == self._bytesPath:
                 value = self.component.getBytesSent()
-            if type(value) == types.IntType:
-                rrdtool.update(item, 'N:%i' % value)
-                self.debug('RRD file [%s] updated with value: %s' % (
-                    item, value))
 
-    def check_rrd(self):
+            if type(value) == types.IntType:
+                rrdtool.update(path, 'N:%i' % value)
+                self.debug('RRD file [%s] updated with value: %s',
+                    path, value)
+            else:
+                self.warning('RRD file [%s] not adding non-int value %r',
+                    path, value)
+
+    def _getRRDPaths(self):
         """Create the RRD file using the CACTI standard configuration
            if it doesn't exist"""
-        rrdready = []
-        rrds = ((self.clients, 'GAUGE'),
-                (self.bytes, 'DERIVE'))
-        for file, rrdtype in rrds:
-            if not os.path.exists(file):
+        paths = []
+        rrds = (
+            (self._clientsPath, 'clients', 'GAUGE'),
+            (self._bytesPath, 'bytes', 'DERIVE'),
+        )
+
+        for path, name, counterType in rrds:
+            if not os.path.exists(path):
                 try:
-                    rrdtool.create(file,
-                        '-s 300',
-                        'DS:snmp_oid:%s:600:0:1000000000' % rrdtype,
-                        'RRA:AVERAGE:0.5:1:600',
-                        'RRA:AVERAGE:0.5:6:700',
-                        'RRA:AVERAGE:0.5:24:775',
-                        'RRA:AVERAGE:0.5:288:797',
+                    rrdtool.create(path,
+                        '--step 300', # consolidate every 300 seconds
+                        'DS:%s:%s:600:0:U' % (name, counterType),
+                        'RRA:AVERAGE:0.5:1:600',   # 600 x 5 mins: 2 days
+                        'RRA:AVERAGE:0.5:6:700',   # 700 x 30 mins: 2 weeks
+                        'RRA:AVERAGE:0.5:24:775',  # 775 x 2 hours: 2 months
+                        'RRA:AVERAGE:0.5:288:797', # 775 x 24 hours: 2 years
                         'RRA:MAX:0.5:1:600',
                         'RRA:MAX:0.5:6:700',
                         'RRA:MAX:0.5:24:775',
                         'RRA:MAX:0.5:288:797')
-                    rrdready.append(file)
-                    self.info('RRD file created: %s' % file)
+                    paths.append(path)
+                    self.info('Created RRD file: %s' % path)
                 except:
-                    self.info('Error creating RRD file: %s' % file)
+                    self.warning('Error creating RRD file: %s' % path)
             else:
-                rrdready.append(file)
-                self.info('Using RRD file: %s' % file)
-        return rrdready
+                paths.append(path)
+                self.info('Using existing RRD file: %s' % path)
+
+        return paths
