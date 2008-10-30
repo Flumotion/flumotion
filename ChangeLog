@@ -1,5 +1,12 @@
 2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/plugs/plugs.xml:
+	  Add 'step-size' property.  Cleanups.
+	* flumotion/component/plugs/rrd.py:
+	  Make step-size configurable.  More cleanups.
+
+2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/plugs/rrd.py:
 	  camelcasing, privatizing, variable renaming, commenting,
 	  logging changes.

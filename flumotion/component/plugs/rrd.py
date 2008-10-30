@@ -28,13 +28,14 @@ except ImportError:
     rrdtool = None
 
 from flumotion.component.plugs import base
-from flumotion.common import common, messages, i18n
+from flumotion.common import common, messages, i18n, log
 from flumotion.common.poller import Poller
 
 from flumotion.common.i18n import N_
 T_ = i18n.gettexter()
 
 _DEFAULT_POLL_INTERVAL = 60 # in seconds
+_DEFAULT_STEP_SIZE = 300 # in seconds
 
 __version__ = "$Rev: 7162 $"
 
@@ -47,13 +48,15 @@ class ComponentRRDPlug(base.ComponentPlug):
     def start(self, component):
         self._rrdpoller = None
 
-        if not self._hasImport(component):
+        self._component = component
+
+        if not self._hasImport():
             return
 
-        self.component = component
         properties = self.args['properties']
         self._clientsPath = properties['clients-connected-file']
         self._bytesPath = properties['bytes-transferred-file']
+        self._stepSize = properties.get('step-size', _DEFAULT_STEP_SIZE)
         self._RRDPaths = self._getRRDPaths()
         # call to update_rrd with a poll interval
         timeout = properties.get('poll-interval', _DEFAULT_POLL_INTERVAL)
@@ -63,7 +66,7 @@ class ComponentRRDPlug(base.ComponentPlug):
         if self._rrdpoller:
             self._rrdpoller.stop()
 
-    def _hasImport(self, component):
+    def _hasImport(self):
         """Check rrdtool availability"""
         if not rrdtool:
             m = messages.Warning(T_(N_(
@@ -71,8 +74,9 @@ class ComponentRRDPlug(base.ComponentPlug):
                                     mid='rrdtool-import-error')
             m.add(T_(N_(
                 "The RRD plug for this component is disabled.")))
-            component.addMessage(m)
+            self._component.addMessage(m)
             return False
+
         return True
 
     def _updateRRD(self):
@@ -80,9 +84,9 @@ class ComponentRRDPlug(base.ComponentPlug):
         for path in self._RRDPaths:
             value = None
             if path == self._clientsPath:
-                value = self.component.getClients()
+                value = self._component.getClients()
             elif path == self._bytesPath:
-                value = self.component.getBytesSent()
+                value = self._component.getBytesSent()
 
             if type(value) == types.IntType:
                 rrdtool.update(path, 'N:%i' % value)
@@ -104,23 +108,37 @@ class ComponentRRDPlug(base.ComponentPlug):
         for path, name, counterType in rrds:
             if not os.path.exists(path):
                 try:
+                    DAY = 60 * 60 * 24
+                    count = [
+                        2 * DAY // self._stepSize,
+                        15 * DAY // (self._stepSize * 6),
+                        63 * DAY // (self._stepSize * 24),
+                        740 * DAY // (self._stepSize * 288),
+                    ]
+
                     rrdtool.create(path,
-                        '--step 300', # consolidate every 300 seconds
+                        '-s %d' % self._stepSize,
                         'DS:%s:%s:600:0:U' % (name, counterType),
-                        'RRA:AVERAGE:0.5:1:600',   # 600 x 5 mins: 2 days
-                        'RRA:AVERAGE:0.5:6:700',   # 700 x 30 mins: 2 weeks
-                        'RRA:AVERAGE:0.5:24:775',  # 775 x 2 hours: 2 months
-                        'RRA:AVERAGE:0.5:288:797', # 775 x 24 hours: 2 years
-                        'RRA:MAX:0.5:1:600',
-                        'RRA:MAX:0.5:6:700',
-                        'RRA:MAX:0.5:24:775',
-                        'RRA:MAX:0.5:288:797')
+                        'RRA:AVERAGE:0.5:1:%d' % count[0],
+                        'RRA:AVERAGE:0.5:6:%d' % count[1],
+                        'RRA:AVERAGE:0.5:24:%d' % count[2],
+                        'RRA:AVERAGE:0.5:288:%d' % count[3],
+                        'RRA:MAX:0.5:1:%d' % count[0],
+                        'RRA:MAX:0.5:6:%d' % count[1],
+                        'RRA:MAX:0.5:24:%d' % count[2],
+                        'RRA:MAX:0.5:288:%d' % count[3])
                     paths.append(path)
-                    self.info('Created RRD file: %s' % path)
-                except:
-                    self.warning('Error creating RRD file: %s' % path)
+                    self.info("Created RRD file: '%s'", path)
+                except Exception, e:
+                    self.warning("Error creating RRD file '%s': %s",
+                        path, log.getExceptionMessage(e))
+                    m = messages.Warning(T_(N_(
+                        "Could not create RRD file '%s'.\n"), path),
+                        debug=log.getExceptionMessage(e),
+                        mid='rrd-create-error-%s' % path)
+                    self._component.addMessage(m)
             else:
                 paths.append(path)
-                self.info('Using existing RRD file: %s' % path)
+                self.info("Using existing RRD file: '%s'", path)
 
         return paths
