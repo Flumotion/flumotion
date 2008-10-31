@@ -1,3 +1,9 @@
+2008-10-31  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/manager/component.py:
+	  If port can be None, it is a crime to debug it with %d.  Change
+	  to %r instead.
+
 2008-10-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/disker/disker.py:

@@ -739,7 +739,7 @@ class ComponentHeaven(base.ManagerHeaven):
         if fromHost == toHost:
             toHost = '127.0.0.1'
 
-        self.debug('mapNetFeed from %r to %r: %s:%d', fromAvatar, toAvatar,
+        self.debug('mapNetFeed from %r to %r: %s:%r', fromAvatar, toAvatar,
             toHost, toPort)
         return toHost, toPort
 
