@@ -57,8 +57,6 @@ class Check(util.LogCommand):
         """Initial values and pipeline setup"""
         self._expectAudio = False
         self._expectVideo = False
-        self._isAudio = False
-        self._isVideo = False
         self._playlist = False
         self._url = None
         self._streamurl = None
@@ -118,16 +116,7 @@ class Check(util.LogCommand):
                  'This option will go away in the future.')
 
     def handleOptions(self, options):
-        #Determine if this stream would have audio/video
         self.options = options
-        if options.videowidth or options.videoheight or \
-           options.videoframerate or options.videopar or \
-           options.videomimetype:
-            self._expectVideo = True
-        if options.audiosamplerate or options.audiochannels or \
-           options.audiowidth or options.audiodepth or \
-           options.audiomimetype:
-            self._expectAudio = True
 
     def critical(self, message):
         return util.critical('%s: %s' % (self._url, message))
@@ -449,7 +438,7 @@ class GSTInfo(log.Loggable):
                         self.options.videopar, value.num, value.denom))
 
     def handleOptions(self):
-        #Determine if this stream would have audio/video
+        # Determine if this stream would have audio/video
         if self.options.videowidth or self.options.videoheight or \
            self.options.videoframerate or self.options.videopar or \
            self.options.videomimetype:
