@@ -1,3 +1,12 @@
+2008-11-03  Julien Le Goff <jlegoff@flumotion.com>
+
+	reviewed by: Arek Korbik <arek@flumotion.com>
+
+	* flumotion/manager/component.py:
+	  Added a condition in the clock synchronization code that checks
+	  whether components belong to the same flow.
+	  Fixes #1160 and #1151
+
 2008-11-03  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/worker/checks/gst010.py:

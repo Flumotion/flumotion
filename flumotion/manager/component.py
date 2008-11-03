@@ -250,7 +250,7 @@ class ComponentAvatar(base.ManagerAvatar):
 
         def success(clocking):
             self.clocking = clocking
-            self.heaven.masterClockAvailable(self.avatarId, clocking)
+            self.heaven.masterClockAvailable(self)
 
         def error(failure):
             self.addMessage(messages.WARNING, 'provide-master-clock',
@@ -259,7 +259,7 @@ class ComponentAvatar(base.ManagerAvatar):
             self.vishnu.releasePortsOnWorker(self.getWorkerName(), [port])
 
         if self.clocking:
-            self.heaven.masterClockAvailable(self.avatarId, self.clocking)
+            self.heaven.masterClockAvailable(self)
         else:
             (port, ) = self.vishnu.reservePortsOnWorker(
                 self.getWorkerName(), 1)
@@ -662,13 +662,16 @@ class ComponentHeaven(base.ManagerHeaven):
                 self._setupClocking(avatar)
                 self._connectEatersAndFeeders(avatar)
 
-    def masterClockAvailable(self, avatarId, clocking):
-        self.debug('master clock for %r provided on %r', avatarId,
-                   clocking)
+    def masterClockAvailable(self, component):
+        self.debug('master clock for %r provided on %r', component.avatarId,
+                   component.clocking)
+        component_flow = component.getParentName()
         # can be made more efficient
         for avatar in self.avatars.values():
-            if avatar.avatarId != avatarId:
-                self._setupClocking(avatar)
+            if avatar.avatarId != component.avatarId:
+                flow = avatar.getParentName()
+                if flow == component_flow:
+                    self._setupClocking(avatar)
 
     def _setupClocking(self, avatar):
         master = avatar.getClockMaster()
