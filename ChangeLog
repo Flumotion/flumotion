@@ -1,3 +1,8 @@
+2008-11-03  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/worker/checks/gst010.py:
+	  Fixed an identation error that makes the check to crash.
+
 2008-11-03  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:

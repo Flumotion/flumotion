@@ -189,8 +189,8 @@ def check1394(mid):
             m = messages.Error(T_(N_(
                 "Neither device node /dev/fw0 nor /dev/raw1394 exists.")),
             mid=mid)
-        result.add(m)
-        return defer.succeed(result)
+            result.add(m)
+            return defer.succeed(result)
 
     pipeline = 'dv1394src name=source ! dvdemux name=demux ! fakesink'
     d = do_element_check(pipeline, 'demux', do_check)
