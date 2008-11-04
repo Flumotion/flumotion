@@ -31,6 +31,7 @@ from twisted.internet import reactor
 from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer, pygobject, messages, errors
 from flumotion.common import documentation, format
+from flumotion.common import eventcalendar
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.mimetypes import mimeTypeToExtention
 from flumotion.common.pygobject import gsignal

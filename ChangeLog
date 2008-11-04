@@ -1,5 +1,10 @@
 2008-11-04  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/consumers/disker/disker.py:
+	Add missing import.
+
+2008-11-04  Jan Urbanski  <jurbanski@flumotion.com>
+
 	reviewed by: Arek Korbik <arek@flumotion.com>
 
 	* flumotion/common/eventcalendar.py:
