@@ -32,7 +32,27 @@ import gobject
 from flumotion.common import log
 from flumotion.monitor.nagios import util
 
+# md5 and sha modules are in hashlib now
+try:
+    from hashlib import md5
+    from hashlib import sha1 as sha
+except:
+    from md5 import md5
+    from sha import sha
+
 URLFINDER = 'http://[^\s"]*' # to search urls in playlists
+
+
+def genToken(relativePath, secretKey, timeout, offset, type):
+    """Generate the hashed token"""
+    startTime = '%08x' % (time.time() + offset)
+    stopTime = '%08x' % (time.time() + offset + int(timeout))
+    hashable = secretKey + relativePath + startTime + stopTime
+    if type == 'md5':
+        hash = md5(hashable).hexdigest()
+    else:
+        hash = sha(hashable).hexdigest()
+    return '%s%s%s' % (hash, startTime, stopTime)
 
 
 def getURLFromPlaylist(url):
@@ -99,7 +119,16 @@ class Check(util.LogCommand):
             action="store", dest="audiomimetype",
             help='Mime type of the encoded audio')
 
-        # general option
+        # timed token options
+        self.parser.add_option('-S', '--secret',
+            action="store", dest="secret",
+            help="secret key used in timedbouncer or geoiptimedbouncer")
+        self.parser.add_option('-T', '--type',
+            action="store", dest="type",
+            choices=('md5', 'sha1'),
+            help="hash type (md5 or sha1)")
+
+        # general options
         self.parser.add_option('-D', '--duration',
             action="store", dest="duration", default='5',
             help='Minimum duration of decoded data (default 5 seconds)')
@@ -128,7 +157,7 @@ class Check(util.LogCommand):
             'stream/playlist.')
 
         self._url = args[0]
-        # check url and get path from it
+        # Check url and get path from it
         try:
             parse = urlparse.urlparse(self._url)
         except ValueError:
@@ -136,13 +165,33 @@ class Check(util.LogCommand):
         if parse[0] != 'http':
             return self.critical('URL type is not valid.')
 
+        # Check options for timed token
+        if self.options.secret:
+            if self.options.type:
+                self.withToken = True
+            else:
+                return util.critical('You supply a secret key \
+                                      without hash type.\n')
+        else:
+            self.withToken = False
+
         # Simple playlist detection
         if self._url.endswith('.m3u') or self._url.endswith('.asx'):
             self.options.playlist = True
 
-        self._streamurl = self._url
+        # Generate a token if it's necesary
+        if self.withToken:
+            path = parse[2] # url without http or domain
+            token = genToken(path, self.options.secret, 1200, -600,
+                             self.options.type)
+            self._url = '%s?token=%s' % (self._url, token)
+
+        # If it is a playlist, take the correct URL
         if self.options.playlist:
             self._streamurl = getURLFromPlaylist(self._url)
+        else:
+            self._streamurl = self._url
+
         result = self.checkStream()
         return result
 

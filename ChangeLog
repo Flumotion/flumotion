@@ -1,3 +1,8 @@
+2008-11-04  Pedro Gracia  <pedro@flumotion.com>
+
+	* flumotion/monitor/nagios/stream.py:
+	  Add support to check streams with timed token.
+
 2008-11-03  Julien Le Goff <jlegoff@flumotion.com>
 
 	reviewed by: Arek Korbik <arek@flumotion.com>
