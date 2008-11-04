@@ -1,3 +1,22 @@
+2008-11-04  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Arek Korbik <arek@flumotion.com>
+
+	* flumotion/common/eventcalendar.py:
+	Make the module importable without having icalendar and dateutils
+	modules.
+	Handle iCalendar files with "floating" date-time values.
+
+	* flumotion/component/bouncers/icalbouncer.py:
+	Make the iCal bouncer gracefuly handle the situation of missing
+	icalendar and dateutil modules.
+	Separate I/O exceptions from parsing exceptions when accessing an
+	iCalendar file. Fixes #1171.
+
+	* flumotion/component/consumers/disker/disker.py:
+	Make the disker check for icalendar and dateutil support in the
+	eventcalendar module after importing it. Fixes #1174.
+
 2008-11-04  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:

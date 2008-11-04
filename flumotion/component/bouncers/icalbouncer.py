@@ -1,4 +1,4 @@
-# -*- Mode: Python -*-
+# -*- Mode: Python;  test-case-name: flumotion.test.test_icalbouncer -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -23,25 +23,21 @@
 A bouncer that only lets in during an event scheduled with an ical file.
 """
 
+from datetime import datetime
+
 from twisted.internet import defer
 
-from flumotion.common import keycards, errors, eventcalendar
+from flumotion.common import keycards, messages, errors
+from flumotion.common import log, documentation
+from flumotion.common import eventcalendar
+from flumotion.common.i18n import N_, gettexter
+from flumotion.component.base import scheduler
 from flumotion.component.bouncers import bouncer
 from flumotion.common.keycards import KeycardGeneric
-from datetime import datetime
-from flumotion.component.base import scheduler
 
 __all__ = ['IcalBouncer']
 __version__ = "$Rev$"
-
-
-try:
-    # icalendar and dateutil modules needed for ical parsing
-    from icalendar import Calendar
-    from dateutil import rrule
-    HAS_ICAL = True
-except ImportError:
-    HAS_ICAL = False
+T_ = gettexter()
 
 
 class IcalBouncer(bouncer.Bouncer):
@@ -50,15 +46,47 @@ class IcalBouncer(bouncer.Bouncer):
     keycardClasses = (KeycardGeneric)
     events = []
 
+    def init(self):
+        self.iCalScheduler = None
+
+    def check_properties(self, properties, addMessage):
+
+        def missingModule(moduleName):
+            m = messages.Error(T_(N_(
+                "To use the iCalendar bouncer you need to have "
+                "the '%s' module installed.\n"), moduleName),
+                               mid='error-python-%s' % moduleName)
+            documentation.messageAddPythonInstall(m, moduleName)
+            addMessage(m)
+
+        if not eventcalendar.HAS_ICALENDAR:
+            missingModule('icalendar')
+        if not eventcalendar.HAS_DATEUTIL:
+            missingModule('dateutil')
+
     def do_setup(self):
-        if not HAS_ICAL:
-            return defer.fail(
-                errors.ConfigError(
-                    "Please install icalendar and dateutil modules"))
         props = self.config['properties']
         self._icsfile = props['file']
-        self.iCalScheduler = scheduler.ICalScheduler(open(
-            self._icsfile, 'r'))
+
+        try:
+            handle = open(self._icsfile, 'r')
+        except IOError, e:
+            m = messages.Error(T_(N_(
+                "Failed to open iCalendar file '%s'. "
+                "Check permissions on that file."), self._icsfile),
+                               mid='error-icalbouncer-file')
+            self.addMessage(m)
+            return defer.fail(errors.ComponentSetupHandledError())
+
+        try:
+            self.iCalScheduler = scheduler.ICalScheduler(handle)
+        except ValueError, e:
+            m = messages.Error(T_(N_(
+                "Error parsing ical file '%s'."), self._icsfile),
+                               debug=log.getExceptionMessage(e),
+                               mid="error-icalbouncer-file")
+            self.addMessage(m)
+            return defer.fail(errors.ComponentSetupHandledError())
 
         return True
 
@@ -84,4 +112,7 @@ class IcalBouncer(bouncer.Bouncer):
         return None
 
     def do_stop(self):
-        self.iCalScheduler.cleanup()
+        # we might not have an iCalScheduler, if something went wrong
+        # during do_setup or do_check
+        if self.iCalScheduler:
+            self.iCalScheduler.cleanup()

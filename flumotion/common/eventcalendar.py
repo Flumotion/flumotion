@@ -23,10 +23,20 @@
 import datetime
 import time
 
-import icalendar
+HAS_ICALENDAR = False
+try:
+    import icalendar
+    HAS_ICALENDAR = True
+except ImportError:
+    pass
 
 # for documentation on dateutil, see http://labix.org/python-dateutil
-from dateutil import rrule, tz, parser
+HAS_DATEUTIL = False
+try:
+    from dateutil import rrule, tz, parser
+    HAS_DATEUTIL = True
+except ImportError:
+    pass
 
 from flumotion.extern.log import log
 
@@ -36,6 +46,10 @@ ending, as well as active event instances at a given time.
 
 This uses iCalendar as defined in
 http://www.ietf.org/rfc/rfc2445.txt
+
+The users of this module should check if it has both HAS_ICALENDAR
+and HAS_DATEUTIL properties and if any of them is False, they should
+withhold from further using the module.
 """
 
 
@@ -616,7 +630,13 @@ def fromICalendar(iCalendar):
         """
         dt = _toDateTime(v.dt)
         if dt.tzinfo is None:
-            tzinfo = tz.gettz(v.params['TZID'])
+            # We might have a "floating" DATE-TIME value here, in
+            # which case we will not have a TZID parameter; see
+            # 4.3.5, FORM #3
+            # Using None as the parameter for tz.gettz will create a
+            # tzinfo object representing local time, which is the
+            # Right Thing
+            tzinfo = tz.gettz(v.params.get('TZID', None))
             dt = datetime.datetime(dt.year, dt.month, dt.day,
                 dt.hour, dt.minute, dt.second,
                 dt.microsecond, tzinfo)

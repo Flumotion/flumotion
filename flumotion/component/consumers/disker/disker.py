@@ -57,22 +57,6 @@ the machine running the disker, as the ical scheduler does not
 understand arbitrary timezones.
 """
 
-HAS_ICALENDAR = False
-HAS_DATEUTIL = False
-
-try:
-    from icalendar import Calendar
-    HAS_ICALENDAR = True
-except ImportError:
-    pass
-try:
-    from dateutil import rrule
-    HAS_DATEUTIL = True
-except ImportError:
-    pass
-
-HAS_ICAL = HAS_ICALENDAR and HAS_DATEUTIL
-
 
 class DiskerMedium(feedcomponent.FeedComponentMedium):
     # called when admin ui wants to stop recording. call changeFilename to
@@ -111,9 +95,11 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     ### BaseComponent methods
 
     def init(self):
+        self._can_schedule = (eventcalendar.HAS_ICALENDAR and
+                              eventcalendar.HAS_DATEUTIL)
         self.uiState.addKey('filename', None)
         self.uiState.addKey('recording', False)
-        self.uiState.addKey('can-schedule', HAS_ICAL)
+        self.uiState.addKey('can-schedule', self._can_schedule)
         self.uiState.addKey('has-schedule', False)
         # list of (dt (in UTC, without tzinfo), which, content)
         self.uiState.addListKey('next-points')
@@ -169,7 +155,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             '%s.%%Y%%m%%d-%%H%%M%%S' % self.getName())
         self._startFilenameTemplate = self._defaultFilenameTemplate
         icalfn = properties.get('ical-schedule')
-        if HAS_ICAL and icalfn:
+        if self._can_schedule and icalfn:
             self.uiState.set('has-schedule', True)
             self.debug('Parsing iCalendar file %s' % icalfn)
             from flumotion.component.base import scheduler
@@ -213,9 +199,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.debug(m)
                 self.addMessage(m)
 
-            if not HAS_ICALENDAR:
+            if not eventcalendar.HAS_ICALENDAR:
                 missingModule('icalendar')
-            if not HAS_DATEUTIL:
+            if not eventcalendar.HAS_DATEUTIL:
                 missingModule('dateutil')
 
         sink = self.get_element('fdsink')
