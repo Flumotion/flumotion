@@ -1,5 +1,10 @@
 2008-11-04  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/test/test_icalbouncer.py (added):
+	Add a test case for the iCalendar bouncer. Fixes #1173.
+
+2008-11-04  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/consumers/disker/disker.py:
 	Add missing import.
 
