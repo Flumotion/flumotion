@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 
 
@@ -25,6 +26,14 @@ class Coverage:
         self.files = []
         self.total_lines = 0
         self.total_covered = 0
+
+        # The python Trace class prints coverage results by prefixing
+        # lines that got executed with a couple of spaces, the number
+        # of times it has been executed and a colon. Uncovered lines
+        # get prefixed with six angle brackets. Lines like comments
+        # and blank lines just get indented.
+        # This regexp will match executed and executable-but-not-covered lines.
+        self.codeline_matcher = re.compile(r'^(>>>>>>)|(\s*\d+:)')
 
     def _strip_filename(self, filename):
         filename = os.path.basename(filename)
@@ -53,11 +62,11 @@ class Coverage:
 
     def show_one(self, filename):
         f = open(filename)
+        # Grab all executables lines
         lines = [line for line in f.readlines()
-                         if (':' in line or line.startswith('>>>>>>')) and
-                           not line.strip().startswith('#') and
-                           not line.endswith(':\n')]
+                 if self.codeline_matcher.match(line)]
 
+        # Find out which of them were not executed
         uncovered_lines = [line for line in lines
                                    if line.startswith('>>>>>>')]
         if not lines:

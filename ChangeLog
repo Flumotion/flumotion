@@ -1,3 +1,9 @@
+2008-11-05  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* common/show-coverage.py:
+	Upgrade the algorithm that determines which lines were covered and
+	which lines could be covered, but where not.
+
 2008-11-05  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po:
