@@ -15,7 +15,7 @@ if not _me.startswith(_prefix):
         os.path.basename(__file__), _prefix)
     sys.exit(1)
 
-_flavor = _me[len(prefix):]
+_flavor = _me[len(_prefix):]
 
 moduleset = os.path.join(os.environ['HOME'], 'flu', 'flu.%s.modules' % _flavor)
 modules = ['flumotion']
