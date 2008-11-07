@@ -1,0 +1,21 @@
+<planet>
+  <atmosphere>
+    <component name="http-server-cached"
+               type="http-server"
+               label="http-server-cached"
+               worker="localhost">
+      <property name="mount-point">/</property>
+      <property name="port">8800</property>
+      <plugs>
+        <plug type="fileprovider-localcached">
+          <property name="path">/tmp/ondemand</property>
+          <property name="cache-dir">/tmp/cache</property>
+          <property name="cache-size">100</property>
+          <property name="cleanup-enabled">True</property>
+          <property name="cleanup-high-watermark">1.0</property>
+          <property name="cleanup-low-watermark">0.6</property>
+        </plug>
+      </plugs>
+    </component>
+  </atmosphere>
+</planet>

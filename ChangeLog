@@ -1,3 +1,15 @@
+2008-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	  Use float from 0.0 to 1.0 instead of percentage.
+	  Use ten-based powers for MB and KB.
+	  Rename some properties to indicate low and high watermark.
+	  Add some debugginf for cache cleanup.
+	* conf/Makefile.am:
+	* conf/examples/ondemand-cache.xml (added):
+	  Add an example.
+
 2008-11-05  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* common/show-coverage.py:
