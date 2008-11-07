@@ -381,7 +381,7 @@ class CopyThread(threading.Thread, log.Loggable):
             self.plug._event.wait()
 
 
-class CopySessionCanceled(Exception):
+class CopySessionCancelled(Exception):
     pass
 
 
@@ -404,7 +404,7 @@ class CopySession(log.Loggable):
     This is done for two reasons:
         - To avoid circular references by have the session manage
           a list of delegate instances.
-        - If not canceled, sessions should not be deleted
+        - If not cancelled, sessions should not be deleted
           when no delegates reference them anymore. So weakref cannot be used.
     """
 
@@ -421,7 +421,7 @@ class CopySession(log.Loggable):
         self.mtime = sourceInfo[stat.ST_MTIME]
         self.size = sourceInfo[stat.ST_SIZE]
         self._sourceFile = sourceFile
-        self._canceled = False # True when a session has been outdated
+        self._cancelled = False # True when a session has been outdated
         self._wTempFile = None
         self._rTempFile = None
         self._allocTag = None # Tag used to identify cache allocations
@@ -497,9 +497,9 @@ class CopySession(log.Loggable):
 
     def decRef(self):
         self._refCount -= 1
-        # If there is only one client and the session has been canceled,
+        # If there is only one client and the session has been cancelled,
         # stop copying and and serve the source file directly
-        if (self._refCount == 1) and self._canceled:
+        if (self._refCount == 1) and self._cancelled:
             # Cancel the copy and close the writing temporary file.
             self._cancelCopy(False, True)
         # We close if not still copying source file
@@ -562,10 +562,10 @@ class CopySession(log.Loggable):
                 cont = False
         # Check for cancellation
         if self._waitCancel:
-            # Copy has been canceled
+            # Copy has been cancelled
             self.copying = False
             reactor.callFromThread(self.plug.disableSession, self)
-            reactor.callFromThread(self._onCopyCanceled, *self._waitCancel)
+            reactor.callFromThread(self._onCopyCancelled, *self._waitCancel)
             return False
         return cont
 
@@ -581,15 +581,15 @@ class CopySession(log.Loggable):
         return True
 
     def _releaseCacheSpace(self):
-        if not (self._canceled or self._allocTag is None):
+        if not (self._cancelled or self._allocTag is None):
             self.plug.releaseCacheSpace(self._allocTag)
         self._allocTag = None
 
     def _cancelSession(self):#
-        if not self._canceled:
+        if not self._cancelled:
             self.log("Canceling copy session")
             # Not a valid copy session anymore
-            self._canceled = True
+            self._cancelled = True
             # If there is no more than 1 client using the session,
             # stop copying and and serve the source file directly
             if self._refCount <= 1:
@@ -663,15 +663,15 @@ class CopySession(log.Loggable):
         if closeTempWrite:
             self._closeWriteTempFile()
 
-    def _onCopyCanceled(self, closeSource, closeTempWrite):
-        self.log("Copy session canceled")
+    def _onCopyCancelled(self, closeSource, closeTempWrite):
+        self.log("Copy session cancelled")
         # Called when the copy thread really stopped to read/write
         self._waitCancel = None
-        self.plug.stats.onCopyCanceled(self.size, self._copied)
+        self.plug.stats.onCopyCancelled(self.size, self._copied)
         # Resolve all pending source read operations
         for position, size, d in self._pending:
             if self._sourceFile is None:
-                d.errback(CopySessionCanceled())
+                d.errback(CopySessionCancelled())
             else:
                 try:
                     self._sourceFile.seek(position)
@@ -782,7 +782,7 @@ class CopySession(log.Loggable):
     def _closeWriteTempFile(self):
         if self._wTempFile is not None:
             # If the copy is not finished, remove the temporary file
-            if not self._canceled and self._copied is not None:
+            if not self._cancelled and self._copied is not None:
                 self._removeTempFile()
             self.log("Closing temporary file for writing [fd %d]",
                      self._wTempFile.fileno())

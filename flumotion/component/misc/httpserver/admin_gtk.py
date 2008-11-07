@@ -227,7 +227,7 @@ class CacheStatsAdminGtkNode(StatisticsAdminGtkNode):
         self._regReqStat('last-cleanup-time', _formatTimeStamp)
         self._regReqStat('current-copy-count')
         self._regReqStat('finished-copy-count')
-        self._regReqStat('canceled-copy-count')
+        self._regReqStat('cancelled-copy-count')
         return statistics
 
 

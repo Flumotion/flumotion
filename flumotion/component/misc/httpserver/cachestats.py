@@ -132,7 +132,7 @@ class CacheStatistics(object):
         self.totalCopyCount = 0
         self.currentCopyCount = 0
         self.finishedCopyCount = 0
-        self.canceledCopyCount = 0
+        self.cancelledCopyCount = 0
         self.bytesCopied = 0L
         self._copyRatios = 0.0
 
@@ -145,7 +145,7 @@ class CacheStatistics(object):
             self._set("last-cleanup-time", time.time())
             self._set("current-copy-count", self.currentCopyCount)
             self._set("finished-copy-count", self.finishedCopyCount)
-            self._set("canceled-copy-count", self.canceledCopyCount)
+            self._set("cancelled-copy-count", self.cancelledCopyCount)
             self._set("mean-copy-ratio", self.meanCopyRatio)
             self._set("mean-bytes-copied", self.meanBytesCopied)
             self._update()
@@ -191,15 +191,15 @@ class CacheStatistics(object):
         self.totalCopyCount += 1
         self._set("current-copy-count", self.currentCopyCount)
 
-    def onCopyCanceled(self, size, copied):
+    def onCopyCancelled(self, size, copied):
         self.currentCopyCount -= 1
         self.finishedCopyCount += 1
-        self.canceledCopyCount += 1
+        self.cancelledCopyCount += 1
         self.bytesCopied += copied
         self._copyRatios += float(copied) / size
         self._set("current-copy-count", self.currentCopyCount)
         self._set("finished-copy-count", self.finishedCopyCount)
-        self._set("canceled-copy-count", self.canceledCopyCount)
+        self._set("cancelled-copy-count", self.cancelledCopyCount)
         self._set("mean-copy-ratio", self.meanCopyRatio)
         self._set("mean-bytes-copied", self.meanBytesCopied)
 
@@ -248,5 +248,5 @@ class CacheStatistics(object):
                   self.cacheOutdateCount, self.cleanupCount,
                   self._cacheUsage, self._cacheUsageRatio,
                   self.totalCopyCount, self.currentCopyCount,
-                  self.canceledCopyCount, self.meanBytesCopied,
+                  self.cancelledCopyCount, self.meanBytesCopied,
                   self.meanCopyRatio)

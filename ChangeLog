@@ -1,5 +1,14 @@
 2008-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/cachestats.py:
+	* flumotion/component/misc/httpserver/httpserver.glade:
+	  While canceled is allowed spelling, everywhere else we've
+	  used cancelled instead.
+
+2008-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpserver/httpserver.xml:
 	* flumotion/component/misc/httpserver/cachedprovider.py:
 	  Use float from 0.0 to 1.0 instead of percentage.
