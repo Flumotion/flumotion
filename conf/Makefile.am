@@ -6,7 +6,8 @@ CONFIG = 						\
 	examples/twores.xml				\
 	examples/default.xml 				\
 	examples/discont.xml 				\
-	examples/ondemand.xml
+	examples/ondemand.xml 				\
+	examples/ondemand-cache.xml
 
 EXTRA_DIST = 						\
         default.pem					\

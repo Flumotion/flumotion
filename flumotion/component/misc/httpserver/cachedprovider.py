@@ -29,7 +29,7 @@ import time
 
 from twisted.internet import defer, reactor, abstract
 
-from flumotion.common import log
+from flumotion.common import log, format
 from flumotion.component.misc.httpserver import cachestats
 from flumotion.component.misc.httpserver import fileprovider
 from flumotion.component.misc.httpserver import localpath
@@ -39,12 +39,12 @@ from flumotion.component.misc.httpserver.fileprovider import NotFoundError
 
 
 SEEK_SET = 0 # os.SEEK_SET is not defined in python 2.4
-DEFAULT_CACHE_SIZE = 1024
-DEFAULT_CLEANUP_THRESHOLD = 100
-DEFAULT_CLEANUP_MAX_USAGE = 60
+DEFAULT_CACHE_SIZE = 1000
+DEFAULT_CLEANUP_HIGH_WATERMARK = 1.0
+DEFAULT_CLEANUP_LOW_WATERMARK = 0.6
 FILE_COPY_BUFFER_SIZE = abstract.FileDescriptor.bufferSize
 TEMP_FILE_POSTFIX = ".tmp"
-MAX_LOGNAME_SIZE = 30
+MAX_LOGNAME_SIZE = 30 # maximum number of characters to use for logging a path
 ID_CACHE_MAX_SIZE = 1024
 
 
@@ -64,7 +64,7 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
     network file system to a shared local directory.
     Multiple instances can share the same cache directory,
     but it's recommended to use slightly different values
-    for the property cleanup-threshold.
+    for the property cleanup-high-watermark.
     I'm using the directory access time to know when
     the cache usage changed and keep an estimation
     of the cache usage for statistics.
@@ -76,24 +76,6 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
     lots of files are copied at the same time.
     Simulations with real request logs show that using a thread
     gives better results than the equivalent asynchronous implementation.
-
-    Properties:
-        path: The absolute path of the root directory
-              from which the files are served.
-        cache-dir: The absolute path of the cache directory.
-        cache-size: The maximum size of the cache in MByte.
-        cleanup-enabled: If set to false and the cache is full,
-                         the plug will not delete files to free
-                         disk space. It will serve the files directly
-                         form the network file system.
-        cleanup-threshold: The cache usage percentage the will trigger
-                           a cache cleanup to be done.
-                           If more than one instance are sharing the same
-                           cache directory, it's recommended to use
-                           slightly different value for each instances.
-        cleanup-max-usage: The maximum usage percentage after cleanup.
-                           When doing a cleanup, older files will be deleted
-                           until the cache usage drop below this percentage.
     """
 
     logCategory = LOG_CATEGORY
@@ -103,12 +85,14 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         self._sourceDir = props.get('path')
         self._cacheDir = props.get('cache-dir', "/tmp")
         cacheSizeInMB = int(props.get('cache-size', DEFAULT_CACHE_SIZE))
-        self._cacheSize = cacheSizeInMB * 1024**2
+        self._cacheSize = cacheSizeInMB * 10 ** 6 # in bytes
         self._cleanupEnabled = props.get('cleanup-enabled', True)
-        threshold = props.get('cleanup-threshold', DEFAULT_CLEANUP_THRESHOLD)
-        self._cleanupThreshold = max(0, min(100, int(threshold)))
-        maxUsage = props.get('cleanup-max-usage', DEFAULT_CLEANUP_MAX_USAGE)
-        self._cleanupMaxUsage = max(0, min(100, int(maxUsage)))
+        highWatermark = props.get('cleanup-high-watermark',
+            DEFAULT_CLEANUP_HIGH_WATERMARK)
+        highWatermark = max(0.0, min(1.0, float(highWatermark)))
+        lowWatermark = props.get('cleanup-low-watermark',
+            DEFAULT_CLEANUP_LOW_WATERMARK)
+        lowWatermark = max(0.0, min(1.0, float(lowWatermark)))
         self._identifiers = {} # {path: identifier}
         self._sessions = {} # {CopySession: None}
         self._index = {} # {path: CopySession}
@@ -119,11 +103,11 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         self.debug("Cache size: %d MB", self._cacheSize)
         self.debug("Cache cleanup enabled: %s", self._cleanupEnabled)
 
-        self._cacheUsage = None
+        self._cacheUsage = None # in bytes
         self._cacheUsageLastUpdate = None
         self._lastCacheTime = None
-        self._cacheMaxUsage = (self._cacheSize * self._cleanupThreshold) / 100
-        self._cacheMinUsage = (self._cacheSize * self._cleanupMaxUsage) / 100
+        self._cacheMaxUsage = self._cacheSize * highWatermark # in bytes
+        self._cacheMinUsage = self._cacheSize * lowWatermark # in bytes
         self.stats = cachestats.CacheStatistics()
 
         # Initialize cache usage
@@ -198,6 +182,9 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         self.stats.onEstimateCacheUsage(self._cacheUsage, self._cacheSize)
 
     def updateCacheUsage(self):
+        """
+        @returns: the cache usage, in bytes
+        """
         # Only calculate cache usage if the cache directory
         # modification time changed since the last time we looked at it.
         cacheTime = os.path.getmtime(self._cacheDir)
@@ -213,15 +200,22 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
     def allocateCacheSpace(self, size):
         """
         Try to reserve cache space.
+
         If there is not enough space and the cache cleanup is enabled,
         it will delete files from the cache starting with the ones
-        with oldest access time until the cache usage drop below
-        the percentage specified by the property cleanup-max-usage.
-        Returns a 'tag' that should be used to 'free' the cache space.
+        with oldest access time until the cache usage drops below
+        the fraction specified by the property cleanup-low-threshold.
+
+        Returns a 'tag' that should be used to 'free' the cache space
+        using releaseCacheSpace.
         This tag is needed to better estimate the cache usage,
         if the cache usage has been updated since cache space
         has been allocated, freeing up the space should not change
         the cache usage estimation.
+
+        @param size: size to reserve, in bytes
+        @type  size: int
+
         @returns: an allocation tag or None if the allocation failed.
         @rtype:   tuple
         """
@@ -230,9 +224,15 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
             self._cacheUsage += size
             self.updateCacheUsageStatistics()
             return (self._cacheUsageLastUpdate, size)
+
+        self.debug('cache usage will be %sbytes, need more cache',
+            format.formatStorage(usage + size))
+
         if not self._cleanupEnabled:
+            self.debug('not allowed to clean up cache, so cannot cache')
             # No space available and cleanup disabled: allocation failed.
             return None
+
         # Update cleanup statistics
         self.stats.onCleanup()
         # List the cached files with file state
@@ -255,7 +255,10 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
                     self.warning("Error cleaning cached file: %s", str(e))
             if usage <= self._cacheMinUsage:
                 # We reach the cleanup limit
+                self.debug('cleaned up, cache use is now %sbytes',
+                    format.formatStorage(usage))
                 break
+
         # Update the cache usage
         self._cacheUsage = usage
         self._cacheUsageLastUpdate = time.time()
@@ -1009,10 +1012,10 @@ class CachedFile(fileprovider.File, log.Loggable):
             cachedFile, cachedInfo = self._open(cachedPath)
             self.log("Opened cached file [fd %d]", cachedFile.fileno())
         except NotFoundError:
-            self.debug("Did not found cached file '%s'", cachedPath)
+            self.debug("Did not find cached file '%s'", cachedPath)
             return self._tryTempFile(sourcePath, sourceFile, sourceInfo)
         except FileError, e:
-            self.debug("Fail to open cached file: %s", str(e))
+            self.debug("Failed to open cached file: %s", str(e))
             self._removeCachedFile(cachedPath)
             return self._tryTempFile(sourcePath, sourceFile, sourceInfo)
         # Found a cached file, now check the modification time

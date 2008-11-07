@@ -36,7 +36,7 @@
 
     <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug"
           type="fileprovider-localcached"
-          _description="Provides files from a local file system, witch caching.">
+          _description="Provides files from a locally mounted file system, with caching to a separate path.">
       <entries>
         <entry type="default"
                location="flumotion/component/misc/httpserver/cachedprovider.py"
@@ -45,17 +45,17 @@
 
       <properties>
         <property name="path" type="string" required="true"
-                  _description="The base path to map to the mount-point (network file system)" />
+                  _description="The base local path to serve from, mapped to the mount-point" />
         <property name="cache-dir" type="string"
-                  _description="The directory where the files are cached" />
+                  _description="The directory where the files are cached.  Multiple components can share the same cache-dir, but then should also share the same cache-size." />
         <property name="cache-size" type="int"
-                  _description="The maximum size of the cache directory in MB" />
+                  _description="The maximum size of the cache directory (in MB, defaults to 1000)" />
         <property name="cleanup-enabled" type="bool"
-                  _description="If the cache should be monitored and cleaned up" />
-        <property name="cleanup-threshold" type="int"
-                  _description="The cache usage in percentage that trigger a cleanup" />
-        <property name="cleanup-max-usage" type="int"
-                  _description="The maximum cache usage in percentage after cleanup" />
+                  _description="Whether the cache should be monitored and cleaned up; if False, files will be served from the original location instead of from the cache" />
+        <property name="cleanup-high-watermark" type="float"
+                  _description="Cache fill level that triggers cleanup (from 0.0 to 1.0, defaults to 1.0).  If more than one component share the same cache directory, it's recommended to use slightly different values for each." />
+        <property name="cleanup-low-watermark" type="float"
+                  _description="Cache fill level to drop back to after cleanup (from 0.0 to 1.0, defaults to 0.6)" />
       </properties>
     </plug>
   </plugs>

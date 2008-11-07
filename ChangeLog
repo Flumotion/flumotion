@@ -6125,7 +6125,8 @@
 
 2008-02-25  Johan Dahlin  <johan@flumotion.com>
 
-	* flumotion/test/test_wizard_save.py: remove the now unused socket attribute too.
+	* flumotion/test/test_wizard_save.py: remove the now unused socket
+	attribute too.
 
 2008-02-25  Michael Smith <msmith@fluendo.com>
 
