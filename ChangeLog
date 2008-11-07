@@ -1,5 +1,15 @@
 2008-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* common/common.mk:
+	  Fail when any config fails to parse, not just the last one.
+	* conf/examples/default.xml:
+	* conf/examples/discont.xml:
+	* conf/examples/twores.xml:
+	  Remove <source> tags for <eater> tags.
+	  Created related bug #1182.
+
+2008-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpserver/admin_gtk.py:
 	* flumotion/component/misc/httpserver/cachedprovider.py:
 	* flumotion/component/misc/httpserver/cachestats.py:

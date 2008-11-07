@@ -19,7 +19,7 @@
     </component>
 
     <component name="overlay-video" project="flumotion" type="overlay-converter" version="0.4.1" worker="localhost">
-      <source>producer-video</source>
+      <eater name="default"><feed>producer-video</feed></eater>
 
       <property name="cc-logo">True</property>
       <property name="fluendo-logo">True</property>
@@ -32,19 +32,19 @@
 
     <!-- create a scaled down copy of the overlayed video for streaming -->
     <component name="overlay-video-small" project="flumotion" type="pipeline-converter" version="0.4.1" worker="localhost">
-      <source>overlay-video</source>
+      <eater name="default"><feed>overlay-video</feed></eater>
 
       <property name="pipeline">videoscale ! video/x-raw-yuv,width=160,height=120</property>
     </component>
 
     <component name="encoder-video" project="flumotion" type="theora-encoder" version="0.4.1" worker="localhost">
-      <source>overlay-video</source>
+      <eater name="default"><feed>overlay-video</feed></eater>
 
       <property name="bitrate">400000</property>
     </component>
 
     <component name="encoder-video-small" project="flumotion" type="theora-encoder" version="0.4.1" worker="localhost">
-      <source>overlay-video-small</source>
+      <eater name="default"><feed>overlay-video-small</feed></eater>
 
       <property name="bitrate">150000</property>
     </component>
@@ -57,23 +57,23 @@
     </component>
 
     <component name="encoder-audio" project="flumotion" type="vorbis-encoder" version="0.4.1" worker="localhost">
-      <source>producer-audio</source>
+      <eater name="default"><feed>producer-audio</feed></eater>
 
       <property name="quality">0.5</property>
     </component>
 
     <component name="muxer-audio-video" project="flumotion" type="ogg-muxer" version="0.4.1" worker="localhost">
-      <source>encoder-video</source>
-      <source>encoder-audio</source>
+      <eater name="default"><feed>encoder-video</feed></eater>
+      <eater name="default"><feed>encoder-audio</feed></eater>
     </component>
 
     <component name="muxer-audio-video-small" project="flumotion" type="ogg-muxer" version="0.4.1" worker="localhost">
-      <source>encoder-video-small</source>
-      <source>encoder-audio</source>
+      <eater name="default"><feed>encoder-video-small</feed></eater>
+      <eater name="default"><feed>encoder-audio</feed></eater>
     </component>
 
     <component name="http-audio-video" project="flumotion" type="http-streamer" version="0.4.1" worker="localhost">
-      <source>muxer-audio-video-small</source>
+      <eater name="default"><feed>muxer-audio-video-small</feed></eater>
 
       <property name="bandwidth-limit">10</property>
       <property name="burst-on-connect">True</property>
@@ -83,7 +83,7 @@
     </component>
 
     <component name="disk-audio-video" project="flumotion" type="disk-consumer" version="0.4.1" worker="localhost">
-      <source>muxer-audio-video</source>
+      <eater name="default"><feed>muxer-audio-video</feed></eater>
 
       <property name="directory">/tmp</property>
       <property name="rotate-type">time</property>
