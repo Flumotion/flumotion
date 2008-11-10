@@ -97,11 +97,18 @@ class TokenBucketConsumer(log.Loggable):
 
         self._lastDrip = time.time()
         self._dripDC = None
+        self._paused = True
 
         self.producer = None # we get this in registerProducer.
         self.consumer = consumer
 
-        self.consumer.registerProducer(self, 0)
+        # We are implemented as a push producer. We forcibly push some
+        # data every couple of seconds to maintain the requested
+        # rate. If the consumer cannot keep up with that rate we want
+        # to get a pauseProducing() call, so we will stop
+        # writing. Otherwise the data would have been buffered on the
+        # server side, leading to excessive memory consumption.
+        self.consumer.registerProducer(self, 1)
 
         self.info("Created TokenBucketConsumer with rate %d, "
                   "initial level %d, maximum level %d",
@@ -150,7 +157,7 @@ class TokenBucketConsumer(log.Loggable):
             # If we have data (and we're not already waiting for our next drip
             # interval), wait... this is what actually performs the data
             # throttling.
-            if not self._dripDC:
+            if not (self._dripDC or self._paused):
                 self._dripDC = reactor.callLater(self._dripInterval,
                     self._dripAndTryWrite)
         else:
@@ -199,9 +206,25 @@ class TokenBucketConsumer(log.Loggable):
         self.consumer = None
 
     def pauseProducing(self):
-        pass
+        self._paused = True
+
+        # In case our producer is also 'push', we want it to stop.
+        # FIXME: Pull producers don't even need to implement that
+        # method, so we probably should remember what kind of producer
+        # are we dealing with and not call pauseProducing when it's
+        # 'pull'.
+        # However, all our producers (e.g. FileProducer) just
+        # ignore pauseProducing, so for now it works.
+        self.producer.pauseProducing()
+
+        # We have to stop dripping, otherwise we will keep on filling
+        # the buffers and eventually run out of memory.
+        if self._dripDC:
+            self._dripDC.cancel()
+            self._dripDC = None
 
     def resumeProducing(self):
+        self._paused = False
         self._tryWrite()
 
         if not self._buffers and self.producer:
@@ -214,6 +237,9 @@ class TokenBucketConsumer(log.Loggable):
         self._tryWrite()
 
         if self._buffers and not self.fillLevel and self.producer:
+            # FIXME: That's not completely correct. See the comment in
+            # self.pauseProducing() about not calling pauseProducing
+            # on 'pull' producers.
             self.producer.pauseProducing()
 
     def finish(self):
