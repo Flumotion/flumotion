@@ -36,7 +36,7 @@ from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
 class TestCompTestGtk2Reactorness(testsuite.TestCase):
     supportedReactors = []
 
-    def test_gtk2_supportness(self):
+    def testGtk2Supportness(self):
 
         class TestCompTestSupportedReactors(CompTestTestCase):
 
@@ -64,16 +64,16 @@ class TestComponentWrapper(testsuite.TestCase):
         # See also a similar snippet in TestCompTestFlow.tearDown()
         comptest.cleanup_reactor()
 
-    def test_get_unique_name(self):
+    def testGetUniqueName(self):
         self.failIfEquals(ComponentWrapper.get_unique_name(),
                           ComponentWrapper.get_unique_name())
 
-    def test_invalid_type(self):
+    def testInvalidType(self):
         self.failUnlessRaises(errors.UnknownComponentError,
                               ComponentWrapper, 'invalid-comp-type',
                               None)
 
-    def test_valid_type(self):
+    def testValidType(self):
         cw = ComponentWrapper('pipeline-producer', None, name='pp')
         self.assertEquals(cw.cfg,
                           {'feed': ['default'], 'name': 'pp',
@@ -82,7 +82,7 @@ class TestComponentWrapper(testsuite.TestCase):
                            'source': [], 'plugs': {}, 'properties': {},
                            'type': 'pipeline-producer'})
 
-    def test_simple_link(self):
+    def testSimpleLink(self):
         pp = ComponentWrapper('pipeline-producer', None, name='pp')
         pc = ComponentWrapper('pipeline-converter', None)
 
@@ -91,7 +91,7 @@ class TestComponentWrapper(testsuite.TestCase):
         self.assertEquals(pc.cfg['eater'], {'default':
                                             [('pp:default', 'default')]})
 
-    def test_non_default_link(self):
+    def testNonDefaultLink(self):
         fwp = ComponentWrapper('firewire-producer', None, name='fwp')
         pc = ComponentWrapper('pipeline-converter', None, name='pc')
 
@@ -107,7 +107,7 @@ class TestComponentWrapper(testsuite.TestCase):
                           {'default': [('fwp:video', 'default'),
                                        ('fwp:audio', 'default-bis')]})
 
-    def test_instantiate_errors(self):
+    def testInstantiateErrors(self):
         # this passes None as the class name for ComponentWrapper,
         # i.e. it tries to dynamically subclass None. Throws a "cannot
         # instantiate None" error
@@ -121,7 +121,7 @@ class TestComponentWrapper(testsuite.TestCase):
         # See the comment in test_setup_fail_gst_linking()
         return self.failUnlessFailure(d, ComponentSad)
 
-    def test_gstreamer_error(self):
+    def testGstreamerError(self):
         pp = ComponentWrapper('pipeline-producer', Producer,
                               name='pp', props={'pipeline': 'fakesink'})
 
@@ -148,11 +148,11 @@ class TestCompTestSetup(CompTestTestCase):
         d.addCallback(comptest.cleanup_reactor)
         return d
 
-    def test_trivial(self):
+    def testTrivial(self):
         # This fails without having cleanup_reactor() in tearDown()
         return defer.succeed(None)
 
-    def test_success(self):
+    def testSuccess(self):
         pp = ComponentWrapper('pipeline-producer', Producer,
                               name='pp', props={'pipeline':
                                                 'audiotestsrc is-live=1'},
@@ -163,7 +163,7 @@ class TestCompTestSetup(CompTestTestCase):
         d.addCallback(lambda _: pp.stop())
         return d
 
-    def test_auto_linking(self):
+    def testAutoLinking(self):
         # the components should be linked automatically
         # [prod:default] --> [default:cnv1:default] --> [default:cnv2]
         self.p.set_flow([self.prod, self.cnv1, self.cnv2])
@@ -178,7 +178,7 @@ class TestCompTestSetup(CompTestTestCase):
         self.assertEquals({'default': [(cnv1_feed, 'default')]},
                           self.cnv2.cfg['eater'])
 
-    def test_dont_auto_link_linked(self):
+    def testDontAutoLinkLinked(self):
         p2 = pipeline_src()
         self.components.append(p2)
 
@@ -203,7 +203,7 @@ class TestCompTestSetup(CompTestTestCase):
         self.assertEquals({'default': [(prod_feed, 'default')]},
                           self.cnv2.cfg['eater'])
 
-    def test_master_clock(self):
+    def testMasterClock(self):
         p2 = pipeline_src()
         self.components.append(p2)
 
@@ -253,7 +253,7 @@ class TestCompTestFlow(CompTestTestCase):
         d.addBoth(lambda _: comptest.cleanup_reactor())
         return d
 
-    def test_setup_fail_gst_linking(self):
+    def testSetupFailGstLinking(self):
         p2 = pipeline_src('fakesink') # this just can't work!
         c2 = pipeline_cnv('fakesink') # and neither can this!
 
@@ -278,7 +278,7 @@ class TestCompTestFlow(CompTestTestCase):
         # the ComponentWrapper.
         return self.failUnlessFailure(d, ComponentSad)
 
-    def test_setup_started_and_happy(self):
+    def testSetupStartedAndHappy(self):
         flow = [self.prod, self.cnv1, self.cnv2]
         self.p.set_flow(flow)
         d = self.p.start_flow()
@@ -299,7 +299,7 @@ class TestCompTestFlow(CompTestTestCase):
         d.addCallback(wait_for_happy)
         return d
 
-    def test_run_fail_gst_linking(self):
+    def testRunFailGstLinking(self):
         p2 = pipeline_src('fakesink') # this just can't work!
         c2 = pipeline_cnv('fakesink') # and neither can this!
 
@@ -320,7 +320,7 @@ class TestCompTestFlow(CompTestTestCase):
         # See the comment in test_setup_fail_gst_linking()
         return self.failUnlessFailure(d, ComponentSad)
 
-    def test_run_start_timeout(self):
+    def testRunStartTimeout(self):
         start_delay_time = 5.0
         self.p.guard_timeout = 2.0
 
@@ -341,14 +341,14 @@ class TestCompTestFlow(CompTestTestCase):
         d = self.p.run_flow(self.duration)
         return self.failUnlessFailure(d, comptest.StartTimeout)
 
-    def test_run_with_delays(self):
+    def testRunWithDelays(self):
         flow = [self.prod, self.cnv1, self.cnv2]
         self.p.start_delay = 0.5
 
         self.p.set_flow(flow)
         return self.p.run_flow(self.duration)
 
-    def test_run_provides_clocking(self):
+    def testRunProvidesClocking(self):
         p2_pp = ('videotestsrc is-live=true ! '
                  'video/x-raw-rgb,framerate=(fraction)8/1,'
                  'width=32,height=24')
@@ -384,7 +384,7 @@ class TestCompTestFlow(CompTestTestCase):
         d = self.p.run_flow(self.duration, tasks=[task_d])
         return d
 
-    def test_run_tasks_chained_and_fired(self):
+    def testRunTasksChainedAndFired(self):
         self.tasks_fired = []
         self.tasks = []
         num_tasks = 5
@@ -409,7 +409,7 @@ class TestCompTestFlow(CompTestTestCase):
 
         return d
 
-    def test_run_tasks_timeout(self):
+    def testRunTasksTimeout(self):
         self.p.set_flow([self.prod, self.cnv1, self.cnv2])
         self.p.guard_timeout = 4.0
 
@@ -424,7 +424,7 @@ class TestCompTestFlow(CompTestTestCase):
 
         return self.failUnlessFailure(d, comptest.FlowTimeout)
 
-    def test_run_stop_timeout(self):
+    def testRunStopTimeout(self):
         stop_delay_time = 6.0
         self.p.guard_timeout = 4.0
 
@@ -449,7 +449,7 @@ class TestCompTestFlow(CompTestTestCase):
         d = self.p.run_flow(self.duration)
         return self.failUnlessFailure(d, comptest.StopTimeout)
 
-    def test_run_started_then_fails(self):
+    def testRunStartedThenFails(self):
         self.p.set_flow([self.prod, self.cnv1, self.cnv2])
         wrench_timeout = 0.5
 
@@ -470,7 +470,7 @@ class TestCompTestFlow(CompTestTestCase):
         d = self.p.run_flow(self.duration, tasks=[task_d])
         return self.failUnlessFailure(d, CustomWrenchException)
 
-    def test_run_started_then_flow_and_stop_fail(self):
+    def testRunStartedThenFlowAndStopFail(self):
         flow_error_timeout = 0.5
 
         class CustomFlowException(Exception):
