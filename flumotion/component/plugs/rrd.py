@@ -22,6 +22,7 @@
 import types
 import os
 
+# FIXME: use a variable like HAS_RRDTOOL like we do in similar code
 try:
     import rrdtool
 except ImportError:
@@ -88,6 +89,7 @@ class ComponentRRDPlug(base.ComponentPlug):
             elif path == self._bytesPath:
                 value = self._component.getBytesSent()
 
+            # FIXME: use isinstance here
             if type(value) == types.IntType:
                 rrdtool.update(path, 'N:%i' % value)
                 self.debug('RRD file [%s] updated with value: %s',
