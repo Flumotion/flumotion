@@ -1,3 +1,14 @@
+2008-11-10  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
+
+	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/gtk/main.py:
+	  Fix a bug with the windows version of twisted.
+	* flumotion/ui/trayicon.py:
+	  Use the gtk.StatusIcon instead of EggTrayIcon when gtk 2.10 or
+	  greater is present.
+	  Fixes #850
+
 2008-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/common.mk:

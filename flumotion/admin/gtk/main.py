@@ -125,5 +125,10 @@ def main(args):
     # Printout unhandled exception to stderr
     d.addErrback(twistedlog.err)
 
+    # Fixes a bug on widnows version of twisted that makes
+    # the application to crash because _simtag is not defined.
+    if not hasattr(reactor, '_simtag'):
+        reactor._simtag = None
+
     reactor.run()
     return _retval
