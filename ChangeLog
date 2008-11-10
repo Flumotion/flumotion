@@ -1,3 +1,8 @@
+2008-11-10  Xavier Queralt Mateu,,,  <xqueralt at flumotion dot com>
+
+	* flumotion/test/test_wizard_save.py:
+	Fixed the tests for the changes on the previous commit.
+
 2008-11-10  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
 
 	* flumotion/component/encoders/theora/wizard_gtk.py:
