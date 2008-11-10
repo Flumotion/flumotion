@@ -42,8 +42,8 @@ class TheoraVideoEncoder(VideoEncoder):
 
     def __init__(self):
         super(TheoraVideoEncoder, self).__init__()
-        self.has_quality = True
-        self.has_bitrate = False
+        self.has_quality = False
+        self.has_bitrate = True
         self.framerate = 25.0
 
         self.properties.noise_sensitivity = 0
@@ -137,6 +137,9 @@ class TheoraStep(VideoEncoderStep):
         # This is bound to both radiobutton_bitrate and radiobutton_quality
         self.bitrate.set_sensitive(self.has_bitrate.get_active())
         self.quality.set_sensitive(self.has_quality.get_active())
+
+        self.model.has_bitrate = self.has_bitrate.get_active()
+        self.model.has_quality = self.has_quality.get_active()
 
 
 class TheoraWizardPlugin(object):
