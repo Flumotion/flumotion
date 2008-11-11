@@ -22,9 +22,9 @@
 import gettext
 
 from flumotion.admin.assistant.models import AudioEncoder, VideoEncoder, Muxer
+from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.common.errors import NoBundleError
 from flumotion.common.i18n import N_
-from flumotion.admin.gtk.workerstep import WorkerWizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -55,7 +55,7 @@ class ConversionStep(WorkerWizardStep):
     # Public API
 
     def getAudioPage(self):
-        if self.wizard.hasAudio():
+        if self.wizard.getScenario().hasAudio(self.wizard):
             return self._getAudioPage()
         return None
 
@@ -65,7 +65,7 @@ class ConversionStep(WorkerWizardStep):
         @returns: the muxer
         @rtype: string
         """
-        entry = self.wizard.getMuxerEntry()
+        entry = self.wizard.getScenario().getMuxerEntry()
         return entry.componentType
 
     def getMuxerFormat(self):
@@ -73,7 +73,7 @@ class ConversionStep(WorkerWizardStep):
         @returns: the muxer formats
         @rtype: string
         """
-        entry = self.wizard.getMuxerEntry()
+        entry = self.wizard.getScenario().getMuxerEntry()
         return entry.getProvidedMediaTypes()[0]
 
     def getAudioFormat(self):
@@ -81,7 +81,7 @@ class ConversionStep(WorkerWizardStep):
         @returns: the audio format
         @rtype: string
         """
-        if self.wizard.getAudioEncoder():
+        if self.wizard.getScenario().getAudioEncoder():
             entry = self.audio.get_selected()
             return entry.getProvidedMediaTypes()[0]
 
@@ -90,18 +90,19 @@ class ConversionStep(WorkerWizardStep):
         @returns: the video format
         @rtype: string
         """
-        if self.wizard.getVideoEncoder():
+        if self.wizard.getScenario().getVideoEncoder():
             entry = self.video.get_selected()
             return entry.getProvidedMediaTypes()[0]
 
     # WizardStep
 
     def activated(self):
-        data = [('muxer', self.muxer, None, self.wizard.getMuxerEntry())]
+        data = [('muxer', self.muxer, None,
+                 self.wizard.getScenario().getMuxerEntry())]
 
-        audioProducer = self.wizard.getAudioProducer()
+        audioProducer = self.wizard.getScenario().getAudioProducer(self.wizard)
         if audioProducer:
-            oldAudioEncoder = self.wizard.getAudioEncoder()
+            oldAudioEncoder = self.wizard.getScenario().getAudioEncoder()
             data.append(('audio-encoder', self.audio,
                          _PREFERRED_AUDIO_ENCODER,
                          oldAudioEncoder))
@@ -109,9 +110,9 @@ class ConversionStep(WorkerWizardStep):
             self.audio.hide()
             self.label_audio.hide()
 
-        videoProducer = self.wizard.getVideoProducer()
+        videoProducer = self.wizard.getScenario().getVideoProducer(self.wizard)
         if videoProducer:
-            oldVideoEncoder = self.wizard.getVideoEncoder()
+            oldVideoEncoder = self.wizard.getScenario().getVideoEncoder()
             data.append(('video-encoder', self.video,
                          _PREFERRED_VIDEO_ENCODER,
                          oldVideoEncoder))
@@ -130,9 +131,9 @@ class ConversionStep(WorkerWizardStep):
             self._populateCombos(data)
 
     def getNext(self):
-        if self.wizard.hasVideo():
+        if self.wizard.getScenario().hasVideo(self.wizard):
             return self._getVideoPage()
-        elif self.wizard.hasAudio():
+        elif self.wizard.getScenario().hasAudio(self.wizard):
             return self._getAudioPage()
         else:
             raise AssertionError
@@ -185,9 +186,9 @@ class ConversionStep(WorkerWizardStep):
         encoder.worker = self.worker
 
         if entry.type == 'audio-encoder':
-            self.wizard.setAudioEncoder(encoder)
+            self.wizard.getScenario().setAudioEncoder(encoder)
         else:
-            self.wizard.setVideoEncoder(encoder)
+            self.wizard.getScenario().setVideoEncoder(encoder)
 
     def _loadPlugin(self, entry):
 
@@ -226,7 +227,7 @@ class ConversionStep(WorkerWizardStep):
 
         def stepLoaded(step):
             if step is not None:
-                self.wizard.setAudioEncoder(step.model)
+                self.wizard.getScenario().setAudioEncoder(step.model)
             self.wizard.taskFinished()
             return step
         self.wizard.waitForTask('audio encoder page')
@@ -238,7 +239,7 @@ class ConversionStep(WorkerWizardStep):
 
         def stepLoaded(step):
             if step is not None:
-                self.wizard.setVideoEncoder(step.model)
+                self.wizard.getScenario().setVideoEncoder(step.model)
             self.wizard.taskFinished()
             return step
         self.wizard.waitForTask('video encoder page')
@@ -251,13 +252,13 @@ class ConversionStep(WorkerWizardStep):
         # '...' used while waiting for the query to be done
         if muxerEntry is None:
             return
-        self.wizard.setMuxerEntry(muxerEntry)
+        self.wizard.getScenario().setMuxerEntry(muxerEntry)
 
         self._populateCombos(
             [('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER,
-              self.wizard.getAudioEncoder()),
+              self.wizard.getScenario().getAudioEncoder()),
              ('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER,
-              self.wizard.getVideoEncoder())],
+              self.wizard.getScenario().getVideoEncoder())],
             provides=muxerEntry.getAcceptedMediaTypes())
 
     # Callbacks

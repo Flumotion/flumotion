@@ -496,6 +496,22 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
     def getConfiguration(self):
         return self.callRemote('getConfiguration')
 
+    def getScenarios(self):
+        """
+        Obtains the available scenarios from the manager.
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        return self.callRemote('getScenarios')
+
+    def getScenarioByType(self, type):
+        """
+        Obtains an scenario given its type.
+
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        return self.callRemote('getScenarioByType', type)
+
     def cleanComponents(self):
         return self.callRemote('cleanComponents')
 

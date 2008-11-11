@@ -706,7 +706,6 @@ class AdminWindow(Loggable, GladeDelegate):
                     if entry.componentType == componentType:
                         yield (componentState, entry)
 
-
         for componentState, entry in _getComponents():
             component = componentClass()
             component.componentType = entry.componentType
@@ -718,10 +717,12 @@ class AdminWindow(Loggable, GladeDelegate):
             yield component
 
     def _runAddNewFormatAssistant(self):
-        from flumotion.admin.gtk.addformatassistant import AddFormatAssistant
-        addFormatAssistant = AddFormatAssistant(self._window)
+        from flumotion.admin.gtk.configurationassistant import \
+                ConfigurationAssistant
 
-        def cb(entries):
+        configurationAssistant = ConfigurationAssistant(self._window)
+
+        def gotWizardEntries(entries):
             entryDict = {}
             for entry in entries:
                 entryDict.setdefault(entry.type, []).append(entry)
@@ -730,13 +731,27 @@ class AdminWindow(Loggable, GladeDelegate):
                     AudioProducer, entryDict['audio-producer'], )
             videoProducers = self._createComponentsByAssistantType(
                     VideoProducer, entryDict['video-producer'])
-            addFormatAssistant.setAudioProducers(audioProducers)
-            addFormatAssistant.setVideoProducers(videoProducers)
-            self._runAssistant(addFormatAssistant)
+            scenario = configurationAssistant.getScenario()
+            scenario.setAudioProducers(audioProducers)
+            scenario.setVideoProducers(videoProducers)
 
-        d = self._adminModel.getWizardEntries(
-            wizardTypes=['audio-producer', 'video-producer'])
-        d.addCallback(cb)
+            self._runAssistant(configurationAssistant)
+
+        def gotBundledFunction(function):
+            scenario = function()
+            scenario.setMode('addformat')
+            scenario.addSteps(configurationAssistant)
+            configurationAssistant.setScenario(scenario)
+
+            return self._adminModel.getWizardEntries(
+                wizardTypes=['audio-producer', 'video-producer'])
+
+        d = self._adminModel.getBundledFunction(
+            'flumotion.scenario.live.wizard_gtk',
+            'LiveAssistantPlugin')
+
+        d.addCallback(gotBundledFunction)
+        d.addCallback(gotWizardEntries)
 
     def _runConfigurationAssistant(self):
         from flumotion.admin.gtk.configurationassistant import \
@@ -744,6 +759,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         def runAssistant():
             configurationAssistant = ConfigurationAssistant(self._window)
+            configurationAssistant.addInitialSteps()
             self._runAssistant(configurationAssistant)
             self._configurationAssistantIsRunning = True
 

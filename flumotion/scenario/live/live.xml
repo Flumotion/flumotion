@@ -1,0 +1,25 @@
+<registry>
+    <scenarios>
+        <scenario type="live-scenario"
+                  base="flumotion/scenario/live"
+                  _description="Creates a live stream.">
+            <entries>
+                <entry type="wizard" location="wizard_gtk.py"
+                       function="LiveAssistantPlugin" />
+            </entries>
+        </scenario>
+    </scenarios>
+    <bundles>
+        <bundle name="live-scenario-base">
+            <dependencies>
+                <dependency name="scenario-steps"/>
+            </dependencies>
+            <directories>
+                <directory name="flumotion/scenario/live">
+                    <filename location="wizard_gtk.py" />
+                    <filename location="__init__.py" />
+                </directory>
+            </directories>
+        </bundle>
+    </bundles>
+</registry>

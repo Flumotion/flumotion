@@ -230,8 +230,8 @@ class HTTPSpecificStep(ConsumerStep):
 
     def getServerConsumers(self):
         return self.plugarea.getServerConsumers(
-           self.wizard.getAudioProducer(),
-           self.wizard.getVideoProducer())
+            self.wizard.getScenario().getAudioProducer(self.wizard),
+            self.wizard.getScenario().getVideoProducer(self.wizard))
 
     def getDefaultMountPath(self):
         encodingStep = self.wizard.getStep('Encoding')

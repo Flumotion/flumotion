@@ -60,6 +60,59 @@ def _getMTime(file):
     return os.stat(file)[stat.ST_MTIME]
 
 
+class RegistryEntryScenario(pb.Copyable, pb.RemoteCopy):
+    """
+    I represent a <scenario> entry in the registry
+    """
+
+    def __init__(self, type, description, base, entries):
+        """
+        @param type:           the type of this scenario
+        @type  type:           str
+        @param description:    description of this scenario
+        @type  description:    str
+        @param base:           base directory where this scenario is placed
+        @type  base:           str
+        @param entries:        dict of entry point type -> entry
+        @type  entries:        dict of str -> L{RegistryEntryEntry}
+        """
+        self.type = type
+        # we don't want to end up with the string "None"
+        self.description = description or ""
+        self.base = base
+        self.entries = entries
+
+    def getEntries(self):
+        """
+        Get the entries asociated with this scenario
+
+        @rtype: list of L{RegistryEntryEntry}
+        """
+        return self.entries.values()
+
+    def getEntryByType(self, type):
+        """
+        Get the entry point for the given type of entry.
+
+        @param type: The type of the wanted entry.
+        @type type: string
+
+        @rtype: L{RegistryEntryEntry}
+        """
+        return self.entries[type]
+
+    def getType(self):
+        return self.type
+
+    def getBase(self):
+        return self.base
+
+    def getDescription(self):
+        return self.description
+
+pb.setUnjellyableForClass(RegistryEntryScenario, RegistryEntryScenario)
+
+
 class RegistryEntryComponent(pb.Copyable, pb.RemoteCopy):
     """
     I represent a <component> entry in the registry
@@ -488,6 +541,7 @@ class RegistryParser(fxml.Parser):
         self._directories = {} # path -> RegistryDirectory
         self._bundles = {}
         self._plugs = {}
+        self._scenarios = {}
 
     def getComponents(self):
         return self._components.values()
@@ -498,6 +552,14 @@ class RegistryParser(fxml.Parser):
         except KeyError:
             raise errors.UnknownComponentError("unknown component type:"
                                                " %s" % (name, ))
+
+    def getScenarios(self):
+        return self._scenarios.values()
+
+    def getScenarioByType(self, type):
+        if type in self._scenarios:
+            return self._scenarios[type]
+        return None
 
     def getPlugs(self):
         return self._plugs.values()
@@ -592,6 +654,42 @@ class RegistryParser(fxml.Parser):
                                       entries, eaters, feeders,
                                       needs_sync, clock_priority,
                                       sockets, wizards)
+
+    def _parseScenarios(self, node):
+        # <scenarios>
+        #   <scenario>
+        # </scenarios>
+
+        scenarios = {}
+
+        def addScenario(scenario):
+            scenarios[scenario.getType()] = scenario
+
+        parsers = {'scenario': (self._parseScenario, addScenario)}
+        self.parseFromTable(node, parsers)
+
+        return scenarios
+
+    def _parseScenario(self, node):
+        # <scenario type="..." base="..." _description="...">
+        #   <entries>
+        # </scenario>
+
+        scenarioType, baseDir, description = \
+            self.parseAttributes(node,
+                required=('type', 'base'),
+                optional=('_description', ))
+
+        entries = {}
+
+        parsers = {
+            'entries': (self._parseEntries, entries.update),
+        }
+
+        self.parseFromTable(node, parsers)
+
+        return RegistryEntryScenario(scenarioType, description,
+                                     baseDir, entries)
 
     def _parseSource(self, node):
         # <source location="..."/>
@@ -1018,12 +1116,14 @@ class RegistryParser(fxml.Parser):
         # <plugs>...</plugs>*
         # <directories>...</directories>*
         # <bundles>...</bundles>*
+        # <scenarios>...</scenarios>*
         parsers = {'components': (self._parseComponents,
                                   self._components.update),
                    'directories': (self._parseDirectories,
                                    self._directories.update),
                    'bundles': (self._parseBundles, self._bundles.update),
-                   'plugs': (self._parsePlugs, self._plugs.update)}
+                   'plugs': (self._parsePlugs, self._plugs.update),
+                   'scenarios': (self._parseScenarios, self._scenarios.update)}
 
         if disallowed:
             for k in disallowed:
@@ -1509,6 +1609,12 @@ class ComponentRegistry(log.Loggable):
 
     def getPlugs(self):
         return self._parser.getPlugs()
+
+    def getScenarios(self):
+        return self._parser.getScenarios()
+
+    def getScenarioByType(self, type):
+        return self._parser.getScenarioByType(type)
 
     def getBundles(self):
         return self._parser._bundles.values()

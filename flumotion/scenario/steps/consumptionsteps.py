@@ -22,16 +22,16 @@
 import gettext
 
 from flumotion.admin.assistant.models import Porter
+from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.common.python import any as pany
 from flumotion.configure import configure
-from flumotion.ui.wizard import WizardStep
-from flumotion.admin.gtk.httpstreamersteps import HTTPBothStep, \
+from flumotion.scenario.steps.httpstreamersteps import HTTPBothStep, \
      HTTPAudioStep, HTTPVideoStep
-from flumotion.admin.gtk.diskersteps import DiskBothStep, DiskAudioStep, \
+from flumotion.scenario.steps.diskersteps import DiskBothStep, DiskAudioStep, \
      DiskVideoStep
-from flumotion.admin.gtk.shout2steps import Shout2BothStep, Shout2AudioStep, \
-     Shout2VideoStep
-from flumotion.admin.gtk.workerstep import WorkerWizardStep
+from flumotion.scenario.steps.shout2steps import Shout2BothStep, \
+     Shout2AudioStep, Shout2VideoStep
+from flumotion.ui.wizard import WizardStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -83,8 +83,8 @@ class ConsumptionStep(WizardStep):
     # WizardStep
 
     def activated(self):
-        hasAudio = self.wizard.hasAudio()
-        hasVideo = self.wizard.hasVideo()
+        hasAudio = self.wizard.getScenario().hasAudio(self.wizard)
+        hasVideo = self.wizard.getScenario().hasVideo(self.wizard)
         hasBoth = hasAudio and hasVideo
 
         possibleButtons = [self.http_audio_video,
@@ -180,8 +180,8 @@ class ConsumptionStep(WizardStep):
                   self.shout2_video,
                   self.shout2_audio_video]))
 
-        has_audio = self.wizard.hasAudio()
-        has_video = self.wizard.hasVideo()
+        has_audio = self.wizard.getScenario().hasAudio(self.wizard)
+        has_video = self.wizard.getScenario().hasVideo(self.wizard)
 
         for steps, (audio, video, audio_video) in uielements:
             # Audio & Video, all checkbuttons are visible and

@@ -12,6 +12,7 @@ SUBDIRS = \
 	monitor \
 	project \
 	service \
+	scenario \
 	test \
 	tester \
 	twisted \

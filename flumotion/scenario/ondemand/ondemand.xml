@@ -1,0 +1,25 @@
+<registry>
+    <scenarios>
+        <scenario type="ondemand-scenario"
+                  base="flumotion/scenario/ondemand"
+                  _description="Creates an ondemand stream.">
+            <entries>
+                <entry type="wizard" location="wizard_gtk.py"
+                       function="OndemandAssistantPlugin" />
+            </entries>
+        </scenario>
+    </scenarios>
+    <bundles>
+        <bundle name="ondemand-scenario-base">
+            <dependencies>
+                <dependency name="scenario-base" />
+            </dependencies>
+            <directories>
+                <directory name="flumotion/scenario/ondemand">
+                    <filename location="wizard_gtk.py" />
+                    <filename location="__init__.py" />
+                </directory>
+            </directories>
+        </bundle>
+    </bundles>
+</registry>

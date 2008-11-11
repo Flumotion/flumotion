@@ -264,6 +264,47 @@ class AdminAvatar(base.ManagerAvatar):
         """
         return self.vishnu.getConfiguration()
 
+    def perspective_getScenarioByType(self, scenarioType, entryType):
+        """
+        Remote method that gets the scenario of a given type.
+
+        @param scenarioType: the component
+        @type scenarioType: a string
+        Returns: a (filename, methodName) tuple, or raises::
+          - NoBundleError if the entry location does not exist
+        """
+        assert scenarioType is not None
+
+        self.debug('getting entry of type %s for scenario type %s',
+                   entryType, scenarioType)
+
+        try:
+            scenarioRegistryEntry = registry.getRegistry().getScenarioByType(
+                scenarioType)
+            # FIXME: add logic here for default entry points and functions
+            entry = scenarioRegistryEntry.getEntryByType(entryType)
+        except KeyError:
+            self.warning("Could not find bundle for %s(%s)" % (
+                scenarioType, entryType))
+            raise errors.NoBundleError("entry type %s in component type %s" %
+                (entryType, scenarioType))
+
+        filename = os.path.join(scenarioRegistryEntry.getBase(),
+                                entry.getLocation())
+        self.debug('entry point is in file path %s and function %s' % (
+            filename, entry.function))
+
+        return (filename, entry.getFunction())
+
+    def perspective_getScenarios(self):
+        """
+        Get all the scenarios defined on the registry.
+
+        @rtype     : List of L{IScenarioAssistantPlugin}
+        """
+        r = registry.getRegistry()
+        return r.getScenarios()
+
     def _saveFlowFile(self, filename):
         """Opens a file that the flow should be written to.
 

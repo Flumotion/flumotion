@@ -1,3 +1,92 @@
+2008-11-11  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
+
+	reviewed by: Arek Korbik <arek@flumotion.com>
+	reviewed by: Johan Dahlin  <johan@flumotion.com>
+
+	After this update the wizard's scenarios are fetched and loaded
+	dynamically from the manager as bundles and we reuse more code among
+	all the wizard modules.
+
+	* flumotion/admin/gtk/addformatassistant.py (deleted):
+	Cleaning code. This is not needed as right now ConfigurationAssistant
+	can act as an AddFormatAssistant.
+	* flumotion/scenario (added):
+	* flumotion/scenario/__init__.py (added):
+	* flumotion/scenario/Makefile.am (added):
+	Created a new module where the scenario bundles will be placed.
+	* flumotion/scenario/live (added):
+	* flumotion/scenario/live/__init__.py (added):
+	* flumotion/scenario/live/Makefile.am (added):
+	* flumotion/scenario/live/live.xml (added):
+	* flumotion/scenario/live/wizard_gtk.py (added):
+	Created the Live scenario's module. This module contains the registry
+	file (live.xml) and the scenario's logic (wizard_gtk.py).
+	* flumotion/scenario/ondemand (added):
+	* flumotion/scenario/ondemand/__init__.py (added):
+	* flumotion/scenario/ondemand/Makefile.am (added):
+	* flumotion/scenario/ondemand/ondemand.xml (added):
+	* flumotion/scenario/ondemand/wizard_gtk.py (added):
+	Created the Ondemand scenario's module. This module contains the
+	registry file (ondemand.xml) and the scenario's logic (wizard_gtk.py).
+	* flumotion/admin/assistant/scenarios.py (deleted):
+	Cleaning code. As by now the scenarios are bundled and have its own
+	module this one is not needed anymore.
+	* flumotion/scenario/steps (added):
+	* flumotion/scenario/steps/__init__.py (added):
+	* flumotion/scenario/steps/Makefile.am (added):
+	Created a new module where the wizard steps will be placed.
+	* flumotion/scenario/steps/steps.xml (added):
+	Registry file for the steps bundle. The scenarios will depend on this.
+	* flumotion/scenario/steps/summarysteps.py (added):
+	* flumotion/scenario/steps/licensestep.py (added):
+	* flumotion/admin/gtk/consumptionsteps.py (moved):
+	New Location: flumotion/scenario/steps/consumptionsteps.py
+	* flumotion/admin/gtk/diskersteps.py (moved):
+	New Location: flumotion/scenario/steps/diskersteps.py
+	* flumotion/admin/gtk/httpstreamersteps.py (moved):
+	New Location: flumotion/scenario/steps/httpstreamersteps.py
+	* flumotion/admin/gtk/shout2steps.py (moved):
+	New Location: flumotion/scenario/steps/shout2steps.py
+	* flumotion/admin/gtk/conversionsteps.py (moved):
+	New Location: flumotion/scenario/steps/conversionsteps.py
+	* flumotion/admin/gtk/productionsteps.py (moved):
+	New Location: flumotion/scenario/steps/productionsteps.py
+	* flumotion/admin/gtk/ondemandstep.py (moved):
+	New Location: flumotion/scenario/steps/ondemandstep.py
+
+	All the wizard steps were moved to the new module.
+
+	* flumotion/admin/admin.py:
+	Adding the proxy methods to the adminModel for fetching the scenarios.
+	* flumotion/admin/assistant/interfaces.py:
+	Added the IScenarioAssistantPlugin, implemented by the scenarios.
+	* flumotion/admin/gtk/adminwindow.py:
+	Modified the _runAddNewFormatAssistant method. It now creates a new
+	ConfigurationAssistant and sets its mode to 'addformat'.
+	* flumotion/admin/gtk/configurationassistant.py:a
+	Various changes:
+		- The ConfigurationAssistant has different modes. The normal
+		wizard will use the 'normal' mode and the AddFormat wizard
+		will use the 'addformat' mode.
+		- The ConfigurationAsssitant now fetches the scenarios
+		remotelly from the manager.
+		- The LiveScenario's particular methods have been moved to the
+		live scenario code.
+	* flumotion/admin/gtk/overlaystep.py:
+	* flumotion/common/registry.py:
+	Added the methods in the parser to understand the scenario bundles.
+	* flumotion/manager/admin.py:
+	Added remote methods to the admin avatar for fetching the available
+	scenarios and sending them to the remote client.
+	* flumotion/component/encoders/theora/wizard_gtk.py:
+	* flumotion/test/test_wizard_save.py:
+	Modified an import because the step modules were moved.
+	* configure.ac:
+	Added the new directory 'flumotion/scenario' and its contents to the
+	configure.ac
+	* flumotion/Makefile.am:
+	Fixes #1164
+
 2008-11-10  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/test/test_comptest.py:

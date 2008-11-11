@@ -105,3 +105,23 @@ class IHTTPConsumerPlugin(Interface):
         @returns: consumer
         @rtype: a L{HTTPServer} subclass
         """
+
+
+class IScenarioAssistantPlugin(Interface):
+    """A pluggable scenario that can be listed at the first page of the wizard.
+    It predefines the steps the wizard will take and the way it is saved.
+    """
+
+    def addSteps(assistant):
+        """Called to add the required steps to the wizard.
+        @param assistant: The assistant the steps have to be added to.
+        @type  assistant: L{ConfigurationAssistant}
+        """
+
+    def save(assistant, saver):
+        """Saves the scenario through an AdminSaver to get the configuration.
+        @param assistant: The assistant the steps have to be added to.
+        @type  assistant: L{ConfigurationAssistant}
+        @param saver: The element which generates the xml configuration.
+        @type  saver: L{AssistantSaver}
+        """

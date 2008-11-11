@@ -57,7 +57,7 @@ import gtk
 from gtk import gdk
 from twisted.internet import defer
 
-from flumotion.admin.assistant.scenarios import LiveScenario, OnDemandScenario
+from flumotion.admin.assistant.save import AssistantSaver
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.admin.gtk.workerlist import WorkerList
 from flumotion.common import errors, messages
@@ -124,31 +124,60 @@ class ScenarioStep(WizardStep):
     # WizardStep
 
     def __init__(self, wizard):
-        self._currentScenarioClass = None
+        self._currentScenarioType = None
         self._radioGroup = None
         self._scenarioRadioButtons = []
         super(ScenarioStep, self).__init__(wizard)
 
     def setup(self):
-        self.addScenario(LiveScenario)
-        self.addScenario(OnDemandScenario)
-        firstButton = self.scenarios_box.get_children()[0]
-        firstButton.set_active(True)
-        firstButton.toggled()
-        firstButton.grab_focus()
+
+        def addScenarios(list):
+            for scenario in list:
+                self.addScenario(scenario.getDescription(),
+                                 scenario.getType())
+
+            firstButton = self.scenarios_box.get_children()[0]
+            firstButton.set_active(True)
+            firstButton.toggled()
+            firstButton.grab_focus()
+
+        d = self.wizard.getAdminModel().getScenarios()
+        d.addCallback(addScenarios)
+
+        return d
 
     def getNext(self):
+        self.wizard.waitForTask('get-next-step')
         self.wizard.cleanFutureSteps()
-        scenario = self._currentScenarioClass(self.wizard)
-        scenario.addSteps()
-        self.wizard.setScenario(scenario)
+
+        def addScenarioSteps(scenarioClass):
+            scenario = scenarioClass()
+            scenario.addSteps(self.wizard)
+            self.wizard.setScenario(scenario)
+            self.wizard.taskFinished()
+
+        d = self.wizard.getWizardScenario(self._currentScenarioType)
+        d.addCallback(addScenarioSteps)
+
+        return d
 
     # Public
 
-    def addScenario(self, scenarioClass):
-        button = gtk.RadioButton(self._radioGroup, scenarioClass.short)
-        button.connect('toggled', self._on_radiobutton__toggled, scenarioClass)
-        button.connect('activate', self._on_radiobutton__activate)
+    def addScenario(self, scenarioDesc, scenarioType):
+        """
+        Adds a new entry to the scenarios list of the wizard.
+
+        @param scenarioDesc: Description that will be shown on the list.
+        @type  scenarioDesc: str
+        @param scenarioType: The type of the scenario we are adding.
+        @type  scenarioType: str
+        """
+        button = gtk.RadioButton(self._radioGroup, scenarioDesc)
+        button.connect('toggled',
+                       self._on_radiobutton__toggled,
+                       scenarioType)
+        button.connect('activate',
+                       self._on_radiobutton__activate)
 
         self.scenarios_box.pack_start(button, False, False)
         button.show()
@@ -163,9 +192,9 @@ class ScenarioStep(WizardStep):
     def _on_radiobutton__activate(self, radio):
         self.wizard.goNext()
 
-    def _on_radiobutton__toggled(self, radio, scenarioClass):
+    def _on_radiobutton__toggled(self, radio, scenarioType):
         if radio.get_active():
-            self._currentScenarioClass = scenarioClass
+            self._currentScenarioType = scenarioType
 
 
 class ConfigurationAssistant(SectionWizard):
@@ -199,20 +228,20 @@ class ConfigurationAssistant(SectionWizard):
         self._stepWorkers = {}
         self._scenario = None
         self._existingComponentNames = []
-        self._videoEncoder = None
-        self._audioEncoder = None
-        self._muxerEntry = None
 
         self._workerList = WorkerList()
         self.top_vbox.pack_start(self._workerList, False, False)
         self._workerList.connect('worker-selected',
                                   self.on_combobox_worker_changed)
-        self.addSteps()
 
     # SectionWizard
 
     def completed(self):
-        saver = self._scenario.save()
+        saver = AssistantSaver()
+        saver.setFlowName('default')
+        saver.setExistingComponentNames(self._existingComponentNames)
+        self._scenario.save(self, saver)
+
         xml = saver.getXML()
         self.emit('finished', xml)
 
@@ -244,7 +273,7 @@ class ConfigurationAssistant(SectionWizard):
 
     # FIXME: Remove this and make fgc create a new scenario
 
-    def addSteps(self):
+    def addInitialSteps(self):
         """Add the step sections of the wizard, can be
         overridden in a subclass
         """
@@ -261,7 +290,6 @@ class ConfigurationAssistant(SectionWizard):
         @type scenario: a L{flumotion.admin.assistant.scenarios.Scenario}
           subclass
         """
-        scenario.setExistingComponentNames(self._existingComponentNames)
         self._scenario = scenario
 
     def getScenario(self):
@@ -332,80 +360,6 @@ class ConfigurationAssistant(SectionWizard):
         @rtype: bool
         """
         return bool(self._tasks)
-
-    # FIXME: Move to scenario
-
-    def hasAudio(self):
-        """If the configured feed has a audio stream
-        @return: if we have audio
-        @rtype: bool
-        """
-        productionStep = self.getStep('Production')
-        return productionStep.hasAudio()
-
-    def hasVideo(self):
-        """If the configured feed has a video stream
-        @return: if we have video
-        @rtype: bool
-        """
-        productionStep = self.getStep('Production')
-        return productionStep.hasVideo()
-
-    def getAudioProducer(self):
-        """Returns the selected audio producer or None
-        @returns: producer or None
-        @rtype: L{flumotion.admin.assistant.models.AudioProducer}
-        """
-        productionStep = self.getStep('Production')
-        return productionStep.getAudioProducer()
-
-    def getVideoProducer(self):
-        """Returns the selected video producer or None
-        @returns: producer or None
-        @rtype: L{flumotion.admin.assistant.models.VideoProducer}
-        """
-        productionStep = self.getStep('Production')
-        return productionStep.getVideoProducer()
-
-    def getVideoEncoder(self):
-        """Returns the selected video encoder or None
-        @returns: encoder or None
-        @rtype: L{flumotion.admin.assistant.models.VideoEncoder}
-        """
-        return self._videoEncoder
-
-    def getAudioEncoder(self):
-        """Returns the selected audio encoder or None
-        @returns: encoder or None
-        @rtype: L{flumotion.admin.assistant.models.AudioEncoder}
-        """
-        return self._audioEncoder
-
-    def setVideoEncoder(self, videoEncoder):
-        """Select a video encoder
-        @param videoEncoder: encoder or None
-        @type videoEncoder: L{flumotion.admin.assistant.models.VideoEncoder}
-        """
-        self._videoEncoder = videoEncoder
-
-    def setAudioEncoder(self, audioEncoder):
-        """Select a audio encoder
-        @param audioEncoder: encoder or None
-        @type audioEncoder: L{flumotion.admin.assistant.models.AudioEncoder}
-        """
-        self._audioEncoder = audioEncoder
-
-    def setMuxerEntry(self, muxerEntry):
-        """Select a muxer entry
-        @param audioEncoder: muxer entry
-        """
-        self._muxerEntry = muxerEntry
-
-    def getMuxerEntry(self):
-        """Returns the muxer entry
-        @returns: the muxer entry
-        """
-        return self._muxerEntry
 
     def setHTTPPorter(self, httpPorter):
         """Sets the HTTP porter of the assistant.
@@ -639,6 +593,25 @@ class ConfigurationAssistant(SectionWizard):
         d.addCallback(self._gotEntryPoint)
         return d
 
+    def getWizardScenario(self, scenarioType):
+        """
+        Fetches a scenario bundle from a specific kind of component.
+
+        @param scenarioType: the scenario type to get the assistant entry
+          bundle from.
+        @type scenarioType: string
+        @returns: a deferred returning either::
+          - factory of the component
+          - noBundle error: if the component lacks a assistant bundle
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        self.waitForTask('get assistant entry %s' % (scenarioType, ))
+        self.clear_msg('assistant-bundle')
+        d = self._adminModel.callRemote(
+            'getScenarioByType', scenarioType, 'wizard')
+        d.addCallback(self._gotEntryPoint)
+        return d
+
     def getWizardPlugEntry(self, plugType):
         """Fetches a assistant bundle from a specific kind of plug
         @param plugType: the plug type to get the assistant entry
@@ -685,8 +658,6 @@ class ConfigurationAssistant(SectionWizard):
         @type componentNames: list of strings
         """
         self._existingComponentNames = componentNames
-        if self._scenario is not None:
-            self._scenario.setExistingComponentNames(componentNames)
 
     def workerChangedForStep(self, step, workerName):
         """Tell a step that its worker changed.
