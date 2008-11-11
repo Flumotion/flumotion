@@ -1,5 +1,11 @@
 2008-11-11  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
 
+	* flumotion/admin/assistant/Makefile.am:
+	* flumotion/admin/gtk/Makefile.am:
+	Deleted some moved files from the Makefiles
+
+2008-11-11  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
+
 	reviewed by: Arek Korbik <arek@flumotion.com>
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
