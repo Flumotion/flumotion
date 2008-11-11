@@ -1,3 +1,17 @@
+2008-11-11  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* common/trial.mk:
+	* common/Makefile.am:
+	Use and dist flumotion-trial instead of flumotion-trial.in, as the
+	latter dues noe require autoconf processing.
+
+	* configure.ac:
+	Remove the directive to generate flumotion-trial.
+
+	* common/flumotion-trial.in (deleted):
+	* common/flumotion-trial (added):
+	Rename flumotion-trial.in to flumotion-trial.
+
 2008-11-11  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
 
 	* flumotion/admin/assistant/Makefile.am:

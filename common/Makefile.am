@@ -19,5 +19,5 @@ EXTRA_DIST = \
 	pep8.py			\
 	validate-config.py	\
 	validate-registry.py	\
-	flumotion-trial.in	\
+	flumotion-trial		\
 	gen-locale-xml.py
