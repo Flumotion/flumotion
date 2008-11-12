@@ -467,6 +467,12 @@
 	Free the old connection when switching managers.
 	Fixes #758
 
+2008-10-16  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/manager/component.py:
+	Added to the component avatar the method to forward
+	keep-alive calls to the bouncers.
+
 2008-10-15  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* common/Makefile.am:

@@ -449,6 +449,20 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         return self.mindCallRemote('expireKeycard', keycardId)
 
+    def keepAlive(self, issuerName, ttl):
+        """
+        Resets the expiry timeout for keycards issued by issuerName.
+
+        @param issuerName: the issuer for which keycards should be kept
+                           alive; that is to say, keycards with the
+                           attribute 'issuerName' set to this value will
+                           have their ttl values reset.
+        @type  issuerName: str
+        @param ttl: the new expiry timeout
+        @type  ttl: number
+        """
+        return self.mindCallRemote('keepAlive', issuerName, ttl)
+
     ### IPerspective methods, called by the worker's component
 
     def perspective_cleanShutdown(self):
