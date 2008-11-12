@@ -513,7 +513,10 @@
 2008-10-20  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/base/http.py:
-        Do not call back the bouncer when tell by it to expire some keycard.
+        Do not call back the bouncer when told to expire some keycard.
+        Done by cleaning up all keycard lists when expiring a keycard,
+        and not calling the bouncer in cleanAuth when the keycard
+        has previously been cleaned up.
 
 2008-10-16  Sebastien Merle  <sebastien@fluendo.com>
 
