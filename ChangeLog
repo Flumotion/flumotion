@@ -510,6 +510,18 @@
 	Accept calls to expireKeycardIds that return None,
 	because the current tests do not support return values.
 
+2008-10-22  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/base/http.py:
+	Fixed a bug in setIssuerClass.
+
+2008-10-22  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/common/keycards.py:
+	* flumotion/component/base/http.py:
+	* flumotion/twisted/credentials.py:
+	Added an HTTPGetArguments credential, keycard and issuer.
+
 2008-10-20  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/base/http.py:

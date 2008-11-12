@@ -122,6 +122,20 @@ class HTTPTokenIssuer(Issuer):
             request.getClientIP(), request.path)
         return keycard
 
+
+class HTTPGetArgumentsIssuer(Issuer):
+    """
+    I create L{flumotion.common.keycards.KeycardHTTPGetArguments}
+    keycards based on an incoming L{twisted.protocols.http.Request}.
+    """
+
+    def issue(self, request):
+        arguments = request.args
+        address = request.getClientIP()
+        path = request.path
+        return keycards.KeycardHTTPGetArguments(arguments, address, path)
+
+
 BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'
 
 
@@ -220,6 +234,8 @@ class HTTPAuthentication(log.Loggable):
         # look up somewhere ?
         if issuerClass == 'HTTPTokenIssuer':
             self._issuer = HTTPTokenIssuer()
+        elif issuerClass == 'HTTPGetArgumentsIssuer':
+            self._issuer = HTTPGetArgumentsIssuer()
         elif issuerClass == 'HTTPAuthIssuer':
             self._issuer = HTTPAuthIssuer()
         elif issuerClass == 'HTTPGenericIssuer':

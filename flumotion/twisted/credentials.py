@@ -228,6 +228,24 @@ class Token:
         self.token = token
 
 
+class IHTTPGetArguments(credentials.ICredentials):
+    """I encapsulate HTTP GET request arguments.
+
+    This credential is used when authentication
+    depend on HTTP request arguments.
+
+    @type arguments: C{dict}
+    @ivar arguments: The HTTP request arguments.
+    """
+
+
+class HTTPGetArguments:
+    implements(IHTTPGetArguments)
+
+    def __init__(self, arguments):
+        self.arguments = arguments
+
+
 class IUsernameSha256Password(credentials.ICredentials):
     """
     I encapsulate a username and check SHA-256 passwords.

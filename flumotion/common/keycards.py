@@ -196,6 +196,38 @@ class KeycardToken(Keycard, credentials.Token):
 pb.setUnjellyableForClass(KeycardToken, KeycardToken)
 
 
+class KeycardHTTPGetArguments(Keycard, credentials.HTTPGetArguments):
+    """
+    I am a keycard with a token and IP address and a path (optional).
+    I get authenticated by HTTP request GET parameters and maybe IP address.
+
+    @type address: C{str}
+    @ivar address: The HTTP client IP address.
+    @type path: C{str}
+    @ivar path: The path requested by the HTTP client.
+    """
+
+    def __init__(self, arguments, address, path=None):
+        credentials.HTTPGetArguments.__init__(self, arguments)
+        Keycard.__init__(self)
+        self.address = address
+        self.path = path
+
+    def getData(self):
+        d = Keycard.getData(self)
+        d['arguments'] = self.arguments
+        d['address'] = self.address
+        d['path'] = self.path
+        return d
+
+    def __repr__(self):
+        return "<%s %s for path %s @%s for reqId %r in state %s>" % (
+            self.__class__.__name__, self.id, self.path,
+            self.address, self.requesterId, _statesEnum[self.state])
+
+pb.setUnjellyableForClass(KeycardHTTPGetArguments, KeycardHTTPGetArguments)
+
+
 USPCC = credentials.UsernameSha256PasswordCryptChallenger
 
 
