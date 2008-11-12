@@ -141,7 +141,7 @@ class TrivialBouncerTest(testsuite.TestCase):
     def testAutoExpire(self):
 
         def authenticated(_):
-            self.assertAttr(k, 'state', keycards.AUTHENTICATED)
+            self.assertAttr(k, 'state', keycards.REFUSED)
             self.assertAttr(k, 'ttl', 0)
             self.failIf(self.obj.hasKeycard(k))
             self.assertEquals(self.medium.calls, [])

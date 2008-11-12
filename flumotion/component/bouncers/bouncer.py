@@ -198,17 +198,17 @@ class Bouncer(component.BaseComponent):
         if not enabled and self.enabled:
             # If we were enabled and are being set to disabled, eject the warp
             # core^w^w^w^wexpire all existing keycards
-            self.expireAllKeycards()
+            self.enabled = False
             self._expirer.stop()
-
+            return self.expireAllKeycards()
         self.enabled = enabled
+        return defer.succeed(0)
 
     def getEnabled(self):
         return self.enabled
 
     def do_stop(self):
-        self.setEnabled(False)
-        return defer.succeed(True)
+        return self.setEnabled(False)
 
     def _expire(self):
         for k in self._keycards.values():
@@ -243,6 +243,18 @@ class Bouncer(component.BaseComponent):
         """
         raise NotImplementedError("authenticate not overridden")
 
+    def on_keycardAdded(self, keycard):
+        """
+        Override to update sub-class specific data related to keycards.
+        Called when the base bouncer accepts and references a new keycard.
+        """
+
+    def on_keycardRemoved(self, keycard):
+        """
+        Override to cleanup sub-class specific data related to keycards.
+        Called when the base bouncer has cleanup his references to a keycard.
+        """
+
     def hasKeycard(self, keycard):
         return keycard in self._keycards.values()
 
@@ -254,35 +266,47 @@ class Bouncer(component.BaseComponent):
         return keycardId
 
     def addKeycard(self, keycard):
+        """
+        Adds a keycard to the bouncer.
+        Can be called with the same keycard more than one time.
+        If the keycard has already been added successfully,
+        adding it again will succeed and return True.
+
+        @param keycard: the keycard to add.
+        @return: if the bouncer accepts the keycard.
+        """
         # give keycard an id and store it in our hash
         if keycard.id in self._keycards:
             # already in there
-            return
+            return True
 
         keycardId = self.generateKeycardId()
         keycard.id = keycardId
 
         if hasattr(keycard, 'ttl') and keycard.ttl <= 0:
             self.log('immediately expiring keycard %r', keycard)
-            return
+            return False
 
         self._keycards[keycardId] = keycard
         data = keycard.getData()
         self._keycardDatas[keycardId] = data
+        self.on_keycardAdded(keycard)
 
         self.uiState.append('keycards', data)
         self.debug("added keycard with id %s, ttl %r", keycard.id,
                    getattr(keycard, 'ttl', None))
+        return True
 
     def removeKeycard(self, keycard):
         if not keycard.id in self._keycards:
             raise KeyError
 
         del self._keycards[keycard.id]
-
         data = self._keycardDatas[keycard.id]
         self.uiState.remove('keycards', data)
         del self._keycardDatas[keycard.id]
+        self.on_keycardRemoved(keycard)
+
         self.info("removed keycard with id %s" % keycard.id)
 
     def removeKeycardId(self, keycardId):
@@ -358,9 +382,10 @@ class TrivialBouncer(Bouncer):
     keycardClasses = (keycards.KeycardGeneric, )
 
     def do_authenticate(self, keycard):
-        self.addKeycard(keycard)
+        if not self.addKeycard(keycard):
+            keycard.state = keycards.REFUSED
+            return keycard
         keycard.state = keycards.AUTHENTICATED
-
         return keycard
 
 
@@ -405,7 +430,9 @@ class ChallengeResponseBouncer(Bouncer):
 
     def do_authenticate(self, keycard):
         # at this point we add it so there's an ID for challenge-response
-        self.addKeycard(keycard)
+        if not self.addKeycard(keycard):
+            keycard.state = keycards.REFUSED
+            return keycard
 
         # check if the keycard is ready for the checker, based on the type
         if isinstance(keycard, self.challengeResponseClasses):

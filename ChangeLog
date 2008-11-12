@@ -469,6 +469,31 @@
 
 2008-10-27  Sebastien Merle  <sebastien@fluendo.com>
 
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/component/bouncers/plug.py:
+	* flumotion/component/bouncers/tokentest.py:
+	* flumotion/test/bouncertest.py:
+	Fixed the bouncer tests.
+	Applied the bouncer fixes to the plug version of the bouncer.
+	Fixed ical and tokentest bouncers use of addKeycard. 
+
+2008-10-21  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/bouncers/bouncer.py:
+	Made addKeycard accept already added keycards.
+
+2008-10-20  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/bouncers/bouncer.py:
+        Fixed the do_close method to return a deferred called when
+        all keycard has been revoked.
+        Made addKeycard return if the keycard has been added.
+        Added two virtual methods where subclasses can safely
+        update and cleanup data related to keycards.
+        Fixes #1153
+
+2008-10-27  Sebastien Merle  <sebastien@fluendo.com>
+
 	* flumotion/component/bouncers/plug.py:
 	Added a comment to remember the new expireKeycardIds
 	API has not been duplicated to the plug version

@@ -196,20 +196,30 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
         return keycardId
 
     def addKeycard(self, keycard):
+        """
+        Adds a keycard to the bouncer.
+        Can be called with the same keycard more than one time.
+        If the keycard has already been added successfully,
+        adding it again will succeed and return True.
+
+        @param keycard: the keycard to add.
+        @return: if the bouncer accepts the keycard.
+        """
         # give keycard an id and store it in our hash
         if keycard.id in self._keycards:
             # already in there
-            return
+            return True
 
         keycard.id = self.generateKeycardId()
 
         if hasattr(keycard, 'ttl') and keycard.ttl <= 0:
             self.log('immediately expiring keycard %r', keycard)
-            return
+            return False
 
         self._keycards[keycard.id] = keycard
 
         self.debug("added keycard with id %s" % keycard.id)
+        return True
 
     def removeKeycard(self, keycard):
         if not keycard.id in self._keycards:
@@ -258,9 +268,10 @@ class BouncerTrivialPlug(BouncerPlug):
     keycardClasses = (keycards.KeycardGeneric, )
 
     def do_authenticate(self, keycard):
-        self.addKeycard(keycard)
+        if not self.addKeycard(keycard):
+            keycard.state = keycards.REFUSED
+            return keycard
         keycard.state = keycards.AUTHENTICATED
-
         return keycard
 
 
@@ -305,7 +316,9 @@ class ChallengeResponseBouncerPlug(BouncerPlug):
 
     def do_authenticate(self, keycard):
         # at this point we add it so there's an ID for challenge-response
-        self.addKeycard(keycard)
+        if not self.addKeycard(keycard):
+            keycard.state = keycards.REFUSED
+            return keycard
 
         # check if the keycard is ready for the checker, based on the type
         if isinstance(keycard, self.challengeResponseClasses):

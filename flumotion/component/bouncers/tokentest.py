@@ -45,17 +45,17 @@ class TokenTestBase(log.Loggable):
 
         if keycard_data['token'] == self._authtoken:
             # authenticated, so return the keycard with state authenticated
-            keycard.state = keycards.AUTHENTICATED
-            self.addKeycard(keycard)
-            self.info('authenticated login of "%s" from ip address %s',
-                      keycard.token, keycard.address)
-            self.debug('keycard %r authenticated, token %s ip address %s',
-                       keycard, keycard.token, keycard.address)
-            return keycard
+            if self.addKeycard(keycard):
+                keycard.state = keycards.AUTHENTICATED
+                self.info('authenticated login of "%s" from ip address %s',
+                          keycard.token, keycard.address)
+                self.debug('keycard %r authenticated, token %s ip address %s',
+                           keycard, keycard.token, keycard.address)
+                return keycard
 
-        else:
-            self.info('keycard %r unauthorized, returning None', keycard)
-            return None
+        keycard.state = keycards.REFUSED
+        self.info('keycard %r unauthorized, returning None', keycard)
+        return None
 
 
 class BouncerTestTokenPlug(TokenTestBase, plug.BouncerPlug):
