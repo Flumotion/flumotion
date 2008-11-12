@@ -517,6 +517,7 @@
         Done by cleaning up all keycard lists when expiring a keycard,
         and not calling the bouncer in cleanAuth when the keycard
         has previously been cleaned up.
+        Fixes #1155
 
 2008-10-16  Sebastien Merle  <sebastien@fluendo.com>
 
