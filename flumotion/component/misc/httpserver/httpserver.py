@@ -300,6 +300,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             'flumotion.component.plugs.request.RequestLoggerPlug', [])
 
         self.httpauth = httpbase.HTTPAuthentication(self)
+        if 'avatarId' in self.config:
+            self.httpauth.setRequesterId(self.config['avatarId'])
         if 'bouncer' in props:
             self.httpauth.setBouncerName(props['bouncer'])
         if 'issuer-class' in props:

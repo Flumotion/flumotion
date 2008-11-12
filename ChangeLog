@@ -1,3 +1,9 @@
+2008-11-12  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/misc/httpserver/httpserver.py:
+	Properly setup the HTTP authenticator,
+	to be able to expire keycard.
+
 2008-11-11  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* common/trial.mk:
