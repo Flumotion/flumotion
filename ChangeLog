@@ -3,6 +3,7 @@
 	* flumotion/component/misc/httpserver/httpserver.py:
 	Properly setup the HTTP authenticator,
 	to be able to expire keycard.
+	Fixes #1155
 
 2008-11-11  Jan Urbanski  <jurbanski@flumotion.com>
 
