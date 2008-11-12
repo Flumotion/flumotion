@@ -510,6 +510,11 @@
 	Accept calls to expireKeycardIds that return None,
 	because the current tests do not support return values.
 
+2008-10-20  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/base/http.py:
+        Do not call back the bouncer when tell by it to expire some keycard.
+
 2008-10-16  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/base/http.py:

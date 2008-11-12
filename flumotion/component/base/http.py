@@ -290,11 +290,16 @@ class HTTPAuthentication(log.Loggable):
     def cleanupAuth(self, fd):
         if self.bouncerName and fd in self._fdToKeycard:
             keycard = self._fdToKeycard[fd]
-            del self._fdToKeycard[fd]
-            del self._idToKeycard[keycard.id]
             self.debug('[fd %5d] asking bouncer %s to remove keycard id %s',
                        fd, self.bouncerName, keycard.id)
             self.doCleanupKeycard(self.bouncerName, keycard)
+        self._removeKeycard(fd)
+
+    def _removeKeycard(self, fd):
+        if self.bouncerName and fd in self._fdToKeycard:
+            keycard = self._fdToKeycard[fd]
+            del self._fdToKeycard[fd]
+            del self._idToKeycard[keycard.id]
         if fd in self._fdToDurationCall:
             self.debug('[fd %5d] canceling later expiration call' % fd)
             self._fdToDurationCall[fd].cancel()
@@ -322,10 +327,7 @@ class HTTPAuthentication(log.Loggable):
 
         self.debug('[fd %5d] expiring client' % fd)
 
-        if fd in self._fdToDurationCall:
-            self.debug('[fd %5d] canceling later expiration call' % fd)
-            self._fdToDurationCall[fd].cancel()
-            del self._fdToDurationCall[fd]
+        self._removeKeycard(fd)
 
         self.debug('[fd %5d] asking streamer to remove client' % fd)
         self.clientDone(fd)
