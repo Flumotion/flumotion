@@ -472,6 +472,7 @@
 	* flumotion/manager/component.py:
 	Added to the component avatar the method to forward
 	keep-alive calls to the bouncers.
+	Fixes #895
 
 2008-10-15  Jan Urbanski  <jurbanski@flumotion.com>
 
