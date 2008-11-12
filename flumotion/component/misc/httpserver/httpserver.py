@@ -184,6 +184,9 @@ class HTTPFileMedium(component.BaseComponentMedium):
     def remote_expireKeycard(self, keycardId):
         return self.comp.httpauth.expireKeycard(keycardId)
 
+    def remote_expireKeycards(self, keycardId):
+        return self.comp.httpauth.expireKeycards(keycardId)
+
     def remote_getStreamData(self):
         return self.comp.getStreamData()
 

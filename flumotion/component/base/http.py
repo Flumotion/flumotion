@@ -330,6 +330,19 @@ class HTTPAuthentication(log.Loggable):
         self.debug('[fd %5d] asking streamer to remove client' % fd)
         self.clientDone(fd)
 
+    def expireKeycards(self, keycardIds):
+        """
+        Expire client's connections associated with the keycard Ids.
+        """
+        expired = 0
+        for keycardId in keycardIds:
+            try:
+                self.expireKeycard(keycardId)
+                expired += 1
+            except:
+                pass
+        return expired
+
     ### resource.Resource methods
 
     def startAuthentication(self, request):

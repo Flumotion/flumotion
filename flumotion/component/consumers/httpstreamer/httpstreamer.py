@@ -231,7 +231,10 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     ### remote methods for manager to call on
 
     def remote_expireKeycard(self, keycardId):
-        self.comp.httpauth.expireKeycard(keycardId)
+        return self.comp.httpauth.expireKeycard(keycardId)
+
+    def remote_expireKeycards(self, keycardIds):
+        return self.comp.httpauth.expireKeycards(keycardIds)
 
     def remote_notifyState(self):
         self.comp.update_ui_state()

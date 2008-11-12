@@ -99,6 +99,8 @@ from flumotion.twisted import flavors, credentials
 __all__ = ['Bouncer']
 __version__ = "$Rev$"
 
+EXPIRE_BLOCK_SIZE = 100
+
 
 class BouncerMedium(component.BaseComponentMedium):
 
@@ -138,6 +140,12 @@ class BouncerMedium(component.BaseComponentMedium):
         Called by bouncer views to expire keycards.
         """
         return self.comp.expireKeycardId(keycardId)
+
+    def remote_expireKeycardIds(self, keycardIds):
+        """
+        Called by bouncer views to expire multiple keycards.
+        """
+        return self.comp.expireKeycardIds(keycardIds)
 
     def remote_setEnabled(self, enabled):
         return self.comp.setEnabled(enabled)
@@ -291,9 +299,7 @@ class Bouncer(component.BaseComponent):
                 k.ttl = ttl
 
     def expireAllKeycards(self):
-        return defer.DeferredList(
-            [self.expireKeycardId(keycardId)
-                for keycardId in self._keycards.keys()])
+        return self.expireKeycardIds(self._keycards.keys())
 
     def expireKeycardId(self, keycardId):
         self.log("expiring keycard with id %r", keycardId)
@@ -308,6 +314,38 @@ class Bouncer(component.BaseComponent):
                                           keycard.requesterId, keycard.id)
         else:
             return defer.succeed(None)
+
+    def expireKeycardIds(self, keycardIds):
+        self.log("expiring keycards with id %r", keycardIds)
+        d = defer.Deferred()
+        self._expireNextKeycardBlock(0, keycardIds, d)
+        return d
+
+    def _expireNextKeycardBlock(self, total, keycardIds, finished):
+        keycardBlock = keycardIds[:EXPIRE_BLOCK_SIZE]
+        keycardIds = keycardIds[EXPIRE_BLOCK_SIZE:]
+        idByReq = {}
+
+        for keycardId in keycardBlock:
+            if keycardId in self._keycards:
+                keycard = self._keycards[keycardId]
+                requesterId = keycard.requesterId
+                idByReq.setdefault(requesterId, []).append(keycardId)
+                self.removeKeycardId(keycardId)
+
+        if not (idByReq and self.medium):
+            finished.callback(total)
+            return
+
+        defs = [self.medium.callRemote('expireKeycards', rid, ids)
+                for rid, ids in idByReq.items()]
+        dl = defer.DeferredList(defs, consumeErrors=True)
+
+        def countExpirations(results, total):
+            return sum([v for s, v in results if s and v]) + total
+
+        dl.addCallback(countExpirations, total)
+        dl.addCallback(self._expireNextKeycardBlock, keycardIds, finished)
 
 
 class TrivialBouncer(Bouncer):

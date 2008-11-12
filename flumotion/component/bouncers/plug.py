@@ -102,6 +102,11 @@ class BouncerPlug(pbase.ComponentPlug, common.InitMixin):
     """
     I am the base class for all bouncer plugs.
 
+    FIXME: expireKeycardIds has been added to the component bouncer.
+           Because the plug version is not yet used, and will be
+           refactored/redesigned in a near future, the modifications
+           have not been duplicated here.
+
     @cvar keycardClasses: tuple of all classes of keycards this bouncer can
                           authenticate, in order of preference
     @type keycardClasses: tuple of L{flumotion.common.keycards.Keycard}

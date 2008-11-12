@@ -449,6 +449,15 @@ class ComponentAvatar(base.ManagerAvatar):
         """
         return self.mindCallRemote('expireKeycard', keycardId)
 
+    def expireKeycards(self, keycardIds):
+        """
+        Expire keycards issued to this component because the bouncer
+        decided to.
+
+        @type  keycardIds: sequence of str
+        """
+        return self.mindCallRemote('expireKeycards', keycardIds)
+
     def keepAlive(self, issuerName, ttl):
         """
         Resets the expiry timeout for keycards issued by issuerName.
@@ -512,6 +521,28 @@ class ComponentAvatar(base.ManagerAvatar):
             raise errors.UnknownComponentError(requesterId)
 
         return self.heaven.getAvatar(requesterId).expireKeycard(keycardId)
+
+    def perspective_expireKeycards(self, requesterId, keycardIds):
+        """
+        Expire multiple keycards (and thus the requester's connections)
+        issued to the given requester.
+
+        This is called by the bouncer component that authenticated
+        the keycards.
+
+        @param requesterId: name (avatarId) of the component that originally
+                            requested authentication for the given keycardId
+        @type  requesterId: str
+        @param keycardIds:  sequence of id of keycards to expire
+        @type  keycardIds:  sequence of str
+        """
+        if not self.heaven.hasAvatar(requesterId):
+            self.warning('asked to expire %d keycards for requester %s, '
+                         'but no such component registered',
+                         len(keycardIds), requesterId)
+            raise errors.UnknownComponentError(requesterId)
+
+        return self.heaven.getAvatar(requesterId).expireKeycards(keycardIds)
 
 
 class dictlist(dict):

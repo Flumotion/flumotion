@@ -467,6 +467,30 @@
 	Free the old connection when switching managers.
 	Fixes #758
 
+2008-10-27  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/bouncers/plug.py:
+	Added a comment to remember the new expireKeycardIds
+	API has not been duplicated to the plug version
+	of the bouncer.
+
+2008-10-22  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/bouncers/bouncer.py:
+	Accept calls to expireKeycardIds that return None,
+	because the current tests do not support return values.
+
+2008-10-16  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/base/http.py:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/manager/component.py:
+	Added expireKeycardIds method to the base Bouncer class,
+	the methods for the manager to forward the calls,
+	and fixed the consumers to use the new method.
+
 2008-10-16  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/manager/component.py:
