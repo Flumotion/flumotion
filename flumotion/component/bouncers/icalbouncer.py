@@ -95,15 +95,13 @@ class IcalBouncer(bouncer.Bouncer):
 
         # need to check if inside an event time
         # FIXME: think of a strategy for handling overlapping events
-        currentEvents = self.icalScheduler.getCurrentEvents()
-        if currentEvents:
-            event = currentEvents[0]
-            now = datetime.now()
-            nowInTz = datetime(now.year, now.month, now.day,
-                                  now.hour, now.minute, now.second,
-                                  tzinfo=scheduler.LOCAL)
-            end = event.currentEnd
-            duration = end - nowInTz
+        cal = self.iCalScheduler.getCalendar()
+        eventInstances = cal.getActiveEventInstances()
+        if eventInstances:
+            instance = eventInstances[0]
+            now = datetime.now(eventcalendar.UTC)
+            end = instance.end
+            duration = end - now
             durationSecs = duration.days * 86400 + duration.seconds
             keycard.duration = durationSecs
             if self.addKeycard(keycard):
