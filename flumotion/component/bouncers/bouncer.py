@@ -173,8 +173,6 @@ class Bouncer(component.BaseComponent):
         self._idCounter = 0
         self._idFormat = time.strftime('%Y%m%d%H%M%S-%%d')
         self._keycards = {} # keycard id -> Keycard
-        self._keycardDatas = {} # keycard id -> data in uiState
-        self.uiState.addListKey('keycards')
 
         self._expirer = Poller(self._expire,
                                self.KEYCARD_EXPIRE_INTERVAL,
@@ -288,11 +286,8 @@ class Bouncer(component.BaseComponent):
             return False
 
         self._keycards[keycardId] = keycard
-        data = keycard.getData()
-        self._keycardDatas[keycardId] = data
         self.on_keycardAdded(keycard)
 
-        self.uiState.append('keycards', data)
         self.debug("added keycard with id %s, ttl %r", keycard.id,
                    getattr(keycard, 'ttl', None))
         return True
@@ -302,9 +297,6 @@ class Bouncer(component.BaseComponent):
             raise KeyError
 
         del self._keycards[keycard.id]
-        data = self._keycardDatas[keycard.id]
-        self.uiState.remove('keycards', data)
-        del self._keycardDatas[keycard.id]
         self.on_keycardRemoved(keycard)
 
         self.info("removed keycard with id %s" % keycard.id)

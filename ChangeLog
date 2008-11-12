@@ -485,6 +485,11 @@
 2008-10-20  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/bouncers/bouncer.py:
+        Removed the UI state updates.
+
+2008-10-20  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/bouncers/bouncer.py:
         Fixed the do_close method to return a deferred called when
         all keycard has been revoked.
         Made addKeycard return if the keycard has been added.
