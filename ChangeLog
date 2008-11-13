@@ -322,6 +322,16 @@
 	  a possible bug in python-iCalendar; see
 	  https://thomas.apestaart.org/thomas/trac/browser/tests/icalendar/
 
+2008-10-27  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/component/bouncers/plug.py:
+	* flumotion/component/bouncers/tokentest.py:
+	* flumotion/test/bouncertest.py:
+	Fixed the bouncer tests.
+	Applied the bouncer fixes to the plug version of the bouncer.
+	Fixed ical and tokentest bouncers use of addKeycard. 
+
 2008-10-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/messages.py:
@@ -398,6 +408,11 @@
 	  JHBuild was changed, and apparently any variable without a _ prefix
 	  is considered as an unknown parameter.
 
+2008-10-21  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/bouncers/bouncer.py:
+	Made addKeycard accept already added keycards.
+
 2008-10-20  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:
@@ -473,21 +488,6 @@
 	* flumotion/admin/gtk/adminwindow.py:
 	Free the old connection when switching managers.
 	Fixes #758
-
-2008-10-27  Sebastien Merle  <sebastien@fluendo.com>
-
-	* flumotion/component/bouncers/icalbouncer.py:
-	* flumotion/component/bouncers/plug.py:
-	* flumotion/component/bouncers/tokentest.py:
-	* flumotion/test/bouncertest.py:
-	Fixed the bouncer tests.
-	Applied the bouncer fixes to the plug version of the bouncer.
-	Fixed ical and tokentest bouncers use of addKeycard. 
-
-2008-10-21  Sebastien Merle  <sebastien@fluendo.com>
-
-	* flumotion/component/bouncers/bouncer.py:
-	Made addKeycard accept already added keycards.
 
 2008-10-20  Sebastien Merle  <sebastien@fluendo.com>
 
