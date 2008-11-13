@@ -1,3 +1,9 @@
+2008-11-13  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
+
+	* flumotion/component/consumers/disker/disker.py:
+	Fix the disk-consumer size rotation type.
+	It was not splitting the file correctly.
+
 2008-11-12  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/misc/httpserver/httpserver.py:

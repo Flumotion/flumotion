@@ -249,7 +249,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.changeFilename()
 
         # Add a new one
-        reactor.callLater(5, self._rotateTimeCallLater, size)
+        reactor.callLater(5, self._rotateSizeCallLater, size)
 
     def getMime(self):
         if self.caps:
