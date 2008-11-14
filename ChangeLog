@@ -1,3 +1,16 @@
+2008-11-14  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
+
+	* po/POTFILES.in:
+	* po/ca.po:
+	* po/de.po:
+	* po/es.po:
+	* po/fr.po:
+	* po/nl.po:
+	* po/no.po:
+	* po/pt_BR.po:
+	* po/sv.po:
+	Catalan and spanish translations updated. 
+
 2008-11-13  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
 
 	* flumotion/component/consumers/disker/disker.py:
