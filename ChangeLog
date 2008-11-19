@@ -1,3 +1,9 @@
+2008-11-19  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* bin/flumotion-admin-command (deleted):
+	Complete the transition between flumotion-admin-command and
+	flumotion-command by removing the obsoleted one. Fixes #725.
+
 2008-11-14  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
 
 	* po/POTFILES.in:
