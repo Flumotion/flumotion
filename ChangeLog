@@ -1,3 +1,9 @@
+2008-11-20  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/component/converters/overlay/overlay.py
+	  (Overlay.configure_pipeline):
+	Add a warning about broken gstreamer versions.
+
 2008-11-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* conf/examples/bouncer.xml:

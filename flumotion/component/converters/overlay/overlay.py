@@ -87,12 +87,22 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         source = self.get_element('source')
         source.set_property('location', self._filename)
 
-        if gstreamer.get_plugin_version('videomixer') == (0, 10, 7, 0):
+        vmixerVersion = gstreamer.get_plugin_version('videomixer')
+        if vmixerVersion == (0, 10, 7, 0):
             m = messages.Warning(
                 T_(N_("The 'videomixer' GStreamer element has a bug in this "
                       "version (0.10.7). You may see many errors in the debug "
                       "output, but it should work correctly anyway.")),
                 mid="videomixer-bug")
+            self.addMessage(m)
+
+        if vmixerVersion >= (0, 10, 10, 0):
+            m = messages.Warning(
+                T_(N_("The 'videomixer' GStreamer element has a bug since "
+                      "version (0.10.10) resulting in no overlay. "
+                      "The bug should be fixed in version 0.10.12. Please "
+                      "disregard this warning if you can see the overlay.")),
+                mid="videomixer-overlay-bug")
             self.addMessage(m)
 
     def do_stop(self):
