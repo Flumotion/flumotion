@@ -19,6 +19,8 @@
 	  Change 'rate' property to 'samplerate'.
 	  Explicit is better than implicit, especially when we have
 	  framerate and bitrate too.
+	  Also document the default samplerate, and sync between wizard
+	  and component.
 	  
 
 2008-11-19  Jan Urbanski  <jurbanski@flumotion.com>
