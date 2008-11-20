@@ -33,7 +33,7 @@
     <component name="producer-audio" project="flumotion" type="audiotest-producer" version="0.4.2.1" worker="localhost">
 
       <property name="frequency">440</property>
-      <property name="rate">8000</property>
+      <property name="samplerate">8000</property>
       <property name="volume">1.0</property>
     </component>
 

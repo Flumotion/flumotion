@@ -52,7 +52,7 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         element = properties.get('source-element', 'alsasrc')
         self.device = properties.get('device', 'hw:0')
-        rate = properties.get('rate', 44100)
+        samplerate = properties.get('samplerate', 44100)
         depth = properties.get('depth', 16)
         channels = properties.get('channels', 2)
         self.inputTrackLabel = properties.get('input-track', None)
@@ -63,7 +63,7 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
         # just adding audioscale and audioconvert always makes the soundcard
         # open in 1000 Hz, mono
         caps = 'audio/x-raw-int,rate=(int)%d,depth=%d,channels=%d' % (
-            rate, depth, channels)
+            samplerate, depth, channels)
         pipeline = "%s device=%s name=src ! %s ! " \
             "level name=volumelevel message=true" % (
             element, self.device, caps)

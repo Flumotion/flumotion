@@ -56,7 +56,7 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
                             ['Sine', 'Square', 'Saw', 'Triangle'])
         self.uiState.addKey('wave', 0)
         self.uiState.addKey('frequency', 440)
-        self.uiState.addKey('rate', 8000)
+        self.uiState.addKey('samplerate', 441000)
 
     def do_check(self):
         levelD = check.do_check(self, check.checkPlugin, 'level', 'level')
@@ -67,8 +67,8 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         return dl
 
     def get_pipeline_string(self, properties):
-        rate = properties.get('rate', 8000)
-        self.rate = rate
+        samplerate = properties.get('samplerate', 44100)
+        self.samplerate = samplerate
         volume = properties.get('volume', 1.0)
 
         is_live = 'is-live=true'
@@ -80,7 +80,7 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         return ('%s name=source %s ! identity name=identity silent=TRUE ! ' \
             'audio/x-raw-int,rate=%d ! ' \
             'volume name=volume volume=%f ! level name=level'
-                % (source, is_live, rate, volume))
+                % (source, is_live, samplerate, volume))
 
     def configure_pipeline(self, pipeline, properties):
 
@@ -115,7 +115,7 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
                     identity.set_property('drop-probability',
                         drop_probability)
 
-        self.uiState.set('rate', self.rate)
+        self.uiState.set('samplerate', self.samplerate)
         self.uiState.set('wave', int(element.get_property('wave')))
 
         level = pipeline.get_by_name('level')

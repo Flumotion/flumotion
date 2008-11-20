@@ -76,6 +76,20 @@
     </xsl:attribute>
   </xsl:template>
 
+  <!-- fix up property name strings -->
+  <xsl:template match="//planet/*/component/property/@name">
+    <xsl:attribute name="name">
+      <xsl:choose>
+        <!-- soundcard and audiotest -->
+        <xsl:when test=". = 'rate'"
+          >samplerate</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="." />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+
   <!-- Copy all the other nodes -->
   <xsl:template match="@*|node()">
     <xsl:copy>

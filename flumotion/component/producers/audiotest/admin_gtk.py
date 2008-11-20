@@ -50,7 +50,7 @@ class AudioTestAdminGtkNode(BaseAdminGtkNode):
         if not self.uiStateHandlers:
             self.uiStateHandlers = {'wave': self.waveSet,
                                     'frequency': self.frequencySet,
-                                    'rate': self.rateSet}
+                                    'samplerate': self.samplerateSet}
         for k, handler in self.uiStateHandlers.items():
             handler(state.get(k))
 
@@ -69,9 +69,9 @@ class AudioTestAdminGtkNode(BaseAdminGtkNode):
         d = self.callRemote("setWave", waveName)
         d.addErrback(self.warningFailure)
 
-    def rateSet(self, rate):
-        self._scale.set_range(1, rate)
-        self._spinbutton.set_range(1, rate)
+    def samplerateSet(self, samplerate):
+        self._scale.set_range(1, samplerate)
+        self._spinbutton.set_range(1, samplerate)
 
     def frequencySet(self, value):
         self._scale.handler_block(self._scale_change_id)

@@ -63,7 +63,7 @@ class SoundcardProducer(AudioProducer):
 
         self.properties.input_track = ''
         self.properties.channels = 2
-        self.properties.rate = 44100
+        self.properties.samplerate = 44100
         self.properties.depth = 16
         self.properties.device = ''
         self.properties.source_element = 'alsasrc'
@@ -91,14 +91,14 @@ class SoundcardStep(AudioProducerStep):
         self._blockUpdate = True
         self.input_track.data_type = str
         self.channels.data_type = int
-        self.rate.data_type = int
+        self.samplerate.data_type = int
         self.depth.data_type = int
         self.device.data_type = str
         self.source_element.data_type = str
 
         self.input_track.prefill([''])
         self.channels.prefill(CHANNELS)
-        self.rate.prefill([(str(r), r) for r in SAMPLE_RATES])
+        self.samplerate.prefill([(str(r), r) for r in SAMPLE_RATES])
         self.depth.prefill(BITDEPTHS)
         self.device.prefill([''])
         self.source_element.prefill(SOURCE_ELEMENTS)
@@ -106,7 +106,7 @@ class SoundcardStep(AudioProducerStep):
         self.add_proxy(self.model.properties,
                        ['input_track',
                         'channels',
-                        'rate',
+                        'samplerate',
                         'depth',
                         'device',
                         'source_element'])
@@ -128,7 +128,7 @@ class SoundcardStep(AudioProducerStep):
         self.input_track.clear()
         self.input_track.set_sensitive(False)
         self.channels.set_sensitive(False)
-        self.rate.set_sensitive(False)
+        self.samplerate.set_sensitive(False)
         self.depth.set_sensitive(False)
 
     def _update_devices(self):
@@ -173,7 +173,7 @@ class SoundcardStep(AudioProducerStep):
             self.label_devicename.set_label(deviceName)
             self._blockUpdate = True
             self.channels.set_sensitive(True)
-            self.rate.set_sensitive(True)
+            self.samplerate.set_sensitive(True)
             self.depth.set_sensitive(True)
             self.input_track.prefill(tracks)
             self.input_track.set_sensitive(bool(tracks))

@@ -26,11 +26,11 @@
 
       <properties>
         <property name="volume" type="float"
-                  _description="The volume of the test signal (0.0 - 1.0)." />
-        <property name="rate" type="int"
-                  _description="The Sample rate (in Hz)." />
+                  _description="The volume of the test signal (0.0 - 1.0). Defaults to 1.0." />
+        <property name="samplerate" type="int"
+                  _description="The Sample rate (in Hz).  Defaults to 44100." />
         <property name="frequency" type="int"
-                  _description="The frequency of the test signal (in Hz)." />
+                  _description="The frequency of the test signal (in Hz). Defaults to 440." />
         <property name="drop-probability" type="float"
                   _description="The fraction of buffers to drop (0.0 - 1.0). Only useful for debugging." />
       </properties>

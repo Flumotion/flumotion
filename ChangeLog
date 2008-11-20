@@ -1,3 +1,26 @@
+2008-11-20  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* conf/examples/bouncer.xml:
+	* conf/examples/default.xml:
+	* conf/examples/discont.xml:
+	* conf/examples/ipbouncer.xml:
+	* conf/examples/twores.xml:
+	* data/upgrade-to-0.5.3.xsl:
+	* flumotion/component/producers/audiotest/admin_gtk.py:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/audiotest/wizard.glade:
+	* flumotion/component/producers/audiotest/wizard_gtk.py:
+	* flumotion/component/producers/soundcard/soundcard.py:
+	* flumotion/component/producers/soundcard/soundcard.xml:
+	* flumotion/component/producers/soundcard/wizard.glade:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/test/test_wizard_save.py:
+	  Change 'rate' property to 'samplerate'.
+	  Explicit is better than implicit, especially when we have
+	  framerate and bitrate too.
+	  
+
 2008-11-19  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* bin/flumotion-admin-command (deleted):

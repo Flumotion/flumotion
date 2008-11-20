@@ -38,7 +38,7 @@ class TestAudioProducer(AudioProducer):
     def __init__(self):
         super(TestAudioProducer, self).__init__()
 
-        self.properties.rate = '44100'
+        self.properties.samplerate = '44100'
 
 
 class TestAudioProducerStep(AudioProducerStep):
@@ -54,18 +54,18 @@ class TestAudioProducerStep(AudioProducerStep):
     # WizardStep
 
     def setup(self):
-        self.rate.data_type = str
+        self.samplerate.data_type = str
         self.volume.data_type = float
 
-        self.rate.prefill(['8000',
+        self.samplerate.prefill(['8000',
                            '16000',
                            '32000',
                            '44100'])
 
         self.add_proxy(self.model.properties,
-                       ['frequency', 'volume', 'rate'])
+                       ['frequency', 'volume', 'samplerate'])
 
-        self.rate.set_sensitive(True)
+        self.samplerate.set_sensitive(True)
 
     def workerChanged(self, worker):
         self.model.worker = worker

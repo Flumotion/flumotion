@@ -158,7 +158,7 @@
       </child>
 
       <child>
-	<widget class="GtkComboBox" id="rate">
+	<widget class="GtkComboBox" id="samplerate">
 	  <property name="visible">True</property>
 	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
