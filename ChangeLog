@@ -1,5 +1,10 @@
 2008-11-20  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/component/producers/looper/looper.py:
+	Add warnings about segfault-causing version of gst-python.
+
+2008-11-20  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/component/converters/overlay/overlay.py
 	  (Overlay.configure_pipeline):
 	Add a warning about broken gstreamer versions.

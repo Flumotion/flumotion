@@ -82,6 +82,15 @@ class Looper(feedcomponent.ParseLaunchComponent):
                 self.addMessage(m)
 
         from flumotion.component.producers import checks
+        version = checks.get_pygst_version(gst)
+        if version >= (0, 10, 11, 0):
+            # if it's going to segfault it won't have time to deliver
+            # messages to manager, otherwise we don't need to show it!
+            # but we can add a log message
+            self.warning('the current version of gst-python is known to '
+                         'cause segfault in the looper component')
+            self.warning('... just so you know, in case it crashes')
+
         d = checks.checkTicket349()
         d.addCallback(on_result)
         return d
