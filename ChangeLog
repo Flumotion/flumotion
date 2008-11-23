@@ -1,3 +1,8 @@
+2008-11-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion.spec.in:
+	  Change summary/description as requested by Fedora.
+
 2008-11-20  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/producers/looper/looper.py:

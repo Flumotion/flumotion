@@ -9,7 +9,7 @@
 Name:           @PACKAGE@
 Version:        @VERSION@
 Release:        @RELEASE@
-Summary:        Flumotion - the Fluendo Streaming Server
+Summary:        Streaming Server based on GStreamer and Twisted
 
 Group:          Applications/Internet
 License:	GPL
@@ -63,8 +63,6 @@ BuildRequires:	intltool
 # BuildArch:	noarch
 
 %description
-Flumotion, the Fluendo Streaming Server.
-
 Flumotion is a GPL streaming media server written in Python. It is distributed
 and component-based: every step in the streaming process (production,
 conversion, consumption) can be run inside a separate process on separate
