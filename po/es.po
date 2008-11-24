@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-11-14 11:02+0100\n"
-"PO-Revision-Date: 2008-11-05 13:15+0100\n"
+"POT-Creation-Date: 2008-11-24 16:15+0100\n"
+"PO-Revision-Date: 2008-11-24 16:18+0100\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n!=1;\n"
+"Plural-Forms: nplurals=2; plural=n!=1;"
 
 #: ../data/glade/admin.glade.h:1
 msgid "Flumotion Administration"
@@ -1848,7 +1848,7 @@ msgstr ""
 "Los logotipos sobreimpresionados son demasiado anchos para la imagen de "
 "video."
 
-#: ../flumotion/component/converters/overlay/overlay.py:92
+#: ../flumotion/component/converters/overlay/overlay.py:93
 msgid ""
 "The 'videomixer' GStreamer element has a bug in this version (0.10.7). You "
 "may see many errors in the debug output, but it should work correctly anyway."
@@ -1856,6 +1856,15 @@ msgstr ""
 "El elemento de GStreamer 'videomixer' tiene un fallo en esta versión "
 "(0.10.7). Podría haber muchos errores en la salida del 'debug', pero debería "
 "funcionar correctamente de todas formas."
+
+#: ../flumotion/component/converters/overlay/overlay.py:101
+msgid ""
+"The 'videomixer' GStreamer element has a bug since version (0.10.10) "
+"resulting in no overlay. The bug should be fixed in version 0.10.12. Please "
+"disregard this warning if you can see the overlay."
+msgstr "El elemento de Gstreamer 'videomixer' tiene un bug desde la versión 0.10.10 dando "
+"como resultado que no hay sobreimpresión. El fallo debiera de estar corregido en la "
+"versión 0.10.12. Por favor, ignore este mensaje si puede ver la sobreimpresión."
 
 #: ../flumotion/component/effects/colorbalance/colorbalance.glade.h:2
 #: ../flumotion/component/encoders/theora/wizard.glade.h:2
@@ -2486,8 +2495,8 @@ msgid "Test audio producer"
 msgstr "Fuente de audio de prueba"
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:3
-msgid "The Sample rate (in Hz)."
-msgstr "Tasa de muestreo (en Hz)."
+msgid "The Sample rate (in Hz).  Defaults to 44100."
+msgstr "Tasa de muestreo (en Hz). Por defecto a 44100."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:4
 #: ../flumotion/component/producers/videotest/videotest.xml.h:3
@@ -2497,12 +2506,12 @@ msgstr ""
 "depuración."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:5
-msgid "The frequency of the test signal (in Hz)."
-msgstr "Frecuencia de la señal de test (en Hz)."
+msgid "The frequency of the test signal (in Hz). Defaults to 440."
+msgstr "Frecuencia de la señal de test (en Hz). Por defecto a 440."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:6
-msgid "The volume of the test signal (0.0 - 1.0)."
-msgstr "Volumen de la señal de prueba (0.0 - 1.0)."
+msgid "The volume of the test signal (0.0 - 1.0). Defaults to 1.0."
+msgstr "Volumen de la señal de prueba (0.0 - 1.0). Por defecto a 1.0."
 
 #: ../flumotion/component/producers/audiotest/wizard.glade.h:1
 msgid "F_requency:"
@@ -2819,7 +2828,7 @@ msgstr "_Reiniciar"
 msgid "Restart looping:"
 msgstr "Reiniciar el bucle:"
 
-#: ../flumotion/component/producers/looper/looper.py:131
+#: ../flumotion/component/producers/looper/looper.py:140
 #, python-format
 msgid "Could not open file '%s' for reading."
 msgstr "No se ha podido abrir el fichero '%s' para lectura."
@@ -3533,6 +3542,9 @@ msgstr "No se ha podido probar el dispositivo Firewire."
 #: ../flumotion/worker/job.py:334
 msgid "Check timed out."
 msgstr "Tiempo de comprobación excedido."
+
+#~ msgid "The Sample rate (in Hz)."
+#~ msgstr "Tasa de muestreo (en Hz)."
 
 #~ msgid "Please select among the following authentication methods."
 #~ msgstr ""
