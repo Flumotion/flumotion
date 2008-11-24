@@ -47,7 +47,6 @@
 	  framerate and bitrate too.
 	  Also document the default samplerate, and sync between wizard
 	  and component.
-	  
 
 2008-11-19  Jan Urbanski  <jurbanski@flumotion.com>
 
@@ -66,7 +65,7 @@
 	* po/no.po:
 	* po/pt_BR.po:
 	* po/sv.po:
-	Catalan and spanish translations updated. 
+	Catalan and spanish translations updated.
 
 2008-11-13  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
 
@@ -406,7 +405,7 @@
 	* flumotion/test/bouncertest.py:
 	Fixed the bouncer tests.
 	Applied the bouncer fixes to the plug version of the bouncer.
-	Fixed ical and tokentest bouncers use of addKeycard. 
+	Fixed ical and tokentest bouncers use of addKeycard.
 
 2008-10-24  Thomas Vander Stichele  <thomas at apestaart dot org>
 
@@ -492,15 +491,15 @@
 2008-10-20  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:
-	Nagios stream check do critical without delay if founds different 
-	stream params. 
+	Nagios stream check do critical without delay if founds different
+	stream params.
 
 2008-10-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/componentview.py:
-	Delete the notebooks each time we open a new one, 
+	Delete the notebooks each time we open a new one,
 	this way we don't have multiple notebooks.
 	Fixes #1070
 
@@ -524,7 +523,6 @@
 	Custom images deleted from the tree as they are
 	no longer used.
 	Fixes #1014
-	
 
 2008-10-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
@@ -539,8 +537,8 @@
 	reviewed by: Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
-	Clear the component list when connecting to a new 
-	manager and allow the wizard to reapear when it is 
+	Clear the component list when connecting to a new
+	manager and allow the wizard to reapear when it is
 	closed without finishing the configuration.
 	Fixes #695
 
@@ -552,7 +550,7 @@
 	* data/glade/greeter-load_connection.glade:
 	* flumotion/admin/gtk/connections.py:
 	* flumotion/admin/gtk/greeter.py:
-	Disables the connect button when the recent 
+	Disables the connect button when the recent
 	connections list is cleared.
 	Fixes #1051
 
@@ -1153,7 +1151,7 @@
 	* flumotion/component/misc/httpserver/httpfile.py:
 	If asked for a range that include the whole file,
 	respond with a range (206) as before instead of a normal request (200).
-	Couldn't find a conclusive answer in the spec. 
+	Couldn't find a conclusive answer in the spec.
 
 2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
 
@@ -1183,7 +1181,7 @@
 	* flumotion/component/misc/httpserver/fileprovider.py:
 	* flumotion/component/misc/httpserver/localpath.py:
 	* flumotion/component/misc/httpserver/localprovider.py:
-	* flumotion/component/misc/httpserver/serverstats.py:	
+	* flumotion/component/misc/httpserver/serverstats.py:
 	Made the file browsing and serving of the httpserver component a plug.
 	Added statistics gathering to the httpserver component.
 	Added a local caching plug for the httpserver component.
@@ -1206,12 +1204,12 @@
 
 2008-09-01  Murray Cumming  <murrayc@murrayc.com>
 
-	* flumotion/component/encoders/smoke/wizard.glade: Key frame instead of 
+	* flumotion/component/encoders/smoke/wizard.glade: Key frame instead of
 	Keyframe.
 
 2008-09-01  Murray Cumming  <murrayc@murrayc.com>
 
-	* flumotion/component/encoders/theora/wizard.glade: Change keyframe 
+	* flumotion/component/encoders/theora/wizard.glade: Change keyframe
 	to key frame in UI strings.
 
 2008-08-30  Thomas Vander Stichele  <thomas at apestaart dot org>
@@ -1259,7 +1257,7 @@
 
 2008-08-29  Pedro Gracia  <pedro@flumotion.com>
 
-	reviewed by: Arek Korbik  <arkadini@gmail.com> 
+	reviewed by: Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
 	* flumotion/component/misc/httpserver/httpserver.py:
@@ -1292,7 +1290,7 @@
 
 2008-08-28  Murray Cumming  <murrayc@murrayc.com>
 
-	* flumotion/component/consumers/disker/disker.glade: Start New File 
+	* flumotion/component/consumers/disker/disker.glade: Start New File
 	button: Use header capitalization as per the HIG.
 
 2008-08-28  Johan Dahlin  <johan@flumotion.com>
@@ -1342,7 +1340,7 @@
 
 2008-08-27  Murray Cumming  <murrayc@murrayc.com>
 
-	* data/glade/shout2-wizard.glade: Changed some labels and added some 
+	* data/glade/shout2-wizard.glade: Changed some labels and added some
 	tooltips to make this slightly less confusing.
 
 2008-08-27  Pedro Gracia  <pedro@flumotion.com>
@@ -1379,7 +1377,7 @@
 2008-08-26  Murray Cumming  <murrayc@murrayc.com>
 
 	* flumotion/admin/gtk/httpstreamersteps.py:
-	* flumotion/admin/gtk/shout2steps.py: Added docSection IDs for 
+	* flumotion/admin/gtk/shout2steps.py: Added docSection IDs for
 	these assistant pages.
 
 2008-08-26  Johan Dahlin  <johan@flumotion.com>
@@ -1500,13 +1498,13 @@
 	* flumotion/component/encoders/vorbis/wizard_gtk.py:
 	* flumotion/component/producers/webcam/wizard_gtk.py:
 	* flumotion/ui/simplewizard.py:
-	Corrected the capitalization in dialog/assistant-page titles 
+	Corrected the capitalization in dialog/assistant-page titles
 	and assistant sidebar titles, as per
 	http://library.gnome.org/devel/hig-book/stable/design-text-labels.html.en#layout-capitalization
 	* flumotion/component/producers/firewire/wizard_gtk.py:
-	Change the Firewire title to Firewire Video. Firewire Audio 
+	Change the Firewire title to Firewire Video. Firewire Audio
 	already has the corrected title.
-	* flumotion/admin/gtk/ondemandstep.py: Change the title from 
+	* flumotion/admin/gtk/ondemandstep.py: Change the title from
 	Demand to On Demand.
 	* flumotion/component/producers/webcam/wizard_gtk.py:
 	Corrected a docSection.
@@ -1915,7 +1913,6 @@
 	* flumotion/wizard/diskersteps.py:
 	Capitalize, reorder
 
->>>>>>> .r7197
 2008-08-04  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/common/vfs.py:
