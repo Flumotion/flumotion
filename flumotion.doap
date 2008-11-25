@@ -269,4 +269,14 @@ it.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.5.2.tar.bz2" />
   </Version>
  </release>
+
+ <release>
+  <Version>
+   <revision>0.5.3</revision>
+   <branch>0.5</branch>
+   <name>Ovella Negra</name>
+   <created>2008-11-25</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.5.3.tar.bz2" />
+  </Version>
+ </release>
 </Project>
