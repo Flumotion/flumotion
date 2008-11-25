@@ -1,3 +1,8 @@
+2008-11-25  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/common/vfsgnome.py (GnomeVFSDirectory.getFiles):
+	Lower log levels - that info is not that important.
+
 2008-11-24  Pedro Gracia  <pedro@flumotion.com>
 
 	* po/es.po:

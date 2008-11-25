@@ -80,7 +80,7 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
 
     def getFiles(self):
         import gnomevfs
-        log.info('vfsgnome', 'getting files for %s' % (self.path, ))
+        log.debug('vfsgnome', 'getting files for %s' % (self.path, ))
         retval = []
         try:
             fileInfos = gnomevfs.open_directory(self.path)
@@ -99,7 +99,7 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
             else:
                 obj = GnomeVFSFile(self.path, fileInfo)
             retval.append(obj)
-        log.info('vfsgnome', 'returning %r' % (retval, ))
+        log.log('vfsgnome', 'returning %r' % (retval, ))
         return succeed(retval)
 
 
