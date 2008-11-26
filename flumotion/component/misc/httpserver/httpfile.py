@@ -87,7 +87,7 @@ class File(resource.Resource, log.Loggable):
         # mapping of mime type -> File subclass
         self._mimeToResource = mimeToResource or {}
         self._rateController = rateController
-        self._requestModifiers = requestModifiers
+        self._requestModifiers = requestModifiers or []
         self._factory = MimedFileFactory(httpauth, self._mimeToResource,
                                          rateController=rateController,
                                          requestModifiers=requestModifiers)
