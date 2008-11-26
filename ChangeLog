@@ -1,5 +1,11 @@
 2008-11-26  Sebastien Merle  <sebastien@fluendo.com>
 
+	* flumotion/component/plugs/requestmodifier.py:
+	* flumotion/component/plugs/requestmodifier.py (added):
+	Added the new plug module forgoten in the last commit.
+
+2008-11-26  Sebastien Merle  <sebastien@fluendo.com>
+
 	reviewed by: Arek,Zaheer
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
