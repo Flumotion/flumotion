@@ -98,6 +98,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.loggers = streamer.plugs[
             'flumotion.component.plugs.request.RequestLoggerPlug']
 
+        self.modifiers = streamer.plugs[
+            'flumotion.component.plugs.requestmodifier.RequestModifierPlug']
+
         self.logfilter = None
 
         web_resource.Resource.__init__(self)
@@ -206,18 +209,24 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             # FIXME: do this ? del request
             return False
 
-        headers = []
+        content = self.streamer.get_content_type()
+        request.setHeader('Server', HTTP_SERVER)
+        request.setHeader('Date', http.datetimeToString())
+        request.setHeader('Cache-Control', 'no-cache')
+        request.setHeader('Cache-Control', 'private')
+        request.setHeader('Content-type', content)
 
-        def setHeader(field, name):
-            headers.append('%s: %s\r\n' % (field, name))
+        # Call request modifiers
+        for modifier in self.modifiers:
+            modifier.modify(request)
 
         # Mimic Twisted as close as possible
-        content = self.streamer.get_content_type()
-        setHeader('Server', HTTP_SERVER)
-        setHeader('Date', http.datetimeToString())
-        setHeader('Cache-Control', 'no-cache')
-        setHeader('Cache-Control', 'private')
-        setHeader('Content-type', content)
+        headers = []
+        for name, value in request.headers.items():
+            headers.append('%s: %s\r\n' % (name.capitalize(), value))
+        for cookie in request.cookies:
+            headers.append('%s: %s\r\n' % ("Set-Cookie", cookie))
+
 
         # ASF needs a Pragma header for live broadcasts
         # Apparently ASF breaks on WMP port 80 if you use the pragma header

@@ -77,6 +77,7 @@
         <socket type="flumotion.component.plugs.base.ComponentPlug" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProviderPlug"/>
         <socket type="flumotion.component.plugs.rrd.ComponentRRDPlug" />
+        <socket type="flumotion.component.plugs.requestmodifier.RequestModifierPlug"/>
         <socket type="flumotion.component.misc.httpserver.ratecontrol.RateControllerPlug"/>
         <socket type="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug"/>
       </sockets>
@@ -88,7 +89,7 @@
                   _description="The mount point on which the stream can be accessed." />
         <property name="path" type="string"
                   _description="The base path to map to the mount-point" />
- 
+
         <property name="type" type="string"
                   _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
 

@@ -76,8 +76,10 @@ class File(resource.Resource, log.Loggable):
     badRequest = BadRequest()
     internalServerError = InternalServerError()
 
-    def __init__(self, path, httpauth, mimeToResource=None,
-            rateController=None):
+    def __init__(self, path, httpauth,
+                 mimeToResource=None,
+                 rateController=None,
+                 requestModifiers=None):
         resource.Resource.__init__(self)
 
         self._path = path
@@ -85,8 +87,10 @@ class File(resource.Resource, log.Loggable):
         # mapping of mime type -> File subclass
         self._mimeToResource = mimeToResource or {}
         self._rateController = rateController
+        self._requestModifiers = requestModifiers
         self._factory = MimedFileFactory(httpauth, self._mimeToResource,
-                                         rateController=rateController)
+                                         rateController=rateController,
+                                         requestModifiers=requestModifiers)
 
     def getChild(self, path, request):
         self.log('getChild: self %r, path %r', self, path)
@@ -242,6 +246,10 @@ class File(resource.Resource, log.Loggable):
         if request.method == 'HEAD':
             return ''
 
+        # Call request modifiers
+        for modifier in self._requestModifiers:
+            modifier.modify(request)
+
         if self._rateController:
             self.log("Creating RateControl object using plug %r",
                 self._rateController)
@@ -290,10 +298,14 @@ class MimedFileFactory(log.Loggable):
 
     defaultType = "application/octet-stream"
 
-    def __init__(self, httpauth, mimeToResource=None, rateController=None):
+    def __init__(self, httpauth,
+                 mimeToResource=None,
+                 rateController=None,
+                 requestModifiers=None):
         self._httpauth = httpauth
         self._mimeToResource = mimeToResource or {}
         self._rateController = rateController
+        self._requestModifiers = requestModifiers
 
     def create(self, path):
         """
@@ -305,7 +317,8 @@ class MimedFileFactory(log.Loggable):
         klazz = self._mimeToResource.get(mimeType, File)
         return klazz(path, self._httpauth,
                      mimeToResource=self._mimeToResource,
-                     rateController=self._rateController)
+                     rateController=self._rateController,
+                     requestModifiers=self._requestModifiers)
 
 
 class FLVFile(File):

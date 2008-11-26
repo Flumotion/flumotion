@@ -217,6 +217,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self._rateControlPlug = None
         self._fileProviderPlug = None
         self._loggers = []
+        self._requestModifiers = []
         self._logfilter = None
         self.httpauth = None
         self._startTime = time.time()
@@ -296,8 +297,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self._porterPath = props['porter-socket-path']
             self._porterUsername = props['porter-username']
             self._porterPassword = props['porter-password']
-        self._loggers = self.plugs.get(
-            'flumotion.component.plugs.request.RequestLoggerPlug', [])
+        socket = 'flumotion.component.plugs.request.RequestLoggerPlug'
+        self._loggers = self.plugs.get(socket, [])
+        socket = \
+          'flumotion.component.plugs.requestmodifier.RequestModifierPlug'
+        self._requestModifiers = self.plugs.get(socket, [])
 
         self.httpauth = httpbase.HTTPAuthentication(self)
         if 'avatarId' in self.config:
@@ -490,7 +494,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.debug('Starting with mount point "%s"' % self.mountPoint)
         factory = httpfile.MimedFileFactory(self.httpauth,
             mimeToResource=self._mimeToResource,
-            rateController=self._rateControlPlug)
+            rateController=self._rateControlPlug,
+            requestModifiers=self._requestModifiers)
 
         root = factory.create(node)
         if self.mountPoint != '/':
