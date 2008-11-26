@@ -1,5 +1,11 @@
 2008-11-26  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/manager/config.py (buildEatersDict):
+	Don't warn about uniquifying alias names, it's only of debugging
+	interest. Fixes #1176.
+
+2008-11-26  Arek Korbik  <arkadini@gmail.com>
+
 	* conf/examples/default.xml:
 	* conf/examples/discont.xml:
 	* conf/examples/twores.xml:

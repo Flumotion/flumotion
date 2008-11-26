@@ -132,8 +132,8 @@ def buildEatersDict(eatersList, eaterDefs):
                 "Already have a feedId %s eating from %s" %
                 (feedId, eater))
         while alias in [a for f, a in feeders]:
-            log.warning('config', "Duplicate alias %s for eater %s, "
-                        "uniquifying", alias, eater)
+            log.debug('config', "Duplicate alias %s for eater %s, "
+                      "uniquifying", alias, eater)
             alias += '-bis'
 
         feeders.append((feedId, alias))
