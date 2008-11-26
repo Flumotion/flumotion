@@ -62,7 +62,9 @@ class Disker(Consumer):
         self.size_unit = SIZE_KB
         self.time = 12
         self.time_unit = TIME_HOUR
+
         self.properties.directory = "/tmp"
+        self.properties.start_recording = False
 
     def _getRotationType(self):
         if self.has_time:
@@ -77,10 +79,10 @@ class Disker(Consumer):
     def getProperties(self):
         properties = super(Disker, self).getProperties()
         properties.rotate_type = self._getRotationType()
-        if 'size' in properties:
-            properties.size *= self.size_unit
-        if 'time' in properties:
-            properties.time *= self.time_unit
+        if 'size' == properties.rotate_type:
+            properties.size = self.size_unit * self.size
+        elif 'time' == properties.rotate_type:
+            properties.time = self.time_unit * self.time
 
         return properties
 
@@ -128,13 +130,13 @@ class DiskStep(ConsumerStep):
                         'has_time',
                         'rotate',
                         'size_unit',
-                        'time_unit'])
+                        'time_unit',
+                        'time',
+                        'size'])
 
         self._proxy = self.add_proxy(self.model.properties,
                        ['directory',
-                        'start_recording',
-                        'size',
-                        'time'])
+                        'start_recording'])
 
     def workerChanged(self, worker):
         self.model.worker = worker
@@ -150,10 +152,12 @@ class DiskStep(ConsumerStep):
         hasSize = rotate and self.has_size.get_active()
         self.size.set_sensitive(hasSize)
         self.size_unit.set_sensitive(hasSize)
+        self.model.has_size = hasSize
 
         hasTime = rotate and self.has_time.get_active()
         self.time.set_sensitive(hasTime)
         self.time_unit.set_sensitive(hasTime)
+        self.model.has_time = hasTime
 
     def _select(self):
 

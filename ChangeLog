@@ -1,3 +1,12 @@
+2008-11-26  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/scenario/steps/diskersteps.py:
+	Now the checkboxes and radiobuttons on the disker wizard step are used
+	properly when configuring the flow.
+	Fixeѕ #1128
+
 2008-11-26  Xavier Queralt Mateu <xqueralt@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py:
