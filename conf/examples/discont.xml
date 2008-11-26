@@ -49,8 +49,10 @@
     </component>
 
     <component name="muxer-audio-video" project="flumotion" type="ogg-muxer" version="0.4.1.1" worker="localhost">
-      <eater name="default"><feed>encoder-audio</feed></eater>
-      <eater name="default"><feed>encoder-video</feed></eater>
+      <eater name="default">
+        <feed alias="audio">encoder-audio</feed>
+        <feed alias="video">encoder-video</feed>
+      </eater>
     </component>
 
     <component name="http-audio-video" project="flumotion" type="http-streamer" version="0.4.1.1" worker="localhost">

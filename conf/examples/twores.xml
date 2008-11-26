@@ -63,13 +63,17 @@
     </component>
 
     <component name="muxer-audio-video" project="flumotion" type="ogg-muxer" version="0.4.1" worker="localhost">
-      <eater name="default"><feed>encoder-video</feed></eater>
-      <eater name="default"><feed>encoder-audio</feed></eater>
+      <eater name="default">
+        <feed alias="video">encoder-video</feed>
+        <feed alias="audio">encoder-audio</feed>
+      </eater>
     </component>
 
     <component name="muxer-audio-video-small" project="flumotion" type="ogg-muxer" version="0.4.1" worker="localhost">
-      <eater name="default"><feed>encoder-video-small</feed></eater>
-      <eater name="default"><feed>encoder-audio</feed></eater>
+      <eater name="default">
+        <feed alias="video">encoder-video-small</feed>
+        <feed alias="audio">encoder-audio</feed>
+      </eater>
     </component>
 
     <component name="http-audio-video" project="flumotion" type="http-streamer" version="0.4.1" worker="localhost">
