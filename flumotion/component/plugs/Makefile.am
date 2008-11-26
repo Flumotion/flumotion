@@ -10,7 +10,8 @@ component_PYTHON = \
 	manhole.py \
 	request.py \
 	rrd.py \
-	streamdata.py
+	streamdata.py \
+	requestmodifier.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/plugs
 component_DATA = plugs.xml
