@@ -10,9 +10,9 @@ AC_INIT(flumotion, [flu_version])
 AM_INIT_AUTOMAKE([-Wno-portability])
 
 AS_VERSION(flumotion, FLUMOTION,
-           flu_major_version, 
-           flu_minor_version, 
-           flu_micro_version, 
+           flu_major_version,
+           flu_minor_version,
+           flu_micro_version,
            flu_extra_version)
 AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
 
