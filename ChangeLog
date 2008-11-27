@@ -1,3 +1,8 @@
+2008-11-27  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/common/common.py:
+	Added year 2008 to the flumotion copyright message (--version)
+
 2008-11-26  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/misc/httpserver/httpfile.py:

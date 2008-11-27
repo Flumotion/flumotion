@@ -55,7 +55,7 @@ def version(binary):
     block = []
     block.append("%s %s" % (binary, configure.version))
     block.append("part of Flumotion - a streaming media server")
-    block.append("(C) Copyright 2004,2005,2006,2007 Fluendo")
+    block.append("(C) Copyright 2004,2005,2006,2007,2008 Fluendo")
     return "\n".join(block)
 
 
