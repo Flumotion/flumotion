@@ -1,3 +1,9 @@
+2008-11-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/upgrade-to-0.5.3.xsl:
+	  Fix selection of nodes to fix for rate->samplerate to only apply
+	  for audiotest-producer and soundcard-producer.
+
 2008-11-27  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/common/common.py:

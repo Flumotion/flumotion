@@ -77,17 +77,11 @@
   </xsl:template>
 
   <!-- fix up property name strings -->
-  <xsl:template match="//planet/*/component/property/@name">
-    <xsl:attribute name="name">
-      <xsl:choose>
-        <!-- soundcard and audiotest -->
-        <xsl:when test=". = 'rate'"
-          >samplerate</xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="." />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:attribute>
+  <xsl:template match="//planet/*/component[@type='audiotest-producer']/property[@name='rate']/@name">
+    <xsl:attribute name="name">samplerate</xsl:attribute>
+  </xsl:template>
+  <xsl:template match="//planet/*/component[@type='soundcard-producer']/property[@name='rate']/@name">
+    <xsl:attribute name="name">samplerate</xsl:attribute>
   </xsl:template>
 
   <!-- Copy all the other nodes -->
