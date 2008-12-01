@@ -71,7 +71,7 @@ class _FireWireCommon:
         self._par = None
 
         # these are instance state variables:
-        self._factor_i = None             # index into self.factors
+        self._factor_i = 0             # index into self.factors
         self._width_correction = None     # currently chosen item from
                                           # width_corrections
 
@@ -79,7 +79,7 @@ class _FireWireCommon:
 
     def workerChanged(self, worker):
         self.model.worker = worker
-        self._run_checks()
+        self._populateDevices()
 
     # Private
 
@@ -91,7 +91,8 @@ class _FireWireCommon:
         self._update_label_camera_settings()
 
         # factor is a double
-        self._factor_i = self.combobox_scaled_height.get_selected()
+        if self.combobox_scaled_height.get_selected() is not None:
+            self._factor_i = self.combobox_scaled_height.get_selected()
 
         self._update_width_correction()
         self._update_label_output_format()
@@ -131,12 +132,9 @@ class _FireWireCommon:
 
     def _update_label_output_format(self):
         d = self._get_width_height()
-        self.model.properties.is_square = (
-            self.checkbutton_square_pixels.get_active())
         self.model.properties.width = d['ow']
         self.model.properties.height = d['oh']
         self.model.properties.scaled_width = d['sw']
-        self.model.properties.framerate = self.spinbutton_framerate.get_value()
         num, den = 1, 1
         if not self.model.properties.is_square:
             num, den = self._par[0], self._par[1]
@@ -173,13 +171,39 @@ class _FireWireCommon:
 
         return dict(sw=sw, sh=sh, ow=ow, oh=oh)
 
-    def _run_checks(self):
+    def _populateDevices(self):
+        self._setSensitive(False)
+        msg = messages.Info(T_(N_('Checking for Firewire devices...')),
+            mid='firewire-check')
+        self.wizard.add_msg(msg)
+        d = self.runInWorker('flumotion.worker.checks.gst010',
+                             'check1394devices', mid='firewire-check')
+
+        def firewireCheckDone(devices):
+            self.wizard.clear_msg('firewire-check')
+            self.guid.prefill(devices)
+            self._runChecks()
+
+        def trapRemoteFailure(failure):
+            failure.trap(errors.RemoteRunFailure)
+
+        def trapRemoteError(failure):
+            failure.trap(errors.RemoteRunError)
+
+        d.addCallback(firewireCheckDone)
+        d.addErrback(trapRemoteError)
+        d.addErrback(trapRemoteFailure)
+
+        return d
+
+    def _runChecks(self):
         self._setSensitive(False)
         msg = messages.Info(T_(N_('Checking for Firewire device...')),
             mid='firewire-check')
         self.wizard.add_msg(msg)
+
         d = self.runInWorker('flumotion.worker.checks.gst010', 'check1394',
-            mid='firewire-check')
+            mid='firewire-check', guid=self.guid.get_selected())
 
         def firewireCheckDone(options):
             self.wizard.clear_msg('firewire-check')
@@ -199,6 +223,7 @@ class _FireWireCommon:
 
         def trapRemoteError(failure):
             failure.trap(errors.RemoteRunError)
+
         d.addCallback(firewireCheckDone)
         d.addErrback(trapRemoteError)
         d.addErrback(trapRemoteFailure)
@@ -206,8 +231,11 @@ class _FireWireCommon:
 
     # Callbacks
 
-    def on_checkbutton_square_pixels_toggled(self, radio):
+    def on_is_square_toggled(self, radio):
         self._update_output_format()
+
+    def on_guid_changed(self, combo):
+        self._runChecks()
 
     def on_combobox_scaled_height_changed(self, combo):
         self._update_output_format()
@@ -232,6 +260,12 @@ class FireWireVideoStep(_FireWireCommon, VideoProducerStep):
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)
         _FireWireCommon.__init__(self)
+
+    def setup(self):
+        self.guid.data_type = int
+        self.framerate.data_type = float
+        self.add_proxy(self.model.properties,
+                       ['guid', 'framerate', 'is_square'])
 
 
 class FireWireAudioStep(_FireWireCommon, AudioProducerStep):
