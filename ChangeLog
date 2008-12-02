@@ -1,5 +1,16 @@
 2008-12-02  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/common/vfs.py:
+	* flumotion/common/vfsgio.py:
+	* flumotion/common/vfsgnome.py:
+	The files are fetched on the worker side now, so we view the remote
+	files on the FileSelector.
+	Fixes #1187
+
+2008-12-02  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/component/producers/soundcard/wizard_gtk.py:
 	Block the Forward button when the check fails.
 	Fixes #1207

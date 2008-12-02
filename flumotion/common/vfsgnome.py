@@ -70,6 +70,7 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
             name = fileInfo.name
         self.filename = name
         self.iconNames = ['gnome-fs-directory']
+        self._cachedFiles = None
 
     # IFile
 
@@ -79,6 +80,14 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
     # IDirectory
 
     def getFiles(self):
+        return succeed(self._cachedFiles)
+
+    def cacheFile(self):
+        """
+        Fetches the files contained on the directory for posterior usage of
+        them. This should be called on the worker side to work or the files
+        wouldn't be the expected ones.
+        """
         import gnomevfs
         log.debug('vfsgnome', 'getting files for %s' % (self.path, ))
         retval = []
@@ -100,7 +109,7 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
                 obj = GnomeVFSFile(self.path, fileInfo)
             retval.append(obj)
         log.log('vfsgnome', 'returning %r' % (retval, ))
-        return succeed(retval)
+        self._cachedFiles = retval
 
 
 def registerGnomeVFSJelly():

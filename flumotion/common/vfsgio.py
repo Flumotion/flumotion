@@ -92,6 +92,14 @@ class GIODirectory(Copyable, RemoteCopy):
     # IDirectory
 
     def getFiles(self):
+        return succeed(self._cachedFiles)
+
+    def cacheFiles(self):
+        """
+        Fetches the files contained on the directory for posterior usage of
+        them. This should be called on the worker side to work or the files
+        wouldn't be the expected ones.
+        """
         import gio
         log.debug('vfsgio', 'getting files for %s' % (self.path, ))
         retval = []
@@ -116,7 +124,7 @@ class GIODirectory(Copyable, RemoteCopy):
                 obj = GIOFile(self.path, gfileinfo)
             retval.append(obj)
         log.log('vfsgio', 'returning %r' % (retval, ))
-        return succeed(retval)
+        self._cachedFiles = retval
 
 
 def registerGIOJelly():

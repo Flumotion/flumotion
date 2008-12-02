@@ -46,7 +46,9 @@ def listDirectory(path):
             "there are no vfs backends available")
     backend = _backends[0]
     log.info('vfs', 'listing directory %s using %r' % (path, backend))
-    return succeed(backend(path))
+    directory = backend(path)
+    directory.cacheFiles()
+    return succeed(directory)
 
 
 def _registerBackends():
