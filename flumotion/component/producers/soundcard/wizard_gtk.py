@@ -165,7 +165,7 @@ class SoundcardStep(AudioProducerStep):
         def checkFailed(failure):
             failure.trap(RemoteRunFailure)
             self._clear_combos()
-            self.wizard.taskFinished()
+            self.wizard.taskFinished(True)
 
         def soundcardCheckComplete((deviceName, tracks)):
             self.wizard.clear_msg('soundcard-check')
