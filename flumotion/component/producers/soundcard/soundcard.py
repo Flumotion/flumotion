@@ -147,7 +147,7 @@ class Soundcard(feedcomponent.ParseLaunchComponent):
                     v = vol / maxVolume
 
                     self.debug("v: %f", v)
-                    return
+                    return v
             self.warning("could not find track %s", self.inputTrackLabel)
         else:
             self.warning("no input track selected, cannot set volume")
