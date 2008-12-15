@@ -1,5 +1,10 @@
 2008-12-15  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/common/vfsgnome.py:
+	Fixed a minor error on vfsgnome.
+
+2008-12-15  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/common/bugreporter.py:
 	Fixed a typo, the bug reporter was serializing a tuple instead of a
 	str for the component name.

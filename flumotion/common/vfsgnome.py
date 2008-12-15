@@ -82,7 +82,7 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
     def getFiles(self):
         return succeed(self._cachedFiles)
 
-    def cacheFile(self):
+    def cacheFiles(self):
         """
         Fetches the files contained on the directory for posterior usage of
         them. This should be called on the worker side to work or the files
