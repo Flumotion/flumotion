@@ -107,7 +107,7 @@ class BugReporter(object):
         if self._keywords:
             params['keywords'] = ','.join(self._keywords)
         if self._component:
-            params['component'] = self._component,
+            params['component'] = self._component
 
         data = urllib.urlencode(params)
         reportURL = "%s/newticket?%s" % (self._baseURL, data, )
