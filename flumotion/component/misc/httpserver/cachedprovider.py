@@ -29,7 +29,7 @@ import time
 
 from twisted.internet import defer, reactor, abstract
 
-from flumotion.common import log, format
+from flumotion.common import log, format, common
 from flumotion.component.misc.httpserver import cachestats
 from flumotion.component.misc.httpserver import fileprovider
 from flumotion.component.misc.httpserver import localpath
@@ -103,6 +103,9 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         self.debug("Cache size: %d MB", self._cacheSize)
         self.debug("Cache cleanup enabled: %s", self._cleanupEnabled)
 
+        common.ensureDir(self._sourceDir, "source")
+        common.ensureDir(self._cacheDir, "cache")
+
         self._cacheUsage = None # in bytes
         self._cacheUsageLastUpdate = None
         self._lastCacheTime = None
@@ -114,9 +117,13 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         self.updateCacheUsage()
 
         # Startup copy thread
-        self._event = threading.Event()
         self._thread = CopyThread(self)
+
+    def start(self, component):
         self._thread.start()
+
+    def stop(self, component):
+        self._thread.stop()
 
     def startStatsUpdates(self, updater):
         #FIXME: This is temporary. Should be done with plug UI.
@@ -316,10 +323,10 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
             self._disableCopyLoop()
 
     def _activateCopyLoop(self):
-        self._event.set()
+        self._thread.wakeup()
 
     def _disableCopyLoop(self):
-        self._event.clear()
+        self._thread.sleep()
 
 
 class LocalPath(localpath.LocalPath, log.Loggable):
@@ -363,9 +370,22 @@ class CopyThread(threading.Thread, log.Loggable):
     def __init__(self, plug):
         threading.Thread.__init__(self)
         self.plug = plug
+        self._running = True
+        self._event = threading.Event()
+
+    def stop(self):
+        self._running = False
+        self._event.set()
+        self.join()
+
+    def wakeup(self):
+        self._event.set()
+
+    def sleep(self):
+        self._event.clear()
 
     def run(self):
-        while True:
+        while self._running:
             sessions = self.plug._sessions.keys()
             for session in sessions:
                 try:
@@ -378,7 +398,7 @@ class CopyThread(threading.Thread, log.Loggable):
                 except Exception, e:
                     log.warning("Error during file copy: %s",
                                 log.getExceptionMessage(e))
-            self.plug._event.wait()
+            self._event.wait()
 
 
 class CopySessionCancelled(Exception):
