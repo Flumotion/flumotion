@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-11-14 11:02+0100\n"
+"POT-Creation-Date: 2008-12-29 16:48+0100\n"
 "PO-Revision-Date: 2005-07-29 01:22+0200\n"
 "Last-Translator: Christian Schaller <christian at fluendo dot com>\n"
 "Language-Team: nl\n"
@@ -783,7 +783,7 @@ msgid "Connection to %s was refused"
 msgstr "Forbindelsen ble %s ikke akseptert."
 
 #: ../flumotion/admin/gtk/adminwindow.py:1247
-#: ../flumotion/admin/gtk/dialogs.py:184
+#: ../flumotion/admin/gtk/dialogs.py:187
 #, fuzzy, python-format
 msgid "Connection to manager on %s failed (%s)."
 msgstr "Forbindelsen til manager %s feilet (%s)."
@@ -1025,33 +1025,33 @@ msgstr ""
 "\n"
 "(C) 2004-2005 Fluendo S.L."
 
-#: ../flumotion/admin/gtk/dialogs.py:162
+#: ../flumotion/admin/gtk/dialogs.py:165
 msgid "Authors"
 msgstr "Forfattere"
 
-#: ../flumotion/admin/gtk/dialogs.py:177
+#: ../flumotion/admin/gtk/dialogs.py:180
 #, fuzzy
 msgid "Connection Refused"
 msgstr "Forbindelsen ble %s ikke akseptert."
 
-#: ../flumotion/admin/gtk/dialogs.py:179
+#: ../flumotion/admin/gtk/dialogs.py:182
 #, python-format
 msgid ""
 "\"%s\" refused your connection.\n"
 "Check your user name and password and try again."
 msgstr ""
 
-#: ../flumotion/admin/gtk/dialogs.py:183
+#: ../flumotion/admin/gtk/dialogs.py:186
 #, fuzzy
 msgid "Connection Failed"
 msgstr "Forbindelsen ble %s ikke akseptert."
 
-#: ../flumotion/admin/gtk/dialogs.py:188
+#: ../flumotion/admin/gtk/dialogs.py:191
 #, python-format
 msgid "Already Connected to %s"
 msgstr ""
 
-#: ../flumotion/admin/gtk/dialogs.py:189
+#: ../flumotion/admin/gtk/dialogs.py:192
 #, fuzzy
 msgid "You cannot connect twice to the same manager. Try disconnecting first."
 msgstr "Mistet forbindelse med manager, kobler til på nytt ..."
@@ -1823,7 +1823,7 @@ msgid "Learn how to increase the maximum number of clients."
 msgstr ""
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:801
-#: ../flumotion/component/misc/httpserver/httpserver.py:392
+#: ../flumotion/component/misc/httpserver/httpserver.py:396
 #: ../flumotion/component/misc/porter/porter.py:356
 #, python-format
 msgid "Network error: TCP port %d is not available."
@@ -1838,10 +1838,17 @@ msgstr ""
 msgid "Overlayed logotypes too wide for the video image."
 msgstr ""
 
-#: ../flumotion/component/converters/overlay/overlay.py:92
+#: ../flumotion/component/converters/overlay/overlay.py:93
 msgid ""
 "The 'videomixer' GStreamer element has a bug in this version (0.10.7). You "
 "may see many errors in the debug output, but it should work correctly anyway."
+msgstr ""
+
+#: ../flumotion/component/converters/overlay/overlay.py:101
+msgid ""
+"The 'videomixer' GStreamer element has a bug since version (0.10.10) "
+"resulting in no overlay. The bug should be fixed in version 0.10.12. Please "
+"disregard this warning if you can see the overlay."
 msgstr ""
 
 #: ../flumotion/component/effects/colorbalance/colorbalance.glade.h:2
@@ -1962,7 +1969,7 @@ msgid "The quality of the JPEG encoding (from 0 to 100 %)."
 msgstr ""
 
 #: ../flumotion/component/encoders/jpeg/wizard.glade.h:1
-#: ../flumotion/component/producers/firewire/wizard.glade.h:6
+#: ../flumotion/component/producers/firewire/wizard.glade.h:7
 msgid "Frame _rate:"
 msgstr "Bilde_rate:"
 
@@ -2478,7 +2485,7 @@ msgid "Test audio producer"
 msgstr "Video_kilde:"
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:3
-msgid "The Sample rate (in Hz)."
+msgid "The Sample rate (in Hz).  Defaults to 44100."
 msgstr ""
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:4
@@ -2487,11 +2494,11 @@ msgid "The fraction of buffers to drop (0.0 - 1.0). Only useful for debugging."
 msgstr ""
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:5
-msgid "The frequency of the test signal (in Hz)."
+msgid "The frequency of the test signal (in Hz). Defaults to 440."
 msgstr ""
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:6
-msgid "The volume of the test signal (0.0 - 1.0)."
+msgid "The volume of the test signal (0.0 - 1.0). Defaults to 1.0."
 msgstr ""
 
 #: ../flumotion/component/producers/audiotest/wizard.glade.h:1
@@ -2689,74 +2696,84 @@ msgid "<b>Camera settings</b>"
 msgstr "<b>Kamera-instilling</b>"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:2
+#, fuzzy
+msgid "<b>Device:</b>"
+msgstr "<b>Stream</b>"
+
+#: ../flumotion/component/producers/firewire/wizard.glade.h:3
 msgid "<b>Output format</b>"
 msgstr "<b>Ut format</b>"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:3
+#: ../flumotion/component/producers/firewire/wizard.glade.h:4
 msgid "<b>Scaling</b>"
 msgstr "<b>Skalerer</b>"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:4
+#: ../flumotion/component/producers/firewire/wizard.glade.h:5
 msgid "<b>Width correction</b>"
 msgstr "<b>Bredekorreksjon</b>"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:5
+#: ../flumotion/component/producers/firewire/wizard.glade.h:6
 msgid "Convert to s_quare pixels"
 msgstr "Konverter til f_irkantede piksler"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:7
+#: ../flumotion/component/producers/firewire/wizard.glade.h:8
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
 msgstr "PAL, 4:3 (59/54 pixelaspectverhouding)"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:8
+#: ../flumotion/component/producers/firewire/wizard.glade.h:9
 msgid "Recommended if you are outputting to a computer screen"
 msgstr "Anbefalt hvis du skal fremvise på en computer skjerm"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:9
+#: ../flumotion/component/producers/firewire/wizard.glade.h:10
 msgid "Scaled _height:"
 msgstr "Skaler _høyde:"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:10
+#: ../flumotion/component/producers/firewire/wizard.glade.h:11
 msgid "_No width correction"
 msgstr "_Ingen bredde korreksjon"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:11
+#: ../flumotion/component/producers/firewire/wizard.glade.h:12
 msgid "_Pad to multiple of 8 pixels"
 msgstr "_Pakk inn til en multipel av 8 piksler"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:12
+#: ../flumotion/component/producers/firewire/wizard.glade.h:13
 msgid "_Stretch to multiple of 8 pixels"
 msgstr "_Utvid til en multiple av 8 piksler"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:13
+#: ../flumotion/component/producers/firewire/wizard.glade.h:14
 #: ../flumotion/component/producers/videotest/wizard.glade.h:5
 msgid "frames per second"
 msgstr "bilder per sekund"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:14
+#: ../flumotion/component/producers/firewire/wizard.glade.h:15
 msgid "none"
 msgstr "ingen"
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:120
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:121
 #, fuzzy, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "PAL, 4:3 (59/54 pixel aspekt ratio)"
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:144
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:142
 #, fuzzy, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "PAL, 4:3 (59/54 pixel aspekt ratio)"
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:178
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:176
+#, fuzzy
+msgid "Checking for Firewire devices..."
+msgstr "Sjekker for Firewire enhet..."
+
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:201
 msgid "Checking for Firewire device..."
 msgstr "Sjekker for Firewire enhet..."
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:227
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:255
 #, fuzzy
 msgid "Firewire Video"
 msgstr "Ingen Firewire enhet oppdaget."
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:239
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:273
 #, fuzzy
 msgid "Firewire Audio"
 msgstr "Ingen Firewire enhet oppdaget."
@@ -2816,7 +2833,7 @@ msgstr "_Start om"
 msgid "Restart looping:"
 msgstr ""
 
-#: ../flumotion/component/producers/looper/looper.py:131
+#: ../flumotion/component/producers/looper/looper.py:140
 #, fuzzy, python-format
 msgid "Could not open file '%s' for reading."
 msgstr ""
@@ -3272,64 +3289,64 @@ msgstr "Hvis du ønsker å streame audio"
 msgid "HTTP Streaming"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:114
+#: ../flumotion/scenario/steps/diskersteps.py:116
 msgid "kB"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:115
+#: ../flumotion/scenario/steps/diskersteps.py:117
 msgid "MB"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:116
+#: ../flumotion/scenario/steps/diskersteps.py:118
 msgid "GB"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:117
+#: ../flumotion/scenario/steps/diskersteps.py:119
 msgid "TB"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:120
+#: ../flumotion/scenario/steps/diskersteps.py:122
 msgid "minute(s)"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:121
+#: ../flumotion/scenario/steps/diskersteps.py:123
 msgid "hour(s)"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:122
+#: ../flumotion/scenario/steps/diskersteps.py:124
 msgid "day(s)"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:123
+#: ../flumotion/scenario/steps/diskersteps.py:125
 msgid "week(s)"
 msgstr ""
 
-#: ../flumotion/scenario/steps/diskersteps.py:193
+#: ../flumotion/scenario/steps/diskersteps.py:197
 #, fuzzy
 msgid "Disk (Audio and Video)"
 msgstr "Audio og Video"
 
-#: ../flumotion/scenario/steps/diskersteps.py:194
+#: ../flumotion/scenario/steps/diskersteps.py:198
 #, fuzzy
 msgid "Disk Audio/Video"
 msgstr "Audio og Video"
 
-#: ../flumotion/scenario/steps/diskersteps.py:204
+#: ../flumotion/scenario/steps/diskersteps.py:208
 #, fuzzy
 msgid "Disk (Audio Only)"
 msgstr "Bare audio"
 
-#: ../flumotion/scenario/steps/diskersteps.py:205
+#: ../flumotion/scenario/steps/diskersteps.py:209
 #, fuzzy
 msgid "Disk Audio"
 msgstr "Bare audio"
 
-#: ../flumotion/scenario/steps/diskersteps.py:215
+#: ../flumotion/scenario/steps/diskersteps.py:219
 #, fuzzy
 msgid "Disk (Video Only)"
 msgstr "Bare video"
 
-#: ../flumotion/scenario/steps/diskersteps.py:216
+#: ../flumotion/scenario/steps/diskersteps.py:220
 #, fuzzy
 msgid "Disk Video"
 msgstr "Bare video"
@@ -3507,30 +3524,39 @@ msgstr ""
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr ""
 
-#: ../flumotion/worker/checks/gst010.py:190
-msgid "Neither device node /dev/fw0 nor /dev/raw1394 exists."
-msgstr ""
-
-#: ../flumotion/worker/checks/gst010.py:212
+#: ../flumotion/worker/checks/gst010.py:201
 msgid ""
 "Could not find or open the Firewire device. Check the device node and its "
 "permissions."
 msgstr ""
 
-#: ../flumotion/worker/checks/gst010.py:216
+#: ../flumotion/worker/checks/gst010.py:205
 #, fuzzy
 msgid "No Firewire device found."
 msgstr "Ingen Firewire enhet oppdaget."
 
-#: ../flumotion/worker/checks/gst010.py:219
+#: ../flumotion/worker/checks/gst010.py:208
 msgid ""
 "Could not open Firewire device for reading. Check permissions on the device."
 msgstr ""
 
-#: ../flumotion/worker/checks/gst010.py:227
+#: ../flumotion/worker/checks/gst010.py:216
 #, fuzzy
 msgid "Could not probe Firewire device."
 msgstr "Sjekker for Firewire enhet..."
+
+#: ../flumotion/worker/checks/gst010.py:248
+msgid ""
+"GStreamer error, dv1394src factory could not be found.\n"
+"Maybe gstreamer-plugins-good is not properly installed."
+msgstr ""
+
+#: ../flumotion/worker/checks/gst010.py:275
+msgid ""
+"Could not find any Firewire device on the system.\n"
+"Please, check whether the device is correctly plugged or the modules are "
+"correctly loaded."
+msgstr ""
 
 #: ../flumotion/worker/job.py:334
 msgid "Check timed out."

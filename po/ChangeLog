@@ -1,3 +1,10 @@
+2008-12-29  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* LINGUAS: remove the german translation from LINGUAS. Fixes #1052
+	* nb.po (added):
+	* no.po (deleted): rename the norwegian bokmål translation from no.po
+	to nb.po. Fixes #1152
+
 2008-05-08  Johan Dahlin  <johan@gnome.org>
 
 	* POTFILES.in: Add a couple of missing files, mentioned in #957
