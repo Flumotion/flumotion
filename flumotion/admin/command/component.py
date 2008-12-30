@@ -194,7 +194,7 @@ class Property(util.LogCommand):
     subCommandClasses = [PropertyGet, PropertyList]
 
     def handleOptions(self, options):
-        if not self.componentId:
+        if not self.parentCommand.componentId:
             common.errorRaise("Please specify a component id "
                 "with 'component -i [component-id]'")
 

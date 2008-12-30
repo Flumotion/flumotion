@@ -1,3 +1,10 @@
+2008-12-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/command/component.py:
+	Of course, noone actually tests flumotion-command to see if the
+	commands work.
+	Fix property subcommand of component.
+
 2008-12-16  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/misc/httpserver/cachedprovider.py:
