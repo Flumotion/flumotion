@@ -1,3 +1,9 @@
+2009-01-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	  Add a link to the ticket that discusses stealing the fd from
+	  the Twisted reactor.
+
 2008-12-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/command/component.py:

@@ -457,6 +457,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # remove the removedWriter - this is because we never write to the
         # socket through twisted, only with direct os.write() calls from
         # _writeHeaders.
+
+        # see http://twistedmatrix.com/trac/ticket/1796 for a guarantee
+        # that this is a supported way of stealing the socket
         fd = fdi
         self.debug("taking away [fd %5d] from Twisted" % fd)
         reactor.removeReader(request.transport)
