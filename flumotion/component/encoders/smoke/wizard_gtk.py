@@ -35,6 +35,13 @@ _ = gettext.gettext
 class SmokeVideoEncoder(VideoEncoder):
     componentType = 'smoke-encoder'
 
+    def __init__(self):
+        super(SmokeVideoEncoder, self).__init__()
+        self.properties.qmin = 10
+        self.properties.qmax = 85
+        self.properties.threshold = 3000
+        self.properties.keyframe = 20
+
 
 class SmokeStep(VideoEncoderStep):
     name = 'SmokeEncoder'
@@ -49,6 +56,15 @@ class SmokeStep(VideoEncoderStep):
     docVersion = 'local'
 
     # WizardStep
+
+    def setup(self):
+        self.qmin.data_type = int
+        self.qmax.data_type = int
+        self.threshold.data_type = int
+        self.keyframe.data_type = int
+
+        self.add_proxy(self.model.properties,
+                       ['qmin', 'qmax', 'threshold', 'keyframe'])
 
     def workerChanged(self, worker):
         self.model.worker = worker

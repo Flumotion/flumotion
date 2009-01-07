@@ -1,3 +1,14 @@
+2009-01-07  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+	
+	reviewed by: Xavier Queralt Mateu  <xqueralt@flumotion.com>
+	patch by: Pedro Gracia  <pedro@flumotion.com>
+
+	* flumotion/component/encoders/smoke/smoke.py:
+	Warn the user about the bug #565441 of Gstreamer smoke encoder.
+	* flumotion/component/encoders/smoke/wizard_gtk.py:
+	The smoke wizard page now uses the settings set by the user.
+	Fixes #891
+
 2009-01-05  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/httpstreamer/resources.py:

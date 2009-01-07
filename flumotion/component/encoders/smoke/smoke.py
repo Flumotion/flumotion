@@ -20,8 +20,11 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
+from flumotion.common import messages, gstreamer
+from flumotion.common.i18n import N_, gettexter
 
 __version__ = "$Rev$"
+T_ = gettexter()
 
 
 class Smoke(feedcomponent.ParseLaunchComponent):
@@ -35,3 +38,11 @@ class Smoke(feedcomponent.ParseLaunchComponent):
         for p in ('qmin', 'qmax', 'threshold', 'keyframe'):
             if p in properties:
                 element.set_property(p, properties[p])
+
+        jpegVersion = gstreamer.get_plugin_version('jpeg')
+        if jpegVersion < (0, 10, 11, 1):
+            m = messages.Warning(
+                T_(N_("The 'smoke' encoder has a bug on versions previous "
+                      "to (0.10.11). It will not work unless it is updated.")),
+                mid="smokeenc-bug")
+            self.addMessage(m)
