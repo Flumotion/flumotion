@@ -51,7 +51,7 @@ def getURLFromPlaylist(url):
 class Check(util.LogCommand):
     """Main class to perform the stream checks"""
     description = 'Check stream.'
-    usage = '[options] url'
+    usage = 'check [options] url'
 
     def __init__(self, parentCommand=None, **kwargs):
         """Initial values and pipeline setup"""
