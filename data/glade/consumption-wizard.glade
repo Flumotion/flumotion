@@ -15,6 +15,8 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <property name="focus_on_map">True</property>
+  <property name="urgency_hint">False</property>
 
   <child>
     <widget class="GtkVBox" id="vbox1">
@@ -29,10 +31,11 @@
 	  <property name="label" translatable="yes">S_tream over HTTP</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
 	  <property name="active">True</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_http__toggled" last_modification_time="Thu, 30 Sep 2004 10:49:24 GMT"/>
+	  <signal name="toggled" handler="on_http__toggled"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -60,10 +63,11 @@
 		  <property name="label" translatable="yes">Audio &amp; Video</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_http_audio_video__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:09 GMT"/>
+		  <signal name="toggled" handler="on_http__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -79,10 +83,11 @@
 		  <property name="label" translatable="yes">Audio only</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_http_audio__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:24 GMT"/>
+		  <signal name="toggled" handler="on_http__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -98,10 +103,11 @@
 		  <property name="label" translatable="yes">Video only</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_http_video__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:36 GMT"/>
+		  <signal name="toggled" handler="on_http__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -131,10 +137,11 @@
 	  <property name="label" translatable="yes">S_ave to disk</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
 	  <property name="active">False</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_disk__toggled" last_modification_time="Thu, 30 Sep 2004 10:49:32 GMT"/>
+	  <signal name="toggled" handler="on_disk__toggled"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -163,10 +170,11 @@
 		  <property name="label" translatable="yes">Audio &amp; Video</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:21:50 GMT"/>
+		  <signal name="toggled" handler="on_disk__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -183,10 +191,11 @@
 		  <property name="label" translatable="yes">Audio only</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:22:06 GMT"/>
+		  <signal name="toggled" handler="on_disk__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -203,10 +212,11 @@
 		  <property name="label" translatable="yes">Video only</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-		  <signal name="toggled" handler="on_secondary__toggled" last_modification_time="Thu, 02 Jun 2005 16:22:16 GMT"/>
+		  <signal name="toggled" handler="on_disk__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -236,10 +246,11 @@
 	  <property name="label" translatable="yes">Stream to _Icecast2</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
+	  <property name="focus_on_click">True</property>
 	  <property name="active">False</property>
 	  <property name="inconsistent">False</property>
 	  <property name="draw_indicator">True</property>
-	  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
+	  <signal name="toggled" handler="on_shout2__toggled"/>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>
@@ -268,10 +279,11 @@
 		  <property name="label" translatable="yes">Audio &amp; Video</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">True</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
+		  <signal name="toggled" handler="on_shout2__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -283,15 +295,16 @@
 	      <child>
 		<widget class="GtkCheckButton" id="shout2_audio">
 		  <property name="visible">True</property>
-		  <property name="can_focus">True</property>
 		  <property name="sensitive">False</property>
+		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes">Audio only</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
+		  <signal name="toggled" handler="on_shout2__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
@@ -303,15 +316,16 @@
 	      <child>
 		<widget class="GtkCheckButton" id="shout2_video">
 		  <property name="visible">True</property>
-		  <property name="can_focus">True</property>
 		  <property name="sensitive">False</property>
+		  <property name="can_focus">True</property>
 		  <property name="label" translatable="yes">Video only</property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <property name="draw_indicator">True</property>
-                  <signal name="toggled" handler="on_shout2__toggled" last_modification_time="Thu, 02 Jun 2005 12:53:31 GMT"/>
+		  <signal name="toggled" handler="on_shout2__toggled"/>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>

@@ -233,15 +233,6 @@ class ConsumptionStep(WizardStep):
 
         self._verify()
 
-    def on_http_audio_video__toggled(self, button):
-        self._verify()
-
-    def on_http_audio__toggled(self, button):
-        self._verify()
-
-    def on_http_video__toggled(self, button):
-        self._verify()
-
     def on_http__toggled(self, button):
         value = self.http.get_active()
         self.http_audio_video.set_sensitive(value)

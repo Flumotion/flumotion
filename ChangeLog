@@ -1,5 +1,13 @@
 2009-01-12  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* data/glade/consumption-wizard.glade:
+	* flumotion/scenario/steps/consumptionsteps.py:
+	Added the callbacks for the disk consumer checkboxes so the forward
+	button is enabled/disabled properly.
+	Fixes #1125
+
+2009-01-12  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/consumers/disker/disker.py:
