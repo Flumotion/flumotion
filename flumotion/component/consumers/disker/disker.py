@@ -22,6 +22,7 @@
 import errno
 import os
 import time
+import tempfile
 
 import gobject
 import gst
@@ -71,6 +72,16 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
 
     def remote_changeFilename(self, filenameTemplate=None):
         self.comp.changeFilename(filenameTemplate)
+
+    def remote_scheduleRecordings(self, icalData):
+        icalFile = tempfile.TemporaryFile()
+        icalFile.write(icalData)
+        icalFile.seek(0)
+
+        self.comp.stopRecording()
+
+        self.comp.scheduleRecordings(icalFile)
+        icalFile.close()
 
     # called when admin ui wants updated state (current filename info)
 
@@ -157,38 +168,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self._startFilenameTemplate = self._defaultFilenameTemplate
         icalfn = properties.get('ical-schedule')
         if self._can_schedule and icalfn:
-            self.uiState.set('has-schedule', True)
-            self.debug('Parsing iCalendar file %s' % icalfn)
-            from flumotion.component.base import scheduler
-            try:
-                self.icalScheduler = scheduler.ICalScheduler(open(
-                    icalfn, 'r'))
-                self.icalScheduler.subscribe(self.eventInstanceStarted,
-                    self.eventInstanceEnded)
-                # FIXME: this should be handled through the subscription
-                # handlers; for that, we should subscribe before the calendar
-                # gets added
-                cal = self.icalScheduler.getCalendar()
-                eventInstances = cal.getActiveEventInstances()
-                if eventInstances:
-                    instance = eventInstances[0]
-                    content = instance.event.content
-                    self.info('Event %s is in progress, start recording' %
-                        content)
-                    self._startFilenameTemplate = content
-                    self._startTimeTuple = instance.start.utctimetuple()
-                    self._recordAtStart = True
-                else:
-                    self.info('No events in progress')
-                    self._recordAtStart = False
-                self._updateNextPoints()
-            except ValueError, e:
-                m = messages.Warning(T_(N_(
-                    "Error parsing ical file %s, so not scheduling any"
-                    " events." % icalfn)),
-                    debug=log.getExceptionMessage(e), mid="error-parsing-ical")
-                self.addMessage(m)
-
+            self.scheduleRecordings(open(icalfn, 'r'))
         elif icalfn:
 
             def missingModule(moduleName):
@@ -262,6 +242,38 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if mime == 'multipart/x-mixed-replace':
             mime += ";boundary=ThisRandomString"
         return mime
+
+    def scheduleRecordings(self, icalFile):
+        self.uiState.set('has-schedule', True)
+        self.debug('Parsing iCalendar file %s' % icalFile)
+        from flumotion.component.base import scheduler
+        try:
+            self.icalScheduler = scheduler.ICalScheduler(icalFile)
+            self.icalScheduler.subscribe(self.eventInstanceStarted,
+                self.eventInstanceEnded)
+            # FIXME: this should be handled through the subscription
+            # handlers; for that, we should subscribe before the calendar
+            # gets added
+            cal = self.icalScheduler.getCalendar()
+            eventInstances = cal.getActiveEventInstances()
+            if eventInstances:
+                instance = eventInstances[0]
+                content = instance.event.content
+                self.info('Event %s is in progress, start recording' %
+                    content)
+                self._startFilenameTemplate = content
+                self._startTimeTuple = instance.start.utctimetuple()
+                self._recordAtStart = True
+            else:
+                self.info('No events in progress')
+                self._recordAtStart = False
+            self._updateNextPoints()
+        except ValueError, e:
+            m = messages.Warning(T_(N_(
+                "Error parsing ical file %s, so not scheduling any"
+                " events." % icalfn)),
+                debug=log.getExceptionMessage(e), mid="error-parsing-ical")
+            self.addMessage(m)
 
     def changeFilename(self, filenameTemplate=None, timeTuple=None):
         """

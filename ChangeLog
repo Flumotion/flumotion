@@ -2,6 +2,15 @@
 
 	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/consumers/disker/disker.py:
+	Added a remote method to allow schedulling recordings with an ical
+	file from the admin window.
+	Fixes #1178
+
+2009-01-12  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* data/glade/ondemand-wizard.glade:
 	* flumotion/common/vfsgio.py:
 	* flumotion/common/vfsgnome.py:
