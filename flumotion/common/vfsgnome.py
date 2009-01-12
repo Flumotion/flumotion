@@ -64,9 +64,13 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
 
     def __init__(self, path, name=None):
         import gnomevfs
-        self.path = path
+        if not os.path.exists(path):
+            self.path = '/'
+        else:
+            self.path = os.path.abspath(path)
+
         if name is None:
-            fileInfo = gnomevfs.get_file_info(os.path.abspath(path))
+            fileInfo = gnomevfs.get_file_info(os.path.abspath(self.path))
             name = fileInfo.name
         self.filename = name
         self.iconNames = ['gnome-fs-directory']

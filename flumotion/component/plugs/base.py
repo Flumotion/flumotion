@@ -39,6 +39,9 @@ class Plug(log.Loggable):
         """
         self.args = args
 
+    def getProperties(self):
+        return self.args['properties']
+
 
 class ComponentPlug(Plug):
     """

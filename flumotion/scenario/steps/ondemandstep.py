@@ -23,15 +23,16 @@
 """
 
 import gettext
+from os.path import dirname, basename
 
 import gobject
 import gtk
 
-from flumotion.common import messages
-
 from flumotion.admin.assistant.models import HTTPServer
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
+from flumotion.common import messages
 from flumotion.common.i18n import N_, gettexter
+from flumotion.component.plugs.request import RequestLoggerFilePlug
 from flumotion.ui.fileselector import FileSelectorDialog
 
 __version__ = "$Rev$"
@@ -50,10 +51,19 @@ class OnDemand(HTTPServer):
         self.properties.path = '/tmp'
         self.properties.port = 8800
 
+        self.add_logger = False
+        self.logfile = '/tmp/access.log'
+
     # Component
 
     def getProperties(self):
         properties = super(OnDemand, self).getProperties()
+
+        if self.add_logger:
+            args = {'properties': {'logfile': self.logfile}}
+            logger = RequestLoggerFilePlug(args)
+            logger.plugType = 'requestlogger-file'
+            self.addPlug(logger)
 
         return properties
 
@@ -74,6 +84,7 @@ class OnDemandStep(WorkerWizardStep):
     def __init__(self, wizard):
         self.model = OnDemand()
         self._idleId = -1
+        self._blockNext = {}
         WorkerWizardStep.__init__(self, wizard)
 
     # WizardStep
@@ -82,13 +93,19 @@ class OnDemandStep(WorkerWizardStep):
         self.path.data_type = str
         self.port.data_type = int
         self.mount_point.data_type = str
+        self.add_logger.data_type = bool
+        self.logfile.data_type = str
 
         self._proxy = self.add_proxy(self.model.properties,
                        ['path',
                         'port',
-                        'mount_point'])
+                        'mount_point',
+                       ])
 
-        self.mount_point.set_text("/")
+        self._plugProxy = self.add_proxy(self.model,
+                       ['add_logger',
+                        'logfile',
+                       ])
 
     def workerChanged(self, worker):
         self.model.worker = worker
@@ -105,7 +122,13 @@ class OnDemandStep(WorkerWizardStep):
     # Private
 
     def _runChecks(self):
+        self._runPathCheck(self.model.properties.path, 'path')
+        if self.model.add_logger:
+            self._runPathCheck(dirname(self.model.logfile), 'logfile')
+
+    def _runPathCheck(self, path, id):
         self.wizard.waitForTask('ondemand check')
+        self._blockNext[id] = True
 
         def importError(failure):
             failure.trap(ImportError)
@@ -121,24 +144,25 @@ class OnDemandStep(WorkerWizardStep):
             self.wizard.add_msg(message)
             self.wizard.taskFinished(True)
 
-        def checkPathFinished(pathExists, path):
+        def checkPathFinished(pathExists):
             if not pathExists:
                 message = messages.Warning(T_(N_(
                     "Directory '%s' does not exist, "
                     "or is not readable on worker '%s'.")
-                                  % (path, self.worker)))
-                message.id = 'demand-directory-check'
+                    % (path, self.worker)))
+                message.id = 'demand-'+id+'-check'
                 self.wizard.add_msg(message)
             else:
-                self.wizard.clear_msg('demand-directory-check')
+                self.wizard.clear_msg('demand-'+id+'-check')
+                self._blockNext[id] = False
 
-            self.wizard.taskFinished(blockNext=not pathExists)
+            self.wizard.taskFinished()
+            self._verify()
 
         def checkPath(unused):
-            path = self.path.get_text()
             d = self.runInWorker('flumotion.worker.checks.check',
                                  'checkDirectory', path)
-            d.addCallback(checkPathFinished, path)
+            d.addCallback(checkPathFinished)
 
         d = self.wizard.checkImport(self.worker, 'twisted.web')
         d.addCallback(checkPath)
@@ -149,19 +173,44 @@ class OnDemandStep(WorkerWizardStep):
             gobject.source_remove(self._idleId)
             self._idleId = -1
 
-    def _scheduleCheck(self):
+    def _scheduleCheck(self, checkToRun, data, id):
         self._abortScheduledCheck()
-        self._idleId = gobject.timeout_add(300, self._runChecks)
+        self._idleId = gobject.timeout_add(300, checkToRun, data, id)
+
+    def _clearMessage(self, id):
+        self.wizard.clear_msg('demand-'+id+'-check')
+        self._blockNext[id] = False
 
     def _verify(self):
-        self._updateBlocked()
+        self.wizard.blockNext(reduce(lambda x, y: x or y,
+                                     self._blockNext.values(),
+                                     False))
 
-    def _updateBlocked(self):
-        # FIXME: This should be updated and only called when all pending
-        #        tasks are done.
-        self.wizard.blockNext(self.mount_point.get_text() == '')
+    def _showFileSelector(self, response_cb, path, directoryOnly=False):
 
-    def _showFileSelector(self):
+        def deleteEvent(fs, event):
+            pass
+
+        fs = FileSelectorDialog(self.wizard.window,
+                                self.wizard.getAdminModel())
+
+        fs.connect('response', response_cb)
+        fs.connect('delete-event', deleteEvent)
+        fs.selector.setWorkerName(self.model.worker)
+        fs.selector.setOnlyDirectoriesMode(directoryOnly)
+        fs.setDirectory(path)
+        fs.show_all()
+
+    # Callbacks
+
+    # FIXME: Find a way to check whether the mount point is already taken.
+    #        See #1186
+
+    def on_mount_point__changed(self, entry):
+        self._blockNext['mount-point'] = not entry.get_text()
+        self._verify()
+
+    def on_select_directory__clicked(self, button):
 
         def response(fs, response):
             fs.hide()
@@ -169,24 +218,53 @@ class OnDemandStep(WorkerWizardStep):
                 self.model.properties.path = fs.getFilename()
                 self._proxy.update('path')
 
-        def deleteEvent(fs, event):
-            pass
-        fs = FileSelectorDialog(self.wizard.window,
-                                self.wizard.getAdminModel())
-        fs.connect('response', response)
-        fs.connect('delete-event', deleteEvent)
-        fs.selector.setWorkerName(self.model.worker)
-        fs.setDirectory(self.model.properties.path)
-        fs.show_all()
+                self._clearMessage('path')
+                self._verify()
 
-    # Callbacks
+        directory = self.model.properties.path
 
-    def on_mount_point_changed(self, entry):
-        self._verify()
-        self.wizard.blockNext(entry.get_text() == "/")
+        self._showFileSelector(response,
+                               path=directory,
+                               directoryOnly=True)
+
+    def on_select_logfile__activate(self, button):
+
+        def response(fs, response):
+            fs.hide()
+            if response == gtk.RESPONSE_OK:
+                directory = fs.getFilename()
+                if directory == '/':
+                    directory = ''
+                filename = basename(self.model.logfile)
+
+                self.model.logfile = "%s/%s" % (directory, filename)
+                self._plugProxy.update('logfile')
+
+                self._clearMessage('logfile')
+                self._verify()
+
+        self._showFileSelector(response,
+                               path=self.model.logfile,
+                               directoryOnly=True)
+
+    def on_add_logger__toggled(self, cb):
+        self.logfile.set_sensitive(cb.get_active())
+        self.select_logfile.set_sensitive(cb.get_active())
+
+        if cb.get_active():
+            self._scheduleCheck(self._runPathCheck,
+                                dirname(self.model.logfile),
+                                'logfile')
+        else:
+            self._clearMessage('logfile')
+            self._verify()
+
+    def on_logfile__changed(self, entry):
+        self._scheduleCheck(self._runPathCheck,
+                            dirname(entry.get_text()),
+                            'logfile')
 
     def on_path__changed(self, entry):
-        self._scheduleCheck()
-
-    def on_select__clicked(self, button):
-        self._showFileSelector()
+        self._scheduleCheck(self._runPathCheck,
+                            entry.get_text(),
+                            'path')

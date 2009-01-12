@@ -1,4 +1,17 @@
-2009-01-07  Xavier Queralt Mateu,,,  <xqueralt@flumotion.com>
+2009-01-12  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* data/glade/ondemand-wizard.glade:
+	* flumotion/common/vfsgio.py:
+	* flumotion/common/vfsgnome.py:
+	* flumotion/component/plugs/base.py:
+	* flumotion/scenario/steps/ondemandstep.py:
+	* flumotion/ui/fileselector.py:
+	Added an optional apache logger to the on demand wizard page.
+	Fixes #947
+
+2009-01-07  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: Xavier Queralt Mateu  <xqueralt@flumotion.com>
 	patch by: Jordi Massaguer i Pla  <jordi@flumotion.com>

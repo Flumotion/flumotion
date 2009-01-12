@@ -72,7 +72,11 @@ class GIODirectory(Copyable, RemoteCopy):
 
     def __init__(self, path, name=None):
         import gio
-        self.path = os.path.abspath(path)
+        if not os.path.exists(path):
+            self.path = '/'
+        else:
+            self.path = os.path.abspath(path)
+
         gfile = gio.File(self.path)
         if name is None:
             name = gfile.get_basename()

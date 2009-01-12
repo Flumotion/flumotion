@@ -28,6 +28,7 @@ twisted.spread/PB protocol.
 """
 
 import gettext
+import os
 
 import gtk
 from gtk import gdk
@@ -35,6 +36,7 @@ from kiwi.ui.objectlist import ObjectList, Column
 from kiwi.utils import gsignal
 from zope.interface import implements
 
+from flumotion.admin.gtk.dialogs import ErrorDialog
 from flumotion.common.errors import AccessDeniedError
 from flumotion.common.interfaces import IDirectory, IFile
 from flumotion.common.vfs import listDirectory, registerVFSJelly
@@ -80,7 +82,14 @@ class FileSelector(ObjectList):
         self._workerName = None
         self._iconTheme = gtk.icon_theme_get_default()
         self._path = None
+        self._onlyDirectories = False
         registerVFSJelly()
+
+    def showErrorMessage(self, fail, var2):
+        dialog = ErrorDialog(_("You don't have enough privileges to view the"
+                               "contents of that directory"),
+                               self._parent, close_on_response=True)
+        dialog.show()
 
     def _rowActivated(self, vfsFile):
         vfsFile = vfsFile.original
@@ -100,6 +109,8 @@ class FileSelector(ObjectList):
     def _populateList(self, vfsFiles):
         self.clear()
         for vfsFile in vfsFiles:
+            if not IDirectory.providedBy(vfsFile) and self._onlyDirectories:
+                continue
             icon = self._renderIcon(vfsFile.iconNames)
             self.append(_File(vfsFile, icon))
 
@@ -157,6 +168,9 @@ class FileSelector(ObjectList):
         """
         self._workerName = workerName
 
+    def setOnlyDirectoriesMode(self, value):
+        self._onlyDirectories = value
+
 
 class FileSelectorDialog(gtk.Dialog):
     """I am a dialog which contains a file selector dialog
@@ -197,4 +211,7 @@ class FileSelectorDialog(gtk.Dialog):
         @param path: the path to show in the file selector
         @type path: str
         """
+        if not os.path.isdir(path):
+            path = os.path.dirname(path)
+
         return self.selector.setDirectory(path)
