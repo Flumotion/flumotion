@@ -105,6 +105,8 @@ class HTTPStreamer(Consumer):
         properties.porter_password = porter.getPassword()
         properties.type = 'slave'
         properties.burst_on_connect = self._common.burst_on_connect
+        # FIXME: Try to maintain the port empty when we are slave. Needed
+        # for now as the adminwindow tab shows the URL based on this property.
         properties.port = self.getPorter().getPort()
 
         return properties
