@@ -105,6 +105,7 @@ class HTTPStreamer(Consumer):
         properties.porter_password = porter.getPassword()
         properties.type = 'slave'
         properties.burst_on_connect = self._common.burst_on_connect
+        properties.port = self.getPorter().getPort()
 
         return properties
 
