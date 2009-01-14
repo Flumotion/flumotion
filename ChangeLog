@@ -1,3 +1,17 @@
+2009-01-14  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Julien Le Goff <jlegoff@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Added a way for the component list to know when a
+	worker is connected or disconnected.
+	* flumotion/admin/gtk/componentlist.py:
+	Code concerning the tooltips rewritten.
+	When a worker is offline its name would appear in italics and the
+	tooltip of the component would explain that.
+	Fixes #1036
+	Fixes #1026
+
 2009-01-13  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/scenario/steps/httpstreamersteps.py:

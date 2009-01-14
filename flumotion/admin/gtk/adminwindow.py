@@ -283,13 +283,15 @@ class AdminWindow(Loggable, GladeDelegate):
 
     def whsAppend(self, state, key, value):
         if key == 'names':
-            self.statusbar.set(
-                'main', _('Worker %s logged in.') % value)
+            self._componentList.workerAppend(value)
+            self._clearLastStatusbarText()
+            self._setStatusbarText(_('Worker %s logged in.') % value)
 
     def whsRemove(self, state, key, value):
         if key == 'names':
-            self.statusbar.set(
-                'main', _('Worker %s logged out.') % value)
+            self._componentList.workerRemove(value)
+            self._clearLastStatusbarText()
+            self._setStatusbarText(_('Worker %s logged out.') % value)
 
     def show(self):
         self._window.show()
@@ -538,6 +540,11 @@ class AdminWindow(Loggable, GladeDelegate):
             self.debug('Connecting to new model %r' % model)
 
         self._adminModel = model
+
+        whs = self._adminModel.getWorkerHeavenState()
+        whs.addListener(self, append=self.whsAppend, remove=self.whsRemove)
+        for worker in whs.get('names'):
+            self._componentList.workerAppend(worker)
 
         # window gets created after model connects initially, so check
         # here

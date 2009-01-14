@@ -57,7 +57,8 @@ MOODS_INFO = {
  COL_PID,
  COL_STATE,
  COL_MOOD_VALUE, # to sort COL_MOOD
- COL_CPU) = range(7)
+ COL_CPU,
+ COL_TOOLTIP) = range(8)
 
 
 def getComponentLabel(state):
@@ -93,6 +94,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         self._iters = {} # componentState -> model iter
         self._lastStates = None
         self._model = None
+        self._workers = []
         self._view = None
         self._moodPixbufs = self._getMoodPixbufs()
         self._createUI(treeView)
@@ -110,6 +112,7 @@ class ComponentList(log.Loggable, gobject.GObject):
             object,         # state
             int,            # mood-value
             str,            # cpu
+            str,            # tooltip
             )
         treeView.set_model(treeModel)
 
@@ -137,15 +140,9 @@ class ComponentList(log.Loggable, gobject.GObject):
         col = gtk.TreeViewColumn(_('PID'), t, text=COL_PID)
         col.set_sort_column_id(COL_PID)
         treeView.append_column(col)
+        if gtk.pygtk_version >= (2, 12):
+            treeView.set_tooltip_column(COL_TOOLTIP)
 
-        # PyGTK bug #479012 was fixed in 2.12.1 and prevents this from crashing
-        if gtk.pygtk_version >= (2, 12, 1):
-            treeView.props.has_tooltip = True
-            treeView.connect("query-tooltip", self._tree_view_query_tooltip_cb)
-
-            def selection_changed_cb(selection):
-                treeView.trigger_tooltip_query()
-            treeSelection.connect('changed', selection_changed_cb)
         if hasattr(gtk.TreeView, 'set_rubber_banding'):
             treeView.set_rubber_banding(False)
 
@@ -320,23 +317,31 @@ class ComponentList(log.Loggable, gobject.GObject):
         if oldstart != canStart:
             self.set_property('can-start-any', canStart)
 
+    def workerAppend(self, name):
+        self._workers.append(name)
+
+    def workerRemove(self, name):
+        self._workers.remove(name)
+        for state, titer in self._iters.items():
+            self._updateWorker(titer, state)
+
     def _updateWorker(self, titer, componentState):
         # update the worker name:
-        # - italic [any worker] if no workerName/workerRequested
-        # - italic if workerName, or no workerName but workerRequested
+        # - italic if workerName and workerRequested are not running
         # - normal if running
 
         workerName = componentState.get('workerName')
         workerRequested = componentState.get('workerRequested')
-        if not workerName:
-            workerName = "%s" % workerRequested
-            if not workerRequested:
-                workerName = _("[any worker]")
+        if not workerName and not workerRequested:
+            #FIXME: Should we raise an error here?
+            #       It's an impossible situation.
+            workerName = _("[any worker]")
 
-        mood = componentState.get('mood')
-        markup = workerName
-        if mood == moods.sleeping.value:
-            markup = "<i>%s</i>" % workerName
+        markup = workerName or workerRequested
+        if markup not in self._workers:
+            self._model.set(titer, COL_TOOLTIP,
+                    _("<b>Worker %s is not connected</b>") % markup)
+            markup = "<i>%s</i>" % markup
         self._model.set(titer, COL_WORKER, markup)
 
     def _removeListenerForeach(self, model, path, titer):
@@ -352,6 +357,9 @@ class ComponentList(log.Loggable, gobject.GObject):
         """
         self._model.set(titer, COL_MOOD, self._moodPixbufs[value])
         self._model.set(titer, COL_MOOD_VALUE, value)
+        mood = moods.get(value)
+        self._model.set(titer, COL_TOOLTIP,
+                _("<b>Component is %s</b>") % (MOODS_INFO[mood].lower(), ))
 
         self._updateStartStop()
 
@@ -365,19 +373,6 @@ class ComponentList(log.Loggable, gobject.GObject):
             component_state = model[tree_row][col_name]
             selected.append(component_state)
         return selected
-
-    def _tooltipsGetContext(self, treeview, keyboard_tip, x, y):
-        if keyboard_tip:
-            path = treeview.get_cursor()
-            if not path:
-                return
-        else:
-            x, y = treeview.convert_widget_to_bin_window_coords(x, y)
-            path = treeview.get_path_at_pos(x, y)
-            if not path:
-                return
-
-        return path
 
     def _getMoodPixbufs(self):
         # load all pixbufs for the moods
@@ -411,11 +406,6 @@ class ComponentList(log.Loggable, gobject.GObject):
         self.emit('selection-changed', states)
         self._lastStates = states
 
-    def _updateTooltip(self, path, tooltip):
-        mood = self._model[path[0]][COL_MOOD_VALUE]
-        tooltip.set_markup("<b>%s</b>" % _("Component is %s") % (
-            MOODS_INFO[moods.get(mood)]))
-
     def _showPopupMenu(self, event):
         selection = self._view.get_selection()
         retval = self._view.get_path_at_pos(int(event.x), int(event.y))
@@ -430,14 +420,6 @@ class ComponentList(log.Loggable, gobject.GObject):
         self.emit('show-popup-menu', event.button, event.time)
 
     # Callbacks
-
-    def _tree_view_query_tooltip_cb(self, treeview, x, y, keyboard_tip,
-                                    tooltip):
-        path = self._tooltipsGetContext(treeview, keyboard_tip, x, y)
-        if path is None:
-            return
-        self._updateTooltip(path, tooltip)
-        return True
 
     def _view_cursor_changed_cb(self, *args):
         self._selectionChanged()
