@@ -2,6 +2,14 @@
 
 	reviewed by: Julien Le Goff <jlegoff@flumotion.com>
 
+	* flumotion/admin/assistant/models.py:
+	Encoders, producers and muxers without a feeder are accepted.
+	Fixes #1142
+
+2009-01-14  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Julien Le Goff <jlegoff@flumotion.com>
+
 	* flumotion/admin/gtk/adminwindow.py:
 	Added a way for the component list to know when a
 	worker is connected or disconnected.

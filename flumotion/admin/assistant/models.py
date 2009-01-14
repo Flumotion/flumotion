@@ -233,9 +233,9 @@ class Producer(Component):
                 (self.name, ))
 
         if not self.feeders:
-            raise ComponentValidationError(
-                "producer component %s must have at least one feeder" %
-                (self.name, ))
+            log.debug("component-validation",
+                      "producer component %s doesn't have any feeder" %
+                      (self.name, ))
 
     def getProperties(self):
         properties = super(Producer, self).getProperties()
@@ -263,9 +263,9 @@ class Encoder(Component):
                 (self.name, ))
 
         if not self.feeders:
-            raise ComponentValidationError(
-                "encoder component %s must have at least one feeder" %
-                (self.name, ))
+            log.debug("component-validation",
+                      "encoder component %s doesn't have any feeder" %
+                      (self.name, ))
 
 
 class Muxer(Component):
@@ -281,9 +281,9 @@ class Muxer(Component):
                 (self.name, ))
 
         if not self.feeders:
-            raise ComponentValidationError(
-                "muxer component %s must have at least one feeder" %
-                (self.name, ))
+            log.debug("component-validation",
+                      "muxer component %s doesn't have any feeder" %
+                      (self.name, ))
 
 
 class Consumer(Component):
