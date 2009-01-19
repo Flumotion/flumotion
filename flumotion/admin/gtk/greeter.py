@@ -24,6 +24,7 @@
 
 import gettext
 import os
+from sys import platform
 
 import gobject
 import gtk
@@ -58,7 +59,10 @@ class Initial(WizardStep):
         super(Initial, self).__init__(wizard, parent)
 
         for radio in self.load_connection.get_group():
-            radio.connect('activate', self._on_radio__activiate)
+            if radio.name == 'start_new' and platform.find('win') >= 0:
+                radio.hide()
+            else:
+                radio.connect('activate', self._on_radio__activiate)
 
     # WizardSteps
 
