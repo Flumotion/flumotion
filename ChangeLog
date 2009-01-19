@@ -1,5 +1,14 @@
 2009-01-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/admin/gtk/componentlist.py:
+	Fixed the behaviour of the component list when selecting a component.
+	If the component is already selected the UI is not updated anymore.
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	Don't create the Link button until the URI has been received.
+	Fixes #1236
+
+2009-01-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/admin/gtk/greeter.py:
 	Hide 'Start new manager and connect to it' option on windows.
 	Fixes #1179

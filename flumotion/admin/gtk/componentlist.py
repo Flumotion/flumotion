@@ -398,7 +398,7 @@ class ComponentList(log.Loggable, gobject.GObject):
             gobject.idle_add(self.emit, 'selection-changed', [])
             return
 
-        if states is self._lastStates:
+        if states == self._lastStates:
             self.debug('no new components selected, no emitting signal')
             return
 

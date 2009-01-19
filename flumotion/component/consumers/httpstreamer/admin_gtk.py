@@ -112,10 +112,10 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
             self._labels[name].set_text(text)
 
         uri = state.get('stream-url') or ''
-        if not self._link:
+        if not self._link and uri:
             self._link = self._createLinkWidget(uri)
 
-        if self._link is not None:
+        if self._link:
             self._link.set_uri(uri)
 
     def _createLinkWidget(self, uri):
