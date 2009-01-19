@@ -356,7 +356,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self.info("Failed to update link %s: %s", dest,
                       log.getExceptionMessage(e))
             m = messages.Warning(T_(N_("Failed to update symbolic link "
-                                       "'%s'. Check your permissions.", dest)),
+                                 "'%s'. Check your permissions." % dest)),
                                  debug=log.getExceptionMessage(e))
             self.addMessage(m)
 

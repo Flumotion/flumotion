@@ -1,5 +1,10 @@
 2009-01-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/component/consumers/disker/disker.py:
+	Fixed the arguments passed to a N_ method call.
+
+2009-01-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/admin/gtk/componentlist.py:
 	Fixed the behaviour of the component list when selecting a component.
 	If the component is already selected the UI is not updated anymore.
