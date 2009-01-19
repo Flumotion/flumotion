@@ -89,7 +89,7 @@ class LocalManagerSpawner(SignalMixin):
         def chain(args, description, failMessage):
             d.addCallback(self._spawnProcess, args, description, failMessage)
 
-        for serviceName in [_('manager'), _('worker')]:
+        for serviceName in ['manager', 'worker']:
             chain(["flumotion",
                    "-C", self._confDir,
                    "-L", self._logDir,
