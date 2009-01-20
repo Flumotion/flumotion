@@ -13,6 +13,9 @@ component_PYTHON = \
 	shout2steps.py \
 	summarysteps.py
 
+component_DATA = \
+	steps.xml
+
 TAGS_FILES = $(component_PYTHON)
 
 clean-local:

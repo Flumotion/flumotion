@@ -5,6 +5,9 @@ component_PYTHON = \
 		__init__.py \
 		wizard_gtk.py
 
+component_DATA = \
+	ondemand.xml
+
 TAGS_FILES = $(component_PYTHON)
 
 clean-local:

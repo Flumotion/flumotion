@@ -1,3 +1,11 @@
+2009-01-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/scenario/live/Makefile.am:
+	* flumotion/scenario/ondemand/Makefile.am:
+	* flumotion/scenario/steps/Makefile.am:
+	Added scenarios registry files to the Makefiles so 
+	they are added to the packages.
+
 2009-01-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/component/consumers/disker/disker.py:
