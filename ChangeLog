@@ -1,5 +1,12 @@
 2009-01-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/admin/gtk/adminwindow.py:
+	The "Add new format" action shouldn't be set sensitive until the wizard
+	has finished, otherwise it can remain that way even if the wizard
+	doesn't configure a flow successly.
+
+2009-01-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/scenario/live/Makefile.am:
 	* flumotion/scenario/ondemand/Makefile.am:
 	* flumotion/scenario/steps/Makefile.am:

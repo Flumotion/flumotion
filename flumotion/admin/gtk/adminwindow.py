@@ -561,7 +561,6 @@ class AdminWindow(Loggable, GladeDelegate):
                                  self._admin_connection_failed_cb)
         self._adminModel.connect('update', self._admin_update_cb)
 
-        self._addFormatAction.set_sensitive(True)
         self._runConfigurationAssistantAction.set_sensitive(True)
 
     def _openConnection(self, info):
