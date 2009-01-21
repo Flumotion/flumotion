@@ -791,7 +791,9 @@ class AdminWindow(Loggable, GladeDelegate):
             return
 
         d = self._clearAllComponents()
-        d.addCallback(lambda unused: runAssistant())
+        # The remote call returns a list with the results of the cleaning.
+        # None if there has been an error during the processs.
+        d.addCallback(lambda list: list and runAssistant())
 
     def _runAssistant(self, assistant):
         if self._adminModel is None:
