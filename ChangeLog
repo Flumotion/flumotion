@@ -1,3 +1,16 @@
+2009-01-22  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Arek
+
+	* flumotion/common/vfsgnome.py:
+	Removed an unnecesary call to os.path.abspath.
+	* flumotion/component/plugs/base.py:
+	Deleted the changes made to the plugs code on r7696.
+	* flumotion/scenario/steps/ondemandstep.py:
+	Added a model for the logger plug and using it.
+	* flumotion/component/consumers/disker/disker.py:
+	Marking the string to translate correctly.
+
 2009-01-21  Xavier Queralt Mateu,,,  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:

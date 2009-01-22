@@ -28,16 +28,29 @@ from os.path import dirname, basename
 import gobject
 import gtk
 
-from flumotion.admin.assistant.models import HTTPServer
+from flumotion.admin.assistant.models import HTTPServer, Plug
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.common import messages
 from flumotion.common.i18n import N_, gettexter
-from flumotion.component.plugs.request import RequestLoggerFilePlug
 from flumotion.ui.fileselector import FileSelectorDialog
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 T_ = gettexter()
+
+
+class LoggerPlug(Plug):
+
+    plugType = 'requestlogger-file'
+
+    def __init__(self, logfile):
+        """
+        @param videoProducer: video producer
+        @type  videoProducer: L{flumotion.admin.assistant.models.VideoProducer}
+          subclass or None
+        """
+        super(LoggerPlug, self).__init__()
+        self.properties.logfile = logfile
 
 
 class OnDemand(HTTPServer):
@@ -60,10 +73,7 @@ class OnDemand(HTTPServer):
         properties = super(OnDemand, self).getProperties()
 
         if self.add_logger:
-            args = {'properties': {'logfile': self.logfile}}
-            logger = RequestLoggerFilePlug(args)
-            logger.plugType = 'requestlogger-file'
-            self.addPlug(logger)
+            self.addPlug(LoggerPlug(self.logfile))
 
         return properties
 
