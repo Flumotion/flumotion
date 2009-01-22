@@ -2,6 +2,16 @@
 
 	reviewed by: Arek
 
+	* flumotion/admin/assistant/models.py:
+	* flumotion/common/fraction.py:
+	Fixed the fraction convertion from a float. 
+	The gcd is calculated now so no precission is lost.
+	Fixes #910
+
+2009-01-22  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Arek
+
 	* flumotion/common/vfsgnome.py:
 	Removed an unnecesary call to os.path.abspath.
 	* flumotion/component/plugs/base.py:
@@ -11,7 +21,7 @@
 	* flumotion/component/consumers/disker/disker.py:
 	Marking the string to translate correctly.
 
-2009-01-21  Xavier Queralt Mateu,,,  <xqueralt@flumotion.com>
+2009-01-21  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
 	Do not run the Assistant when the cleaning operation has not succeed.

@@ -24,6 +24,25 @@
 
 __version__ = "$Rev$"
 
+import math
+
+
+def gcd(a, b):
+    """
+    Returns the greatest common divisor of two integers.
+
+    @type a: int
+    @type b: int
+
+    @rtype : int
+    """
+    while b:
+        tmp = a
+        a = b
+        b = tmp % b
+
+    return a
+
 
 def fractionFromValue(value):
     """
@@ -56,8 +75,19 @@ def fractionFromValue(value):
             raise ValueError(
                 "Can only convert two sized tuple to fraction")
         return value
-    elif isinstance(value, (float, int, long)):
+    elif isinstance(value, (int, long)):
         return _frac(value)
+    elif isinstance(value, float):
+        ipart = int(value)
+        fpart = value - ipart
+
+        if not fpart:
+            return _frac(value)
+        else:
+            den = math.pow(10, len(str(fpart))-2)
+            num = value*den
+            div = gcd(num, den)
+            return _frac(num/div, den/div)
     else:
         raise ValueError(
             "Cannot convert %r of type %s to a fraction" % (

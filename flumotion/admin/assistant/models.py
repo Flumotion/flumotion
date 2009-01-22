@@ -242,11 +242,11 @@ class Producer(Component):
         if 'framerate' in properties:
             # Convert framerate to fraction
             try:
-                framerate = int(properties['framerate'])
+                framerate = fractionFromValue(properties['framerate'])
             except ValueError:
                 pass
             else:
-                properties['framerate'] = "%d/%d" % (framerate * 10, 10)
+                properties['framerate'] = "%d/%d" % framerate
         return properties
 
 
