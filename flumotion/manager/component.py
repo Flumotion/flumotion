@@ -562,6 +562,7 @@ class FeedMap(object, log.Loggable):
     logName = 'feed-map'
 
     def __init__(self):
+        #FIXME: Use twisted.python.util.OrderedDict instead
         self.avatars = {}
         self._ordered_avatars = []
         self._dirty = True

@@ -26,6 +26,7 @@ import types
 import gobject
 import gtk
 from twisted.internet.defer import Deferred
+from twisted.python import util
 
 from flumotion.configure import configure
 from flumotion.common import log, messages
@@ -249,7 +250,7 @@ class _SidebarSection(gtk.VBox):
         gtk.VBox.__init__(self)
 
         self.set_name(title)
-        self.buttons = []
+        self._buttons = util.OrderedDict()
 
         self.title = _SidebarButton(title, 10)
         self.title.show()
@@ -262,10 +263,10 @@ class _SidebarSection(gtk.VBox):
 
     def set_active(self, active):
         if active:
-            for button in self.buttons:
+            for button in self._buttons.values():
                 button.show()
         else:
-            for button in self.buttons:
+            for button in self._buttons.values():
                 button.hide()
 
     def push_header(self):
@@ -275,6 +276,8 @@ class _SidebarSection(gtk.VBox):
         self.title.set_sensitive(False)
 
     def push_step(self, step_name, step_title):
+        if step_name in self._buttons:
+            return
 
         def clicked_cb(b, name):
             self.emit('step-chosen', name)
@@ -283,11 +286,17 @@ class _SidebarSection(gtk.VBox):
         button.connect('clicked', clicked_cb, step_name)
         self.pack_start(button, False, False)
         button.show()
-        self.buttons.append(button)
+        self._buttons[step_name] = button
 
     def pop_step(self):
-        b = self.buttons.pop()
-        self.remove(b)
+        if not self._buttons:
+            return None
+
+        button = self._buttons.popitem()[1]
+        if button:
+            self.remove(button)
+        return button
+
 gobject.type_register(_SidebarSection)
 
 
@@ -367,12 +376,11 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
             self._sections[self._active].push_header()
 
     def pop(self):
-        if not self._top in self._sections:
+        if self._top < 0 or self._top >= len(self._sections):
             return False
+
         top_section = self._sections[self._top]
-        if top_section.buttons:
-            top_section.pop_step()
-        else:
+        if not top_section.pop_step():
             top_section.pop_header()
             self._top -= 1
             if self._top < 0:
@@ -384,11 +392,11 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
     def cleanFutureSteps(self):
         oldSections = self._sections2[self._currentSection+1:][:]
         for i, oldSection in enumerate(oldSections):
-            self.removeSection(oldSection.title)
+            self.removeSection(oldSection.name)
             self._sections2.remove(oldSection)
 
     def addStepSection(self, section):
-        self.appendSection(section.section, section.title)
+        self.appendSection(section.section, section.name)
         self._sections2.append(section)
 
     def getStep(self, stepname):
@@ -506,7 +514,7 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
         hasNext = not hasattr(step, 'lastStep')
         if not step.visited and hasNext:
             self.push(step.section,
-                      step.title,
+                      step.name,
                       step.sidebarName)
         else:
             self.jumpTo(step.section)

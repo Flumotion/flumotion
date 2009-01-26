@@ -275,8 +275,9 @@ class StateRemoteCache(pb.RemoteCache):
         # when this is created through serialization from a JobCS,
         # __init__ does not seem to get called, so create self._listeners
         if not hasattr(self, '_listeners'):
-            # fixme: this means that callbacks will be fired in
+            # FIXME: this means that callbacks will be fired in
             # arbitrary order; should be fired in order of connecting.
+            # Use twisted.python.util.OrderedDict instead
             self._listeners = {}
 
     #F0.8: remove set=None and move set_=None there

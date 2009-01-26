@@ -1,4 +1,16 @@
-2009-01-26  Xavier Queralt Mateu,,,  <xqueralt@flumotion.com>
+2009-01-26  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Arek
+
+	* flumotion/manager/component.py:
+	* flumotion/twisted/flavors.py:
+	Add FIXMEs in places where an ordered dict is needed.
+	* flumotion/ui/wizard.py:
+	Fixed the strange behaviour of the sidebar that never deletes the
+	buttons and ends with a large list of ununsable buttons.
+	Fixes #1126
+
+2009-01-26  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/common/fraction.py:
 	Calculating the module in one line.
