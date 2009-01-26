@@ -37,9 +37,7 @@ def gcd(a, b):
     @rtype : int
     """
     while b:
-        tmp = a
-        a = b
-        b = tmp % b
+        a, b = b, a % b
 
     return a
 

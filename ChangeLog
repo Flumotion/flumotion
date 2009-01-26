@@ -1,3 +1,8 @@
+2009-01-26  Xavier Queralt Mateu,,,  <xqueralt@flumotion.com>
+
+	* flumotion/common/fraction.py:
+	Calculating the module in one line.
+
 2009-01-22  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: Arek
