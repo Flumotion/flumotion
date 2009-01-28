@@ -2,8 +2,9 @@
 NAME=flumotion-test
 PROTOCOL=tcp
 PORT=8642
+HOST=localhost
 
-while getopts “n:sp:” OPTION
+while getopts “n:sp:h:” OPTION
 do
      case $OPTION in
          n)
@@ -15,10 +16,14 @@ do
          p)
              PORT=$OPTARG
              ;;
+         h)
+             HOST=$OPTARG
+             ;;
      esac
 done
 
 flumotion-manager -v -T $PROTOCOL \
+                  -H $HOST \
                   -P $PORT \
                   -n $NAME \
                   -d 5 \
@@ -26,12 +31,13 @@ flumotion-manager -v -T $PROTOCOL \
 manager_pid=$!
 
 flumotion-worker -v -T $PROTOCOL \
+                 -H $HOST \
                  -P $PORT \
                  -d 5 \
 		 -u user -p test >& /tmp/$NAME.worker.log  &
 worker_pid=$!
 
-MANAGER=user:test@localhost:$PORT
+MANAGER=user:test@$HOST:$PORT
 
 killed()
 {

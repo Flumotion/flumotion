@@ -1,3 +1,9 @@
+2009-01-28  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* scripts/run-local-manager:
+	Added the option -h to the script so the hostname where the manager
+	and worker are going to run can be specified.
+
 2009-01-27  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/effects/volume/volume.glade:
