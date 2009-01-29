@@ -116,6 +116,7 @@ if hasattr(gtk, 'LinkButton'):
         def __init__(self, uri):
             gtk.LinkButton.__init__(self, uri)
             self.connect('pressed', self._on_pressed)
+            self.set_property('can-focus', False)
             self._callback = None
 
         def set_callback(self, callback):

@@ -1,3 +1,10 @@
+2009-01-29  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/ui/linkwidget.py:
+	The link widget cannot have the focus now.
+	* scripts/run-local-manager:
+	Allow setting the flow file that the manager will use with -c option.
+
 2009-01-28  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* scripts/run-local-manager:

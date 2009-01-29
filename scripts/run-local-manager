@@ -3,8 +3,9 @@ NAME=flumotion-test
 PROTOCOL=tcp
 PORT=8642
 HOST=localhost
+FLOW=''
 
-while getopts “n:sp:h:” OPTION
+while getopts "n:sp:h:c:" OPTION
 do
      case $OPTION in
          n)
@@ -19,6 +20,9 @@ do
          h)
              HOST=$OPTARG
              ;;
+         c)
+             FLOW=$OPTARG
+             ;;
      esac
 done
 
@@ -27,7 +31,7 @@ flumotion-manager -v -T $PROTOCOL \
                   -P $PORT \
                   -n $NAME \
                   -d 5 \
-		  conf/managers/default/planet.xml >& /tmp/$NAME.manager.log &
+		  conf/managers/default/planet.xml $CONF >& /tmp/$NAME.manager.log &
 manager_pid=$!
 
 flumotion-worker -v -T $PROTOCOL \
