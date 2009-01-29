@@ -68,7 +68,7 @@ def parseTypedArgs(spec, args):
         while spec:
             argtype = spec.pop(0)
             parsers = {'i': int, 's': str, 'b': common.strToBool,
-                'F': _readFile}
+                'F': _readFile, 'N': (lambda _: None)}
             if argtype == ')':
                 return tuple(accum)
             elif argtype == '(':

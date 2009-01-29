@@ -1,3 +1,8 @@
+2009-01-29  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/admin/command/common.py:
+	Make it possible to use None in 'invoke'.
+
 2009-01-29  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* scripts/run-local-manager:
