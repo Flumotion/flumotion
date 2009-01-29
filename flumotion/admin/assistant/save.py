@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import re
 
 from flumotion.admin.assistant.configurationwriter import ConfigurationWriter
 from flumotion.admin.assistant.models import Muxer, AudioProducer, \
@@ -343,14 +344,9 @@ class AssistantSaver(object):
         # Resolve naming conflicts, using a simple algorithm
         # First, find all the trailing digits, for instance in
         # 'audio-producer42' -> '42'
-        pos = -1
-        trailingDigit = ''
-        while True:
-            lastChar = suggestedName[pos]
-            if not lastChar.isdigit():
-                break
-            trailingDigit = lastChar + trailingDigit
-            pos -= 1
+        pattern = re.compile('(\d*$)')
+        match = pattern.search(suggestedName)
+        trailingDigit = match.group()
 
         # Now if we had a digit in the end, convert it to
         # a number and increase it by one and remove the trailing

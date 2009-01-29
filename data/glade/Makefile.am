@@ -19,7 +19,6 @@ glade_DATA =					\
 	consumption-wizard.glade		\
 	disker-wizard.glade			\
 	encoding-wizard.glade			\
-	http-wizard.glade			\
 	httpstreamer-wizard.glade		\
 	license-wizard.glade			\
 	ondemand-wizard.glade			\

@@ -37,18 +37,6 @@ __version__ = "$Rev$"
 _ = gettext.gettext
 
 
-class HTTPCommon(object):
-
-    def __init__(self):
-        self.has_client_limit = False
-        self.has_bandwidth_limit = False
-        self.client_limit = 1000
-        self.bandwidth_limit = 500.0
-        self.burst_on_connect = False
-        self.set_hostname = False
-        self.hostname = ''
-
-
 class ConsumptionStep(WizardStep):
     name = 'Consumption'
     title = _('Consumption')
@@ -58,27 +46,6 @@ class ConsumptionStep(WizardStep):
     docSection = 'help-configuration-assistant-consumption'
     docAnchor = ''
     docVersion = 'local'
-
-    def __init__(self, wizard):
-        self._httpCommon = HTTPCommon()
-        self._httpPorter = Porter(
-            worker=None, port=configure.defaultHTTPStreamPort)
-        WizardStep.__init__(self, wizard)
-
-    # Public
-
-    def getHTTPCommon(self):
-        return self._httpCommon
-
-    def getHTTPPorter(self):
-        return self._httpPorter
-
-    def haveHTTP(self):
-        """If we have a http-streamer selected
-        @returns: if http-streamer will be included
-        @rtype: bool
-        """
-        return self.http.get_active()
 
     # WizardStep
 
@@ -114,7 +81,7 @@ class ConsumptionStep(WizardStep):
         steps = self._getSteps()
         assert steps
 
-        if step is None:
+        if not step:
             step_class = steps[0]
         else:
             step_class = step.__class__
@@ -161,7 +128,6 @@ class ConsumptionStep(WizardStep):
         uielements = []
         retval = []
         if self.http.get_active():
-            retval.append(HTTPConsumptionStep)
             uielements.append(
                 ([HTTPAudioStep, HTTPVideoStep, HTTPBothStep],
                  [self.http_audio,
@@ -240,82 +206,3 @@ class ConsumptionStep(WizardStep):
         self.http_video.set_sensitive(value)
 
         self._verify()
-
-
-class HTTPConsumptionStep(WorkerWizardStep):
-    """I am a step of the configuration wizard which allows you
-    to configure the common http properties of a stream
-    """
-    name = 'HTTPStreaming'
-    title = _('HTTP Streaming')
-    section = _('Consumption')
-    icon = 'consumption.png'
-    gladeFile = 'http-wizard.glade'
-    docSection = 'help-configuration-assistant-http-streaming'
-    docAnchor = ''
-    docVersion = 'local'
-
-    def __init__(self, wizard):
-        consumptionStep = wizard.getStep('Consumption')
-        self.common = consumptionStep.getHTTPCommon()
-        self.porter = consumptionStep.getHTTPPorter()
-        WorkerWizardStep.__init__(self, wizard)
-
-    # WizardStep
-
-    def setup(self):
-        self.bandwidth_limit.data_type = float
-        self.burst_on_connect.data_type = bool
-        self.client_limit.data_type = int
-        self.port.data_type = int
-        self.hostname.data_type = str
-        self.hostname.set_sensitive(False)
-
-        self.add_proxy(self.porter.properties, ['port'])
-        self._proxy = self.add_proxy(
-            self.common, ['has_client_limit',
-                          'has_bandwidth_limit',
-                          'client_limit',
-                          'bandwidth_limit',
-                          'burst_on_connect',
-                          'set_hostname',
-                          'hostname'])
-
-    def activated(self):
-        self._verify()
-
-    def getNext(self):
-        return self.wizard.getStep('Consumption').getNext(self)
-
-    def workerChanged(self, worker):
-        self.porter.worker = worker
-        self._runWorkerChecks()
-
-    # Private
-
-    def _verify(self):
-        self.client_limit.set_sensitive(
-            self.has_client_limit.get_active())
-        self.bandwidth_limit.set_sensitive(
-            self.has_bandwidth_limit.get_active())
-
-    def _runWorkerChecks(self):
-
-        def finished(public_hostname):
-            self.common.hostname = public_hostname
-            self._proxy.update('hostname')
-        d = self.wizard.runInWorker(
-            self.worker, 'flumotion.worker.checks.http',
-            'runHTTPStreamerChecks')
-        d.addCallback(finished)
-
-    # Callbacks
-
-    def on_has_client_limit_toggled(self, checkbutton):
-        self._verify()
-
-    def on_has_bandwidth_limit_toggled(self, checkbutton):
-        self._verify()
-
-    def on_set_hostname__toggled(self, checkbutton):
-        self.hostname.set_sensitive(checkbutton.get_active())

@@ -1,3 +1,47 @@
+2009-01-29  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Julien Le Goff <jlegoff@flumotion.com>
+
+	* data/glade/Makefile.am:
+	* data/glade/http-wizard.glade (deleted):
+	* data/glade/httpstreamer-wizard.glade:
+	The HTTPCommon step has been merged with the HTTPStreamer one.
+	Now the	specific details of the streamer will be shown on the first
+	step and hidden for the following ones unless the worker is changed
+	or the user requests it.
+	Fixes #1232
+	* flumotion/admin/assistant/save.py:
+	Updated the method for fetching the trailing digits using regexp
+	instead of a loop. Thanks Julien.
+	* flumotion/test/test_wizard_save.py:
+	Fixed the tests of the HTTPStreamer step according to the changes made.
+	* flumotion/admin/gtk/adminwindow.py:
+	Now the adminwindow can manage multiple porters (actually only one was
+	used was used).
+	It also tells to the wizard the used mount points when a new format 
+	is going to be added so we can prevent reusing them.
+	* flumotion/admin/gtk/configurationassistant.py:
+	It has also been modified to support multiple porters and to track them
+	Checks the used mountpoints from the adminwindow or the
+	HTTPSstreamer steps to prevent duplicates.
+	* flumotion/scenario/live/wizard_gtk.py:
+	The way the flow is saved has been updated and it can manage the
+	multiple porters we can have now.
+	* flumotion/scenario/steps/consumptionsteps.py:
+	The HTTPConsumptionStep has been deleted as we don't need it anymore.
+	All of its functionality has been added to the HTTPStreamerStep.
+	Some simplifications have been done to the ConsumptionStep.
+	* flumotion/scenario/steps/httpstreamersteps.py:
+	HTTPStreamerStep runs now a check when the mountpoint/port/worker has
+	been changed. It warns the user when the mountpoint has already been
+	used on the required host:port.
+	The step initializes the next one with its data when Forward is
+	pressed.
+	Fixes #2873 (pt)
+	Fixes #2871 (pt)
+	Fixes #1231
+	Fixes #995
+
 2009-01-29  Arek Korbik  <arkadini@gmail.com>
 
 	patch by: Aitor

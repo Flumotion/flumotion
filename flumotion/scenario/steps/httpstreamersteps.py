@@ -36,14 +36,16 @@ On the http-server the applet will be provided with help of a plug.
 """
 
 import gettext
+import re
 
 import gobject
 from kiwi.utils import gsignal
 import gtk
 from twisted.internet import defer
 
-from flumotion.admin.assistant.models import Consumer
+from flumotion.admin.assistant.models import Consumer, Porter
 from flumotion.admin.gtk.basesteps import ConsumerStep
+from flumotion.configure import configure
 from flumotion.common import errors, log, messages
 from flumotion.common.i18n import N_, gettexter, ngettext
 
@@ -56,18 +58,32 @@ class HTTPStreamer(Consumer):
     """I am a model representing the configuration file for a
     HTTP streamer component.
     @ivar has_client_limit: If a client limit was set
+    @ivar client_limit: The client limit
     @ivar has_bandwidth_limit: If a bandwidth limit was set
-    @ivar has_cortado: If we should embed cortado
+    @ivar bandwidth_limit: The bandwidth limit
+    @ivar set_hostname: If a hostname was set
     @ivar hostname: the hostname this will be streamed on
+    @ivar port: The port this server will be listening to
     """
     componentType = 'http-streamer'
 
-    def __init__(self, common):
+    def __init__(self):
         super(HTTPStreamer, self).__init__()
-        self._common = common
-        self.has_cortado = False
+
+        self.setPorter(
+            Porter(worker=None, port=8080))#configure.defaultHTTPStreamPort))
+
         self.has_plugins = False
-        self.hostname = None
+
+        self.has_client_limit = False
+        self.client_limit = 1000
+        self.has_bandwidth_limit = False
+        self.bandwidth_limit = 500.0
+        self.set_hostname = False
+        self.hostname = ''
+        self.port = 8080#configure.defaultHTTPStreamPort
+
+        self.properties.burst_on_connect = False
 
     # Public
 
@@ -84,37 +100,55 @@ class HTTPStreamer(Consumer):
         """Fetch the hostname this stream will be published on
         @returns: the hostname
         """
-        if self._common.set_hostname:
-            return self._common.hostname
-        return self.properties.get('hostname', self.hostname)
+        return self.hostname
+
+    def setData(self, model):
+        """
+        Sets the data from another model so we can reuse it.
+
+        @param model : model to get the data from
+        @type  model : L{HTTPStreamer}
+        """
+        self.has_client_limit = model.has_client_limit
+        self.has_bandwidth_limit = model.has_bandwidth_limit
+        self.client_limit = model.client_limit
+        self.bandwidth_limit = model.bandwidth_limit
+        self.set_hostname = model.set_hostname
+        self.hostname = model.hostname
+        self.properties.burst_on_connect = model.properties.burst_on_connect
+        self.port = model.port
 
     # Component
 
+    def getPorter(self):
+        """
+        Obtains this streamer's porter model.
+        """
+        porter = Consumer.getPorter(self)
+        porter.worker = self.worker
+        porter.properties.port = self.port
+        return porter
+
     def getProperties(self):
         properties = super(HTTPStreamer, self).getProperties()
-        if self._common.has_bandwidth_limit:
-            properties.bandwidth_limit = int(
-                self._common.bandwidth_limit * 1e6)
+        if self.has_bandwidth_limit:
+            properties.bandwidth_limit = int(self.bandwidth_limit * 1e6)
+        if self.has_client_limit:
+            properties.client_limit = self.client_limit
 
         porter = self.getPorter()
         hostname = self.getHostname()
-        if hostname:
+        if hostname and self.set_hostname:
             properties.hostname = hostname
         properties.porter_socket_path = porter.getSocketPath()
         properties.porter_username = porter.getUsername()
         properties.porter_password = porter.getPassword()
         properties.type = 'slave'
-        properties.burst_on_connect = self._common.burst_on_connect
         # FIXME: Try to maintain the port empty when we are slave. Needed
         # for now as the adminwindow tab shows the URL based on this property.
-        properties.port = self.getPorter().getPort()
+        properties.port = self.port
 
         return properties
-
-    # Private
-
-    def _getPort(self):
-        return self._common.port
 
 
 class PlugPluginLine(gtk.VBox):
@@ -159,12 +193,18 @@ class PlugPluginArea(gtk.VBox):
     or get the internal models of the plugins.
     """
 
-    def __init__(self, streamer):
+    def __init__(self, streamer=None):
         self.streamer = streamer
         gtk.VBox.__init__(self, spacing=6)
         self._lines = []
 
     # Public
+
+    def setStreamer(self, streamer):
+        """
+        Stablishes the streamer's model the plug is related to.
+        """
+        self.streamer = streamer
 
     def addPlug(self, plugin, description):
         """Add a plug, eg a checkbutton with a description such as
@@ -215,55 +255,109 @@ class HTTPSpecificStep(ConsumerStep):
     """I am a step of the configuration wizard which allows you
     to configure a stream to be served over HTTP.
     """
+    section = _('Consumption')
     gladeFile = 'httpstreamer-wizard.glade'
 
     def __init__(self, wizard):
-        consumptionStep = wizard.getStep('Consumption')
-        self.model = HTTPStreamer(consumptionStep.getHTTPCommon())
-        self.model.setPorter(consumptionStep.getHTTPPorter())
+        self.model = HTTPStreamer()
         ConsumerStep.__init__(self, wizard)
+
+    def updateModel(self, model):
+        """
+        There is a previous httpstreamer step from where the data can be copied
+        It will be copied to the actual model and the advanced
+        tab would be hidden.
+
+        @param model: The previous model we are going to copy.
+        @type  model: L{HTTPStreamer}
+        """
+        self.model.setData(model)
+        self.expander.set_expanded(False)
+        self._proxy2.set_model(self.model)
 
     # ConsumerStep
 
     def getConsumerModel(self):
         return self.model
 
-    def getComponentType(self):
-        return 'http-streamer'
-
     def getServerConsumers(self):
         return self.plugarea.getServerConsumers(
             self.wizard.getScenario().getAudioProducer(self.wizard),
             self.wizard.getScenario().getVideoProducer(self.wizard))
 
-    def getDefaultMountPath(self):
-        encodingStep = self.wizard.getStep('Encoding')
-        return '/%s-%s/' % (str(encodingStep.getMuxerFormat()),
-                            self.getConsumerType(), )
-
     # WizardStep
 
     def setup(self):
         self.mount_point.data_type = str
-
-        self.plugarea = PlugPluginArea(self.model)
-        self.main_vbox.pack_start(self.plugarea, False, False)
-        self.plugarea.show()
+        self.bandwidth_limit.data_type = float
+        self.burst_on_connect.data_type = bool
+        self.client_limit.data_type = int
+        self.port.data_type = int
+        self.hostname.data_type = str
 
         self._populatePlugins()
 
-        self.model.properties.mount_point = self.getDefaultMountPath()
-        self.add_proxy(self.model.properties, ['mount_point'])
+        self.model.properties.mount_point = self._getDefaultMountPath()
+        self._proxy1 = self.add_proxy(self.model.properties,
+                                      ['mount_point', 'burst_on_connect'])
+        self._proxy2 = self.add_proxy(
+            self.model, ['has_client_limit',
+                         'has_bandwidth_limit',
+                         'client_limit',
+                         'bandwidth_limit',
+                         'set_hostname',
+                         'hostname',
+                         'port'])
 
-    def activated(self):
-        self._checkElements()
-        self._verify()
+        self.client_limit.set_sensitive(self.model.has_client_limit)
+        self.bandwidth_limit.set_sensitive(self.model.has_bandwidth_limit)
+        self.hostname.set_sensitive(self.model.set_hostname)
+
+        self.plugarea.setStreamer(self.model)
+
+        self.port.connect('changed', self.on_port_changed)
+        self.mount_point.connect('changed', self.on_mount_point_changed)
 
     def workerChanged(self, worker):
         self.model.worker = worker
-        self._checkElements()
+        self._runChecks()
+
+    def getNext(self):
+        next = ConsumerStep.getNext(self)
+        if next and next.model.componentType == self.model.componentType:
+            next.updateModel(self.model)
+        return next
 
     # Private
+
+    def _getDefaultMountPath(self):
+        encodingStep = self.wizard.getStep('Encoding')
+        return '/%s-%s/' % (str(encodingStep.getMuxerFormat()),
+                            self.getConsumerType(), )
+
+    def _suggestMountPoint(self, mountPoint):
+        # FIXME: Generalise this method and use the same in f.a.a.save module.
+        # Resolve naming conflicts, using a simple algorithm
+        # First, find all the trailing digits, for instance in
+        # 'audio-producer42' -> '42'
+        mountPoint = mountPoint.rstrip('/')
+
+        pattern = re.compile('(\d*$)')
+        match = pattern.search(mountPoint)
+        trailingDigit = match.group()
+
+        # Now if we had a digit in the end, convert it to
+        # a number and increase it by one and remove the trailing
+        # digits the existing component name
+        if trailingDigit:
+            digit = int(trailingDigit) + 1
+            mountPoint = mountPoint[:-len(trailingDigit)]
+        # No number in the end, use 2 the first one so we end up
+        # with 'audio-producer' and 'audio-producer2' in case of
+        # a simple conflict
+        else:
+            digit = 2
+        return mountPoint + str(digit) + '/'
 
     def _populatePlugins(self):
 
@@ -324,8 +418,14 @@ class HTTPSpecificStep(ConsumerStep):
     def _addPlug(self, plugin, description):
         self.plugarea.addPlug(plugin, description)
 
-    def _checkElements(self):
+    def _runChecks(self):
         self.wizard.waitForTask('http streamer check')
+
+        def gotHostname(hostname):
+            self.model.hostname = hostname
+            self._proxy2.update('hostname')
+            self.wizard.taskFinished(True)
+            self._checkMountPoint(need_fix=True)
 
         def importError(failure):
             print 'FIXME: trap', failure, 'in .../httpstreamer/wizard_gtk.py'
@@ -341,9 +441,11 @@ class HTTPSpecificStep(ConsumerStep):
             self.wizard.add_msg(message)
             self.wizard.taskFinished(True)
 
-        def finished(hostname):
-            self.model.hostname = hostname
-            self.wizard.taskFinished()
+        def getHostname(_):
+            d = self.wizard.runInWorker(
+                self.worker, 'flumotion.worker.checks.http',
+                'runHTTPStreamerChecks')
+            return d.addCallback(gotHostname)
 
         def checkElements(elements):
             if elements:
@@ -355,39 +457,100 @@ class HTTPSpecificStep(ConsumerStep):
                     mid='httpstreamer')
                 self.wizard.add_msg(message)
                 self.wizard.taskFinished(True)
-                return defer.fail(errors.FlumotionError(
-                    'missing multifdsink element'))
+                return defer.fail(
+                    errors.FlumotionError('missing multifdsink element'))
 
             self.wizard.clear_msg('httpstreamer')
 
             # now check import
             d = self.wizard.checkImport(self.worker, 'twisted.web')
-            d.addCallback(finished)
-            d.addErrback(importError)
+            d.addCallback(getHostname)
+            return d.addErrback(importError)
 
         # first check elements
         d = self.wizard.requireElements(self.worker, 'multifdsink')
-        d.addCallback(checkElements)
+        return d.addCallback(checkElements)
 
-        # requireElements calls checkElements which unconditionally
-        # unblocks the next call. Work around that behavior here.
-        d.addErrback(lambda unused: self.wizard.taskFinished(True))
+    def _checkMountPoint(self, port=None, worker=None,
+                         mount_point=None, need_fix=False):
+        """
+        Checks whether the provided mount point is available with the
+        current configuration (port, worker). It can provide a valid
+        mountpoint if it is required with need_fix=True.
 
-    def _verify(self):
-        self._update_blocked()
+        @param port : The port the streamer is going to be listening.
+        @type  port : int
+        @param worker : The worker the streamer will be running.
+        @type  worker : str
+        @param mount_point : The desired mount point.
+        @type  mount_point : str
+        @param need_fix : Whether the method should search for a valid
+                          mount_point if the provided one is not.
+        @type  need_fix : bool
 
-    def _update_blocked(self):
-        # FIXME: This should be updated and only called when all pending
-        #        tasks are done.
-        self.wizard.blockNext(
-            self.wizard.pendingTask() or self.mount_point.get_text() == '')
+        @returns : True if the mount_point can be used, False if it is in use.
+        @rtype   : bool
+        """
+        self.wizard.clear_msg('http-streamer-mountpoint')
+
+        port = port or self.model.port
+        worker = worker or self.model.worker
+        mount_point = mount_point or self.model.properties.mount_point
+
+        self.wizard.waitForTask('http-streamer-mountpoint')
+
+        if self.wizard.addMountPoint(worker, port, mount_point,
+                                     self.getConsumerType()):
+            self.wizard.taskFinished()
+            return True
+        else:
+            if need_fix:
+                while not self.wizard.addMountPoint(worker, port,
+                                                    mount_point,
+                                                    self.getConsumerType()):
+                    mount_point=self._suggestMountPoint(mount_point)
+
+                self.model.properties.mount_point = mount_point
+                self._proxy1.update('mount_point')
+                self.wizard.taskFinished()
+                return True
+
+            message = messages.Error(T_(N_(
+                "The mount point %s is already been used for worker %s and "
+                "port %s. Correct it to be able to go forward."),
+                mount_point, worker, port))
+            message.id = 'http-streamer-mountpoint'
+            self.wizard.add_msg(message)
+            self.wizard.taskFinished(True)
+            return False
 
     # Callbacks
 
     def on_mount_point_changed(self, entry):
-        self._verify()
-        self.wizard.blockNext(self.model.has_cortado and
-                              entry.get_text() == self.getDefaultMountPath())
+        if not entry.get_text():
+            self.wizard.clear_msg('http-streamer-mountpoint')
+            message = messages.Error(T_(N_(
+                "Mountpoint cannot be left empty.\n"
+                "Fill the text field with a correct mount point to"
+                "be able to go forward.")))
+            message.id = 'http-streamer-mountpoint'
+            self.wizard.add_msg(message)
+            self.wizard.blockNext(True)
+        else:
+            self._checkMountPoint(mount_point=entry.get_text())
+
+    def on_has_client_limit_toggled(self, cb):
+        self.client_limit.set_sensitive(cb.get_active())
+
+    def on_has_bandwidth_limit_toggled(self, cb):
+        self.bandwidth_limit.set_sensitive(cb.get_active())
+
+    def on_set_hostname__toggled(self, cb):
+        self.hostname.set_sensitive(cb.get_active())
+
+    def on_port_changed(self, widget):
+        if widget.get_text().isdigit():
+            self._checkMountPoint(port=int(widget.get_text()))
 
 
 class HTTPBothStep(HTTPSpecificStep):

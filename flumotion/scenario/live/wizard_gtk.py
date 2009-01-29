@@ -90,23 +90,20 @@ class LiveAssistantPlugin(object):
         saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
 
         consumptionStep = wizard.getStep('Consumption')
-        httpPorter = None
-        if consumptionStep.haveHTTP():
-            httpPorter = consumptionStep.getHTTPPorter()
-            existingPorter = wizard.getHTTPPorter()
-            if existingPorter is None:
-                wizard.setHTTPPorter(httpPorter)
-            elif existingPorter.properties.port == httpPorter.properties.port:
-                httpPorter = existingPorter
-                assert httpPorter.exists, httpPorter
-            saver.addPorter(httpPorter, 'http')
 
+        httpPorters = wizard.getHTTPPorters()
         steps = list(self._getConsumptionSteps(wizard))
+
         for step in steps:
             consumerType = step.getConsumerType()
             consumer = step.getConsumerModel()
-            if httpPorter is not None:
-                consumer.setPorter(httpPorter)
+            if consumer.componentType == 'http-streamer':
+                porter = self._obtainPorter(httpPorters, consumer.getPorter())
+
+                if porter not in httpPorters:
+                    saver.addPorter(porter, 'http')
+                    httpPorters.append(porter)
+                consumer.setPorter(porter)
             saver.addConsumer(consumer, consumerType)
             if not self._defaultConsumer:
                 self._defaultConsumer = consumer
@@ -215,3 +212,25 @@ class LiveAssistantPlugin(object):
         for step in wizard.getVisitedSteps():
             if isinstance(step, ConsumerStep):
                 yield step
+
+    def _obtainPorter(self, actualPorters, consumerPorter):
+        """
+        Looks if the consumerPorter has been already created and is inside
+        the actualPorters list. If it is so, we return the existent porter,
+        otherwise we return the consumerPorter.
+
+        @param actualPorters : list of already exsisting porters.
+        @type  actualPorters : list of L{flumotion.assistant.models.Porter}
+        @param consumerPorter: porter model created by the consumer.
+        @type  consumerPorter: L{flumotion.assistant.models.Porter}
+
+        @rtype : L{flumotion.assistant.models.Porter}
+        """
+        for porter in actualPorters:
+            p1 = porter.getProperties()
+            p2 = consumerPorter.getProperties()
+
+            if p1.port == p2.port and porter.worker == consumerPorter.worker:
+                return porter
+
+        return consumerPorter

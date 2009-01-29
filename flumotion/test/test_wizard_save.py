@@ -198,10 +198,7 @@ class TestWizardSave(testsuite.TestCase):
                       socketPath='flu-XXXX.socket')
 
     def _createHTTPStreamer(self):
-        common = Settable(has_bandwidth_limit=False,
-                          burst_on_connect=False,
-                          set_hostname=False)
-        streamer = HTTPStreamer(common)
+        streamer = HTTPStreamer()
         streamer.worker = 'streamer-worker'
         return streamer
 
@@ -812,8 +809,8 @@ class TestWizardSave(testsuite.TestCase):
         save.setMuxer('default-muxer', 'muxer-worker')
 
         streamer = self._createHTTPStreamer()
-        streamer._common.has_bandwidth_limit = True
-        streamer._common.bandwidth_limit = 123
+        streamer.has_bandwidth_limit = True
+        streamer.bandwidth_limit = 123
         streamer.setPorter(porter)
         save.addConsumer(streamer, 'audio-video')
 

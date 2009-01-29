@@ -670,9 +670,18 @@ class AdminWindow(Loggable, GladeDelegate):
         self._componentNameToSelect = scenario.getSelectComponentName()
         self.show()
 
-    def _getComponentBy(self, componentType):
+    def _getComponentsBy(self, componentType):
+        """
+        Obtains the components according a given type.
+
+        @param componentType: The type of the components to get
+        @type  componentType: str
+
+        @rtype : list of L{flumotion.common.component.AdminComponentState}
+        """
         if componentType is None:
             raise ValueError
+
         componentStates = []
 
         for state in self._componentStates.values():
@@ -680,28 +689,53 @@ class AdminWindow(Loggable, GladeDelegate):
             if componentType and config['type'] == componentType:
                 componentStates.append(state)
 
-        if not componentStates:
-            return None
-        elif len(componentStates) == 1:
-            return componentStates[0]
-        else:
-            raise AssertionError(
-                "Attempted to fetch a component state by type %r, "
-                "expected one, but got %r" % (
-                componentType, componentStates))
+        return componentStates
 
-    def _getHTTPPorter(self):
-        porterState = self._getComponentBy(componentType='porter')
-        if porterState is None:
-            return None
-        properties = porterState.get('config')['properties']
-        porter = Porter(worker=None,
-                        port=properties['port'],
-                        username=properties['username'],
-                        password=properties['password'],
-                        socketPath=properties['socket-path'])
-        porter.exists = True
-        return porter
+    def _getHTTPPorters(self):
+        """
+        Obtains the porters currently configured on the running flow.
+
+        @rtype : list of L{flumotion.admin.assistant.models.Porter}
+        """
+        porterList = []
+        porterStates = self._getComponentsBy(componentType='porter')
+
+        for porter in porterStates:
+            properties = porter.get('config')['properties']
+            porterModel = Porter(worker=porter.get('workerName') or
+                                        porter.get('workerRequested'),
+                                 port=properties['port'],
+                                 username=properties['username'],
+                                 password=properties['password'],
+                                 socketPath=properties['socket-path'])
+            porterModel.exists = True
+            porterList.append(porterModel)
+
+        return porterList
+
+    def _setMountPoints(self, wizard):
+        """
+        Sets the mount points currently used on the flow so they can not
+        be used for others servers or streamers.
+
+        @param wizard : An assistant that wants to know the used mount_points
+        @type  wizard : L{ConfigurationAssistant}
+        """
+        streamerStates = self._getComponentsBy(componentType='http-streamer')
+        serverStates = self._getComponentsBy(componentType='http-server')
+        porterStates = self._getComponentsBy(componentType='porter')
+
+        for porter in porterStates:
+            properties = porter.get('config')['properties']
+            for streamer in streamerStates + serverStates:
+                streamerProperties = streamer.get('config')['properties']
+                socketPath = streamerProperties['porter-socket-path']
+
+                if socketPath == properties['socket-path']:
+                    worker = streamer.get('workerRequested')
+                    port = int(properties['port'])
+                    mount_point = streamerProperties['mount-point']
+                    wizard.addMountPoint(worker, port, mount_point)
 
     def _createComponentsByAssistantType(self, componentClass, entries):
 
@@ -748,6 +782,10 @@ class AdminWindow(Loggable, GladeDelegate):
             scenario.setMode('addformat')
             scenario.addSteps(configurationAssistant)
             configurationAssistant.setScenario(scenario)
+            httpPorters = self._getHTTPPorters()
+            self._setMountPoints(configurationAssistant)
+            if httpPorters:
+                configurationAssistant.setHTTPPorters(httpPorters)
 
             return self._adminModel.getWizardEntries(
                 wizardTypes=['audio-producer', 'video-producer'])
@@ -810,9 +848,9 @@ class AdminWindow(Loggable, GladeDelegate):
             self._componentList.getComponentNames())
         assistant.setAdminModel(self._adminModel)
         assistant.setWorkerHeavenState(workerHeavenState)
-        httpPorter = self._getHTTPPorter()
-        if httpPorter:
-            assistant.setHTTPPorter(httpPorter)
+        httpPorters = self._getHTTPPorters()
+        if httpPorters:
+            assistant.setHTTPPorters(httpPorters)
         assistant.connect('finished', self._assistant_finished_cb)
         assistant.connect('destroy', self.on_assistant_destroy)
         assistant.run(main=False)

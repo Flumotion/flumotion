@@ -224,10 +224,12 @@ class ConfigurationAssistant(SectionWizard):
         self._adminModel = None
         self._workerHeavenState = None
         self._lastWorker = 0 # combo id last worker from step to step
-        self._httpPorter = None
         self._stepWorkers = {}
         self._scenario = None
         self._existingComponentNames = []
+        self._porters = []
+        self._mountPoints = []
+        self._consumers = {}
 
         self._workerList = WorkerList()
         self.top_vbox.pack_start(self._workerList, False, False)
@@ -316,6 +318,65 @@ class ConfigurationAssistant(SectionWizard):
         """
         self._adminModel = adminModel
 
+    def setHTTPPorters(self, porters):
+        """
+        Sets the list of currently configured porters so
+        we can reuse them for future streamers.
+
+        @param porters: list of porters
+        @type porters : list of L{flumotion.admin.assistant.models.Porter}
+        """
+
+        self._porters = porters
+
+    def getHTTPPorters(self):
+        """
+        Obtains the list of the currently configured porters.
+
+        @rtype : list of L{flumotion.admin.assistant.models.Porter}
+        """
+        return self._porters
+
+    def addMountPoint(self, worker, port, mount_point, consumer=None):
+        """
+        Marks a mount point as used on the given worker and port.
+        If a consumer name is provided it means we are changing the
+        mount point for that consumer and that we should keep track of
+        it for further modifications.
+
+        @param worker   : The worker where the mount_point is configured.
+        @type  worker   : str
+        @param port     : The port where the streamer should be listening.
+        @type  port     : int
+        @param mount_point : The mount point where the data will be served.
+        @type  mount_point : str
+        @param consumer : The consumer that is changing its mountpoint.
+        @type  consumer : str
+
+        @returns : True if the mount point is not used and has been
+                   inserted correctly, False otherwise.
+        @rtype   : boolean
+        """
+        if not worker or not port or not mount_point:
+            return False
+
+        if consumer in self._consumers:
+            oldData = self._consumers[consumer]
+            if oldData in self._mountPoints:
+                self._mountPoints.remove(oldData)
+
+        data = (worker, port, mount_point)
+
+        if data in self._mountPoints:
+            return False
+
+        self._mountPoints.append(data)
+
+        if consumer:
+            self._consumers[consumer] = data
+
+        return True
+
     def getAdminModel(self):
         """Gets the admin model of the assistant
         @returns adminModel: the admin model
@@ -360,18 +421,6 @@ class ConfigurationAssistant(SectionWizard):
         @rtype: bool
         """
         return bool(self._tasks)
-
-    def setHTTPPorter(self, httpPorter):
-        """Sets the HTTP porter of the assistant.
-        If the http port set in the new assistant is identical to the old one,
-        this porter will be reused
-        @param httpPorter: the http porter
-        @type httpPorter: L{flumotion.admin.assistant.models.Porter} instance
-        """
-        self._httpPorter = httpPorter
-
-    def getHTTPPorter(self):
-        return self._httpPorter
 
     def checkElements(self, workerName, *elementNames):
         """Check if the given list of GStreamer elements exist on the
