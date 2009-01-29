@@ -1,3 +1,10 @@
+2009-01-29  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* doc/redhat/flumotion:
+	Change the 'status' service command to print useful output to stdout
+	and possible errors to the logfile, instead of printing everything to
+	stdout.
+
 2009-01-29  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: Julien Le Goff <jlegoff@flumotion.com>

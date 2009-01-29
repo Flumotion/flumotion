@@ -179,8 +179,15 @@ statusone() {
 
 	touch_logfile
 
-	$prog status $type $name
+	# Redirect stderr manually, to log possible errors in the log
+	# file, but output useful information on stdout.
+	$prog status $type $name 2>>$logfile
 	RETVAL=$?
+	if [ $RETVAL != 0 ]; then
+	    echo -n "Checking status of $type $name: "
+	    failure
+	    echo
+	fi
 	return $RETVAL
 }
 
