@@ -1,5 +1,10 @@
 2009-01-29  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* scripts/run-local-manager:
+	Rename the variable CONF to FLOW as they are the same
+
+2009-01-29  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/ui/linkwidget.py:
 	The link widget cannot have the focus now.
 	* scripts/run-local-manager:
