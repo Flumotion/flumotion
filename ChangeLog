@@ -1,5 +1,12 @@
 2009-01-29  Arek Korbik  <arkadini@gmail.com>
 
+	patch by: Aitor
+
+	* flumotion/component/producers/playlist/playlist.py:
+	Add forgotten (in r6983) keyword parameter change.
+
+2009-01-29  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/admin/command/common.py:
 	Make it possible to use None in 'invoke'.
 

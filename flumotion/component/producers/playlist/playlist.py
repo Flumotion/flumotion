@@ -420,7 +420,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self._cleanMessage(file)
         try:
             self.debug("Parsing file: %s", file)
-            self.playlistparser.parseFile(file, id=file)
+            self.playlistparser.parseFile(file, piid=file)
         except fxml.ParserError, e:
             self.warning("Failed to parse playlist file: %r", e)
             # Since this isn't done directly via the remote method, add a
