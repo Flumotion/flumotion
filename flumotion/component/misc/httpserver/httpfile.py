@@ -169,7 +169,10 @@ class File(resource.Resource, log.Loggable):
         request.setHeader('Server', 'Flumotion/%s' % configure.version)
         request.setHeader('Connection', 'close')
         # We can do range requests, in bytes.
-        request.setHeader('Accept-Ranges', 'bytes')
+        # UGLY HACK FIXME: if pdf, then do not accept range requests
+        # because Adobe Reader plugin messes up
+        if not self._path.path.endswith('.pdf'):
+            request.setHeader('Accept-Ranges', 'bytes')
 
         if request.setLastModified(provider.getmtime()) is http.CACHED:
             return ''

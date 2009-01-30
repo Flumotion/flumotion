@@ -1,3 +1,9 @@
+2009-01-30  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/httpserver/httpfile.py:
+	Ugly hack: do not send Accept-Ranges header if filename
+	ends in .pdf.
+
 2009-01-29  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* doc/redhat/flumotion:
