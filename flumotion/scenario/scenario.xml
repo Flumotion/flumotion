@@ -1,0 +1,11 @@
+<registry>
+    <bundles>
+        <bundle name="scenario-base">
+            <directories>
+                <directory name="flumotion/scenario">
+                    <filename location="__init__.py" />
+                </directory>
+            </directories>
+        </bundle>
+    </bundles>
+</registry>

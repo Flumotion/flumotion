@@ -1,5 +1,16 @@
 2009-02-03  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/scenario/Makefile.am:
+	* flumotion/scenario/live/live.xml:
+	* flumotion/scenario/ondemand/ondemand.xml:
+	* flumotion/scenario/steps/steps.xml:
+	* flumotion/scenario/scenario.xml (added):
+	Bundle the flumotion/scenario/__init__.py file. Otherwise the modules
+	under that module were load from the local installation and not from
+	the bundles.
+
+2009-02-03  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/common/bundleclient.py:
 	Don't fetch a bundle when it is already up-to-date!!
 

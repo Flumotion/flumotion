@@ -1,6 +1,9 @@
 <registry>
     <bundles>
         <bundle name="scenario-steps">
+            <dependencies>
+                <dependency name="scenario-base"/>
+            </dependencies>
             <directories>
                 <directory name="flumotion/scenario/steps">
                     <filename location="consumptionsteps.py"/>

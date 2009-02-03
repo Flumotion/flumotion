@@ -12,6 +12,7 @@
     <bundles>
         <bundle name="live-scenario-base">
             <dependencies>
+                <dependency name="scenario-base"/>
                 <dependency name="scenario-steps"/>
             </dependencies>
             <directories>

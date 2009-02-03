@@ -4,6 +4,9 @@ componentdir = $(libdir)/flumotion/python/flumotion/scenario
 component_PYTHON = \
 	__init__.py
 
+component_DATA = \
+	scenario.xml
+
 TAGS_FILES = $(component_PYTHON)
 
 clean-local:

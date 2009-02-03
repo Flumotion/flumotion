@@ -13,6 +13,7 @@
         <bundle name="ondemand-scenario-base">
             <dependencies>
                 <dependency name="scenario-base" />
+                <dependency name="scenario-steps"/>
             </dependencies>
             <directories>
                 <directory name="flumotion/scenario/ondemand">
