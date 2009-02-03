@@ -82,7 +82,7 @@ class BundleLoader(log.Loggable):
                     self.log('%s is up to date', name)
                 else:
                     self.log('%s needs fetching', name)
-                toFetch.append(name)
+                    toFetch.append(name)
             if toFetch:
                 return annotated(self.callRemote('getBundleZips', toFetch),
                                  toFetch, sums)
