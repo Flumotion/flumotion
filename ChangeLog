@@ -1,3 +1,11 @@
+2009-02-04  Julien Le Goff  <jlegoff@flumotion.com>
+
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	Flush the temporary cached file after calling the File.write method in
+	order to avoid race problems (since that same file is read in a
+	concurrent thread).
+	Fixes #1244
+
 2009-02-04  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/plugs/rrd.py:

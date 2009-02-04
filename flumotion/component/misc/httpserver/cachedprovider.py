@@ -561,6 +561,7 @@ class CopySession(log.Loggable):
             self._wTempFile.seek(self._copied)
             data = self._sourceFile.read(FILE_COPY_BUFFER_SIZE)
             self._wTempFile.write(data)
+            self._wTempFile.flush()
         except IOError, e:
             self.warning("Failed to copy source file: %s",
                          log.getExceptionMessage(e))
