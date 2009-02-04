@@ -1,3 +1,10 @@
+2009-02-04  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/common/bundleclient.py:
+	Revert r7753 and add a FIXME comment to remember that we cannot be 
+	completelly sure the bundle has the correct content only by checking
+	that the directory exists.
+
 2009-02-03  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/scenario/Makefile.am:

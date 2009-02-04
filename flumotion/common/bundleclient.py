@@ -82,7 +82,11 @@ class BundleLoader(log.Loggable):
                     self.log('%s is up to date', name)
                 else:
                     self.log('%s needs fetching', name)
-                    toFetch.append(name)
+                # FIXME: We cannot be completelly sure the bundle has the
+                # correct content only by checking that the directory exists.
+                # The worker/manager could have died during a download leaving
+                # the package incomplete.
+                toFetch.append(name)
             if toFetch:
                 return annotated(self.callRemote('getBundleZips', toFetch),
                                  toFetch, sums)
