@@ -1,3 +1,9 @@
+2009-02-04  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/plugs/rrd.py:
+	Make updating the RRD file more robust and make it work with long
+	values (as opposed to just working with ints). Fixes #1230.
+
 2009-02-04  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/common/bundleclient.py:

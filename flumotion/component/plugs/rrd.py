@@ -89,14 +89,15 @@ class ComponentRRDPlug(base.ComponentPlug):
             elif path == self._bytesPath:
                 value = self._component.getBytesSent()
 
-            # FIXME: use isinstance here
-            if type(value) == types.IntType:
+            try:
                 rrdtool.update(path, 'N:%i' % value)
                 self.debug('RRD file [%s] updated with value: %s',
                     path, value)
-            else:
-                self.warning('RRD file [%s] not adding non-int value %r',
-                    path, value)
+            except rrdtool.error, e:
+                # We could get an error from rrdtool on converting the
+                # value to a double or from not finding the file
+                self.warning('RRD error: %r',
+                    path, log.getExceptionMessage(e))
 
     def _getRRDPaths(self):
         """Create the RRD file using the CACTI standard configuration
