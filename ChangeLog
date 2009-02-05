@@ -1,3 +1,9 @@
+2009-02-05  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/plugs/rrd.py:
+	Log the RRD updates with %r, not with %s. Fix format string with
+	missing parameters.
+
 2009-02-04  Julien Le Goff  <jlegoff@flumotion.com>
 
 	* flumotion/component/misc/httpserver/cachedprovider.py:
