@@ -28,6 +28,7 @@ import gtk
 from twisted.internet.defer import Deferred
 from twisted.python import util
 
+from flumotion.admin.gtk.dialogs import exceptionHandler
 from flumotion.configure import configure
 from flumotion.common import log, messages
 from flumotion.common.i18n import gettexter
@@ -454,7 +455,14 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
                 if step is None:
                     return
                 self._showNextStep(step)
+
+            def manageBundleError(error):
+                exceptionHandler(error.type,
+                                  error.value,
+                                  error.getTracebackObject())
+                self._wizard.taskFinished(False)
             d.addCallback(getStep)
+            d.addErrback(manageBundleError)
             return
         elif next is None:
             nextStep = self._getNextStep()

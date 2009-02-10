@@ -37,6 +37,36 @@ __version__ = "$Rev$"
 _ = gettext.gettext
 
 
+def exceptionHandler(exctype, value, tb):
+    """
+    Opens a dialog showing an exception in a nice dialog allowing
+    the users to report it directly to trac.
+
+    @param exctype : The class of the catched exception.
+    @type  exctype : type
+    @param value   : The exception itself.
+    @type  value   : exctype
+    @param tb      : Contains the full traceback information.
+    @type  tb      : traceback
+    """
+    if exctype is KeyboardInterrupt:
+        return
+
+    from flumotion.extern.exceptiondialog import ExceptionDialog
+    dialog = ExceptionDialog((exctype, value, tb))
+    response = dialog.run()
+    if response != ExceptionDialog.RESPONSE_BUG:
+        dialog.destroy()
+        return
+
+    from flumotion.common.bugreporter import BugReporter
+    br = BugReporter()
+    br.submit(dialog.getFilenames(),
+              dialog.getDescription(),
+              dialog.getSummary())
+    dialog.destroy()
+
+
 class ProgressDialog(gtk.Dialog):
 
     def __init__(self, title, message, parent = None):

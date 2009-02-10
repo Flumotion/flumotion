@@ -65,25 +65,6 @@ def _connectToManager(win, manager, ssl):
     return d
 
 
-def _exceptionHandler(exctype, value, tb):
-    if exctype is KeyboardInterrupt:
-        return
-
-    from flumotion.extern.exceptiondialog import ExceptionDialog
-    dialog = ExceptionDialog((exctype, value, tb))
-    response = dialog.run()
-    if response != ExceptionDialog.RESPONSE_BUG:
-        dialog.destroy()
-        return
-
-    from flumotion.common.bugreporter import BugReporter
-    br = BugReporter()
-    br.submit(dialog.getFilenames(),
-              dialog.getDescription(),
-              dialog.getSummary())
-    dialog.destroy()
-
-
 def main(args):
     global _retval
 
@@ -107,7 +88,8 @@ def main(args):
     from flumotion.ui.icons import register_icons
     register_icons()
 
-    sys.excepthook = _exceptionHandler
+    from flumotion.admin.gtk.dialogs import exceptionHandler
+    sys.excepthook = exceptionHandler
 
     from flumotion.admin.gtk.adminwindow import AdminWindow
     win = AdminWindow()
