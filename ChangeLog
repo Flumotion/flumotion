@@ -1,6 +1,13 @@
 2009-02-10  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/dialogs.py:
+	* flumotion/admin/gtk/greeter.py:
+	Handle ConnectionRefusedError when trying to log in to the manager.
+	Fixes #1138
+
+2009-02-10  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/admin/gtk/dialogs.py:
 	* flumotion/admin/gtk/main.py:
 	Moved the exceptionHandler to dialogs.py so it can be used from other
 	parts of the project.

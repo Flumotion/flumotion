@@ -33,7 +33,8 @@ from twisted.internet import reactor
 from flumotion.admin.connections import hasRecentConnections
 from flumotion.admin.gtk.dialogs import showConnectionErrorDialog
 from flumotion.common.connection import parsePBConnectionInfo
-from flumotion.common.errors import ConnectionFailedError
+from flumotion.common.errors import ConnectionFailedError, \
+     ConnectionRefusedError
 from flumotion.common.managerspawner import LocalManagerSpawner
 from flumotion.common.netutils import tryPort
 from flumotion.common.pygobject import gsignal
@@ -367,8 +368,7 @@ class Greeter(SimpleWizard):
             return self.runAsync()
 
         def connectionFailed(failure):
-            failure.trap(ConnectionFailedError)
-            self.hide()
+            failure.trap(ConnectionFailedError, ConnectionRefusedError)
             d = showConnectionErrorDialog(failure, info,
                                           parent=self.window)
             d.addCallback(errorMessageDisplayed)

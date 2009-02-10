@@ -215,7 +215,7 @@ def showConnectionErrorDialog(failure, info, parent=None):
     elif failure.check(ConnectionFailedError):
         title = _('Connection Failed')
         message = (_("Connection to manager on %s failed (%s).")
-                   % (str(info), str(failure)))
+                   % (str(info), str(failure.getErrorMessage())))
     elif failure.check(AlreadyConnectedError,
                        AlreadyConnectingError):
         title =_('Already Connected to %s') % (info, )
