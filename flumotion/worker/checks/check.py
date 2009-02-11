@@ -193,6 +193,22 @@ def checkDirectory(pathName):
     return result
 
 
+def checkFile(filePath):
+    """
+    Checks if a path is a file.
+
+    @param filePath : The path of the file
+    @type  filePath : str
+
+    @returns : True if filePath exists and is a file, False otherwise.
+    @rtype   : L{messages.Result}
+    """
+    log.debug('check', 'checkFile: %s', filePath)
+    result = messages.Result()
+    result.succeed(os.path.isfile(filePath))
+    return result
+
+
 def checkPlugin(pluginName, packageName, minimumVersion=None,
                 featureName=None, featureCheck=None):
     """
