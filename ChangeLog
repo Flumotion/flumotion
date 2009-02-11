@@ -1,5 +1,12 @@
 2009-02-11  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* common/rpm.mk:
+	Force deletion of rpm with -f otherwise the build fails.
+	Use the PACKAGE variable for the name of the spec file this 
+	way other packages can use the same code for building rpm.
+
+2009-02-11  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	reviewed by: jlegoff
 
 	* flumotion/worker/checks/check.py:
