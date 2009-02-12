@@ -1,3 +1,10 @@
+2009-02-12  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/combiners/switch/switch.py:
+	Get the UID of the event from the Event itself, not from the
+	EventInstance that the code gives you. Also, add a logCategory for the
+	switch ICal plug.
+
 2009-02-11  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* common/rpm.mk:

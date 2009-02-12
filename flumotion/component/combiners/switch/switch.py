@@ -51,18 +51,19 @@ class SwitchMedium(feedcomponent.FeedComponentMedium):
 
 
 class ICalSwitchPlug(base.ComponentPlug):
+    logCategory = "ical-switch"
 
     def start(self, component):
         self._sid = None
         self.sched = None
         try:
 
-            def eventStarted(event):
-                self.debug("event started %r", event.uid)
+            def eventStarted(eventInstance):
+                self.debug("event started %r", eventInstance.event.uid)
                 component.switch_to("backup")
 
-            def eventEnded(event):
-                self.debug("event ended %r", event.uid)
+            def eventEnded(eventInstance):
+                self.debug("event ended %r", eventInstance.event.uid)
                 component.switch_to("master")
 
             # if an event starts, semantics are to switch to backup
