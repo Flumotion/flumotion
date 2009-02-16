@@ -111,11 +111,16 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
 
             self._labels[name].set_text(text)
 
-        uri = state.get('stream-url') or ''
+        uri = state.get('stream-url', '')
         if not self._link and uri:
             self._link = self._createLinkWidget(uri)
 
+        disable = state.get('stream-mime') is None
+        tooltip = _('The stream is temporarly unavailable.\n'
+                  'No data is being transmitted right now.')
         if self._link:
+            self._link.set_sensitive(not disable)
+            self._link.set_tooltip_text((disable and tooltip) or '')
             self._link.set_uri(uri)
 
     def _createLinkWidget(self, uri):

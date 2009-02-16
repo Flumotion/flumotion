@@ -1,3 +1,9 @@
+2009-02-16  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	Disable the link button when we have not received the mime type.
+	Fixes #1245
+
 2009-02-12  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/combiners/switch/switch.py:
