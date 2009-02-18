@@ -1,3 +1,11 @@
+2009-02-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/component/producers/firewire/firewire.py:
+	Fix an error when checking if the current-device-change property is
+	present on the received message's structure. Before the line crashed
+	without reporting anything to the user neither the (dis)connection
+	messages.
+
 2009-02-16  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:

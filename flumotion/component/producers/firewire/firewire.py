@@ -160,7 +160,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
             # we have a firewire bus reset
             s = message.structure
             # current-device-change is only in gst-plugins-good >= 0.10.3
-            if 'current-device-change' in s:
+            if 'current-device-change' in s.keys():
                 if s['current-device-change'] != 0:
                     # we actually have a connect or disconnect of the camera
                     # so first remove all the previous messages warning about a
