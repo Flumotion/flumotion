@@ -1,5 +1,21 @@
 2009-02-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	reviewed by: jlegoff
+
+	* flumotion/admin/gtk/configurationassistant.py:
+	Show an informative message when we are checking the existence of
+	GStreamer elements on the workers. Fixes #898
+	* flumotion/scenario/steps/conversionsteps.py:
+	Remove the unncessary code that interfers with the message we show
+	when checking the GStreamer elements. The worker was changed twice for
+	the encoding steps thus, the messages were cleaned before the user
+	could see them.
+	* flumotion/scenario/steps/productionsteps.py:
+	Clean those two pages as they were using extra code that is not
+	needed anymore.
+
+2009-02-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/component/producers/firewire/firewire.py:
 	Fix an error when checking if the current-device-change property is
 	present on the received message's structure. Before the line crashed

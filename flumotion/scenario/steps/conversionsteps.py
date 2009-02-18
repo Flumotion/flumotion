@@ -23,11 +23,12 @@ import gettext
 
 from flumotion.admin.assistant.models import AudioEncoder, VideoEncoder, Muxer
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
-from flumotion.common.errors import NoBundleError
-from flumotion.common.i18n import N_
+from flumotion.common import errors, messages
+from flumotion.common.i18n import N_, gettexter
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+T_ = gettexter()
 
 _PREFERRED_VIDEO_ENCODER = "theora"
 _PREFERRED_AUDIO_ENCODER = "vorbis"
@@ -131,6 +132,7 @@ class ConversionStep(WorkerWizardStep):
             self._populateCombos(data)
 
     def getNext(self):
+        #TODO: Share in some way this code with the productionsteps page.
         if self.wizard.getScenario().hasVideo(self.wizard):
             return self._getVideoPage()
         elif self.wizard.getScenario().hasAudio(self.wizard):
@@ -174,29 +176,13 @@ class ConversionStep(WorkerWizardStep):
                     combo.select(entry)
                     break
 
-    def _createDummyModel(self, entry):
-        if entry.type == 'audio-encoder':
-            encoder = AudioEncoder()
-        elif entry.type == 'video-encoder':
-            encoder = VideoEncoder()
-        else:
-            raise AssertionError
-
-        encoder.componentType = entry.componentType
-        encoder.worker = self.worker
-
-        if entry.type == 'audio-encoder':
-            self.wizard.getScenario().setAudioEncoder(encoder)
-        else:
-            self.wizard.getScenario().setVideoEncoder(encoder)
-
     def _loadPlugin(self, entry):
 
         def gotFactory(factory):
             return factory(self.wizard)
 
         def no_bundle(failure):
-            failure.trap(NoBundleError)
+            failure.trap(errors.NoBundleError)
 
         d = self.wizard.getWizardEntry(entry.componentType)
         d.addCallback(gotFactory)
@@ -205,19 +191,13 @@ class ConversionStep(WorkerWizardStep):
         return d
 
     def _loadStep(self, combo):
-        entry = combo.get_selected()
-        assert entry, 'combo %s has nothing selected' % (combo, )
 
         def pluginLoaded(plugin, entry):
-            if plugin is None:
-                self._createDummyModel(entry)
-                return None
             # FIXME: verify that factory implements IEncoderPlugin
             step = plugin.getConversionStep()
-            if isinstance(step, WorkerWizardStep):
-                self.wizard.workerChangedForStep(step, self.worker)
             return step
 
+        entry = combo.get_selected()
         d = self._loadPlugin(entry)
         d.addCallback(pluginLoaded, entry)
 

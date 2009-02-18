@@ -464,8 +464,19 @@ class ConfigurationAssistant(SectionWizard):
             return
 
         self.debug('requiring elements %r' % (elementNames, ))
+        f = ngettext("Checking the existence of GStreamer element '%s' "
+                     "on %s worker.",
+                     "Checking the existence of GStreamer elements '%s' "
+                     "on %s worker.",
+                     len(elementNames))
+        msg = messages.Info(T_(f, "', '".join(elementNames), workerName),
+                            mid='require-elements')
+
+        self.add_msg(msg)
 
         def gotMissingElements(elements, workerName):
+            self.clear_msg('require-elements')
+
             if elements:
                 self.warning('elements %r do not exist' % (elements, ))
                 f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
