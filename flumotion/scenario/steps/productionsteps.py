@@ -106,7 +106,7 @@ class LiveProductionStep(WizardStep):
             self.wizard.taskFinished()
             return step
         self.wizard.waitForTask('video producer step')
-        d = self._loadStep(self.video)
+        d = self._loadStep(self.video, 'video')
         d.addCallback(stepLoaded)
         return d
 
@@ -123,7 +123,7 @@ class LiveProductionStep(WizardStep):
             self.wizard.taskFinished()
             return step
         self.wizard.waitForTask('audio producer step')
-        d = self._loadStep(self.audio)
+        d = self._loadStep(self.audio, 'audio')
         d.addCallback(stepLoaded)
         return d
 
@@ -187,7 +187,7 @@ class LiveProductionStep(WizardStep):
             self._loadedSteps = True
         d.addCallback(done)
 
-    def _loadPlugin(self, componentType):
+    def _loadPlugin(self, componentType, type):
 
         def gotFactory(factory):
             return factory(self.wizard)
@@ -201,7 +201,7 @@ class LiveProductionStep(WizardStep):
 
         return d
 
-    def _loadStep(self, combo):
+    def _loadStep(self, combo, type):
 
         def pluginLoaded(plugin, entry):
             # FIXME: verify that factory implements IProductionPlugin
@@ -209,7 +209,7 @@ class LiveProductionStep(WizardStep):
             return step
 
         entry = combo.get_selected()
-        d = self._loadPlugin(entry)
+        d = self._loadPlugin(entry, type)
         d.addCallback(pluginLoaded, entry)
 
         return d

@@ -1,3 +1,10 @@
+2009-02-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/scenario/steps/productionsteps.py:
+	Reverted the changes on last commit as they were probably a bad idea.
+	The firewire production step was not appearing after the commit.
+	This doesn't affect the bug fix.
+
 2009-02-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: jlegoff
