@@ -110,6 +110,7 @@ class ConversionStep(WorkerWizardStep):
         else:
             self.audio.hide()
             self.label_audio.hide()
+            self.wizard.getScenario().setAudioEncoder(None)
 
         videoProducer = self.wizard.getScenario().getVideoProducer(self.wizard)
         if videoProducer:
@@ -120,6 +121,7 @@ class ConversionStep(WorkerWizardStep):
         else:
             self.video.hide()
             self.label_video.hide()
+            self.wizard.getScenario().setVideoEncoder(None)
 
 
         # If there is data in the combo already, do not populate it,
