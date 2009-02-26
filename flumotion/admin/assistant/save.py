@@ -248,7 +248,8 @@ class AssistantSaver(object):
         if not self._audioProducer:
             return
 
-        self._audioProducer.name = 'producer-audio'
+        if not self._audioProducer.name:
+            self._audioProducer.name = 'producer-audio'
 
         self._flowComponents.append(self._audioProducer)
 
@@ -264,7 +265,9 @@ class AssistantSaver(object):
         if not self._videoProducer:
             return
 
-        self._videoProducer.name = 'producer-video'
+        if not self._videoProducer.name:
+            self._videoProducer.name = 'producer-video'
+
         self._flowComponents.append(self._videoProducer)
 
         if self._videoEncoder is None:
@@ -309,8 +312,10 @@ class AssistantSaver(object):
             video.componentType == audio.componentType and
             video.worker == audio.worker):
             self._flowComponents.remove(self._audioProducer)
-            self._audioProducer.name = 'producer-audio-video'
-            self._videoProducer.name = 'producer-audio-video'
+            if not audio.exists:
+                self._audioProducer.name = 'producer-audio-video'
+            if not video.exists:
+                self._videoProducer.name = 'producer-audio-video'
             self._audioProducer = self._videoProducer
 
     def _handleMuxers(self):

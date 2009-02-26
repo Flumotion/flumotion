@@ -719,6 +719,7 @@ class TestWizardSave(testsuite.TestCase):
              '               worker="firewire-video-producer-worker"\n'
              '               version="%(version)s">\n'
              '      \n'
+             '      <property name="framerate">25/2</property>\n'
              '      <property name="height">480</property>\n'
              '      <property name="is-square">False</property>\n'
              '      <property name="width">640</property>\n'
@@ -795,11 +796,9 @@ class TestWizardSave(testsuite.TestCase):
         save.setFlowName('flow')
 
         audioProducer = self._createFirewireProducer()
-        audioProducer.name = 'audio-producer'
         audioProducer.worker = 'audio-worker'
         save.setAudioProducer(audioProducer)
         videoProducer = self._createFirewireProducer()
-        videoProducer.name = 'video-producer'
         videoProducer.worker = 'video-worker'
         save.setVideoProducer(videoProducer)
         save.setVideoOverlay(self._createVideoOverlay(videoProducer))
@@ -850,6 +849,7 @@ class TestWizardSave(testsuite.TestCase):
              '               worker="audio-worker"\n'
              '               version="%(version)s">\n'
              '      \n'
+             '      <property name="framerate">25/2</property>\n'
              '      <property name="height">480</property>\n'
              '      <property name="is-square">False</property>\n'
              '      <property name="width">640</property>\n'
@@ -860,6 +860,7 @@ class TestWizardSave(testsuite.TestCase):
              '               worker="video-worker"\n'
              '               version="%(version)s">\n'
              '      \n'
+             '      <property name="framerate">25/2</property>\n'
              '      <property name="height">480</property>\n'
              '      <property name="is-square">False</property>\n'
              '      <property name="width">640</property>\n'

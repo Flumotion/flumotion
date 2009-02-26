@@ -1,3 +1,26 @@
+2009-02-25  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: jlegoff
+
+	* flumotion/admin/assistant/save.py:
+	Don't set the name of the producers if it is already set before.
+	This prevents adding new encoders feeding from an unexistent producer
+	from the add-new-format wizard when the producer is a firewire camera
+	or the producers names are not the default ones.
+	* flumotion/admin/gtk/adminwindow.py:
+	The add-new-format wizard knows the names of the existing producers so
+	they are used instead of the proposed by the saver. It was a problem
+	before when we wanted to use an audio-video producer as a audio/video
+	only producer.
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	Set the default framerate to 12.5.
+	* flumotion/scenario/steps/productionsteps.py:
+	SelectProducersStep extends now LiveProductionStep. Most of all
+	duplicate code between the two classes has now disappeared.
+	* flumotion/test/test_wizard_save.py:
+	Fixed the tests to fit the changes to the save module.
+	Fixes #1253
+
 2009-02-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/scenario/steps/conversionsteps.py:

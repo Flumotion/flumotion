@@ -751,6 +751,7 @@ class AdminWindow(Loggable, GladeDelegate):
             component.componentType = entry.componentType
             component.description = entry.description
             component.exists = True
+            component.name = componentState.get('name')
             config = componentState.get('config')
             for key, value in config['properties'].items():
                 component.properties[key] = value

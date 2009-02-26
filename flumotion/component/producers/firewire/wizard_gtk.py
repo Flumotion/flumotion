@@ -45,6 +45,7 @@ class FireWireProducer(AudioProducer, VideoProducer):
         super(FireWireProducer, self).__init__()
 
         self.properties.is_square = False
+        self.properties.framerate = 12.5
 
     def getFeederName(self, component):
         if isinstance(component, AudioEncoder):

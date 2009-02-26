@@ -143,6 +143,7 @@ class LiveProductionStep(WizardStep):
         tips.set_tip(self.has_audio,
             _('Select this if you want to stream audio'))
 
+    def activated(self):
         self._populateCombos()
 
     def getNext(self):
@@ -156,27 +157,27 @@ class LiveProductionStep(WizardStep):
 
     # Private API
 
-    def _populateCombos(self):
+    def _gotEntries(self, entries, type, combo, default_type):
+        data = []
+        default = None
+        for entry in entries:
+            if entry.componentType == default_type:
+                default = entry
+                continue
+            data.append((N_(entry.description), entry.componentType))
+        assert default
+        data.insert(0, (N_(default.description), default.componentType))
+        combo.prefill(data)
+        combo.set_sensitive(True)
 
-        def gotEntries(entries, combo, default_type):
-            data = []
-            default = None
-            for entry in entries:
-                if entry.componentType == default_type:
-                    default = entry
-                    continue
-                data.append((N_(entry.description), entry.componentType))
-            assert default
-            data.insert(0, (N_(default.description), default.componentType))
-            combo.prefill(data)
-            combo.set_sensitive(True)
+    def _populateCombos(self):
 
         for ctype, combo, default_type in [
             ('video-producer', self.video, 'videotest-producer'),
             ('audio-producer', self.audio, 'audiotest-producer')]:
             d = self.wizard.getWizardEntries(
                 wizardTypes=[ctype])
-            d.addCallback(gotEntries, combo, default_type)
+            d.addCallback(self._gotEntries, ctype, combo, default_type)
             combo.prefill([('...', None)])
             combo.set_sensitive(False)
 
@@ -238,113 +239,68 @@ class LiveProductionStep(WizardStep):
         self._verify()
 
 
-class SelectProducersStep(WizardStep):
-    name = 'Production'
-    title = _('Production')
-    section = _('Production')
-    icon = 'source.png'
-    gladeFile = 'select-producers-wizard.glade'
+class SelectProducersStep(LiveProductionStep):
 
     def __init__(self, wizard):
-        self._audioProducer = None
-        self._videoProducer = None
-        self._loadedSteps = None
-        WizardStep.__init__(self, wizard)
+        self._producers = {}
+        LiveProductionStep.__init__(self, wizard)
 
     # Public API
 
-    def hasAudio(self):
-        """Returns if audio will be used in the stream
-        created by the wizard.
-
-        @returns: if audio will be used
-        @rtype:   bool
-        """
-        return self.has_audio.get_active()
-
-    def hasVideo(self):
-        """Returns if video will be used in the stream
-        created by the wizard.
-
-        @returns: if video will be used
-        @rtype:   bool
-        """
-        return self.has_video.get_active()
-
-    def getAudioProducer(self):
-        """Returns the selected audio producer or None
-        @returns: producer or None
-        @rtype: L{flumotion.admin.assistant.models.AudioProducer}
-        """
-        if self.has_audio.get_active():
-            return self.audio.get_selected()
-
-    def getVideoProducer(self):
-        """Returns the selected video producer or None
-        @returns: producer or None
-        @rtype: L{flumotion.admin.assistant.models.VideoProducer}
-        """
-        if self.has_video.get_active():
-            return self.video.get_selected()
-
     def setVideoProducers(self, videoProducers):
-        self.video.prefill([(N_(vp.description), vp) for vp in videoProducers])
-        self._updateWidgets()
+        self._producers['video-producer'] = \
+                dict((vp.componentType, vp) for vp in videoProducers)
 
     def setAudioProducers(self, audioProducers):
-        self.audio.prefill([(N_(vp.description), vp) for vp in audioProducers])
-        self._updateWidgets()
-
-    # WizardStep
-
-    def setup(self):
-        self.audio.data_type = object
-        self.video.data_type = object
-        # We want to save the audio/video attributes as
-        # componentType in the respective models
-        self.audio.model_attribute = 'componentType'
-        self.video.model_attribute = 'componentType'
-
-        tips = gtk.Tooltips()
-        tips.set_tip(self.has_video,
-            _('Select this if you want to stream video'))
-        tips.set_tip(self.has_audio,
-            _('Select this if you want to stream audio'))
+        self._producers['audio-producer'] = \
+                dict((ap.componentType, ap) for ap in audioProducers)
 
     def getNext(self):
         return None
 
     # Private API
 
-    def _updateWidgets(self):
-        # We can't call getAudio/VideoProducer here, since they
-        # depend on set_active() being enabled
-        hasAudio = bool(self.audio.get_model_strings())
-        hasVideo = bool(self.video.get_model_strings())
-        hasBoth = hasVideo and hasAudio
-        self.has_video.set_active(hasVideo)
-        self.has_audio.set_active(hasAudio)
-        self.audio.set_property('visible', hasAudio)
-        self.video.set_property('visible', hasVideo)
-        self.has_audio.set_property('visible', hasBoth)
-        self.has_video.set_property('visible', hasBoth)
-
-    def _verify(self):
-        canContinue = self.hasAudio() or self.hasVideo()
-        self.wizard.blockNext(not canContinue)
-
-    # Callbacks
-
-    def on_has_video__toggled(self, button):
-        self.video.set_sensitive(button.get_active())
-        self._verify()
-
-    def on_has_audio__toggled(self, button):
-        self.audio.set_sensitive(button.get_active())
-        self._verify()
+    def _gotEntries(self, entries, type, combo, default_type):
+        """
+        Overrides L{LiveProductionStep.gotEntries}. We only want to show the
+        producers that are actually on the flow, so they are filtered here.
+        """
+        data = []
+        default = None
+        for entry in entries:
+            if entry.componentType in self._producers[type]:
+                data.append((N_(entry.description), entry.componentType))
+        combo.prefill(data)
+        combo.set_sensitive(True)
 
     def on_video__changed(self, button):
-        self._verify()
+        if not button.get_selected():
+            return
+
+        def gotStep(step):
+            model = self._producers['video-producer'][step.model.componentType]
+
+            self._videoProducer.worker = model.worker
+            self._videoProducer.exists = True
+            self._videoProducer.name = model.name
+            for key, value in model.properties.items():
+                self._videoProducer.properties[key] = value
+
+        step = self.getVideoStep()
+        step.addCallback(gotStep)
 
     def on_audio__changed(self, button):
-        self._verify()
+        if not button.get_selected():
+            return
+
+        def gotStep(step):
+            model = self._producers['audio-producer'][step.model.componentType]
+
+            self._audioProducer.worker = model.worker
+            self._audioProducer.exists = True
+            self._audioProducer.name = model.name
+            for key, value in model.properties.items():
+                self._audioProducer.properties[key] = value
+
+        step = self.getAudioStep()
+        step.addCallback(gotStep)
