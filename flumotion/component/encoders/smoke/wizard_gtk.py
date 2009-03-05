@@ -27,6 +27,7 @@ from zope.interface import implements
 from flumotion.admin.assistant.interfaces import IEncoderPlugin
 from flumotion.admin.assistant.models import VideoEncoder
 from flumotion.admin.gtk.basesteps import VideoEncoderStep
+from flumotion.common.fraction import fractionAsFloat
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -37,10 +38,19 @@ class SmokeVideoEncoder(VideoEncoder):
 
     def __init__(self):
         super(SmokeVideoEncoder, self).__init__()
+        self.framerate = 25.0
+        self.keyframe_interval = 2.0
+
         self.properties.qmin = 10
         self.properties.qmax = 85
         self.properties.threshold = 3000
-        self.properties.keyframe = 20
+
+    def getProperties(self):
+        properties = super(SmokeVideoEncoder, self).getProperties()
+
+        properties.keyframe = int(self.framerate * self.keyframe_interval)
+
+        return properties
 
 
 class SmokeStep(VideoEncoderStep):
@@ -61,10 +71,19 @@ class SmokeStep(VideoEncoderStep):
         self.qmin.data_type = int
         self.qmax.data_type = int
         self.threshold.data_type = int
-        self.keyframe.data_type = int
+        self.keyframe_interval.data_type = float
+
+        producer = self.wizard.getScenario().getVideoProducer(self.wizard)
+        self.model.framerate = fractionAsFloat(producer.getFramerate())
+        self.model.keyframe_interval = 20 / self.model.framerate
 
         self.add_proxy(self.model.properties,
-                       ['qmin', 'qmax', 'threshold', 'keyframe'])
+                       ['qmin', 'qmax', 'threshold'])
+        self.add_proxy(self.model, ['keyframe_interval'])
+
+        step = 1 / self.model.framerate
+        page = 1.0
+        self.keyframe_interval.set_increments(step, page)
 
     def workerChanged(self, worker):
         self.model.worker = worker
