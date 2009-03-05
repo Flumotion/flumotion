@@ -1,5 +1,10 @@
 2009-03-05  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/test/test_wizard_save.py:
+	Fix the tests for the last commit's changes.
+
+2009-03-05  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/component/producers/firewire/wizard.glade:
 	* flumotion/component/producers/firewire/wizard_gtk.py:
 	Change the default options of the the firewire wizard page to get
