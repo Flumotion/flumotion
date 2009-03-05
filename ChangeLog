@@ -1,5 +1,13 @@
 2009-03-05  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/component/producers/firewire/wizard.glade:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	Change the default options of the the firewire wizard page to get
+	better results when the source's width has to be corrected.
+	Fixes #1135
+
+2009-03-05  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/component/encoders/smoke/wizard.glade:
 	* flumotion/component/encoders/smoke/wizard_gtk.py:
 	Present the keyframe spacing in seconds on the wizard. Transform it to

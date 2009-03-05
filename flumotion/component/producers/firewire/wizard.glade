@@ -136,6 +136,7 @@
                             <property name="tooltip" translatable="yes">Recommended if you are outputting to a computer screen</property>
                             <property name="label" translatable="yes">Convert to s_quare pixels</property>
                             <property name="use_underline">True</property>
+                            <property name="active">True</property>
                             <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="on_is_square_toggled"/>
@@ -186,7 +187,6 @@
                             <property name="label" translatable="yes">_No width correction</property>
                             <property name="use_underline">True</property>
                             <property name="response_id">0</property>
-                            <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="on_radiobutton_width_none_toggled"/>
                           </widget>
@@ -213,6 +213,7 @@
                             <property name="label" translatable="yes">_Pad to multiple of 8 pixels</property>
                             <property name="use_underline">True</property>
                             <property name="response_id">0</property>
+                            <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">radiobutton_width_none</property>
                             <signal name="toggled" handler="on_radiobutton_width_pad_toggled"/>

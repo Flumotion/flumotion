@@ -44,7 +44,7 @@ class FireWireProducer(AudioProducer, VideoProducer):
     def __init__(self):
         super(FireWireProducer, self).__init__()
 
-        self.properties.is_square = False
+        self.properties.is_square = True
         self.properties.framerate = 12.5
 
     def getFeederName(self, component):
@@ -158,12 +158,15 @@ class _FireWireCommon:
             # sw = sw + (2 - (sw % 2)) % 2
 
         # if scaled width (after squaring) is not multiple of 8, present
-        # width correction
+        # width correction and select padding as default.
         self.frame_width_correction.set_sensitive(sw % 8 != 0)
+        self.radiobutton_width_none.set_active(sw % 8 == 0)
+        self.radiobutton_width_pad.set_active(sw % 8 != 0)
 
         # actual output
         ow = sw
         oh = sh
+
         if self._width_correction == 'pad':
             ow = sw + (8 - (sw % 8)) % 8
         elif self._width_correction == 'stretch':
@@ -183,7 +186,6 @@ class _FireWireCommon:
         def firewireCheckDone(devices):
             self.wizard.clear_msg('firewire-check')
             self.guid.prefill(devices)
-            self._runChecks()
 
         def trapRemoteFailure(failure):
             failure.trap(errors.RemoteRunFailure)
@@ -216,6 +218,8 @@ class _FireWireCommon:
             for i, height in enumerate(self._input_heights):
                 values.append(('%d pixels' % height, i))
             self.combobox_scaled_height.prefill(values)
+            if len(values) > 2:
+                self.combobox_scaled_height.set_active(1)
             self._setSensitive(True)
             self._update_output_format()
 
