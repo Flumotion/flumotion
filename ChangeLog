@@ -1,3 +1,9 @@
+2009-03-05  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py (_disconnectActionProxy):
+	Fix the UIManager's disconnect from proxy callbac. It was expecting
+	the callback ids as a pair (name, id) but we only had the ids.
+
 2009-02-25  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: jlegoff

@@ -527,7 +527,7 @@ class AdminWindow(Loggable, GladeDelegate):
         if isinstance(widget, gtk.ToolButton):
             widget = widget.child
 
-        for name, cid in cids:
+        for cid in cids:
             widget.disconnect(cid)
 
     def _setAdminModel(self, model):
