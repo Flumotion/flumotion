@@ -1,5 +1,17 @@
 2009-03-10  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* data/cortado-template.html:
+	* flumotion/component/plugs/cortado/cortado.py:
+	* flumotion/component/plugs/cortado/cortado.xml:
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	Framerate is no longer used on cortado, setting it to optional for
+	compatibility reasons but not using it anymore.
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	Convert the framerate to a float instead of using a string.
+	Fixes #970
+
+2009-03-10  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	reviewed by: murrayc
 
 	* data/glade/welcome-wizard.glade:
@@ -812,7 +824,7 @@
 	* flumotion/test/test_comptest.py:
 	Change underscores to camel case in test names. No functional changes.
 
-2008-11-10  Xavier Queralt Mateu,,,  <xqueralt at flumotion dot com>
+2008-11-10  Xavier Queralt Mateu <xqueralt at flumotion dot com>
 
 	* flumotion/test/test_wizard_save.py:
 	Fixed the tests for the changes on the previous commit.

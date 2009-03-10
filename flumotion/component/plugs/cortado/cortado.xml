@@ -41,7 +41,7 @@
         <property name="buffer-size" type="int" required="true"
                   _description="The size of the buffer in the cortado applet." />
                   <!-- FIXME: What is this? murrayc -->
-        <property name="framerate" type="float" required="true"
+        <property name="framerate" type="float" required="false"
                   _description="The frame rate used in the cortado applet." />
                   <!-- FIXME: Isn't this determined by the stream that it gets? murrayc -->
       </properties>

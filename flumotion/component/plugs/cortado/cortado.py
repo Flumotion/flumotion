@@ -89,8 +89,7 @@ class CortadoDirectoryResource(Resource):
                           'width',
                           'height',
                           'stream-url',
-                          'buffer-size',
-                          'framerate']:
+                          'buffer-size']:
             ns[attribute] = self._properties[attribute]
 
         data = open(html_template, 'r').read()
@@ -144,8 +143,7 @@ def test():
                   'width': 320,
                   'height': 240,
                   'stream-url': '/stream.ogg',
-                  'buffer-size': 40,
-                  'framerate': 1}
+                  'buffer-size': 40}
     root = CortadoDirectoryResource('/', properties, getCortadoFilename())
     site = Site(root)
 

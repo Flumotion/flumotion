@@ -27,7 +27,7 @@ from zope.interface import implements
 from flumotion.admin.assistant.interfaces import IProducerPlugin
 from flumotion.admin.assistant.models import VideoProducer
 from flumotion.common import errors
-from flumotion.common.fraction import fractionAsString
+from flumotion.common.fraction import fractionAsFloat
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.messages import Info
 # FIXME: make pychecker able to suppress shadowed builtins like these
@@ -191,7 +191,7 @@ class WebcamStep(VideoProducerStep):
             format = None
 
         self.model.properties.mime = mime
-        self.model.properties.framerate = fractionAsString((num, denom))
+        self.model.properties.framerate = fractionAsFloat((num, denom))
         if format:
             self.model.properties.format = format
 

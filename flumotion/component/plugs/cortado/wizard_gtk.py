@@ -64,19 +64,12 @@ class CortadoHTTPPlug(HTTPPlug):
 
         width = 320
         height = 240
-        framerate = 1
         if self.videoProducer:
             width = self.videoProducer.properties.width
             height = self.videoProducer.properties.height
-            framerate = self.videoProducer.properties.framerate
-            # FIXME: Why do we get floats and strings randomly?
-            if type(framerate) == str and '/' in framerate:
-                nom, denom = framerate.split('/')
-                framerate = int(float(nom)/float(denom))
 
         p.width = width
         p.height = height
-        p.framerate = fractionAsFloat(fractionFromValue(framerate))
         p.buffer_size = 40
 
         return p
