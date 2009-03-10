@@ -1,3 +1,12 @@
+2009-03-10  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: murrayc
+
+	* data/glade/welcome-wizard.glade:
+	Add a notice for the user about the safety of using the default
+	options set on the wizard.
+	Fixes #1100
+
 2009-03-05  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py:
