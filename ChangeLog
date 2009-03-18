@@ -1,3 +1,13 @@
+2009-03-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: jlegoff
+
+	* flumotion/scenario/steps/conversionsteps.py:
+	Controll whether a muxer can or cannot be shown on the wizard
+	depending on the configured media types (audio/video) and the ones it
+	accepts.
+	Helps #2074(pt)
+
 2009-03-10  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* data/cortado-template.html:

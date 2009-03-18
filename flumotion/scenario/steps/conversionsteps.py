@@ -157,18 +157,36 @@ class ConversionStep(WorkerWizardStep):
         self.wizard.waitForTask('querying encoders')
         d.addCallback(lambda x: self.wizard.taskFinished())
 
+    def _canAddMuxer(self, entry):
+        # Fetch the media types the muxer accepts ('audio', 'video')
+        types = [t.split(':')[0] for t in entry.getAcceptedMediaTypes()]
+
+        acceptAudio = 'audio' in types
+        acceptVideo = 'video' in types
+
+        if acceptVideo ^ acceptAudio:
+            hasAudio = self.wizard.getScenario().hasAudio(self.wizard)
+            hasVideo = self.wizard.getScenario().hasVideo(self.wizard)
+            if hasAudio and not acceptAudio or hasVideo and not acceptVideo:
+                return False
+
+        return True
+
     def _addEntries(self, entries, ctype, combo, defaultType, oldComponent):
         self.debug('adding entries for ctype %s: %r with defaultType %s',
                    ctype, entries, defaultType)
         data = []
         for entry in entries:
-            item = (N_(entry.description), entry)
-            providedMediaTypes = entry.getProvidedMediaTypes()
-            self.debug("adding entry %r", providedMediaTypes)
-            if defaultType and defaultType in providedMediaTypes:
-                data.insert(0, item)
-            else:
-                data.append(item)
+            if ctype != 'muxer' or self._canAddMuxer(entry):
+                item = (N_(entry.description), entry)
+                providedMediaTypes = entry.getProvidedMediaTypes()
+                self.debug("adding entry %r", providedMediaTypes)
+
+                if defaultType and defaultType in providedMediaTypes:
+                    data.insert(0, item)
+                else:
+                    data.append(item)
+
         combo.prefill(data)
         combo.set_sensitive(True)
 
@@ -236,12 +254,14 @@ class ConversionStep(WorkerWizardStep):
             return
         self.wizard.getScenario().setMuxerEntry(muxerEntry)
 
+        provides = map(lambda f: f.find(':') > 0 and f.split(':', 1)[1] or f,
+                        muxerEntry.getAcceptedMediaTypes())
         self._populateCombos(
             [('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER,
               self.wizard.getScenario().getAudioEncoder()),
              ('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER,
               self.wizard.getScenario().getVideoEncoder())],
-            provides=muxerEntry.getAcceptedMediaTypes())
+            provides=provides)
 
     # Callbacks
 
