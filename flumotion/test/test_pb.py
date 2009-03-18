@@ -34,6 +34,7 @@ from flumotion.component.bouncers import htpasswdcrypt, saltsha256
 from flumotion.twisted import checkers, pb
 from flumotion.twisted import portal as fportal
 
+from flumotion.test.common import haveTwisted
 
 htpasswdcryptConf = {
     'name': 'testbouncer',
@@ -128,6 +129,9 @@ class FakeBroker(tpb.Broker):
 
 
 class TestTwisted_PortalAuthChallenger(testsuite.TestCase):
+    if haveTwisted(8, 0):
+        # FIXME: don't directly use twisted's private classes!
+        skip = 'Test broken since twisted 8.0.'
 
     def setUp(self):
         # PB server creates a challenge

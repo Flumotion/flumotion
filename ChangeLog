@@ -1,3 +1,16 @@
+2009-03-18  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/test/test_pb.py (TestTwisted_PortalAuthChallenger):
+	_PortalAuthChallenger's __init__() signature changed in Twisted
+	8.0 - mark those tests as 'skip' for now.
+
+	* flumotion/test/test_icalbouncer.py: Fix for the compatibility
+	breakage in dateutil 1.4; clean-up after ourselves, too.
+
+	* flumotion/test/common.py:
+	* flumotion/test/Makefile.am:
+	New module for small utilities like haveTwisted().
+
 2009-03-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: jlegoff

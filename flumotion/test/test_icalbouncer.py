@@ -264,8 +264,19 @@ class TestIcalBouncerFloating(TestIcalBouncerRunning, RequiredModulesMixin):
         return d
 
     def testApprovedTZFromEnvironmentWithFloating(self):
+
+        def _restoreTZEnv(result, oldTZ):
+            if oldTZ is None:
+                del os.environ['TZ']
+            else:
+                os.environ['TZ'] = oldTZ
+            return result
+
         new_end_naive = self.half_an_hour_ago.replace(tzinfo=None)
-        os.environ['TZ'] = 'UTC+%d' % 1
+
+        oldTZ = os.environ.get('TZ', None)
+        os.environ['TZ'] = 'US/Pacific'
+
         data = self.ical_from_specs('', self.half_an_hour_ago,
                                     '', new_end_naive)
         self.bouncer = self.bouncer_from_ical(data)
@@ -273,4 +284,5 @@ class TestIcalBouncerFloating(TestIcalBouncerRunning, RequiredModulesMixin):
         keycard = keycards.KeycardGeneric()
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
         d.addCallback(self._approved_callback)
+        d.addBoth(_restoreTZEnv, oldTZ)
         return d

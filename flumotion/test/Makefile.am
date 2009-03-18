@@ -6,6 +6,7 @@ flumotiondir = $(libdir)/flumotion/python/flumotion/test
 
 flumotion_PYTHON =			\
         __init__.py			\
+	common.py			\
 	comptest.py			\
 	gtkunit.py			\
 	realm.py
