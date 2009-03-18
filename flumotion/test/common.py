@@ -20,8 +20,28 @@
 # Headers in this file shall remain intact.
 
 
-def haveTwisted(major, minor, micro=0, prerelease=None):
+import twisted
+
+
+def haveTwisted(major, minor, micro=0):
     '''Check if we're running at least the given version of twisted.'''
-    from twisted import version
-    from twisted.python.versions import Version
-    return version >= Version('twisted', major, minor, micro, prerelease)
+
+    # looks like there is no better (fairly simple) way than check for
+    # the stringified __version__ in the twisted module
+    #
+    # the following code should work with the current and the known
+    # previous versions but forward compatibility is not guaranteed
+
+    try:
+        vtuple = twisted.__version__.split('.')
+    except:
+        # it's not a string? - it's not twisted!
+        return False
+
+    try:
+        vconv = map(int, vtuple[:3])
+    except ValueError, ve:
+        # doesn't have at least 3 numerical components? - not a known twisted!
+        return False
+
+    return vconv >= [major, minor, micro]

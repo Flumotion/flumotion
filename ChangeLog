@@ -1,5 +1,9 @@
 2009-03-18  Arek Korbik  <arkadini@gmail.com>
 
+	* flumotion/test/common.py: Now stone age compatible, too!
+
+2009-03-18  Arek Korbik  <arkadini@gmail.com>
+
 	* flumotion/test/test_pb.py (TestTwisted_PortalAuthChallenger):
 	_PortalAuthChallenger's __init__() signature changed in Twisted
 	8.0 - mark those tests as 'skip' for now.
