@@ -198,7 +198,22 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         if ((self._cacheUsage is None) or (self._lastCacheTime < cacheTime)):
             self._lastCacheTime = cacheTime
             os.chdir(self._cacheDir)
-            sizes = [os.path.getsize(f) for f in os.listdir('.')]
+
+            # There's a possibility here that we got the filename from
+            # os.listdir, but before we get to os.stat, the file is gone. We'll
+            # get a OSError with a ENOENT errno and we should ignore that file,
+            # since we're just estimating the amount of space taken by the
+            # cache
+            sizes = []
+            for f in os.listdir('.'):
+                try:
+                    sizes.append(os.path.getsize(f))
+                except OSError, e:
+                    if e.errno == errno.ENOENT:
+                        pass
+                    else:
+                        raise
+
             self._cacheUsage = sum(sizes)
             self.updateCacheUsageStatistics()
             self._cacheUsageLastUpdate = time.time()
@@ -244,7 +259,19 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         self.stats.onCleanup()
         # List the cached files with file state
         os.chdir(self._cacheDir)
-        files = [(f, os.stat(f)) for f in os.listdir('.')]
+
+        files = []
+        for f in os.listdir('.'):
+            # There's a possibility of getting an error on os.stat here. See
+            # similar comment in updateCacheUsage()
+            try:
+                files.append((f, os.stat(f)))
+            except OSError, e:
+                if e.errno == errno.ENOENT:
+                    pass
+                else:
+                    raise
+
         # Calculate the cached file total size
         usage = sum([d[1].st_size for d in files])
         # Delete the cached file starting by the oldest accessed ones

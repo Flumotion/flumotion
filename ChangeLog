@@ -2,6 +2,14 @@
 
 	reviewed by: arkadini
 
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	Handle files disappearing from the cache directory while we're
+	estimating cache usage. Fixes #1255.
+
+2009-03-20  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: arkadini
+
 	* flumotion/component/misc/httpserver/ratecontrol.py:
 	Prevent proxying pauseProducing calls to producers that have already
 	disconnected. Fixes #1256.
