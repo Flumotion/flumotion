@@ -1,3 +1,11 @@
+2009-03-20  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: arkadini
+
+	* flumotion/component/misc/httpserver/ratecontrol.py:
+	Prevent proxying pauseProducing calls to producers that have already
+	disconnected. Fixes #1256.
+
 2009-03-18  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/test/common.py: Now stone age compatible, too!

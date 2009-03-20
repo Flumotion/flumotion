@@ -215,7 +215,23 @@ class TokenBucketConsumer(log.Loggable):
         # 'pull'.
         # However, all our producers (e.g. FileProducer) just
         # ignore pauseProducing, so for now it works.
-        self.producer.pauseProducing()
+        #
+        # FIXME: convert the following scenario into a unit test and remove it
+        # from here. It's rather lengthy for a comment.
+        #
+        # The producer might be None at this point if the following happened:
+        # 1) we resumeProducing()
+        # 2) we find out we're not permitted to write more, so we set up the
+        #    callLater to write after self._dripInterval
+        # 3) the producer goes avay, unregisterProducer() gets called
+        # 4) the callLater fires and we _dripAndTryWrite()
+        # 5) we try to push some data to the consumer
+        # 6) but the consumer is not reading fast enough, Twisted calls
+        #    pauseProducing() on us
+        # 7) at this point if self.producer is None we simply don't proxy the
+        #    pauseProducing() call to him
+        if self.producer:
+            self.producer.pauseProducing()
 
         # We have to stop dripping, otherwise we will keep on filling
         # the buffers and eventually run out of memory.
