@@ -1,3 +1,11 @@
+2009-03-23  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: arkadini
+
+	* flumotion/component/misc/httpserver/httpfile.py:
+	Guard against writing pending data to consumers if they already want
+	away. Fixes #1257, a really tricky corner case.
+
 2009-03-20  Jan Urbanski  <jurbanski@flumotion.com>
 
 	reviewed by: arkadini

@@ -382,6 +382,7 @@ class FileTransfer(log.Loggable):
         self.bytesWritten = 0
         self._pending = None
         self._again = False # True if resume was called while waiting for data
+        self._finished = False # Set when we finish a transfer
         self.debug("Calling registerProducer on %r", consumer)
         consumer.registerProducer(self, 0)
 
@@ -414,13 +415,35 @@ class FileTransfer(log.Loggable):
 
     def _cbGotData(self, data):
         self._pending = None
-        if self.consumer and data:
-            self.written += len(data)
-            self.bytesWritten += len(data)
-            # this .write will spin the reactor, calling .doWrite and then
-            # .resumeProducing again, so be prepared for a re-entrant call
-            self.consumer.write(data)
-        if self.consumer and (self.provider.tell() == self.size):
+
+        # We might have got a  stopProducing before the _cbGotData callback has
+        # been fired, so we might be in the _finished state. If so, just
+        # return.
+        if self._finished:
+            return
+
+        if data:
+            # WARNING! This call goes back to the reactor! Read the comment in
+            # _writeToConsumer!
+            self._writeToConsumer(data)
+
+        # We again might be in _finished state, because we might just
+        # got out of the reactor after writing some data to the consumer.
+        #
+        # The story goes thusly:
+        # 1) you write the last data chunk
+        # 2) before you get out of _writeToConsumer(), the _cbGotData gets
+        #    fired again
+        # 3) because it's the last write (we've written the entire file)
+        #    _terminate() gets called
+        # 4) consumer and provider are set to None
+        # 5) you return from the _writeToConsumer call
+        #
+        # If this happened, just exit (again)
+        if self._finished:
+            return
+
+        if self.provider.tell() == self.size:
             self.debug('Written entire file of %d bytes from %s',
                        self.size, self.provider)
             self._terminate()
@@ -434,9 +457,17 @@ class FileTransfer(log.Loggable):
                      self.provider, log.getFailureMessage(failure))
         self._terminate()
 
+    def _writeToConsumer(self, data):
+        self.written += len(data)
+        self.bytesWritten += len(data)
+        # this .write will spin the reactor, calling .doWrite and then
+        # .resumeProducing again, so be prepared for a re-entrant call
+        self.consumer.write(data)
+
     def _terminate(self):
         self.provider.close()
         self.provider = None
         self.consumer.unregisterProducer()
         self.consumer.finish()
         self.consumer = None
+        self._finished = True
