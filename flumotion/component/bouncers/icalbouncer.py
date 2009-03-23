@@ -43,7 +43,7 @@ T_ = gettexter()
 class IcalBouncer(bouncer.Bouncer):
 
     logCategory = 'icalbouncer'
-    keycardClasses = (KeycardGeneric)
+    keycardClasses = (KeycardGeneric, )
     events = []
 
     def init(self):

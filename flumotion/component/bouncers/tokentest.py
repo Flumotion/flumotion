@@ -33,7 +33,7 @@ __version__ = "$Rev$"
 class TokenTestBase(log.Loggable):
 
     logCategory = 'tokentestbouncer'
-    keycardClasses = (KeycardToken)
+    keycardClasses = (KeycardToken, )
 
     def haveProperties(self, properties):
         self._authtoken = properties['authorized-token']
