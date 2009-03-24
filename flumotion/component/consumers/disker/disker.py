@@ -271,7 +271,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         except ValueError, e:
             m = messages.Warning(T_(N_(
                 "Error parsing ical file %s, so not scheduling any"
-                " events." % icalfn)),
+                " events." % icalFile)),
                 debug=log.getExceptionMessage(e), mid="error-parsing-ical")
             self.addMessage(m)
 
