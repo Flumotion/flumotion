@@ -1,0 +1,15 @@
+<!ELEMENT playlist (entry*)>
+
+<!ELEMENT entry EMPTY>
+
+<!ATTLIST entry filename CDATA #REQUIRED>
+
+<!-- time: format "YYYY-MM-DDThh:mm:ss.ssZ"
+           (fractional seconds part ignored) -->
+<!ATTLIST entry time CDATA #REQUIRED>
+
+<!-- duration: number of seconds, float -->
+<!ATTLIST entry duration CDATA #IMPLIED>
+
+<!-- offset: number seconds, int -->
+<!ATTLIST entry offset CDATA "0">

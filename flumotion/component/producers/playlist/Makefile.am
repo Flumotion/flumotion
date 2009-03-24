@@ -8,4 +8,4 @@ component_DATA = playlist.xml
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(component_DATA)
+EXTRA_DIST = $(component_DATA) playlist.dtd
