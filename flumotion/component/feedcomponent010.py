@@ -293,7 +293,7 @@ class FeedComponent(basecomponent.BaseComponent):
                     dSeconds = discont / float(gst.SECOND)
                     self.debug("we have a discont on eater %s of %f s "
                                "between %s and %s ", eater.eaterAlias,
-                               dSeconds, gst.TIME_ARGS(prevTs),
+                               dSeconds, gst.TIME_ARGS(prevTs + prevDuration),
                                gst.TIME_ARGS(curTs))
                     eater.timestampDiscont(dSeconds,
                                            float(curTs) / float(gst.SECOND))

@@ -1,3 +1,8 @@
+2009-03-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Fix discont log message.
+
 2009-03-24  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/consumers/disker/disker.py:
