@@ -15,7 +15,6 @@ data/glade/greeter-load_connection.glade
 data/glade/greeter-start_new_error.glade
 data/glade/greeter-start_new.glade
 data/glade/greeter-start_new_success.glade
-data/glade/http-wizard.glade
 data/glade/httpstreamer-wizard.glade
 data/glade/license-wizard.glade
 data/glade/ondemand-wizard.glade

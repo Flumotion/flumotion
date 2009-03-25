@@ -1,3 +1,7 @@
+2009-03-25  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* POTFILES.in: remove a reference to http-wizard.glade
+
 2008-12-29  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* LINGUAS: remove the german translation from LINGUAS. Fixes #1052
