@@ -133,7 +133,7 @@ class ScenarioStep(WizardStep):
 
         def addScenarios(list):
             for scenario in list:
-                self.addScenario(scenario.getDescription(),
+                self.addScenario(_(scenario.getDescription()),
                                  scenario.getType())
 
             firstButton = self.scenarios_box.get_children()[0]

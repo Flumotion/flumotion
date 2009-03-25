@@ -1,3 +1,8 @@
+2009-03-25  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/admin/gtk/configurationassistant.py:
+	Show the translations for the descriptions at scenario step.
+
 2009-03-24  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py:
