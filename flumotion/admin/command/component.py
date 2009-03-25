@@ -39,7 +39,7 @@ class Delete(common.AdminCommand):
     description = "Delete a component."
 
     def doCallback(self, args):
-        if not self.componentId:
+        if not self.parentCommand.componentId:
             common.errorRaise("Please specify a component id "
                 "with 'component -i [component-id]'")
 
@@ -225,7 +225,7 @@ class Start(common.AdminCommand):
     description = "Start a component."
 
     def doCallback(self, args):
-        if not self.componentId:
+        if not self.parentCommand.componentId:
             common.errorRaise("Please specify a component id "
                 "with 'component -i [component-id]'")
 
@@ -258,7 +258,7 @@ class Stop(common.AdminCommand):
     description = "Stop a component."
 
     def doCallback(self, args):
-        if not self.componentId:
+        if not self.parentCommand.componentId:
             common.errorRaise("Please specify a component id "
                 "with 'component -i [component-id]'")
 
