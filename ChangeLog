@@ -1,3 +1,8 @@
+2009-03-26  Arek Korbik  <arkadini@gmail.com>
+
+	* tools/genpls.py:
+	Add a simple playlist generator.
+
 2009-03-25  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/admin/command/component.py:
