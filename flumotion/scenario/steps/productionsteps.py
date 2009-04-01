@@ -270,8 +270,15 @@ class SelectProducersStep(LiveProductionStep):
         for entry in entries:
             if entry.componentType in self._producers[type]:
                 data.append((N_(entry.description), entry.componentType))
-        combo.prefill(data)
-        combo.set_sensitive(True)
+        if not data:
+            combo.hide()
+            cb = (type == 'video-producer' and self.has_video
+                                            or self.has_audio)
+            cb.set_active(False)
+            cb.hide()
+        else:
+            combo.prefill(data)
+            combo.set_sensitive(True)
 
     def on_video__changed(self, button):
         if not button.get_selected():

@@ -1,3 +1,10 @@
+2009-04-01  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/scenario/steps/productionsteps.py:
+	Hide the corresponent combo and check boxes if no audio or video
+	producer exist on the flow when adding a new format from the admin
+	window.
+
 2009-03-26  Arek Korbik  <arkadini@gmail.com>
 
 	* tools/genpls.py:
