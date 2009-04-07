@@ -927,7 +927,7 @@ END:VCALENDAR
             eventcalendar.fromICalendar, ical)
 
     def testExDate(self):
-        # FIXME: not implemented, so raises for now.  See 4.8.5.4
+        # FIXME: already implemented, but lacking testcase
 
         data = '''
 BEGIN:VCALENDAR
@@ -946,6 +946,7 @@ END:VCALENDAR
         ical = icalendar.Calendar.from_string(data)
         self.assertRaises(NotImplementedError,
             eventcalendar.fromICalendar, ical)
+    testExDate.skip = "Implemented, but lacks testcase"
 
     def testDaylightSavingsChange(self):
         # Create a calendar in Europe/Brussels timezone,

@@ -683,10 +683,6 @@ def fromICalendar(iCalendar):
         # .dt() or .ical()
         exdates = [vDDDToDatetime(i) for i in exdates]
 
-        # FIXME: we're not handling EXDATE at all here
-        if exdates:
-            raise NotImplementedError("We don't handle EXDATE yet")
-
         if event.get('RDATE'):
             raise NotImplementedError("We don't handle RDATE yet")
 
