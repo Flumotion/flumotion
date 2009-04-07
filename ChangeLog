@@ -2,6 +2,13 @@
 
 	* flumotion/common/eventcalendar.py:
 	* flumotion/test/test_common_eventcalendar.py:
+	The RECURRENCE-ID in iCal files is returned as a vDDDTypes object, not
+	a string. Fixes #1269, parsing RECURRENCE-IDs with TZID.
+
+2009-04-07  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/eventcalendar.py:
+	* flumotion/test/test_common_eventcalendar.py:
 	Don't raise NotImplementedErrors for implemented features. Fixes #1268.
 
 2009-04-07  Jan Urbanski  <jurbanski@flumotion.com>

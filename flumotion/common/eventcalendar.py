@@ -33,7 +33,7 @@ except ImportError:
 # for documentation on dateutil, see http://labix.org/python-dateutil
 HAS_DATEUTIL = False
 try:
-    from dateutil import rrule, tz, parser
+    from dateutil import rrule, tz
     HAS_DATEUTIL = True
 except ImportError:
     pass
@@ -215,12 +215,13 @@ class Event(log.Loggable):
         @type  content:      unicode
         @param rrules:       a list of RRULE string
         @type  rrules:       list of str
-        @param recurrenceid: a RECURRENCE-ID string, used with
+        @param recurrenceid: a RECURRENCE-ID, used with
                              recurrence events
-        @type  recurrenceid: str
+        @type  recurrenceid: L{datetime.datetime}
         @param exdates:      list of exceptions to the recurrence rule
         @type  exdates:      list of L{datetime.datetime} or None
         """
+
         self.start = self._ensureTimeZone(start)
         self.end = self._ensureTimeZone(end)
         self.content = content
@@ -395,11 +396,9 @@ class EventSet(log.Loggable):
                 continue
 
             if event.recurrenceid:
-                recurDateTime = parser.parse(event.recurrenceid.ical())
-
                 # Remove recurrent instance(s) that start at this recurrenceid
                 for i in eventInstances[:]:
-                    if i.start == recurDateTime:
+                    if i.start == event.recurrenceid:
                         eventInstances.remove(i)
                         break
 
@@ -498,10 +497,9 @@ class EventSet(log.Loggable):
                 # ignore if we have another event with this recurrence-id
                 for event in self._events:
                     if event.recurrenceid:
-                        r = parser.parse(event.recurrenceid.ical())
-                        if r == dtstart:
+                        if event.recurrenceid == dtstart:
                             self.log(
-                                'event %r, recurrenceid %s matches dtstart %r',
+                                'event %r, recurrenceid %r matches dtstart %r',
                                     event, event.recurrenceid, dtstart)
                             skip = True
 
@@ -609,6 +607,29 @@ class Calendar(log.Loggable):
         return result
 
 
+def vDDDToDatetime(v):
+    """
+    Convert a vDDDType to a datetime, respecting timezones.
+
+    @param v: the time to convert
+    @type  v: L{icalendar.prop.vDDDTypes}
+
+    """
+    dt = _toDateTime(v.dt)
+    if dt.tzinfo is None:
+        # We might have a "floating" DATE-TIME value here, in
+        # which case we will not have a TZID parameter; see
+        # 4.3.5, FORM #3
+        # Using None as the parameter for tz.gettz will create a
+        # tzinfo object representing local time, which is the
+        # Right Thing
+        tzinfo = tz.gettz(v.params.get('TZID', None))
+        dt = datetime.datetime(dt.year, dt.month, dt.day,
+                               dt.hour, dt.minute, dt.second,
+                               dt.microsecond, tzinfo)
+    return dt
+
+
 def fromICalendar(iCalendar):
     """
     Parse an icalendar Calendar object into our Calendar object.
@@ -619,28 +640,6 @@ def fromICalendar(iCalendar):
     @rtype: L{Calendar}
     """
     calendar = Calendar()
-
-    def vDDDToDatetime(v):
-        """
-        Convert a vDDDType to a datetime, respecting timezones.
-
-        @param v: the time to convert
-        @type  v: L{icalendar.prop.vDDDTypes}
-
-        """
-        dt = _toDateTime(v.dt)
-        if dt.tzinfo is None:
-            # We might have a "floating" DATE-TIME value here, in
-            # which case we will not have a TZID parameter; see
-            # 4.3.5, FORM #3
-            # Using None as the parameter for tz.gettz will create a
-            # tzinfo object representing local time, which is the
-            # Right Thing
-            tzinfo = tz.gettz(v.params.get('TZID', None))
-            dt = datetime.datetime(dt.year, dt.month, dt.day,
-                dt.hour, dt.minute, dt.second,
-                dt.microsecond, tzinfo)
-        return dt
 
     for event in iCalendar.walk('vevent'):
         # extract to function ?
@@ -673,6 +672,9 @@ def fromICalendar(iCalendar):
         recur = [r.ical() for r in recur]
 
         recurrenceid = event.get('RECURRENCE-ID', None)
+        if recurrenceid:
+            recurrenceid = vDDDToDatetime(recurrenceid)
+
         exdates = event.get('EXDATE', [])
         # When there is only one exdate, we don't get a list, but the
         # single exdate. Bad API

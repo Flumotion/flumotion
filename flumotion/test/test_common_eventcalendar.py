@@ -329,6 +329,7 @@ class ManualCalendarTest(testsuite.TestCase):
         self.failIf(cal.getActiveEventInstances())
 
     def testGetActiveRecurrenceId(self):
+        # use a RECCURRENCE-ID with TZID, just to stress the code some more
         data = '''
 BEGIN:VCALENDAR
 PRODID:-//My calendar product//mxm.dk//
@@ -343,7 +344,7 @@ END:VEVENT
 BEGIN:VEVENT
 DTSTART:20150411T070000Z
 DTEND:20150411T080000Z
-RECURRENCE-ID:20150411T060000Z
+RECURRENCE-ID;TZID=UTC:20150411T060000
 SUMMARY:changed event one hour later
 UID:uid
 END:VEVENT
