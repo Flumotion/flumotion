@@ -1,3 +1,8 @@
+2009-04-07  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/eventcalendar.py:
+	Add workaround for an apparent Google Calendar bug.
+
 2009-04-01  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/scenario/steps/productionsteps.py:

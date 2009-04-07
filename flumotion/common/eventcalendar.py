@@ -713,5 +713,10 @@ def fromFile(file):
     @rtype: L{Calendar}
     """
     data = file.read()
+
+    # FIXME Google calendar recently started introducing things like
+    # CREATED:0000XXXXTXXXXXXZ, which means: created in year 0000
+    # this breaks the icalendar parsing code. Guard against that.
+    data = data.replace('\nCREATED:0000', '\nCREATED:2008')
     cal = icalendar.Calendar.from_string(data)
     return fromICalendar(cal)
