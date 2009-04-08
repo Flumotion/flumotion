@@ -75,7 +75,7 @@ class Command(util.LogCommand):
                  "(defaults to %s)" % default,
             default=default)
         self.parser.add_option('-T', '--transport',
-            action="store_true", dest="transport",
+            action="store", type="string", dest="transport",
             help="transport protocol to use (tcp/ssl) [default ssl]",
             default="ssl")
 

@@ -1,3 +1,9 @@
+2009-04-08  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/admin/command/main.py:
+	flumotion-command's transport parameter should expect an string
+	parameter but it was treated as a flag in the option parser.
+
 2009-04-07  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/eventcalendar.py:
