@@ -56,7 +56,7 @@
 
   <autotools id="flumotion">
     <branch repo="code.fluendo.com-flumotion"
-            module="flumotion" revision="../tags/flumotion-0.5.2" />
+            module="flumotion" revision="../tags/flumotion-0.5.3" />
     <dependencies>
       <dep package="gst-plugins-good" />
       <dep package="gst-python" />
