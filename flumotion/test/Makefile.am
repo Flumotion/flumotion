@@ -63,6 +63,7 @@ EXTRA_DIST = 					\
 	test_htpasswdcrypt.py			\
 	test_http.py				\
 	test_i18n.py				\
+	test_import.py				\
 	test_keycards.py			\
 	test_logfilter.py			\
 	test_manager_admin.py			\
