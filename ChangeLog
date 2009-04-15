@@ -1,5 +1,10 @@
 2009-04-15  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
+	* flumotion/test/test_import.py:
+        Import flumotion.admin.rrdmon only if rrdtool is installed.
+
+2009-04-15  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
 	* flumotion/test/Makefile.am:
 	* flumotion/test/test_import.py:
  	Add a test case that imports all flumotion modules.

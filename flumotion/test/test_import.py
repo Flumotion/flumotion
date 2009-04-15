@@ -48,6 +48,11 @@ class TestImport(testsuite.TestCase):
     def testImportAllModules(self):
         pkg_exclude = ['flumotion.test']
 
+        try:
+            import rrdtool
+        except ImportError:
+            pkg_exclude.append('flumotion.admin.rrdmon')
+
         for path in flumotion.__path__:
             for module in find_modules('flumotion', path, pkg_exclude):
                 __import__(module, globals(), locals())
