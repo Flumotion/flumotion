@@ -156,7 +156,7 @@ class Command(util.LogCommand):
 
     def connect(self, options):
         connection = connections.parsePBConnectionInfo(options.manager,
-                                               options.transport == 'ssl')
+           use_ssl=options.transport == 'ssl')
 
         # platform-3/trunk compatibility stuff to guard against
         # gratuitous changes

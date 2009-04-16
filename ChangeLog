@@ -1,3 +1,9 @@
+2009-04-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/command/main.py:
+	Make sure use_ssl gets passed to correct parameter! This fixes
+	connection to non ssl managers with flumotion-command.
+
 2009-04-16  Pedro Gracia  <pedro@flumotion.com>
 
 	reviewed by: Jan Urbanski  <jurbanski@flumotion.com> 
