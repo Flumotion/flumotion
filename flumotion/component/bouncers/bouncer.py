@@ -222,7 +222,7 @@ class Bouncer(component.BaseComponent):
             self.warning('keycard %r is not an allowed keycard class', keycard)
             return None
 
-        if not self.do_validation(keycard):
+        if not self.do_validate(keycard):
             self.warning('keycard %r is not a valid keycard instance', keycard)
             return None
 
@@ -252,7 +252,7 @@ class Bouncer(component.BaseComponent):
                     self.expireKeycardId(k.id)
         return len(self._keycards) > 0
 
-    def do_validation(self, keycard):
+    def do_validate(self, keycard):
         """
         Override to check keycards before authentication steps.
         Should return True if the keycard is valid, False otherwise.

@@ -1,6 +1,11 @@
 2009-04-16  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/bouncers/bouncer.py:
+	Rename on_validation to on_validate for real.
+
+2009-04-16  Sebastien Merle  <sebastien@fluendo.com>
+
+	* flumotion/component/bouncers/bouncer.py:
 	Removed a debug print, rename on_validation to on_validate
 	and added a comment on returning keycard with state REFUSED
 	when using authetication session.
