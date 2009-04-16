@@ -278,6 +278,10 @@ class Bouncer(component.BaseComponent):
 
         FIXME: Currently, a return value of 'None' is treated
         as rejecting the keycard. This is unintuitive.
+
+        FIXME: in fact, for authentication sessions like challenge/response,
+        returning a keycard with state REFUSED instead of None
+        will not work properly and may enter in an asynchronous infinit loop.
         """
         raise NotImplementedError("authenticate not overridden")
 
@@ -423,7 +427,6 @@ class Bouncer(component.BaseComponent):
                    getattr(keycard, 'ttl', None))
 
     def _expire(self):
-        print "X"*80
         if not self.do_expireKeycards(self._expirer.timeout):
             if self._expirer.running:
                 self.debug('no more keycards, removing timeout poller')

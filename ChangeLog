@@ -1,5 +1,14 @@
 2009-04-16  Sebastien Merle  <sebastien@fluendo.com>
 
+	* flumotion/component/bouncers/bouncer.py:
+	Removed a debug print, rename on_validation to on_validate
+	and added a comment on returning keycard with state REFUSED
+	when using authetication session.
+	* flumotion/test/test_component_bouncers_bouncer_authsession.py:
+	Use failIf and failUnless insteed of assertFalse and assertTrue.
+
+2009-04-16  Sebastien Merle  <sebastien@fluendo.com>
+
 	reviewed by: Arek, Zaheer
 
 	* flumotion/component/bouncers/bouncer.py:
