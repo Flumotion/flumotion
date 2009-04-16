@@ -1,3 +1,16 @@
+2009-04-16  Sebastien Merle  <sebastien@fluendo.com>
+
+	reviewed by: Arek, Zaheer
+
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_component_bouncers_bouncer_authsession.py:
+	* flumotion/test/test_component_bouncers_bouncer_authsession.py
+	  (added):
+	Added a helper bouncer for authentication sessions
+	like challenge/response. It provide a way to store and retrieve
+	data related to the session, and validate/cancel sessions.
+
 2009-04-16  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/command/main.py:

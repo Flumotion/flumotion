@@ -193,14 +193,23 @@ class Bouncer(component.BaseComponent):
         return isinstance(keycard, self.keycardClasses)
 
     def setEnabled(self, enabled):
+
+        def callAndPassthru(result, method, *args):
+            method(*args)
+            return result
+
         if not enabled and self.enabled:
             # If we were enabled and are being set to disabled, eject the warp
             # core^w^w^w^wexpire all existing keycards
             self.enabled = False
             self._expirer.stop()
-            return self.expireAllKeycards()
+            d = self.expireAllKeycards()
+            d.addCallback(callAndPassthru, self.on_disabled)
+            return d
         self.enabled = enabled
-        return defer.succeed(0)
+        d = defer.succeed(0)
+        d.addCallback(callAndPassthru, self.on_enabled)
+        return d
 
     def getEnabled(self):
         return self.enabled
@@ -208,16 +217,13 @@ class Bouncer(component.BaseComponent):
     def do_stop(self):
         return self.setEnabled(False)
 
-    def _expire(self):
-        for k in self._keycards.values():
-            if hasattr(k, 'ttl'):
-                k.ttl -= self._expirer.timeout
-                if k.ttl <= 0:
-                    self.expireKeycardId(k.id)
-
     def authenticate(self, keycard):
         if not self.typeAllowed(keycard):
             self.warning('keycard %r is not an allowed keycard class', keycard)
+            return None
+
+        if not self.do_validation(keycard):
+            self.warning('keycard %r is not a valid keycard instance', keycard)
             return None
 
         if self.enabled:
@@ -229,6 +235,37 @@ class Bouncer(component.BaseComponent):
             self.debug("Bouncer disabled, refusing authentication")
             return None
 
+    def do_expireKeycards(self, elapsed):
+        """
+        Override to expire keycards managed by sub-classes.
+
+        @param elapsed: time in second since the last expiration call.
+        @type elapsed: int
+        @returns: if there is more keycard to expire. If False is returned,
+                  the expirer poller MAY be stopped.
+        @rtype: bool
+        """
+        for k in self._keycards.values():
+            if hasattr(k, 'ttl'):
+                k.ttl -= elapsed
+                if k.ttl <= 0:
+                    self.expireKeycardId(k.id)
+        return len(self._keycards) > 0
+
+    def do_validation(self, keycard):
+        """
+        Override to check keycards before authentication steps.
+        Should return True if the keycard is valid, False otherwise.
+        #FIXME: This belong to the base bouncer class
+
+        @param keycard: the keycard that should be validated
+                        before authentication
+        @type keycard: flumotion.common.keycards.Keycard
+        @returns: True if the keycard is accepted, False otherwise
+        @rtype: bool
+        """
+        return True
+
     def do_authenticate(self, keycard):
         """
         Must be overridden by subclasses.
@@ -236,8 +273,11 @@ class Bouncer(component.BaseComponent):
         Authenticate the given keycard.
         Return the keycard with state AUTHENTICATED to authenticate,
         with state REQUESTING to continue the authentication process,
-        or None to deny the keycard, or a deferred which should have the same
-        eventual value.
+        or REFUSED to deny the keycard or a deferred which should
+        have the same eventual value.
+
+        FIXME: Currently, a return value of 'None' is treated
+        as rejecting the keycard. This is unintuitive.
         """
         raise NotImplementedError("authenticate not overridden")
 
@@ -251,6 +291,18 @@ class Bouncer(component.BaseComponent):
         """
         Override to cleanup sub-class specific data related to keycards.
         Called when the base bouncer has cleanup his references to a keycard.
+        """
+
+    def on_enabled(self):
+        """
+        Override to initialize sub-class specific data
+        when the bouncer is enabled.
+        """
+
+    def on_disabled(self):
+        """
+        Override to cleanup sub-class specific data
+        when the bouncer is disabled.
         """
 
     def hasKeycard(self, keycard):
@@ -285,11 +337,7 @@ class Bouncer(component.BaseComponent):
             self.log('immediately expiring keycard %r', keycard)
             return False
 
-        self._keycards[keycardId] = keycard
-        self.on_keycardAdded(keycard)
-
-        self.debug("added keycard with id %s, ttl %r", keycard.id,
-                   getattr(keycard, 'ttl', None))
+        self._addKeycard(keycard)
         return True
 
     def removeKeycard(self, keycard):
@@ -363,6 +411,210 @@ class Bouncer(component.BaseComponent):
         dl.addCallback(countExpirations, total)
         dl.addCallback(self._expireNextKeycardBlock, keycardIds, finished)
 
+    def _addKeycard(self, keycard):
+        """
+        Adds a keycard without checking.
+        Used by sub-class knowing what they do.
+        """
+        self._keycards[keycard.id] = keycard
+        self.on_keycardAdded(keycard)
+
+        self.debug("added keycard with id %s, ttl %r", keycard.id,
+                   getattr(keycard, 'ttl', None))
+
+    def _expire(self):
+        print "X"*80
+        if not self.do_expireKeycards(self._expirer.timeout):
+            if self._expirer.running:
+                self.debug('no more keycards, removing timeout poller')
+                self._expirer.stop()
+
+
+class AuthSessionBouncer(Bouncer):
+    """
+    I am a bouncer that handle pending authentication sessions.
+    I am storing the last keycard of an authenticating session.
+    """
+
+    def init(self):
+        # Keycards pending to be authenticated
+        self._sessions = {} # keycard id -> (ttl, data)
+
+    def on_disabled(self):
+        # Removing all pending authentication
+        self._sessions.clear()
+
+    def do_extractKeycardInfo(self, keycard, oldData):
+        """
+        Extracts session info from a keycard.
+        Used by updateAuthSession to store session info.
+        Must be overridden by subclasses.
+        """
+        raise NotImplementedError()
+
+    def hasAuthSession(self, keycard):
+        """
+        Tells if a keycard is related to a pending authentication session.
+        It basically check if the id of the keycard is known.
+
+        @param keycard: the keycard to check
+        @type keycard: flumotion.common.keycards.Keycard
+        @returns: if a pending authentication session associated
+                  with the specified keycard exists.
+
+        @rtype: bool
+        """
+        return (keycard.id is not None) and (keycard.id in self._sessions)
+
+    def getAuthSessionInfo(self, keycard):
+        """
+        @return: the last updated keycard for the authentication session
+                 associated with the specified keycard
+        @rtype: flumotion.common.keycards.Keycard or None
+        """
+        data = keycard.id and self._sessions.get(keycard.id, None)
+        return data and data[1]
+
+    def startAuthSession(self, keycard):
+        """
+        Starts an authentication session with a keycard.
+        The keycard id will be generated and set.
+        The session info will be extracted from the keycard
+        by calling the method do_extractKeycardInfo, and can
+        be retrieved by calling getAuthSessionInfo.
+
+        If a the keycard already have and id, and there is
+        an authentication session with this id, the session info
+        is updated from the keycard, and it return True.
+
+        @param keycard: the keycard to update from.
+        @type keycard: flumotion.common.keycards.Keycard
+        @return: if the bouncer accepts the keycard.
+        """
+        # Check if there is already an authentication session
+        if self.hasAuthSession(keycard):
+            # Updating the authentication session data
+            self._updateInfoFromKeycard(keycard)
+            return True
+
+        if keycard.id:
+            self.warning("keycard %r already has an id, but no "
+                         "authentication session", keycard)
+            keycard.state = keycards.REFUSED
+            return False
+
+        if hasattr(keycard, 'ttl') and keycard.ttl <= 0:
+            self.log('immediately expiring keycard %r', keycard)
+            keycard.state = keycards.REFUSED
+            return False
+
+        # Generate an id for the authentication session
+        keycardId = self.generateKeycardId()
+        keycard.id = keycardId
+
+        self._updateInfoFromKeycard(keycard)
+
+        self.debug("started authentication session with with id %s, ttl %r",
+                   keycard.id, getattr(keycard, 'ttl', None))
+        return True
+
+    def updateAuthSession(self, keycard):
+        """
+        Updates an authentication session with the last keycard.
+        The session info will be extracted from the keycard
+        by calling the method do_extractKeycardInfo, and can
+        be retrieved by calling getAuthSessionInfo.
+
+        @param keycard: the keycard to update from.
+        @type keycard: flumotion.common.keycards.Keycard
+        """
+        # Check if there is already an authentication session
+        if self.hasAuthSession(keycard):
+            # Updating the authentication session data
+            self._updateInfoFromKeycard(keycard)
+        else:
+            keycard.state = keycards.REFUSED
+
+    def cancelAuthSession(self, keycard):
+        """
+        Cancels the authentication session associated
+        with the specified keycard.
+        Used when doing challenge/response authentication.
+        @raise KeyError: when there is no session associated with the keycard.
+        """
+        keycard.state = keycards.REFUSED
+        del self._sessions[keycard.id]
+
+    def confirmAuthSession(self, keycard):
+        """
+        Confirms the authentication session represented
+        by the specified keycard is authenticated.
+        This will add the specified keycard to the
+        bouncer keycard list like addKeycard would do
+        but without changing the keycard id.
+        The authentication session data is cleaned up.
+
+        If the bouncer already have a keycard with the same id,
+        the authentication is confirmed but the bouncer keycard
+        is NOT updated. FIXME: is it what we want ? ? ?
+
+        @param keycard: the keycard to add to the bouncer list.
+        @type keycard: flumotion.common.keycards.Keycard
+        @return: if the bouncer accepts the keycard.
+        """
+        keycardId = keycard.id
+
+        if keycardId not in self._sessions:
+            self.warning("unknown authentication session, or pending keycard "
+                         "expired for id %s", keycardId)
+            keycard.state = keycards.REFUSED
+            return False
+
+        del self._sessions[keycardId]
+
+        # Check if there already an authenticated keycard with the same id
+        if keycardId in self._keycards:
+            self.debug("confirming an authentication session we already "
+                       "know about with id %s", keycardId)
+            keycard.state = keycards.AUTHENTICATED
+            return True
+
+        # check if the keycard already expired
+        if hasattr(keycard, 'ttl') and keycard.ttl <= 0:
+            self.log('immediately expiring keycard %r', keycard)
+            keycard.state = keycards.REFUSED
+            return False
+
+        keycard.state = keycards.AUTHENTICATED
+        self._addKeycard(keycard)
+        return True
+
+    def updateAuthSessionInfo(self, keycard, data):
+        """
+        Updates the authentication session data.
+        Can be used bu subclasses to modify the data directly.
+        """
+        ttl, _oldData = self._sessions.get(keycard.id, (None, None))
+        if ttl is None:
+            ttl = getattr(keycard, 'ttl', None)
+        self._sessions[keycard.id] = (ttl, data)
+
+    def do_expireKeycards(self, elapsed):
+        cont = Bouncer.do_expireKeycards(self, elapsed)
+        for id, (ttl, data) in self._sessions.items():
+            if ttl is not None:
+                ttl -= elapsed
+                self._sessions[id] = (ttl, data)
+                if ttl <= 0:
+                    del self._sessions[id]
+
+        return cont and len(self._sessions) > 0
+
+    def _updateInfoFromKeycard(self, keycard):
+        oldData = self.getAuthSessionInfo(keycard)
+        newData = self.do_extractKeycardInfo(keycard, oldData)
+        self.updateAuthSessionInfo(keycard, newData)
+
 
 class TrivialBouncer(Bouncer):
     """
@@ -374,14 +626,14 @@ class TrivialBouncer(Bouncer):
     keycardClasses = (keycards.KeycardGeneric, )
 
     def do_authenticate(self, keycard):
-        if not self.addKeycard(keycard):
+        if self.addKeycard(keycard):
+            keycard.state = keycards.AUTHENTICATED
+        else:
             keycard.state = keycards.REFUSED
-            return keycard
-        keycard.state = keycards.AUTHENTICATED
         return keycard
 
 
-class ChallengeResponseBouncer(Bouncer):
+class ChallengeResponseBouncer(AuthSessionBouncer):
     """
     A base class for Challenge-Response bouncers
     """
@@ -400,36 +652,47 @@ class ChallengeResponseBouncer(Bouncer):
         self._db[user] = salt
         self._checker.addUser(user, *args)
 
+    def do_extractKeycardInfo(self, keycard, oldData):
+        return getattr(keycard, 'challenge', None)
+
     def _requestAvatarIdCallback(self, PossibleAvatarId, keycard):
+        if not self.hasAuthSession(keycard):
+            # The session expired
+            keycard.state = keycards.REFUSED
+            return None
+
         # authenticated, so return the keycard with state authenticated
-        keycard.state = keycards.AUTHENTICATED
-        self.addKeycard(keycard)
         if not keycard.avatarId:
             keycard.avatarId = PossibleAvatarId
         self.info('authenticated login of "%s"' % keycard.avatarId)
         self.debug('keycard %r authenticated, id %s, avatarId %s' % (
             keycard, keycard.id, keycard.avatarId))
-
+        self.confirmAuthSession(keycard)
+        keycard.state = keycards.AUTHENTICATED
         return keycard
 
     def _requestAvatarIdErrback(self, failure, keycard):
+        if not self.hasAuthSession(keycard):
+            # The session expired
+            keycard.state = keycards.REFUSED
+            return None
+
         failure.trap(errors.NotAuthenticatedError)
         # FIXME: we want to make sure the "None" we return is returned
         # as coming from a callback, ie the deferred
-        self.removeKeycard(keycard)
         self.info('keycard %r refused, Unauthorized' % keycard)
+        self.cancelAuthSession(keycard)
+        keycard.state = keycards.REFUSED
         return None
 
     def do_authenticate(self, keycard):
-        # at this point we add it so there's an ID for challenge-response
-        if not self.addKeycard(keycard):
-            keycard.state = keycards.REFUSED
-            return keycard
-
-        # check if the keycard is ready for the checker, based on the type
         if isinstance(keycard, self.challengeResponseClasses):
             # Check if we need to challenge it
-            if not keycard.challenge:
+            if not self.hasAuthSession(keycard):
+                if not self.startAuthSession(keycard):
+                    # Keycard refused right away
+                    keycard.state = keycards.REFUSED
+                    return None
                 self.debug('putting challenge on keycard %r' % keycard)
                 keycard.challenge = credentials.cryptChallenge()
                 if keycard.username in self._db:
@@ -441,20 +704,26 @@ class ChallengeResponseBouncer(Bouncer):
                     md.update(string)
                     keycard.salt = md.hexdigest()[:2]
                     self.debug("user not found, inventing bogus salt")
-                self.debug("salt %s, storing challenge for id %s" % (
-                    keycard.salt, keycard.id))
-                # we store the challenge locally to verify against tampering
-                self._challenges[keycard.id] = keycard.challenge
+                self.debug("salt %s, storing challenge for id %s"
+                           % (keycard.salt, keycard.id))
+                self.updateAuthSession(keycard)
                 return keycard
-
-            if keycard.response:
+            else:
                 # Check if the challenge has been tampered with
-                if self._challenges[keycard.id] != keycard.challenge:
-                    self.removeKeycard(keycard)
-                    self.info('keycard %r refused, challenge tampered with' %
-                        keycard)
+                challenge = self.getAuthSessionInfo(keycard)
+                if challenge != keycard.challenge:
+                    self.info('keycard %r refused, challenge tampered with'
+                              % keycard)
+                    self.cancelAuthSession(keycard)
+                    keycard.state = keycards.REFUSED
                     return None
-                del self._challenges[keycard.id]
+        else:
+            # Not a challenge/response authentication.
+            # creating a temporary session to have a keycard id
+            if not self.startAuthSession(keycard):
+                # Keycard refused right away
+                keycard.state = keycards.REFUSED
+                return None
 
         # use the checker
         self.debug('submitting keycard %r to checker' % keycard)
