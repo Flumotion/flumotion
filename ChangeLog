@@ -1,3 +1,11 @@
+2009-04-16  Pedro Gracia  <pedro@flumotion.com>
+
+	reviewed by: Jan Urbanski  <jurbanski@flumotion.com> 
+
+	* flumotion/monitor/nagios/main.py:
+	* flumotion/monitor/nagios/stream.py:
+	Store dumps if nagios check fails testing and check bouncer status too.
+
 2009-04-15  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	* flumotion/test/test_import.py:

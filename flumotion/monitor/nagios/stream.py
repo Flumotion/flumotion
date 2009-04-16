@@ -10,29 +10,63 @@
 # the Free Software Foundation.
 # This file is distributed without any warranty; without even the implied
 # warranty of merchantability or fitness for a particular purpose.
-# See "LICENSE.GPL" in the source distribution for more information.
+# See 'LICENSE.GPL' in the source distribution for more information.
 
 # Licensees having purchased or holding a valid Flumotion Advanced
 # Streaming Server license may use this file in accordance with the
 # Flumotion Advanced Streaming Server Commercial License Agreement.
-# See "LICENSE.Flumotion" in the source distribution for more information.
+# See 'LICENSE.Flumotion' in the source distribution for more information.
 
 # Headers in this file shall remain intact.
 
-"""
+'''
 check streams for flumotion-nagios
-"""
+'''
 from urllib2 import urlopen, URLError
 import urlparse
+import os
 import re
 import time
+import sys
+import md5
+import sha
 import gst
 import gobject
-
-from flumotion.common import log
+import tempfile
+from datetime import datetime
+from twisted.internet import reactor, defer
+from flumotion.common import log, errors, keycards
 from flumotion.monitor.nagios import util
+from flumotion.admin.connections import parsePBConnectionInfoRecent
+from flumotion.admin import admin
 
-URLFINDER = 'http://[^\s"]*' # to search urls in playlists
+URLFINDER = "http://[^\s']*" # to search urls in playlists
+PLAYLIST_SUFIX = ('m3u', 'asx') # extensions for playlists
+TIMEOUT = 5 # timeout in seconds
+DIR = '/var/tmp/flumotion/'
+
+CHECKS = {'videowidth': 'video_width',
+          'videoheight': 'video_height',
+          'videoframerate': 'video_framerate',
+          'videopar': 'video_pixel-aspect-ratio',
+          'videomimetype': 'video_mime',
+          'videomimetype': 'video_mime',
+          'audiosamplerate': 'audio_rate',
+          'audiochannels': 'audio_channels',
+          'audiowidth': 'audio_width',
+          'audiodepth': 'audio_depth',
+          'audiomimetype': 'audio_mime'}
+
+
+def gen_timed_link(relative_path, secret_key, timeout, type):
+    start_time = '%08x' % (time.time() - 10)
+    stop_time = '%08x' % (time.time() + int(timeout))
+    hashable = secret_key + relative_path + start_time + stop_time
+    if type == 'md5':
+        hash = md5.md5(hashable).hexdigest()
+    else:
+        hash = sha.sha(hashable).hexdigest()
+    return '%s%s%s' % (hash, start_time, stop_time)
 
 
 def getURLFromPlaylist(url):
@@ -48,399 +82,150 @@ def getURLFromPlaylist(url):
         raise util.NagiosCritical('No URLs into the playlist.')
 
 
-class Check(util.LogCommand):
-    """Main class to perform the stream checks"""
+class CheckBase(util.LogCommand):
+    '''Main class to perform the stream checks'''
     description = 'Check stream.'
-    usage = 'check [options] url'
+    usage = '[options] url'
 
     def __init__(self, parentCommand=None, **kwargs):
-        """Initial values and pipeline setup"""
+        '''Initial values and pipeline setup'''
         self._expectAudio = False
         self._expectVideo = False
         self._playlist = False
         self._url = None
         self._streamurl = None
-
+        self.managerDeferred = defer.Deferred()
+        self.model = None
+        self.path = ''
+        self.tmpfile = ''
+        self.token = ''
         util.LogCommand.__init__(self, parentCommand, **kwargs)
-
-    def addOptions(self):
-        """Command line options"""
-        # video options
-        self.parser.add_option('-W', '--videowidth',
-            action="store", dest="videowidth",
-            help='Video width')
-        self.parser.add_option('-H', '--videoheight',
-            action="store", dest="videoheight",
-            help='Video height')
-        self.parser.add_option('-F', '--videoframerate',
-            action="store", dest="videoframerate",
-            help='Video framerate (fraction)')
-        self.parser.add_option('-P', '--videopar',
-            action="store", dest="videopar",
-            help='Video pixel aspect ratio (fraction)')
-        self.parser.add_option('-M', '--videomimetype',
-            action="store", dest="videomimetype",
-            help='Mime type of the encoded video')
-
-        # audio options
-        self.parser.add_option('-s', '--audiosamplerate',
-            action="store", dest="audiosamplerate",
-            help='Audio sample rate')
-        self.parser.add_option('-c', '--audiochannels',
-            action="store", dest="audiochannels",
-            help='Audio channels')
-        self.parser.add_option('-w', '--audiowidth',
-            action="store", dest="audiowidth",
-            help='Audio width')
-        self.parser.add_option('-d', '--audiodepth',
-            action="store", dest="audiodepth",
-            help='Audio depth')
-        self.parser.add_option('-m', '--audiomimetype',
-            action="store", dest="audiomimetype",
-            help='Mime type of the encoded audio')
-
-        # general options
-        self.parser.add_option('-D', '--duration',
-            action="store", dest="duration", default='5',
-            help='Minimum duration of decoded data (default 5 seconds)')
-        self.parser.add_option('-t', '--timeout',
-            action="store", dest="timeout", default='10',
-            help='Number of seconds before timing out and failing '
-                '(default 10 seconds)')
-        self.parser.add_option('-p', '--playlist',
-            action="store_true", dest="playlist",
-            help='is a playlist')
-        self.parser.add_option('', '--allow-resource-error-read',
-            action="store_true", dest="allow_resource_error_read",
-            help='Return OK when the resource cannot be read. '
-                 'This option will go away in the future.')
 
     def handleOptions(self, options):
         self.options = options
 
-    def critical(self, message):
-        return util.critical('%s: %s' % (self._url, message))
+    def addOptions(self):
+        '''Command line options'''
+        # video options
+        self.parser.add_option('-W', '--videowidth',
+            action='store', dest='videowidth',
+            help='Video width')
+        self.parser.add_option('-H', '--videoheight',
+            action='store', dest='videoheight',
+            help='Video height')
+        self.parser.add_option('-F', '--videoframerate',
+            action='store', dest='videoframerate',
+            help='Video framerate (fraction)')
+        self.parser.add_option('-P', '--videopar',
+            action='store', dest='videopar',
+            help='Video pixel aspect ratio (fraction)')
+        self.parser.add_option('-M', '--videomimetype',
+            action='store', dest='videomimetype',
+            help='Mime type of the encoded video')
+
+        # audio options
+        self.parser.add_option('-s', '--audiosamplerate',
+            action='store', dest='audiosamplerate',
+            help='Audio sample rate')
+        self.parser.add_option('-c', '--audiochannels',
+            action='store', dest='audiochannels',
+            help='Audio channels')
+        self.parser.add_option('-w', '--audiowidth',
+            action='store', dest='audiowidth',
+            help='Audio width')
+        self.parser.add_option('-d', '--audiodepth',
+            action='store', dest='audiodepth',
+            help='Audio depth')
+        self.parser.add_option('-m', '--audiomimetype',
+            action='store', dest='audiomimetype',
+            help='Mime type of the encoded audio')
+
+        # general options
+        self.parser.add_option('-T', '--timestamp',
+            action='store', dest='timestamp',
+            help='Check if timestamp is higher that this value.')
+        self.parser.add_option('-D', '--duration',
+            action='store', dest='duration', default='5',
+            help='Minimum duration of decoded data (default 5 seconds)')
+        self.parser.add_option('-t', '--timeout',
+            action='store', dest='timeout', default='10',
+            help='Number of seconds before timing out and failing '
+                '(default 10 seconds)')
+        self.parser.add_option('-p', '--playlist',
+            action='store_true', dest='playlist',
+            help='is a playlist')
+        self.parser.add_option('', '--manager',
+            dest='manager', default='user:test@localhost:7531',
+            help='the manager connection string, in the form '
+                 '[username[:password]@]host:port (defaults to '
+                 'user:test@localhost:7531)')
+        self.parser.add_option('', '--bouncer',
+            action='store', dest='bouncer', help='bouncer path')
+        self.parser.add_option('', '--ip',
+            action='store', dest='ip', default='195.10.10.36',
+            help='IP used to create the keycard [default 195.10.10.36]')
+        self.parser.add_option('', '--transport',
+            action='store', dest='transport', default='ssl',
+            help='transport protocol to use (tcp/ssl) [default ssl]')
 
     def do(self, args):
-        """Check URL and perfom the stream check"""
+        '''Check URL, IP and perfom the stream check'''
         if not args:
             return self.critical('Please specify the url to check the '
             'stream/playlist.')
 
-        self._url = args[0]
         # Check url and get path from it
+        self._url = args[0]
         try:
             parse = urlparse.urlparse(self._url)
         except ValueError:
-            return self.critical("URL isn't valid.")
+            return self.critical('URL isn\'t valid.')
         if parse[0] != 'http':
             return self.critical('URL type is not valid.')
+        self.path = parse[2]
+
+        # use unique names for stream dumps
+        if len(self.path) <= 1:
+            self.path='unknown'
+        elif self.path[0] == '/':
+            self.path = self.path[1:]
+        slug=self.path.replace('/', '_')
+        tmpfile = '%s-%s' % (datetime.now().strftime('%Y%m%dT%H%M%S'), slug)
+        tmp = os.path.join(DIR, tmpfile)
+        if os.path.exists(tmp):
+            counter = 1
+            while not counter:
+                newtmpfile = '%s.%i' % (tmpfile, counter)
+                tmp = os.path.join(DIR, tmpfile)
+                if os.path.exists(tmp):
+                    counter = False
+                counter += 1
+        self.tmpfile = tmp
+
+        # Check for a valid IPv4 address with numbers and dots
+        ip = self.options.ip.split('.')
+        result = True
+        try:
+            result = len(ip) == 4 and all(0 <= int(x) < 256 for x in ip)
+        except ValueError:
+            return self.critical('URL type is not valid.')
+        if not result:
+            return self.critical('URL type is not valid.')
+
+        if self.options.bouncer:
+            result = self.connect(self.options)
+            reactor.run()
+            if reactor.exitStatus != 0:
+                sys.exit(reactor.exitStatus)
 
         # Simple playlist detection
-        if self._url.endswith('.m3u') or self._url.endswith('.asx'):
+        if not self.options.playlist and self._url[-3:] in PLAYLIST_SUFIX:
+            self._url = getURLFromPlaylist(self._url)
             self.options.playlist = True
-
         # If it is a playlist, take the correct URL
-        if self.options.playlist:
-            self._streamurl = getURLFromPlaylist(self._url)
-        else:
-            self._streamurl = self._url
+        elif self.options.playlist:
+            self._url = getURLFromPlaylist(self._url)
 
-        result = self.checkStream()
-        return result
-
-    def checkStream(self):
-        """Launch the pipeline and compare values with the expecteds"""
-        self.debug('checking url %s', self._streamurl)
-        gstinfo = GSTInfo(self.options, self._streamurl)
-        self.debug('checked url %s', self._streamurl)
-        self._playlist = gstinfo.isPlaylist()
-        if self._playlist:
-            self._streamurl = getURLFromPlaylist(self._streamurl)
-            gstinfo = GSTInfo(self.options, self._streamurl)
-
-        gsterror = gstinfo.getGStreamerError()
-        if gsterror:
-            if gsterror.domain == 'gst-resource-error-quark':
-                if gsterror.code == gst.RESOURCE_ERROR_OPEN_READ:
-                    # a 401 gives a RESOURCE READ error with gnomevfssrc;
-                    # for now, treat it as OK
-                    # FIXME: instead, this check should be able to crosscheck
-                    # with the bouncer
-                    if self.options.allow_resource_error_read:
-                        return self.ok("Cannot read the resource, "
-                            "but OK according to options")
-                    else:
-                        return self.critical("GStreamer error: %s" %
-                            gsterror.message)
-            else:
-                return self.critical("GStreamer error: %s" %
-                    gsterror.message)
-        gstinfo.checkStream()
-
-
-class GSTInfo(log.Loggable):
-    """
-    Get info from a given URL using a gstreamer pipeline.
-
-    @param timeout:  maximum actual runtime before timing out
-    @param duration: the minimum duration of decoded data to get in the timeout
-                     interval
-    @param url:      the url of the stream/playlist
-    """
-
-    # FIXME: duration is interpreted wrong in this object.
-    # Instead, what should happen is:
-    # for each kind of decoded stream, save the first decoded buffer timestamp
-    # keep checking buffer timestamps + offsets
-    # as soon as each stream has duration's worth of decoded data, this
-    # object can return a value
-
-    def __init__(self, options, url):
-        self._expectAudio = False
-        self._expectVideo = False
-        self._isAudio = False
-        self._isVideo = False
-        self._error = False
-        self._last = False
-        self.options = options
-        timeout = int(options.timeout)
-        duration = int(options.duration)
-        gobject.timeout_add(timeout * 1000, self.endTimeout)
-        self._duration = duration
-        self._url = url
-
-        # it's fine to not have any of them and then have pipeline parsing
-        # fail trying to use the last option
-        for factory in ['gnomevfssrc', 'neonhttpsrc', 'souphttpsrc']:
-            try:
-                gst.element_factory_make(factory)
-                break
-            except gst.PluginNotFoundError:
-                pass
-
-        _pipeline = '%s name=httpsrc ! ' \
-                    'typefind name=typefinder ! ' \
-                    'decodebin name=decoder ! ' \
-                    'fakesink' % factory
-
-        self._counter = 0 # counter to track the playing state
-        self._gsterror = None
-        self._playlist = False
-        self._timeout = True
-        self._startime = time.time()
-        self._running = 0
-        self._pipeline = gst.parse_launch(_pipeline)
-        self.elements = dict((e.get_name(), e) for e in \
-                                              self._pipeline.elements())
-        bus = self._pipeline.get_bus()
-        bus.add_watch(self.busWatch)
-        self.elements['httpsrc'].set_property('location', url)
-        self._pipeline.set_state(gst.STATE_PLAYING)
-
-        self.handleOptions()
-        self.run()
-
-    def run(self):
-        self._mainloop = gobject.MainLoop()
-        self._mainloop.run()
-        #self.checkStream()
-
-    def getGStreamerError(self):
-        return self._gsterror
-
-    def isPlaylist(self):
-        return self._playlist
-
-    def quit(self):
-        self._running = time.time() - self._startime
-        self._mainloop.quit()
-
-    def busWatch(self, bus, message):
-        """Capture messages in pipeline bus"""
-        self.log('busWatch: message %r, type %r', message, message.type)
-        if message.type == gst.MESSAGE_EOS:
-            self.info('busWatch: eos')
-            self._pipeline.set_state(gst.STATE_NULL)
-        elif message.type == gst.MESSAGE_ELEMENT:
-            s = message.structure
-            if s.get_name() == 'missing-plugin':
-                caps = s['detail']
-                if caps[0].get_name() == 'text/uri-list':
-                    # we don't have a plug-in but we know it's a playlist
-                    self.info('text/uri-list but missing plugin')
-                    self._playlist = True
-            self.quit()
-        elif message.type == gst.MESSAGE_ERROR:
-            self._gsterror = message.parse_error()[0]
-            domain = self._gsterror.domain
-            code = self._gsterror.code
-            if domain == 'gst-stream-error-quark':
-                if code == 5: #gst.STREAM_ERROR_CODEC_NOT_FOUND:
-                    if 'text' in self._gsterror.message:
-                        self._playlist = True
-            self.quit()
-        elif message.type == gst.MESSAGE_STATE_CHANGED:
-            new = message.parse_state_changed()[1]
-            if message.src == self._pipeline and new == gst.STATE_PLAYING:
-                result = self.checkStream()
-                if result == 0:
-                    self._timeout = False
-                    self._last = True
-                    gobject.timeout_add(1000, self.isPlaying)
-                else:
-                    self.quit()
-        return True
-
-    def isPlaying(self):
-        """Check the stream is playing every second"""
-        ret, cur, pen = self._pipeline.get_state()
-        if ret == gst.STATE_CHANGE_SUCCESS and cur == gst.STATE_PLAYING:
-            self._counter += 1
-            if self._counter == self._duration:
-                self.quit()
-        return True
-
-    def endTimeout(self):
-        """End of time to do the check"""
-        if self._timeout:
-            self.quit()
-
-    def checkStream(self):
-        """Check stream properties"""
-        for i in self.elements['typefinder'].src_pads():
-            caps = i.get_caps()
-            if caps == 'ANY' or not caps:
-                return self.critical("The stream has no caps.")
-
-        # loop through all elements in the decoder bin, finding the actual
-        # decoders
-        for element in self.elements['decoder']:
-            for pad in element.src_pads():
-                caps = pad.get_caps()
-                name = caps[0].get_name()
-                if name.startswith('audio/x-raw-'):
-                    ret = self._verifyAudioOptions(element, caps)
-                    if ret:
-                        return ret
-                if name.startswith('video/x-raw-'):
-                    ret = self._verifyVideoOptions(element, caps)
-                    if ret:
-                        return ret
-
-        # is audio and/or video missing?
-        if self._expectAudio != self._isAudio:
-            if self._expectAudio:
-                return self.critical('Expected audio, but no audio in stream')
-            else:
-                return self.critical('Did not expect audio, '
-                    'but audio in stream')
-        if self._expectVideo != self._isVideo:
-            if self._expectVideo:
-                return self.critical('Expected video, but no video in stream')
-            else:
-                return self.critical('Did not expect video, '
-                    'but video in stream')
-
-        if self._expectAudio and self._expectVideo:
-            return self.ok('Got %i seconds of audio and video in '
-            '%.2f seconds of runtime.' % (self._counter, self._running))
-        elif self._expectAudio:
-            return self.ok('Got %i seconds of audio in '
-            '%.2f seconds of runtime.' % (self._counter, self._running))
-        elif self._expectVideo:
-            return self.ok('Got %i seconds of video in '
-            '%.2f seconds of runtime.' % (self._counter, self._running))
-        else:
-            # There was no audio or video, and no options were given to check.
-            # Still, this is probably an error on the nagios user's part.
-            return self.critical("The stream does not have audio or video.")
-
-    def _verifyAudioOptions(self, element, caps):
-        self.debug('verifying audio options against element %r with caps %s',
-            element, caps.to_string())
-        # match the audio options against the given element and src caps
-        self._isAudio = True
-        if self.options.audiomimetype:
-            # mime type should be gotten from the sink pad of the encoder
-            mime = None
-            for pad in element.sink_pads():
-                mime = pad.get_caps()[0].get_name()
-
-            if self.options.audiomimetype != mime:
-                return self.critical(
-                    'Audio mime type fail: EXPECTED: %s, ACTUAL: %s' % (
-                        self.options.audiomimetype, mime))
-
-        if self.options.audiosamplerate:
-            if int(self.options.audiosamplerate) != caps[0]['rate']:
-                return self.critical(
-                    'Audio sample rate fail: EXPECTED: %s, ACTUAL: %s' % (
-                        self.options.audiosamplerate, caps[0]['rate']))
-
-        if self.options.audiowidth:
-            if int(self.options.audiowidth) != caps[0]['width']:
-                return self.critical(
-                    'Audio width fail: EXPECTED: %s, ACTUAL: %s' % (
-                        self.options.audiowidth, caps[0]['width']))
-
-        if self.options.audiodepth:
-            if int(self.options.audiodepth) != caps[0]['depth']:
-                return self.critical(
-                    'Audio depth fail: EXPECTED: %s, ACTUAL: %s' % (
-                        self.options.audiodepth, caps[0]['depth']))
-
-        if self.options.audiochannels:
-            if int(self.options.audiochannels) != caps[0]['channels']:
-                return self.critical(
-                    'Audio channels fail: EXPECTED: %s, ACTUAL: %s' % (
-                        self.options.audiochannels, caps[0]['channels']))
-
-    def _verifyVideoOptions(self, element, caps):
-        self.debug('verifying video options against element %r with caps %s',
-            element, caps.to_string())
-        # match the video options against the given element and src caps
-        self._isVideo = True
-
-        if self.options.videomimetype:
-            # mime type should be gotten from the sink pad of the encoder
-            mime = None
-            for pad in element.sink_pads():
-                mime = pad.get_caps()[0].get_name()
-            if self.options.videomimetype != mime:
-                return self.critical(
-                    'Video mime type fail: EXPECTED: %s, ACTUAL: %s' % (
-                        self.options.videomimetype, mime))
-
-        if self.options.videowidth:
-            if int(self.options.videowidth) != caps[0]['width']:
-                return self.critical(
-                    'Video width fail: EXPECTED: %s, ACTUAL: %s' % (
-                        self.options.videowidth, caps[0]['width']))
-
-        if self.options.videoheight:
-            if int(self.options.videoheight) != caps[0]['height']:
-                return self.critical(
-                    'Video height fail: EXPECTED: %s, ACTUAL: %s' % (
-                        self.options.videoheight, caps[0]['height']))
-
-        if self.options.videoframerate:
-            value = caps[0]['framerate']
-            if self.options.videoframerate != '%i/%i' % \
-                (value.num, value.denom):
-                return self.critical(
-                    'Video framerate fail: EXPECTED: %s, ACTUAL: %i/%i' % (
-                        self.options.videoframerate, value.num, value.denom))
-
-        if self.options.videopar:
-            value = caps[0]['pixel-aspect-ratio']
-            if self.options.videopar != '%i/%i' % \
-                (value.num, value.denom):
-                return self.critical(
-                    'Video height fail: EXPECTED: %s, ACTUAL: %i/%i' % (
-                        self.options.videopar, value.num, value.denom))
-
-    def handleOptions(self):
         # Determine if this stream would have audio/video
         if self.options.videowidth or self.options.videoheight or \
            self.options.videoframerate or self.options.videopar or \
@@ -451,13 +236,297 @@ class GSTInfo(log.Loggable):
            self.options.audiomimetype:
             self._expectAudio = True
 
+        # Add token only if we need it
+        if self.token:
+            self._url += '?token=%s' % self.token
+
+        result = self.checkStream()
+        return result
+
+    def checkStream(self):
+        '''Check stream'''
+        i = GstInfo(self._url, self.options, self.tmpfile)
+        isAudio, isVideo, info, error = i.run()
+
+        # is there an error?
+        if error:
+            return self.critical('GStreamer error: %s' % error[1])
+
+        # is audio and/or video missing?
+        if self._expectAudio != isAudio:
+            if self._expectAudio:
+                msg = 'Expected audio, but no audio in stream'
+                return self.critical(msg)
+            else:
+                msg = 'Did not expect audio, but audio in stream'
+                return self.critical(msg)
+        if self._expectVideo != isVideo:
+            if self._expectVideo:
+                msg = 'Expected video, but no video in stream'
+                return self.critical(msg)
+            else:
+                msg = 'Did not expect video, but video in stream'
+                return self.critical(msg)
+
+        # then we check options
+        for i in CHECKS:
+            expected = getattr(self.options, i)
+            if expected:
+                current = info[CHECKS[i]]
+                if str(current) != expected:
+                    return self.critical(
+                        '%s fail: EXPECTED: %s, ACTUAL: %s' %
+                        (i, expected, current))
+        return self.ok('Got %s seconds of audio and video.' %
+            self.options.duration)
+
     def critical(self, message):
-        if not self._error:
-            self._error = True
-            return util.critical('%s: %s' % (self._url, message))
-        return -1
+        return util.critical('%s: %s [dump at %s]' %
+            (self._url, message, self.tmpfile))
 
     def ok(self, message):
-        if self._last:
-            return util.ok('%s: %s' % (self._url, message))
-        return 0
+        # remove tempfile with the stream if all goes ok
+        os.remove(self.tmpfile)
+        return util.ok('%s: %s' % (self._url, message))
+
+    def unknown(self, message):
+        return util.unknown('%s: %s [dump at %s]' %
+            (self._url, message, self.tmpfile))
+
+    def connect(self, options):
+        # code from main.py in this directory
+
+        def _connectedCb(model):
+            self.model = model
+            self.debug('Connected to manager.')
+            planet = model.planet
+            components = planet.get('atmosphere').get('components')
+            for c in components:
+                ctype = c.get('type')
+                # check if this component is a bouncer
+                if 'bouncer' in ctype:
+                    if c.get('name') == self.options.bouncer:
+                        self.check_bouncer(c, ctype)
+
+        def _connectedEb(failure):
+            reactor.stop()
+            if failure.check(errors.ConnectionFailedError):
+                return self.unknown('Unable to connect to manager.')
+            if failure.check(errors.ConnectionRefusedError):
+                return self.critical('Manager refused connection.')
+
+        connection = parsePBConnectionInfoRecent(options.manager,
+                                                 options.transport == 'ssl')
+
+        # platform-3/trunk compatibility stuff
+        try:
+            # platform-3
+            self.adminModel = admin.AdminModel(connection.authenticator)
+            self.debug('code is platform-3')
+            d = self.adminModel.connectToHost(connection.host, \
+                connection.port, not connection.use_ssl)
+        except TypeError:
+            # trunk
+            self.adminModel = admin.AdminModel()
+            self.debug('code is trunk')
+            d = self.adminModel.connectToManager(connection)
+        except:
+            self.debug('error connecting with manager')
+
+        d.addCallback(_connectedCb)
+        d.addErrback(_connectedEb)
+
+    def check_bouncer(self, component, ctype):
+        pass
+
+
+class Check(CheckBase):
+
+    def check_bouncer(self, component, ctype):
+
+        def authenticate(result):
+            self.authenticate = result
+
+        def noauthenticate(result):
+            util.critical('Error: %s' % result)
+            reactor.stop()
+
+        def success(result):
+            self.enabled = result # True or False from bouncer status
+
+        def failure(result):
+            util.critical('Error: %s' % result)
+            reactor.stop()
+
+        # Read config and get correct properties for each bouncers
+        properties = component.get('config')['properties']
+        if 'ical' in ctype:
+            workername = component.get('workerName')
+            ical_schedule = properties['ical_schedule']
+            k = keycards.KeycardGeneric()
+        else:
+            k = keycards.KeycardGeneric()
+
+        e = self.model.callRemote('componentCallRemote',
+            component, 'getEnabled')
+        e.addErrback(failure)
+        e.addCallback(success)
+
+        f = self.model.callRemote('componentCallRemote',
+            component, 'authenticate', k)
+        f.addErrback(noauthenticate)
+        f.addCallback(authenticate)
+
+
+class GstInfo:
+    video = None
+    audio = None
+    audio_ts = None
+    video_ts = None
+    have_audio = False
+    have_video = False
+    video_done = False
+    audio_done = False
+    info = {}
+    error = None
+
+    def __init__(self, uri, options, tmpfile):
+        # it's fine to not have any of them and then have pipeline parsing
+        # fail trying to use the last option
+        for factory in ['gnomevfssrc', 'neonhttpsrc', 'souphttpsrc']:
+            try:
+                gst.element_factory_make(factory)
+                break
+            except gst.PluginNotFoundError:
+                pass
+        PIPELINE = '%s name=input ! tee name = t ! \
+            queue ! decodebin name=dbin t. ! \
+            queue ! filesink location=%s' % (factory, tmpfile)
+
+        self.options = options
+        self.mainloop = gobject.MainLoop()
+        self.pipeline = gst.parse_launch(PIPELINE)
+        self.input = self.pipeline.get_by_name('input')
+        self.input.props.location = uri
+        self.dbin = self.pipeline.get_by_name('dbin')
+        self.bus = self.pipeline.get_bus()
+        self.bus.add_watch(self.onBusMessage)
+        self.dbin.connect('new-decoded-pad', self.demux_pad_added)
+
+    def run(self):
+        self.pipeline.set_state(gst.STATE_PLAYING)
+        #duration
+        pads = None
+        if self.video:
+            pads = self.video.sink_pads()
+        elif self.audio:
+            pads = self.audio.sink_pads()
+
+        self.mainloop.run()
+        return self.have_audio, self.have_video, self.info, self.error
+
+    def launch_eos(self):
+        if self.have_audio and self.have_video:
+            if self.audio_done and self.video_done:
+                self.bus.post(gst.message_new_eos(self.pipeline))
+        else:
+            if self.audio_done or self.video_done:
+                self.bus.post(gst.message_new_eos(self.pipeline))
+
+    def get_audio_info_cb(self, sink, buffer, pad):
+        '''Callback to get audio info'''
+        timestamp = buffer.timestamp / gst.SECOND
+        if not self.audio_ts:
+            self.audio_ts = timestamp
+        if (self.audio_ts + TIMEOUT) < timestamp:
+            # get audio info
+            caps = sink.sink_pads().next().get_negotiated_caps()
+            for s in caps:
+                for i in s.keys():
+                    self.info['audio_%s' % i] = s[i]
+            self.audio.disconnect(self.audio_cb)
+            self.audio_done = True
+            self.launch_eos()
+
+    def get_video_info_cb(self, sink, buffer, pad):
+        '''Callback to get video info'''
+        timestamp = buffer.timestamp / gst.SECOND
+        if not self.video_ts:
+            self.video_ts = timestamp
+        if (self.video_ts + TIMEOUT) < timestamp:
+            # get video info
+            caps = sink.sink_pads().next().get_negotiated_caps()
+            for s in caps:
+                for i in s.keys():
+                    if i in ('pixel-aspect-ratio', 'framerate'):
+                        self.info['video_%s' % i] = '%d:%d' % \
+                        (s[i].num, s[i].denom)
+                    elif i == 'format':
+                        self.info['video_%s' % i] = s[i].fourcc
+                    else:
+                        self.info['video_%s' % i] = s[i]
+            self.video.disconnect(self.video_cb)
+            self.video_done = True
+            self.launch_eos()
+
+    def get_mime(self):
+        '''Inspect source pads from decodebin to get mime info'''
+        mime = None
+        for e in self.dbin:
+            for pad in e.src_pads():
+                pad_template = pad.get_pad_template()
+                if pad_template:
+                    type = pad_template.name_template
+                    if type in ('audio', 'video'):
+                        caps = pad.get_caps()
+                        mime = caps[0].get_name()
+                        self.info['%s_mime' % type] = mime
+        if not mime: # get last type from last loop
+            caps = pad.get_caps()
+            mime = caps[0].get_name()
+            if self.have_audio:
+                self.info['audio_mime'] = mime
+            else:
+                self.info['video_mime'] = mime
+
+    def demux_pad_added(self, element, pad, bool):
+        '''Add fake sink to get demux info'''
+        caps = pad.get_caps()
+        structure = caps[0]
+        stream_type = structure.get_name()
+        if stream_type.startswith('video'):
+            self.have_video = True
+            colorspace = gst.element_factory_make('ffmpegcolorspace')
+            self.pipeline.add(colorspace)
+            colorspace.set_state(gst.STATE_PLAYING)
+            pad.link(colorspace.get_pad('sink'))
+            self.video = gst.element_factory_make('fakesink')
+            self.video.props.signal_handoffs = True
+            self.pipeline.add(self.video)
+            self.video.set_state(gst.STATE_PLAYING)
+            colorspace.link(self.video)
+            self.video_cb = self.video.connect('handoff',
+                self.get_video_info_cb)
+        elif stream_type.startswith('audio'):
+            self.have_audio = True
+            self.audio = gst.element_factory_make('fakesink')
+            self.audio.props.signal_handoffs = True
+            self.pipeline.add(self.audio)
+            self.audio.set_state(gst.STATE_PLAYING)
+            pad.link(self.audio.get_pad('sink'))
+            self.audio_cb = self.audio.connect('handoff',
+                self.get_audio_info_cb)
+
+    def quit(self):
+        self.get_mime()
+        self.pipeline.set_state(gst.STATE_NULL)
+        self.pipeline.get_state()
+        self.mainloop.quit()
+
+    def onBusMessage(self, bus, message):
+        if message.src == self.pipeline and message.type == gst.MESSAGE_EOS:
+            self.quit()
+        elif message.type == gst.MESSAGE_ERROR:
+            self.error = message.parse_error()
+            self.mainloop.quit()
+        return True

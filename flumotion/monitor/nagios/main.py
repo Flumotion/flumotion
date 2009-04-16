@@ -29,7 +29,7 @@ from twisted.internet import reactor, defer
 
 from flumotion.common import common, errors, planet, log
 from flumotion.admin.connections import parsePBConnectionInfoRecent
-from flumotion.admin import  admin
+from flumotion.admin import admin
 
 from flumotion.monitor.nagios import util, process, stream, log as nlog
 
