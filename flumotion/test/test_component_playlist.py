@@ -21,6 +21,7 @@
 
 import time
 import tempfile
+import gst
 
 from twisted.trial import unittest
 
@@ -31,6 +32,7 @@ from flumotion.common import testsuite
 
 class FakeProducer(object):
     position = -1
+    pipeline = gst.Pipeline()
 
     def scheduleItem(self, item):
         return item
