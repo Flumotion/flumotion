@@ -22,10 +22,9 @@
 import time
 
 import gst
-import gobject
 from twisted.internet import defer, reactor
 
-from flumotion.common import errors, messages, log, fxml
+from flumotion.common import messages, fxml
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.base import watcher
@@ -89,6 +88,7 @@ def file_gnl_src(name, uri, caps, start, duration, offset, priority):
     gnlsrc.props.media_start = offset
     gnlsrc.props.media_duration = duration
     gnlsrc.props.priority = priority
+    gnlsrc.props.caps = caps
     gnlsrc.add(src)
 
     return gnlsrc
@@ -175,8 +175,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             # For each of audio, video, we build a pipeline that looks roughly
             # like:
             #
-            # gnlcomposition ! identity single-segment=true !
-            #    audio/video-elements ! identity sync=true ! sink
+            # gnlcomposition ! identity sync=true !
+            # identity single-segment=true ! audio/video-elements ! sink
 
             composition = gst.element_factory_make("gnlcomposition",
                 mediatype + "-composition")
@@ -194,7 +194,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 self.debug("Pad added, linking")
                 pad.link(target)
             composition.connect('pad-added', _padAddedCb,
-                segmentidentity.get_pad("sink"))
+                syncidentity.get_pad("sink"))
+            syncidentity.link(segmentidentity)
 
             if mediatype == 'audio':
                 self.audiocomp = composition
@@ -203,9 +204,12 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 self.videocomp = composition
                 srcpad = self._buildVideoPipeline(pipeline, segmentidentity)
 
-            srcpad.link(syncidentity.get_pad('sink'))
+            feedername = self.feeders[mediatype].elementName
+            #FIXME: rethink how we expose the feeder pipeline strings
+            feederchunk = \
+              feedcomponent.ParseLaunchComponent.FEEDER_TMPL \
+              % {'name': feedername}
 
-            feederchunk = self.get_feeder_template(mediatype)
             binstr = "bin.("+feederchunk+" )"
             self.debug("Parse for media composition is %s", binstr)
 
@@ -215,7 +219,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             bin.add_pad(ghostpad)
 
             pipeline.add(bin)
-            syncidentity.get_pad('src').link(ghostpad)
+            srcpad.link(ghostpad)
 
         return pipeline
 

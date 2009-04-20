@@ -1,3 +1,16 @@
+2009-04-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	Remove unused imports.
+	Set filtercaps on gnlsource.
+	Move identity sync=true before identity single-segment=true.
+	Hack to expose feeder template.
+	* flumotion/component/producers/playlist/playlistparser.py:
+	position used is in terms of clock time, not in terms of
+	running time
+	* flumotion/component/producers/playlist/singledecodebin.py:
+	Update to later version.
+
 2009-04-16  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/bouncers/bouncer.py:

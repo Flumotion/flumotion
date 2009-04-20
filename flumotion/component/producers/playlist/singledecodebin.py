@@ -33,6 +33,73 @@ import gst
 __version__ = "$Rev$"
 
 
+def find_upstream_demuxer_and_pad(pad):
+    while pad:
+        if pad.props.direction == gst.PAD_SRC \
+                and isinstance(pad, gst.GhostPad):
+            pad = pad.get_target()
+            continue
+
+        if pad.props.direction == gst.PAD_SINK:
+            pad = pad.get_peer()
+            continue
+
+        element = pad.get_parent()
+        if isinstance(element, gst.Pad):
+            # pad is a proxy pad
+            element = element.get_parent()
+
+        if element is None:
+            pad = None
+            continue
+
+        element_factory = element.get_factory()
+        element_klass = element_factory.get_klass()
+
+        if 'Demuxer' in element_klass:
+            return element, pad
+
+        sink_pads = list(element.sink_pads())
+        if len(sink_pads) > 1:
+            if element_factory.get_name() == 'multiqueue':
+                pad = element.get_pad(pad.get_name().replace('src', 'sink'))
+            else:
+                raise Exception('boom!')
+
+        elif len(sink_pads) == 0:
+            pad = None
+        else:
+            pad = sink_pads[0]
+
+    return None, None
+
+
+def get_type_from_decoder(decoder):
+    log.debug("stream", "%r" % decoder)
+    klass = decoder.get_factory().get_klass()
+    parts = klass.split('/', 2)
+    if len(parts) != 3:
+        return None
+
+    return parts[2].lower()
+
+
+def get_pad_id(pad):
+    lst = []
+    while pad:
+        demuxer, pad = find_upstream_demuxer_and_pad(pad)
+        if (demuxer, pad) != (None, None):
+            lst.append([demuxer.get_factory().get_name(), pad.get_name()])
+
+            # FIXME: we always follow back the first sink
+            try:
+                pad = list(demuxer.sink_pads())[0]
+            except IndexError:
+                pad = None
+
+    return lst
+
+
 def is_raw(caps):
     """ returns True if the caps are RAW """
     rep = caps.to_string()
@@ -44,24 +111,30 @@ def is_raw(caps):
 
 
 class SingleDecodeBin(gst.Bin):
+    """
+    A variant of decodebin.
+
+    * Only outputs one stream
+    * Doesn't contain any internal queue
+    """
+
+    QUEUE_SIZE = 1 * gst.SECOND
 
     __gsttemplates__ = (
-        gst.PadTemplate("sinkpadtemplate",
-                        gst.PAD_SINK,
-                        gst.PAD_ALWAYS,
-                        gst.caps_new_any()),
-        gst.PadTemplate("srcpadtemplate",
-                        gst.PAD_SRC,
-                        gst.PAD_SOMETIMES,
-                        gst.caps_new_any()))
+        gst.PadTemplate("sinkpadtemplate", gst.PAD_SINK, gst.PAD_ALWAYS,
+                         gst.caps_new_any()),
+        gst.PadTemplate("srcpadtemplate", gst.PAD_SRC, gst.PAD_SOMETIMES,
+                         gst.caps_new_any()))
 
-    def __init__(self, caps=None, uri=None, *args, **kwargs):
+    def __init__(self, caps=None, uri=None, stream=None, *args, **kwargs):
         gst.Bin.__init__(self, *args, **kwargs)
+
         if not caps:
             caps = gst.caps_new_any()
         self.caps = caps
-        self.typefind = gst.element_factory_make(
-            "typefind", "internal-typefind")
+        self.stream = stream
+        self.typefind = gst.element_factory_make("typefind",
+            "internal-typefind")
         self.add(self.typefind)
 
         self.uri = uri
@@ -101,18 +174,17 @@ class SingleDecodeBin(gst.Bin):
         by rank
         """
 
-        def myfilter(fact):
+        def _myfilter(fact):
             if fact.get_rank() < 64:
                 return False
             klass = fact.get_klass()
-            if not ("Demuxer" in klass or
-                    "Decoder" in klass or
-                    "Parse" in klass):
+            if not ("Demuxer" in klass or "Decoder" in klass \
+                or "Parse" in klass):
                 return False
             return True
         reg = gst.registry_get_default()
-        res = [x for x in reg.get_feature_list(gst.ElementFactory)
-                     if myfilter(x)]
+        res = [x for x in reg.get_feature_list(gst.ElementFactory) \
+            if _myfilter(x)]
         res.sort(lambda a, b: int(b.get_rank() - a.get_rank()))
         return res
 
@@ -155,9 +227,8 @@ class SingleDecodeBin(gst.Bin):
                 else:
                     dynamic = True
             else:
-                self.log(
-                    "Template %s is a request pad, ignoring" %
-                    pad.name_template)
+                self.log("Template %s is a request pad, ignoring" % (
+                    pad.name_template))
 
         if dynamic:
             self.debug("%s is a dynamic element" % element.get_name())
@@ -165,6 +236,34 @@ class SingleDecodeBin(gst.Bin):
 
         for pad in to_connect:
             self._closePadLink(element, pad, pad.get_caps())
+
+    def _isDemuxer(self, element):
+        if not 'Demux' in element.get_factory().get_klass():
+            return False
+
+        potential_src_pads = 0
+        for template in element.get_pad_template_list():
+            if template.direction != gst.PAD_SRC:
+                continue
+
+            if template.presence == gst.PAD_REQUEST or \
+                    "%" in template.name_template:
+                potential_src_pads += 2
+                break
+            else:
+                potential_src_pads += 1
+
+        return potential_src_pads > 1
+
+    def _plugDecodingQueue(self, pad):
+        queue = gst.element_factory_make("queue")
+        queue.props.max_size_time = self.QUEUE_SIZE
+        self.add(queue)
+        queue.sync_state_with_parent()
+        pad.link(queue.get_pad("sink"))
+        pad = queue.get_pad("src")
+
+        return pad
 
     def _tryToLink1(self, source, pad, factories):
         """
@@ -175,12 +274,16 @@ class SingleDecodeBin(gst.Bin):
         self.debug("source:%s, pad:%s , factories:%r" % (source.get_name(),
                                                          pad.get_name(),
                                                          factories))
+
+        if self._isDemuxer(source):
+            pad = self._plugDecodingQueue(pad)
+
         result = None
         for factory in factories:
             element = factory.create()
             if not element:
-                self.warning(
-                    "weren't able to create element from %r" % factory)
+                self.warning("weren't able to create element from %r" % (
+                    factory))
                 continue
 
             sinkpad = element.get_pad("sink")
@@ -188,6 +291,7 @@ class SingleDecodeBin(gst.Bin):
                 continue
 
             self.add(element)
+            element.set_state(gst.STATE_READY)
             try:
                 pad.link(sinkpad)
             except:
@@ -218,7 +322,9 @@ class SingleDecodeBin(gst.Bin):
         if caps.is_any():
             self.log("type is not know yet, waiting")
             return
-        if caps.intersect(self.caps):
+
+        if caps.intersect(self.caps) and (self.stream is None or
+                (self.stream.pad_id == get_pad_id(pad))):
             # This is the desired caps
             if not self._srcpad:
                 self._wrapUp(element, pad)
@@ -247,7 +353,7 @@ class SingleDecodeBin(gst.Bin):
             return
         self._markValidElements(element)
         self._removeUnusedElements(self.typefind)
-        self.log("ghosting pad %s" % pad.get_name)
+        self.log("ghosting pad %s" % pad.get_name())
         self._srcpad = gst.GhostPad("src", pad)
         self._srcpad.set_active(True)
         self.add_pad(self._srcpad)
@@ -270,7 +376,7 @@ class SingleDecodeBin(gst.Bin):
         """
         Remove unused elements connected to srcpad(s) of element
         """
-        self.log("element:%s" % element)
+        self.log("element:%r" % element)
         for pad in element.src_pads():
             if pad.is_linked():
                 peer = pad.get_peer().get_parent()
@@ -296,8 +402,7 @@ class SingleDecodeBin(gst.Bin):
     def do_change_state(self, transition):
         self.debug("transition:%r" % transition)
         res = gst.Bin.do_change_state(self, transition)
-        if transition in [gst.STATE_CHANGE_PAUSED_TO_READY,
-                          gst.STATE_CHANGE_READY_TO_NULL]:
+        if transition == gst.STATE_CHANGE_PAUSED_TO_READY:
             self._cleanUp()
         return res
 

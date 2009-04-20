@@ -63,20 +63,21 @@ class Playlist(object, log.Loggable):
 
         self.producer = producer
 
-    def _findItem(self, position):
-        # Get the item that corresponds to position, or None
+    def _findItem(self, timePosition):
+        # timePosition is the position in terms of the clock time
+        # Get the item that corresponds to timePosition, or None
         cur = self.items
         while cur:
-            if cur.timestamp < position and \
-                    cur.timestamp + cur.duration > position:
+            if cur.timestamp < timePosition and \
+                    cur.timestamp + cur.duration > timePosition:
                 return cur
-            if cur.timestamp > position:
+            if cur.timestamp > timePosition:
                 return None # fail without having to iterate over everything
             cur = cur.next
         return None
 
     def _getCurrentItem(self):
-        position = self.producer.getCurrentPosition()
+        position = self.producer.pipeline.get_clock().get_time()
         item = self._findItem(position)
         self.debug("Item %r found as current for playback position %d",
             item, position)
@@ -90,6 +91,10 @@ class Playlist(object, log.Loggable):
 
         items = self._itemsById[piid]
         for item in items:
+            self.debug("removeItems: item %r ts: %d", item, item.timestamp)
+            if current:
+                self.debug("current ts: %d current dur: %d",
+                    current.timestamp, current.duration)
             if (current and item.timestamp < current.timestamp +
                     current.duration):
                 self.debug("Not removing current item!")
@@ -272,7 +277,7 @@ class PlaylistParser(object, log.Loggable):
     def _discoverPending(self):
 
         def _discovered(disc, is_media):
-            self.debug("Discovered!")
+            self.debug("Discovered! is media: %d", is_media)
             reactor.callFromThread(_discoverer_done, disc, is_media)
 
         def _discoverer_done(disc, is_media):
