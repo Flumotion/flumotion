@@ -100,7 +100,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
             m = messages.Warning(
                 T_(N_("The 'videomixer' GStreamer element has a bug since "
                       "version (0.10.10) resulting in no overlay. "
-                      "The bug should be fixed in version 0.10.12. Please "
+                      "The bug should be fixed in a future version. Please "
                       "disregard this warning if you can see the overlay.")),
                 mid="videomixer-overlay-bug")
             self.addMessage(m)
