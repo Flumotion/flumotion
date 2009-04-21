@@ -1,4 +1,66 @@
-This is Flumotion 0.5.3 "Ovella Negra"
+This is Flumotion 0.5.4 "EAT"
+        
+Features since 0.5.3:
+    
+  * You can now configure your ondemand flows to force displaying
+    a file download dialog when the user browses to the media URL,
+    instead of relying on the web browser handling of the file.
+
+  * The assistant displays more precise and user-friendly
+    messages and is more thorough in checking for the correct
+    working environment for your flow. It's also capable of
+    presenting a list of connected FireWire cameras allowing
+    you to choose any of them.
+
+Bugs fixed since 0.5.3:
+    
+  * 604 : [gtk admin] UI bug showing volume widget in completely the wrong place
+  * 710 : in the wizard, selecting alsa sound card for a device you don'th ave permissions for gives a GStreamer error, not permission denied.
+  * 829 : Unify keyframe spacing encoding property
+  * 891 : smoke wizard glade has settings but wizard step doesn't use them
+  * 898 : wizard should tell you when it is checking worker capability
+  * 910 : wizard produces firewire flow with wrong (rounded?) fps
+  * 947 : Add a apache logger option to the httpstreamer/httpserver wizard page
+  * 949 : at the wizard, firewire audio can be configured when firewire video is not selected
+  * 970 : Clean up framerate/fraction mess in the wizard
+  * 995 : Check for porter mount point collissions
+  * 1026 : problems with component tooltips in component list
+  * 1036 : worker name in component view should be handled differently
+  * 1063 : fix firewire messages for new firewire stack
+  * 1073 : If a lost component exists, the wizard fails to erase the previous stream
+  * 1100 : Tell the user that if he's in doubt, chose the default options
+  * 1104 : flumotion-admin wizard: "Demand" page should use a button
+  * 1125 : flumotion-admin: Consumption: Forward is disbled for Save To Disk
+  * 1126 : flumotion-admin: Back/Forward adds duplicates to left-hand list
+  * 1128 : flumotion-admin: disker: "Record on startup" checkbox is ignored
+  * 1135 : flumotion-admin: Firewire Video: Bad defaults
+  * 1138 : flumotion-admin handles authentication problems badly
+  * 1142 : models.py:742 ComponentValidationError: encoder component encoder-audio must have at least one feeder
+  * 1145 : flumotion-admin: Exports a hostname of "None" in http-server properties
+  * 1152 : Rename norwegian bokmål translation
+  * 1170 : bug filer widget files bugs with the component wrong
+  * 1176 : not clear how muxers should name their eaters
+  * 1178 : No such method: remote_scheduleRecordings when selecting a iCal file using disker with the GUI
+  * 1179 : Block or delete the "Start new manager and connect to it" option from the Flumotion Admin' Greeter on windows
+  * 1183 : Firewire wizard page should let the user choose between all the available cameras
+  * 1187 : On Demand's file selector browses the local directories instead of the worker's ones
+  * 1207 : Sound card wizard page does not block the froward button while probing the device nor when probe failed
+  * 1208 : soundcard audio-producer's 'Volume' tab crashes
+  * 1209 : The 'Statistics' tab of http-streamer component offers a wrong url to the user
+  * 1210 : The text of the checkbox from the adminwindow's Volume tab is not fully clear
+  * 1230 : RRD plug does not log Long values
+  * 1231 : Multiple porters should be created when the streamers are on different workers
+  * 1232 : The HTTP Streaming wizard step should be deleted or replaced
+  * 1236 : Admin window updates the componentview even when the selected component is the same as before
+  * 1244 : http cached provider sends truncated files
+  * 1245 : mimetypes.py:126 TypeError: gnomevfs.mime_get_default_application() argument 1 must be string, not None
+  * 1253 : New encoders added to an existing flow with a firewire-producer cannot feed from the producer
+  * 1255 : fileprovider-localcached has a race condition when calculating cache usage
+  * 1256 : ratecontroller-fixed has a race condition when the producer gets deregistered while there's pending data to send to the client.
+  * 1257 : http-ondemand has a race condition when the consumer goes away while we're waiting for data to be read asynchronously
+  * 1268 : eventcalendar supports EXDATE (and should know that)
+  * 1269 : eventcalendar interprets the RECURRENCE-ID incorrectly
+  * 1274 : Firewire check doesn't specify the video pad and it fails occasionally when obtaining the negotiated caps
 
 Features since 0.5.2:
 

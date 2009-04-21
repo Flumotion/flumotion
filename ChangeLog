@@ -1,3 +1,13 @@
+=== release 0.5.4 ===
+
+2009-04-21  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* NEWS:
+	* RELEASE:
+	* configure.ac:
+	* flumotion.doap:
+	Releasing 0.5.4 "EAT".
+
 2009-04-21  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/admin/gtk/dialogs.py:

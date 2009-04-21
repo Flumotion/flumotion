@@ -279,4 +279,14 @@ it.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.5.3.tar.bz2" />
   </Version>
  </release>
+
+ <release>
+  <Version>
+   <revision>0.5.4</revision>
+   <branch>0.5</branch>
+   <name>EAT</name>
+   <created>2009-04-21</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.5.4.tar.bz2" />
+  </Version>
+ </release>
 </Project>
