@@ -182,6 +182,7 @@ class AboutDialog(gtk.Dialog):
                    'Pedro Gracia Fajardo',
                    'Arek Korbik',
                    'Julien Le Goff',
+                   'Xavier Martinez',
                    'Jordi Massaguer Pla',
                    'Zaheer Abbas Merali',
                    'Sébastien Merle',

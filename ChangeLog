@@ -1,5 +1,10 @@
 2009-04-21  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/admin/gtk/dialogs.py:
+	Update the list of authors.
+
+2009-04-21  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/converters/overlay/overlay.py:
 	Change the warning text, gst-plugins-good are still buggy.
 
