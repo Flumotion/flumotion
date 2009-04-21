@@ -180,7 +180,7 @@ def check1394(mid, guid):
         return result
 
     pipeline = \
-        'dv1394src name=source guid=%s ! dvdemux name=demux ! fakesink' % guid
+        'dv1394src guid=%s ! dvdemux name=demux .video ! fakesink' % guid
 
     d = do_element_check(pipeline, 'demux', do_check)
 
