@@ -1,3 +1,9 @@
+2009-04-23  Pedro Gracia  <pedro@flumotion.com>
+
+	* flumotion/monitor/nagios/stream.py:
+	Fixed a dependency of python2.5 checking ips.
+	Fallback to get always video and audio mime types.
+
 2009-04-21  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* configure.ac:

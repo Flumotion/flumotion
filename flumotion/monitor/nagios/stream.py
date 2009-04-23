@@ -202,17 +202,14 @@ class CheckBase(util.LogCommand):
                 counter += 1
         self.tmpfile = tmp
 
-        # Check for a valid IPv4 address with numbers and dots
-        ip = self.options.ip.split('.')
-        result = True
-        try:
-            result = len(ip) == 4 and all(0 <= int(x) < 256 for x in ip)
-        except ValueError:
-            return self.critical('URL type is not valid.')
-        if not result:
-            return self.critical('URL type is not valid.')
-
         if self.options.bouncer:
+            # Check for a valid IPv4 address with numbers and dots
+            parts = self.options.ip.split('.')
+            if len(parts) != 4:
+                return self.critical('URL type is not valid.')
+            for item in parts:
+                if not 0 <= int(item) <= 255:
+                    return self.critical('URL type is not valid.')
             result = self.connect(self.options)
             reactor.run()
             if reactor.exitStatus != 0:
@@ -486,7 +483,7 @@ class GstInfo:
             mime = caps[0].get_name()
             if self.have_audio:
                 self.info['audio_mime'] = mime
-            else:
+            if self.have_video:
                 self.info['video_mime'] = mime
 
     def demux_pad_added(self, element, pad, bool):
