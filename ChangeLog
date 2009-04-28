@@ -1,3 +1,8 @@
+2009-04-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	Subtract basetime from timestamp when adjusting gnlsources.
+
 2009-04-23  Pedro Gracia  <pedro@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:

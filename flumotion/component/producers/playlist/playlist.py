@@ -348,12 +348,12 @@ class PlaylistProducer(feedcomponent.FeedComponent):
     def adjustItemScheduling(self, item):
         if self._hasVideo and item.hasVideo:
             vsrc = self._vsrcs[item]
-            vsrc.props.start = item.timestamp
+            vsrc.props.start = item.timestamp - self.basetime
             vsrc.props.duration = item.duration
             vsrc.props.media_duration = item.duration
         if self._hasAudio and item.hasAudio:
             asrc = self._asrcs[item]
-            asrc.props.start = item.timestamp
+            asrc.props.start = item.timestamp - self.basetime
             asrc.props.duration = item.duration
             asrc.props.media_duration = item.duration
 
