@@ -1,3 +1,14 @@
+2009-04-29  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Allow some feeders to be in pipeline, outputting a warning
+	log message if it happens.
+	Needed for single stream playlist producer to continue
+	functioning.
+	* flumotion/component/producers/playlist/playlistparser.py:
+	Set discoveredDuration to be correct when there is no
+	video or no audio in media file.
+
 2009-04-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/playlist/playlist.py:

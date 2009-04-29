@@ -184,9 +184,12 @@ class FeedComponent(basecomponent.BaseComponent):
 
         for feeder in self.feeders.values():
             element = pipeline.get_by_name(feeder.elementName)
-            element.connect('client-fd-removed', client_fd_removed,
-                            feeder)
-            self.debug("Connected to client-fd-removed on %r", feeder)
+            if element:
+                element.connect('client-fd-removed', client_fd_removed,
+                                feeder)
+                self.debug("Connected to client-fd-removed on %r", feeder)
+            else:
+                self.warning("No feeder %s in pipeline", feeder.elementName)
 
     def get_pipeline(self):
         return self.pipeline
