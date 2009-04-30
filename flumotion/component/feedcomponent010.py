@@ -343,6 +343,10 @@ class FeedComponent(basecomponent.BaseComponent):
                 # We do this because we know gdppay/gdpdepay screw up on 2nd
                 # newsegments (unclear what the original reason for this
                 # was, perhaps #349204)
+                # Other elements might also have problems with repeated
+                # newsegments coming in, so we just drop them all. Flumotion
+                # operates in single segment space, so dropping newsegments
+                # should be fine.
                 if getattr(eater, '_gotFirstNewSegment', False):
                     self.info("Subsequent new segment event received on "
                               "depay on eater %s", eater.eaterAlias)
@@ -355,9 +359,8 @@ class FeedComponent(basecomponent.BaseComponent):
         self.debug('adding event probe for eater %s', eater.eaterAlias)
         fdsrc = self.get_element(eater.elementName)
         fdsrc.get_pad("src").add_event_probe(fdsrc_event)
-        if gstreamer.get_plugin_version('gdp') < (0, 10, 10, 1):
-            depay = self.get_element(eater.depayName)
-            depay.get_pad("src").add_event_probe(depay_event)
+        depay = self.get_element(eater.depayName)
+        depay.get_pad("src").add_event_probe(depay_event)
 
     def _setup_pipeline(self):
         self.debug('setup_pipeline()')

@@ -1,3 +1,13 @@
+2009-04-30  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/feedcomponent010.py:
+	Drop all newsegment events except the first one in the gdp
+	depayloader. Some components have problems when they see a second
+	newsegment event coming in and Flumotion does not deal with newsegments
+	in any special way anyway.
+	Fixes #1278.
+	See also #1277.
+
 2009-04-30  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/config.py:
