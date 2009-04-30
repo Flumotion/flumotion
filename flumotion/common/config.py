@@ -157,8 +157,8 @@ def buildPlugsSet(plugsList, sockets):
     for plugType, propertyList in plugsList:
         plug = ConfigEntryPlug(plugType, propertyList)
         if plug.socket not in ret:
-            raise ConfigError("Unsupported socket type: %s"
-                              % (plug.socket, ))
+            raise ConfigError("Unsupported socket type: %s (not in list %s)"
+                              % (plug.socket, ", ".join(ret)))
         ret[plug.socket].append(plug.config)
     return ret
 

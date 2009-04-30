@@ -1,3 +1,9 @@
+2009-04-30  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/config.py:
+	  Show a list of allowed sockets when the socket type is
+	  unsupported.
+
 2009-04-29  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/feedcomponent010.py:
