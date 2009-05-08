@@ -32,16 +32,13 @@ BORDER = 4
 FONT_SIZE = 22
 
 
-def generateOverlay(filename,
-                    text,
+def generateOverlay(text,
                     showFlumotion,
                     showCC,
                     showXiph,
                     width, height):
     """Generate an transparent image with text + logotypes rendered on top
     of it suitable for mixing into a video stream
-    @param filename: name of the filename to generate
-    @type filename: str
     @param text: text to put in the top left corner
     @type text: str
     @param showFlumotion: if we should show the flumotion logo
@@ -54,8 +51,8 @@ def generateOverlay(filename,
     @type width: int
     @param height: height of the image to generate
     @type height: int
-    @returns: if images or if text overflowed
-    @rtype: 2 sized tuple of booleans
+    @returns: raw image and if images or if text overflowed
+    @rtype: 3 sized tuple of string and 2 booleans
     """
     from PIL import Image
     from PIL import ImageDraw
@@ -95,12 +92,9 @@ def generateOverlay(filename,
         if textWidth > width:
             textOverflowed = True
 
-    if os.path.exists(filename):
-        os.unlink(filename)
+    buf = image.tostring()
 
-    image.save(filename, 'png')
-
-    return imagesOverflowed, textOverflowed
+    return buf, imagesOverflowed, textOverflowed
 
 if __name__ == '__main__':
-    generateOverlay('test.png', 'Testing', True, True, True, 128, 196)
+    print generateOverlay('Testing', True, True, True, 128, 196)[0]

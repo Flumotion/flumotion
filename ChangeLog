@@ -1,3 +1,14 @@
+2009-05-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Arek
+
+	* flumotion/admin/gtk/overlaystep.py:
+	* flumotion/component/converters/overlay/genimg.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	Make overlay use appsrc or a python src element if appsrc is
+	not available.
+	Fixes #1275
+
 2009-04-30  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/feedcomponent010.py:

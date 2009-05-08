@@ -162,7 +162,7 @@ class OverlayStep(WorkerWizardStep):
         self.wizard.waitForTask('overlay')
         # first check elements
         d = self.wizard.checkElements(
-            self.worker, 'pngenc', 'ffmpegcolorspace', 'videomixer')
+            self.worker, 'ffmpegcolorspace', 'videomixer')
         d.addCallback(checkElements)
 
     # Callbacks
