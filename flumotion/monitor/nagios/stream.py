@@ -456,7 +456,7 @@ class GstInfo:
             for s in caps:
                 for i in s.keys():
                     if i in ('pixel-aspect-ratio', 'framerate'):
-                        self.info['video_%s' % i] = '%d:%d' % \
+                        self.info['video_%s' % i] = '%d/%d' % \
                         (s[i].num, s[i].denom)
                     elif i == 'format':
                         self.info['video_%s' % i] = s[i].fourcc
@@ -470,21 +470,21 @@ class GstInfo:
         '''Inspect source pads from decodebin to get mime info'''
         mime = None
         for e in self.dbin:
-            for pad in e.src_pads():
-                pad_template = pad.get_pad_template()
-                if pad_template:
-                    type = pad_template.name_template
-                    if type in ('audio', 'video'):
-                        caps = pad.get_caps()
-                        mime = caps[0].get_name()
-                        self.info['%s_mime' % type] = mime
-        if not mime: # get last type from last loop
-            caps = pad.get_caps()
-            mime = caps[0].get_name()
+            # only check demuxer source pad
+            if "Demuxer" in e.get_factory().get_klass():
+                for pad in e.src_pads():
+                    caps = pad.get_caps()
+                    mime = caps[0].get_name()
+                    if "audio" in mime:
+                        self.info['audio_mime'] = mime
+                    elif "video" in mime:
+                        self.info['video_mime'] = mime
+
+        if not mime: # unknown
             if self.have_audio:
-                self.info['audio_mime'] = mime
+                self.info['audio_mime'] = "Unknown"
             if self.have_video:
-                self.info['video_mime'] = mime
+                self.info['video_mime'] = "Unknown"
 
     def demux_pad_added(self, element, pad, bool):
         '''Add fake sink to get demux info'''

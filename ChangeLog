@@ -1,5 +1,13 @@
 2009-05-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/monitor/nagios/stream.py:
+	Fix mimetype detection to not randomly look for src pads
+	with template name "audio" or "video", instead to find the
+	demuxer and look at its src pads and their caps.
+	Also make fractions output as x/y not x:y.
+
+2009-05-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	reviewed by: Arek
 
 	* flumotion/admin/gtk/overlaystep.py:
