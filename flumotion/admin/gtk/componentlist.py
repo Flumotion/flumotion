@@ -245,34 +245,47 @@ class ComponentList(log.Loggable, gobject.GObject):
         componentsSorted.sort(cmp=componentSort)
 
         for component in componentsSorted:
-            self.debug('adding component %r to listview' % component)
-            component.addListener(self, set_=self.stateSet)
-
-            titer = self._model.append()
-            self._iters[component] = titer
-
-            mood = component.get('mood')
-            self.debug('component has mood %r' % mood)
-            messages = component.get('messages')
-            self.debug('component has messages %r' % messages)
-
-            if mood != None:
-                self._setMoodValue(titer, mood)
-
-            self._model.set(titer, COL_STATE, component)
-            componentName = getComponentLabel(component)
-            self._model.set(titer, COL_NAME, componentName)
-
-            pid = component.get('pid')
-            self._model.set(titer, COL_PID, (pid and str(pid)) or '')
-
-            self._updateWorker(titer, component)
-            if (componentNameToSelect is not None and
-                componentName == componentNameToSelect):
-                selection = self._view.get_selection()
-                selection.select_iter(titer)
+            self.appendComponent(component, componentNameToSelect)
 
         self.debug('updated components view')
+
+    def appendComponent(self, component, componentNameToSelect):
+        self.debug('adding component %r to listview' % component)
+        component.addListener(self, set_=self.stateSet)
+
+        titer = self._model.append()
+        self._iters[component] = titer
+
+        mood = component.get('mood')
+        self.debug('component has mood %r' % mood)
+        messages = component.get('messages')
+        self.debug('component has messages %r' % messages)
+
+        if mood != None:
+            self._setMoodValue(titer, mood)
+
+        self._model.set(titer, COL_STATE, component)
+        componentName = getComponentLabel(component)
+        self._model.set(titer, COL_NAME, componentName)
+
+        pid = component.get('pid')
+        self._model.set(titer, COL_PID, (pid and str(pid)) or '')
+
+        self._updateWorker(titer, component)
+        selection = self._view.get_selection()
+        if (componentNameToSelect is not None and
+            componentName == componentNameToSelect and
+            not selection.get_selected_rows()[1]):
+            selection.select_iter(titer)
+
+        self._updateStartStop()
+
+    def removeComponent(self, component):
+        self.debug('removing component %r to listview' % component)
+
+        titer = self._iters[component]
+        self._model.remove(titer)
+        del self._iters[component]
 
         self._updateStartStop()
 

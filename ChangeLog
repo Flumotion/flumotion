@@ -1,3 +1,26 @@
+2009-05-04  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+	
+	reviewed by: Julien Le Goff
+	
+	* flumotion/admin/gtk/componentlist.py:
+	Added two methods to append and remove components incrementally to and
+	from the componentlist used by the admin window.
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Changed the algorithm used for updating the componentlist. Before it
+	was extremelly inefficient because the list was cleaned and
+	repopulated each time a component was added or removed. Now it appends
+	or removes the components one by one when it is needed using the new
+	methods of ComponentList. Fixes #1276
+	This also fixes a race condition given when some components were
+	selected from the admin and one of them was deleted. The
+	selection-changed event and the component-deleted listener method were
+	triggered at the same time both cleaning and rebuilding the list.
+	Another issue fixed on this commit is the deselection of a component
+	of the list when a new one is loaded. This shouldn't happen anymore
+	because the situation is controlled when the component is loaded.
+	Fixes #1159
+
 2009-05-08  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/monitor/nagios/stream.py:
