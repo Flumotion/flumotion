@@ -461,6 +461,7 @@ class EventSet(log.Loggable):
             # skip if it's on our list of exceptions
             if event.exdates:
                 if startTime in event.exdates:
+                    self.debug("startTime %r is listed as EXDATE, skipping")
                     continue
 
             endTime = startTime + delta
