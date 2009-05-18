@@ -126,7 +126,10 @@ class PlaylistProducer(feedcomponent.FeedComponent):
     def _buildAudioPipeline(self, pipeline, src):
         audiorate = gst.element_factory_make("audiorate")
         audioconvert = gst.element_factory_make('audioconvert')
-        audioresample = gst.element_factory_make('audioresample')
+        resampler = 'audioresample'
+        if gstreamer.element_factory_exists('legacyresample'):
+            resampler = 'legacyresample'
+        audioresample = gst.element_factory_make(resampler)
         outcaps = gst.Caps(
             "audio/x-raw-int,channels=%d,rate=%d,width=16,depth=16" %
             (self._channels, self._samplerate))

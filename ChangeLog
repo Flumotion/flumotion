@@ -1,3 +1,8 @@
+2009-05-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/playlist/playlist.py:
+	Prefer legacyresample over audioresample where available.
+
 2009-05-18  Arek Korbik  <arkadini@gmail.com>
 
 	reviewed by: Zaheer
