@@ -1,3 +1,11 @@
+2009-05-18  Arek Korbik  <arkadini@gmail.com>
+
+	reviewed by: Zaheer
+
+	* flumotion/component/misc/httpserver/httpserver.py
+	  (HTTPFileStreamer._timeoutRequests):
+	Cleanup the _timeoutRequestsCallLater on entry. See #1281.
+
 2009-05-18  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/base/http.py:

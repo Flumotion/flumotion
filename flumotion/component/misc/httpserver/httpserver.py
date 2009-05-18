@@ -471,6 +471,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                             self._pbclient, 10, checkPID=False)
 
     def _timeoutRequests(self):
+        self._timeoutRequestsCallLater = None
+
         now = time.time()
         for request in self._connected_clients.values():
             if now - request.lastTimeWritten > self.REQUEST_TIMEOUT:
@@ -483,6 +485,10 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 request.channel.transport.connectionLost(
                     errors.TimeoutException())
 
+        # FIXME: ideally, we shouldn't create another callLater if the
+        # component is shutting down, to leave the environment clean
+        # and tidy (right now, let's hope the process will be stopped
+        # eventually anyway)
         self._timeoutRequestsCallLater = reactor.callLater(
             self.REQUEST_TIMEOUT, self._timeoutRequests)
 
