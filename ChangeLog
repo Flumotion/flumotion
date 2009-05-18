@@ -1,3 +1,10 @@
+2009-05-18  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/base/http.py:
+	Log the return code when handling unauthorized connections. It doesn't
+	always have to be 401, sometimes it can be 500 if the bouncer had an
+	error.
+
 2009-05-13  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: Julien Le Goff

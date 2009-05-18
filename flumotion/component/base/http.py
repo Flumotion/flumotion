@@ -415,7 +415,8 @@ class HTTPAuthentication(log.Loggable):
         return failure
 
     def _handleUnauthorized(self, request, code):
-        self.debug('client from %s is unauthorized' % (request.getClientIP()))
+        self.debug('client from %s is unauthorized, returning code %r' %
+                   (request.getClientIP(), code))
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_SERVER_VERSION)
         if self._domain and code == http.UNAUTHORIZED:
