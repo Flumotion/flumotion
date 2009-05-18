@@ -1,3 +1,11 @@
+2009-05-18  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Arek
+
+	* flumotion/component/misc/httpserver/httpfile.py:
+	Fixes #1280. Http-server not checking if a byte range request has an end
+	range bigger than the filesize.
+
 2009-05-18  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/playlist/playlist.py:

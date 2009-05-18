@@ -216,7 +216,7 @@ class File(resource.Resource, log.Loggable):
                 # byte-range-spec
                 first = int(start)
                 if end:
-                    last = int(end)
+                    last = min(int(end), last)
             elif end:
                 # suffix-byte-range-spec
                 count = int(end)
