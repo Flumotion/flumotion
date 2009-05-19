@@ -112,7 +112,7 @@ DOCUMENTATION
 -------------
 
 A manual is being written.  You can access the current work in progress at
-http://www.flumotion.net/doc/flumotion/manual/html/
+http://www.flumotion.net/doc/flumotion/manual/en/trunk/html/
 
 Flumotion also comes with API documentation.  You need epydoc to build them.
 
