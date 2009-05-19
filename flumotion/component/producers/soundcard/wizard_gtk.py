@@ -35,15 +35,9 @@ __version__ = "$Rev$"
 _ = gettext.gettext
 T_ = gettexter()
 
-OSS_DEVICES = ["/dev/dsp",
-               "/dev/dsp1",
-               "/dev/dsp2"]
-ALSA_DEVICES = ['hw:0',
-                'hw:1',
-                'hw:2']
-CHANNELS = [(_('Stereo'), 2),
-            (_('Mono'), 1)]
-BITDEPTHS = [(_('16-bit'), 16)]
+CHANNELS = {1: _('Mono'),
+            2: _('Stereo')}
+
 SAMPLE_RATES = [48000,
                 44100,
                 32000,
@@ -51,6 +45,8 @@ SAMPLE_RATES = [48000,
                 16000,
                 11025,
                 8000]
+
+# TODO: Add other sources (pulse, jack, ...)
 SOURCE_ELEMENTS = [(_('Alsa'), 'alsasrc'),
                    (_('OSS'), 'osssrc')]
 
@@ -60,13 +56,6 @@ class SoundcardProducer(AudioProducer):
 
     def __init__(self):
         super(SoundcardProducer, self).__init__()
-
-        self.properties.input_track = ''
-        self.properties.channels = 2
-        self.properties.samplerate = 44100
-        self.properties.depth = 16
-        self.properties.device = ''
-        self.properties.source_element = 'alsasrc'
 
 
 class SoundcardStep(AudioProducerStep):
@@ -81,14 +70,10 @@ class SoundcardStep(AudioProducerStep):
 
     def __init__(self, wizard, model):
         AudioProducerStep.__init__(self, wizard, model)
-        self._blockUpdate = False
 
     # WizardStep
 
     def setup(self):
-        # block updates, because populating a shown combobox will of course
-        # trigger the callback
-        self._blockUpdate = True
         self.input_track.data_type = str
         self.channels.data_type = int
         self.samplerate.data_type = int
@@ -96,11 +81,6 @@ class SoundcardStep(AudioProducerStep):
         self.device.data_type = str
         self.source_element.data_type = str
 
-        self.input_track.prefill([''])
-        self.channels.prefill(CHANNELS)
-        self.samplerate.prefill([(str(r), r) for r in SAMPLE_RATES])
-        self.depth.prefill(BITDEPTHS)
-        self.device.prefill([''])
         self.source_element.prefill(SOURCE_ELEMENTS)
 
         self.add_proxy(self.model.properties,
@@ -111,94 +91,140 @@ class SoundcardStep(AudioProducerStep):
                         'device',
                         'source_element'])
 
-        self._blockUpdate = False
+        # Connect the callback after the combo has been filled so the changed
+        # signal is not emited before the page has been set uhas
+        self.source_element.connect('changed', self.on_source_element__changed)
 
     def workerChanged(self, worker):
         self.model.worker = worker
-        self._clear_combos()
-        self._update_devices()
-        self._updateInputs()
+        self._blockCombos()
+        self._updateDevices()
 
     def getNext(self):
         return None
 
     # Private
 
-    def _clear_combos(self):
-        self.input_track.clear()
-        self.input_track.set_sensitive(False)
-        self.channels.set_sensitive(False)
-        self.samplerate.set_sensitive(False)
-        self.depth.set_sensitive(False)
+    def _blockCombos(self, block=True):
+        self.input_track.set_sensitive(not block)
+        self.channels.set_sensitive(not block)
+        self.depth.set_sensitive(not block)
+        self.samplerate.set_sensitive(not block)
 
-    def _update_devices(self):
-        self._blockUpdate = True
-        self.device.clear()
-        sourceElement = self.source_element.get_selected()
-        if sourceElement == 'alsasrc':
-            self.device.prefill(ALSA_DEVICES)
-        elif sourceElement == 'osssrc':
-            self.device.prefill(OSS_DEVICES)
-        else:
-            raise AssertionError
-        self._blockUpdate = False
-
-    def _updateInputs(self):
-        if self._blockUpdate:
-            return
+    def _updateDevices(self):
         self.wizard.waitForTask('soundcard checks')
+        self.wizard.clear_msg('soundcard-device')
 
-        device = self.device.get_selected()
-        elementName = self.source_element.get_selected()
-        channels = self.channels.get_selected() or 2
-        assert device
-        assert elementName
-        assert channels
         msg = Info(T_(
-            N_("Probing the sound card. This can take a while...")),
-                            mid='soundcard-check')
+            N_("Looking for the sound devices present on the system."
+               "This can take a while...")), mid='soundcard-check')
         self.wizard.add_msg(msg)
-        d = self.runInWorker(
-            'flumotion.worker.checks.audio', 'checkMixerTracks',
-            elementName, device, channels, mid='soundcard-check')
 
         def checkFailed(failure):
             failure.trap(RemoteRunFailure)
-            self._clear_combos()
-            self.wizard.taskFinished(True)
+            self.wizard.taskFinished(blockNext=True)
+            self._blockCombos()
 
-        def soundcardCheckComplete((deviceName, tracks)):
+        def gotSoundDevices(devices):
             self.wizard.clear_msg('soundcard-check')
             self.wizard.taskFinished(False)
-            self.label_devicename.set_label(deviceName)
-            self._blockUpdate = True
-            self.channels.set_sensitive(True)
-            self.samplerate.set_sensitive(True)
-            self.depth.set_sensitive(True)
+            self.device.set_sensitive(True)
+            self.device.prefill(devices)
+
+        sourceElement = self.source_element.get_selected()
+
+        d = self.runInWorker(
+            'flumotion.worker.checks.audio', 'getAudioDevices',
+            sourceElement, mid='soundcard-device')
+
+        d.addCallback(gotSoundDevices)
+        d.addErrback(checkFailed)
+
+        return d
+
+    def _updateInputtrack(self):
+        device = self.device.get_selected()
+        sourceElement = self.source_element.get_selected()
+
+        if not device:
+            return
+
+        self.wizard.waitForTask('soundcard checks')
+        msg = Info(T_(
+            N_("Probing the sound card. This can take a while...")),
+            mid='soundcard-check')
+        self.wizard.add_msg(msg)
+
+        def checkFailed(failure):
+            failure.trap(RemoteRunFailure)
+            self._blockCombos()
+            self.wizard.taskFinished(True)
+
+        def soundcardCheckComplete((deviceName, tracks, caps)):
+            self.wizard.clear_msg('soundcard-check')
+            self.wizard.taskFinished(False)
+            self._caps = caps
             self.input_track.prefill(tracks)
             self.input_track.set_sensitive(bool(tracks))
-            self._blockUpdate = False
+
+        d = self.runInWorker(
+            'flumotion.worker.checks.audio', 'checkMixerTracks',
+            sourceElement, device, mid='soundcard-check')
 
         d.addCallback(soundcardCheckComplete)
         d.addErrback(checkFailed)
 
         return d
 
+    def _updateDepth(self):
+        bitdepths = {}
+        for capStruct in self._caps:
+            data = capStruct.copy()
+            bitdepths[data.pop('depth')] = data
+            self._capStructs = bitdepths
+        bitdepths = sorted(bitdepths)
+        self.depth.prefill(
+        [(_('%d-bit') % bitdepth, bitdepth) for bitdepth in bitdepths])
+        self.depth.set_sensitive(True)
+
+    def _updateChannels(self):
+        capStruct = self._capStructs.get(self.depth.get_selected())
+        if capStruct is None:
+            return
+        channels = []
+        if type(capStruct['channels']) == int:
+            nchannels = capStruct['channels']
+            channels.append((CHANNELS[nchannels], nchannels))
+        else:
+            for nchannels in capStruct['channels']:
+                channels.append((CHANNELS[nchannels], nchannels))
+
+        self.channels.prefill(channels)
+        self.channels.set_sensitive(True)
+
+    def _updateSamplerate(self):
+        capStruct = self._capStructs.get(self.depth.get_selected())
+        if capStruct is None:
+            return
+        max, min = capStruct['rate']
+        self.samplerate.prefill(
+            [(str(rate), rate) for rate in SAMPLE_RATES if min <= rate <= max])
+        self.samplerate.set_sensitive(True)
+
     # Callbacks
 
     def on_source_element__changed(self, combo):
-        if not self._blockUpdate:
-            self._update_devices()
-            self._updateInputs()
+        self._updateDevices()
 
     def on_device__changed(self, combo):
-        self._updateInputs()
+        self._updateInputtrack()
 
-    def on_channels__changed(self, combo):
-        # FIXME: make it so that the number of channels can be changed
-        # and the check gets executed with the new number
-        # self.updateInputs()
-        pass
+    def on_input_track__changed(self, combo):
+        self._updateDepth()
+        self._updateChannels()
+
+    def on_depth__changed(self, combo):
+        self._updateSamplerate()
 
 
 class SoundcardWizardPlugin(object):

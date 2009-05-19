@@ -10,6 +10,8 @@
   <property name="modal">False</property>
   <property name="default_width">760</property>
   <property name="default_height">470</property>
+  <property name="width_request">760</property>
+  <property name="height_request">470</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="decorated">True</property>

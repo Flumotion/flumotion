@@ -1,5 +1,27 @@
 2009-05-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	reviewed by: jurbanski
+
+	* data/glade/sectionwizard.glade:
+	Avoid resize the wizard window if not needed setting the default size.
+	* flumotion/component/producers/soundcard/wizard.glade:
+	Reorganize the widgets without a table. A VBox and some HBoxes give
+	more control on positioning and sizing options.
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	The devices are fetched automatically using a worker check. The same
+	is done for the parameters associated to the devices (tracks,
+	number of channels, sample rate and the bit depth).
+	The devices are listed by their name and the code has been cleaned
+	and restructured.
+	* flumotion/worker/checks/audio.py:
+	Added a check that returns the available sound devices in the
+	system according to the provided source factory.
+	Modified the checkMixerTracks method to return the device
+	capabilities too.
+	Fixes #197, #804 and #952
+
+2009-05-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/component/encoders/vorbis/vorbis010.py:
 	Import forgotten gstreamer module for the check in r7887 to work.
 

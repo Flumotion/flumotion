@@ -22,17 +22,107 @@
 __version__ = "$Rev$"
 
 import gst
+import dbus
 
 from flumotion.common import messages, log, errors, gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.worker.checks import check
+from twisted.internet import defer
 
 from gst010 import do_element_check
 
 T_ = gettexter()
 
 
-def checkMixerTracks(source_factory, device, channels, mid=None):
+def getAudioDevices(source_factory, mid=None):
+    """
+    Search the available devices in worker for the specified factory.
+    Return a deferred firing a result.
+
+    The result is either:
+     - succesful, with an empty list: no device found
+     - succesful, with the list of found devices
+     - failed
+
+    @rtype: L{twisted.internet.defer.Deferred}
+    """
+    result = messages.Result()
+    devices = []
+
+    def getOssDevices():
+        bus = dbus.SystemBus()
+        hal = dbus.Interface(bus.get_object('org.freedesktop.Hal',
+                                            '/org/freedesktop/Hal/Manager'),
+                             'org.freedesktop.Hal.Manager')
+        udis = hal.FindDeviceStringMatch('oss.type', 'pcm')
+
+        for udi in udis:
+            dev = dbus.Interface(bus.get_object('org.freedesktop.Hal', udi),
+                                 'org.freedesktop.Hal.Device')
+            if not dev.PropertyExists('oss.device'):
+                continue
+            if dev.GetProperty('oss.device') != 0:
+                continue
+
+            devices.append((str(dev.GetProperty('info.product')),
+                            str(dev.GetProperty('oss.device_file'))))
+
+    def getAlsaDevices():
+        source = gst.element_factory_make('alsasrc')
+        pipeline = 'alsasrc name=source device=%s ! fakesink'
+
+        for device in source.probe_get_values_name('device'):
+            p = gst.parse_launch(pipeline % device)
+            p.set_state(gst.STATE_READY)
+            s = p.get_by_name('source')
+            devices.append((s.get_property('device-name'),
+                            device.split(',')[0]))
+            p.set_state(gst.STATE_NULL)
+
+    try:
+        {'alsasrc': getAlsaDevices,
+         'osssrc': getOssDevices}[source_factory]()
+
+    except dbus.DBusException, e:
+        devices = [("/dev/dsp", "/dev/dsp"),
+                   ("/dev/dsp1", "/dev/dsp1"),
+                   ("/dev/dsp2", "/dev/dsp2")]
+
+        result.succeed(devices)
+
+        failure = defer.failure.Failure()
+        m = messages.Warning(T_(
+             N_("There has been an error while fetching the OSS audio devices"
+                "through Hal.\nThe listed devices have been guessed and may "
+                "not work properly.")), debug=check.debugFailure(failure))
+        m.id = mid
+        result.add(m)
+        return defer.succeed(result)
+    except:
+        failure = defer.failure.Failure()
+        log.debug('check', 'unhandled failure: %r (%s)\nTraceback:\n%s' % (
+                  failure, failure.getErrorMessage(), failure.getTraceback()))
+        m = messages.Error(T_(N_("Could not probe devices.")),
+                           debug=check.debugFailure(failure))
+
+        m.id = mid
+        result.add(m)
+        return defer.fail(result)
+    else:
+        result.succeed(devices)
+        if not devices:
+            m = messages.Error(T_(
+                N_("Could not find any device in the system.\n"
+                   "Please, check whether the device is correctly plugged "
+                   "and/or the modules are correctly loaded."), sound_system))
+
+            m.id = mid
+            result.add(m)
+
+        return defer.succeed(result)
+
+
+def checkMixerTracks(source_factory, device, mid=None):
     """
     Probe the given GStreamer element factory with the given device for
     audio mixer tracks.
@@ -51,18 +141,22 @@ def checkMixerTracks(source_factory, device, channels, mid=None):
     def get_tracks(element):
         # Only mixers have list_tracks. Why is this a perm error? FIXME in 0.9?
         if not element.implements_interface(gst.interfaces.Mixer):
-            msg = 'Cannot get mixer tracks from the device.  '\
+            msg = 'Cannot get mixer tracks from the device. '\
                   'Check permissions on the mixer device.'
             log.debug('checks', "returning failure: %s" % msg)
             raise check.CheckProcError(msg)
-        return (element.get_property('device-name'),
-                [track.label for track in element.list_tracks()])
 
-    pipeline = ('%s name=source device=%s ! '
-                'audio/x-raw-int,channels=%d ! fakesink') % (
-        source_factory, device, channels)
-    d = do_element_check(pipeline, 'source', get_tracks,
-        set_state_deferred=True)
+        devName = element.get_property('device-name')
+        tracks = [track.label for track in element.list_tracks()]
+        structs = []
+        for structure in element.get_pad('src').get_caps():
+            structDict = dict(structure)
+            for key, value in structDict.items()[:]:
+                # Filter items which are not serializable over pb
+                if isinstance(value, gst.IntRange):
+                    structDict[key] = (value.high, value.low)
+            structs.append(structDict)
+        return (devName, tracks, structs)
 
     def errbackAlsaBugResult(failure, result, mid, device):
         # alsasrc in gst-plugins-base <= 0.10.14 was accidentally reporting
@@ -89,6 +183,16 @@ def checkMixerTracks(source_factory, device, channels, mid=None):
                 return result
 
         return failure
+
+    pipeline = ('%s name=source device=%s ! fakesink') % (
+                source_factory, device)
+    d = do_element_check(pipeline, 'source', get_tracks,
+                         set_state_deferred=True)
+
+    pipeline = ('%s name=source device=%s ! fakesink') % (
+                source_factory, device)
+    d = do_element_check(pipeline, 'source', get_tracks,
+                         set_state_deferred=True)
 
     d.addCallback(check.callbackResult, result)
     d.addErrback(check.errbackNotFoundResult, result, mid, device)
