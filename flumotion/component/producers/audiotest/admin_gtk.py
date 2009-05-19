@@ -38,6 +38,8 @@ class AudioTestAdminGtkNode(BaseAdminGtkNode):
         self._scale = self.wtree.get_widget('scale-frequency')
         self._spinbutton = self.wtree.get_widget('spinbutton-frequency')
         self._combobox = self.wtree.get_widget('combobox-wave')
+        self._combobox.prefill(['Sine', 'Square', 'Saw'])
+
         self._scale_change_id = self._scale.connect('value-changed',
             self.frequency_changed_cb)
         self._spinbutton_change_id = self._spinbutton.connect('value-changed',

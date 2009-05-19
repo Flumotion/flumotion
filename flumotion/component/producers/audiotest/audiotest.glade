@@ -103,19 +103,16 @@
       <child>
 	<widget class="GtkComboBox" id="combobox-wave">
 	  <property name="visible">True</property>
-	  <property name="items" translatable="yes">Sine
-Square
-Saw</property>
 	  <property name="add_tearoffs">False</property>
 	  <property name="focus_on_click">True</property>
 	</widget>
 	<packing>
 	  <property name="left_attach">1</property>
-	  <property name="right_attach">3</property>
+	  <property name="right_attach">2</property>
 	  <property name="top_attach">0</property>
 	  <property name="bottom_attach">1</property>
 	  <property name="x_options">fill</property>
-	  <property name="y_options">fill</property>
+	  <property name="y_options"></property>
 	</packing>
       </child>
 
