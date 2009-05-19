@@ -48,9 +48,11 @@ class Vorbis(feedcomponent.ParseLaunchComponent):
         self.bitrate = properties.get('bitrate', -1)
         self.quality = properties.get('quality', 0.3)
         self.channels = properties.get('channels', 2)
-
-        return ('audioresample name=ar ! audioconvert ! capsfilter name=cf '
-                '! vorbisenc name=enc')
+        resampler = 'audioresample'
+        if gstreamer.element_factory_exists('legacyresample'):
+            resampler = 'legacyresample'
+        return ('%s name=ar ! audioconvert ! capsfilter name=cf '
+                '! vorbisenc name=enc' % resampler)
 
     def configure_pipeline(self, pipeline, properties):
         enc = pipeline.get_by_name('enc')

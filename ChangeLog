@@ -1,3 +1,8 @@
+2009-05-19  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/encoders/vorbis/vorbis010.py:
+	Prefer legacyresample over audioresample where available.
+
 2009-05-18  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Arek
