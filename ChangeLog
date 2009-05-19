@@ -1,5 +1,10 @@
 2009-05-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/component/encoders/vorbis/vorbis010.py:
+	Import forgotten gstreamer module for the check in r7887 to work.
+
+2009-05-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/component/producers/audiotest/admin_gtk.py:
 	* flumotion/component/producers/audiotest/audiotest.glade:
 	Initialize the combo while loading the widgets not inside the glade

@@ -21,6 +21,7 @@
 
 import gst
 
+from flumotion.common import gstreamer
 from flumotion.component import feedcomponent
 from vorbisutils import get_max_sample_rate, get_preferred_sample_rate
 
