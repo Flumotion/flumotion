@@ -24,7 +24,7 @@ import time
 import gst
 from twisted.internet import defer, reactor
 
-from flumotion.common import messages, fxml
+from flumotion.common import messages, fxml, gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.base import watcher
@@ -127,7 +127,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         audiorate = gst.element_factory_make("audiorate")
         audioconvert = gst.element_factory_make('audioconvert')
         resampler = 'audioresample'
-        if gst.element_factory_exists('legacyresample'):
+        if gstreamer.element_factory_exists('legacyresample'):
             resampler = 'legacyresample'
         audioresample = gst.element_factory_make(resampler)
         outcaps = gst.Caps(

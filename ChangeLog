@@ -1,6 +1,11 @@
 2009-05-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/playlist/playlist.py:
+	Fix import of gstreamer modules, fixed previous commit.
+
+2009-05-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/playlist/playlist.py:
 	Use gst not gstreamer for import.
 
 2009-05-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
