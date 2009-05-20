@@ -127,7 +127,7 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         audiorate = gst.element_factory_make("audiorate")
         audioconvert = gst.element_factory_make('audioconvert')
         resampler = 'audioresample'
-        if gstreamer.element_factory_exists('legacyresample'):
+        if gst.element_factory_exists('legacyresample'):
             resampler = 'legacyresample'
         audioresample = gst.element_factory_make(resampler)
         outcaps = gst.Caps(
