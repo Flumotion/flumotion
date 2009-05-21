@@ -1,3 +1,10 @@
+2009-05-21  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/scenario/live/live.xml:
+	* flumotion/scenario/ondemand/ondemand.xml:
+	  The descriptions are used in the scenario selection step, so the
+	  verbs should be imperative.
+
 2009-05-21  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: arek

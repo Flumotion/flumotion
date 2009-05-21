@@ -2,7 +2,7 @@
     <scenarios>
         <scenario type="ondemand-scenario"
                   base="flumotion/scenario/ondemand"
-                  _description="Creates an ondemand stream.">
+                  _description="Create an ondemand stream.">
             <entries>
                 <entry type="wizard" location="wizard_gtk.py"
                        function="OndemandAssistantPlugin" />
