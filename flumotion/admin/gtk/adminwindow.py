@@ -903,7 +903,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._componentStates[component.get('name')] = component
         self._componentList.appendComponent(component,
                                             self._componentNameToSelect)
-        self._trayicon.update(self._componentstates)
+        self._trayicon.update(self._componentStates)
 
     def _hasProducerComponent(self):
         for state in self._componentList.getComponentStates():

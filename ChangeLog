@@ -1,3 +1,11 @@
+2009-05-21  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: arek
+
+	* flumotion/admin/gtk/adminwindow.py (_appendComponent):
+	Fix a typo that caused the trayicon not being updated with the correct
+	mood when adding the components incrementally.
+
 2009-05-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/monitor/nagios/stream.py:
