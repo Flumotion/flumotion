@@ -479,6 +479,18 @@ class GstInfo:
                         self.info['audio_mime'] = mime
                     elif "video" in mime:
                         self.info['video_mime'] = mime
+        # if audio only then there won't be a demuxer sometimes
+        if not mime:
+            for e in self.dbin:
+                # check decoder sink pad
+                if "Decoder" in e.get_factory().get_klass():
+                    for pad in e.sink_pads():
+                        caps = pad.get_caps()
+                        mime = caps[0].get_name()
+                        if "audio" in mime:
+                            self.info["audio_mime"] = mime
+                        elif "video" in mime:
+                            self.info["video_mime"] = mime
 
         if not mime: # unknown
             if self.have_audio:

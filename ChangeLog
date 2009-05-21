@@ -1,3 +1,9 @@
+2009-05-21  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/monitor/nagios/stream.py:
+	Fix stream check for streams which don't require a demuxer
+	like mp3.
+
 2009-05-21  Arek Korbik  <arkadini@gmail.com>
 
 	patch by: Philippe Normand <philippe at fluendo dot com>
