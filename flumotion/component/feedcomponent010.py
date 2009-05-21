@@ -527,7 +527,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
     ### BaseComponent interface implementation
 
-    def try_start_pipeline(self):
+    def try_start_pipeline(self, force=False):
         """
         Tell the component to start.
         Whatever is using the component is responsible for making sure all
@@ -536,7 +536,9 @@ class FeedComponent(basecomponent.BaseComponent):
         (ret, state, pending) = self.pipeline.get_state(0)
         if state == gst.STATE_PLAYING:
             self.log('already PLAYING')
-            return
+            if not force:
+                return
+            self.debug('pipeline PLAYING, but starting anyway as requested')
 
         if self._clock_slaved and not self._master_clock_info:
             self.debug("Missing master clock info, deferring set to PLAYING")

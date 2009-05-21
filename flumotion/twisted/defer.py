@@ -229,6 +229,7 @@ class RetryingDeferred(object):
         """
         self._masterD = defer.Deferred()
         self._running = True
+        self.delay = None
 
         self._retry()
 

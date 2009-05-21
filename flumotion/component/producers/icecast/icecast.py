@@ -20,8 +20,10 @@
 # Headers in this file shall remain intact.
 
 import gst
-
+from twisted.internet import defer
 from flumotion.component import feedcomponent
+from flumotion.twisted.defer import RetryingDeferred
+from flumotion.common import errors
 
 __version__ = "$Rev$"
 
@@ -57,9 +59,67 @@ class Icecast(feedcomponent.ParseLaunchComponent):
                 pad.unlink(peer)
                 tf.link(parser)
                 parser.link(peer.get_parent())
+                # Disconnect signal to avoid adding a parser every time
+                # it gets reconnected.
+                tf.disconnect(self.signal_id)
 
-        src = pipeline.get_by_name('src')
-        src.set_property('location', properties['url'])
+        self.src = pipeline.get_by_name('src')
+        self.url = properties['url']
+        self.src.set_property('location', self.url)
 
         typefind = pipeline.get_by_name('tf')
-        typefind.connect('have-type', have_caps)
+        self.signal_id = typefind.connect('have-type', have_caps)
+
+        self._pad_monitors.attach(self.src.get_pad('src'), 'gnomevfs-src')
+        self._pad_monitors['gnomevfs-src'].addWatch(
+                self._src_connected, self._src_disconnected)
+        self.reconnecting = False
+        self.reconnector = RetryingDeferred(self.connect)
+        self.reconnector.initialDelay = 1.0
+        self.attemptD = None
+
+        def _drop_eos(pad, event):
+            self.debug('Swallowing event %r', event)
+            if event.type == gst.EVENT_EOS:
+                return False
+            return True
+        self.src.get_pad('src').add_event_probe(_drop_eos)
+
+    def bus_message_received_cb(self, bus, message):
+        if message.type == gst.MESSAGE_ERROR and message.src == self.src:
+            gerror, debug = message.parse_error()
+            self.warning('element %s error %s %s',
+                    message.src.get_path_string(), gerror, debug)
+            if self.reconnecting:
+                self._retry()
+            return True
+        feedcomponent.ParseLaunchComponent.bus_message_received_cb(
+                self, bus, message)
+
+    def connect(self):
+        self.info('Connecting to icecast server: %s', self.url)
+        self.src.set_state(gst.STATE_READY)
+        # can't just self.src.set_state(gst.STATE_PLAYING),
+        # because the pipeline might NOT be in PLAYING,
+        # if we never connected to Icecast and never went to PLAYING
+        self.try_start_pipeline(force=True)
+        self.attemptD = defer.Deferred()
+        return self.attemptD
+
+    def _src_connected(self, name):
+        self.info('Connected to icecast server : %s', self.url)
+        if self.reconnecting:
+            assert self.attemptD
+            self.attemptD.callback(None)
+            self.reconnecting = False
+
+    def _src_disconnected(self, name):
+        self.info('Icecast server: %s got disconnected', self.url)
+        if not self.reconnecting:
+            self.reconnecting = True
+            self.reconnector.start()
+
+    def _retry(self):
+        assert self.attemptD
+        self.debug('Retrying connection to icecast server: %s', self.url)
+        self.attemptD.errback(errors.ConnectionError)
