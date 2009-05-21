@@ -691,13 +691,18 @@ def outputToFiles(stdout=None, stderr=None):
             info('log', "Calling old SIGHUP hander")
             _old_hup_handler(signum, frame)
 
-    debug('log', 'installing SIGHUP handler')
-    import signal
-    handler = signal.signal(signal.SIGHUP, sighup)
-    if handler == signal.SIG_DFL or handler == signal.SIG_IGN:
-        _old_hup_handler = None
+    try:
+        import signal
+    except ImportError:
+        debug('log', 'POSIX signals not supported, unable to install'
+              ' SIGHUP handler')
     else:
-        _old_hup_handler = handler
+        debug('log', 'installing SIGHUP handler')
+        handler = signal.signal(signal.SIGHUP, sighup)
+        if handler == signal.SIG_DFL or handler == signal.SIG_IGN:
+            _old_hup_handler = None
+        else:
+            _old_hup_handler = handler
 
 
 # base class for loggable objects

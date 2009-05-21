@@ -1,3 +1,10 @@
+2009-05-21  Arek Korbik  <arkadini@gmail.com>
+
+	patch by: Philippe Normand <philippe at fluendo dot com>
+
+	* flumotion/extern/log/log.py (outputToFiles): Catch importing
+	signal for improved win32 experience. Fixes #1295.
+
 2009-05-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/producers/playlist/playlist.py:
