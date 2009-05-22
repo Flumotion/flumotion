@@ -1,6 +1,15 @@
 2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/stream.py:
+	  Use tempfile to choose a temporary file instead of the handrolled
+	  uniquifying process that was broken to begin with.
+	  Do not use a potentially non-existing or non-writable directory
+	  for saving dumps.
+	  Privatize private variables.
+
+2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/monitor/nagios/stream.py:
 	  Clean up based on pychecker's findings.
 	  This fixes an actual bug in the temporary file creation,
 	  and removes chunks of either half-implemented code or

@@ -28,6 +28,7 @@ import urlparse
 import os
 import re
 import time
+import tempfile
 import sys
 import md5
 import sha
@@ -43,7 +44,6 @@ from flumotion.admin import admin
 URLFINDER = "http://[^\s']*" # to search urls in playlists
 PLAYLIST_SUFFIX = ('m3u', 'asx') # extensions for playlists
 TIMEOUT = 5 # timeout in seconds
-DIR = '/var/tmp/flumotion/'
 
 CHECKS = {'videowidth': 'video_width',
           'videoheight': 'video_height',
@@ -96,8 +96,8 @@ class CheckBase(util.LogCommand):
         self._streamurl = None
         self.managerDeferred = defer.Deferred()
         self.model = None
-        self.path = ''
-        self.tmpfile = ''
+        self._path = ''
+        self._tmpfile = ''
         self.token = ''
         util.LogCommand.__init__(self, parentCommand, **kwargs)
 
@@ -182,25 +182,19 @@ class CheckBase(util.LogCommand):
             return self.critical('URL isn\'t valid.')
         if parse[0] != 'http':
             return self.critical('URL type is not valid.')
-        self.path = parse[2]
+        self._path = parse[2]
 
         # use unique names for stream dumps
-        if len(self.path) <= 1:
-            self.path = 'unknown'
-        elif self.path[0] == '/':
-            self.path = self.path[1:]
-        slug = self.path.replace('/', '_')
-        tmpfile = '%s-%s' % (datetime.now().strftime('%Y%m%dT%H%M%S'), slug)
-        tmp = os.path.join(DIR, tmpfile)
-        if os.path.exists(tmp):
-            counter = 1
-            while not counter:
-                newtmpfile = '%s.%i' % (tmpfile, counter)
-                tmp = os.path.join(DIR, newtmpfile)
-                if os.path.exists(tmp):
-                    counter = False
-                counter += 1
-        self.tmpfile = tmp
+        if len(self._path) <= 1:
+            self._path = 'unknown'
+        elif self._path[0] == '/':
+            self._path = self._path[1:]
+        slug = self._path.replace('/', '_')
+        if slug[-3:] in PLAYLIST_SUFFIX:
+            slug = slug[:-4]
+        (fd, self._tmpfile) = tempfile.mkstemp(
+            suffix='.flumotion-nagios.%s-%s' % (
+                datetime.now().strftime('%Y%m%dT%H%M%S'), slug))
 
         if self.options.bouncer:
             # Check for a valid IPv4 address with numbers and dots
@@ -242,7 +236,7 @@ class CheckBase(util.LogCommand):
 
     def checkStream(self):
         '''Check stream'''
-        i = GstInfo(self._url, self.options, self.tmpfile)
+        i = GstInfo(self._url, self.options, self._tmpfile)
         isAudio, isVideo, info, error = i.run()
 
         # is there an error?
@@ -279,16 +273,16 @@ class CheckBase(util.LogCommand):
 
     def critical(self, message):
         return util.critical('%s: %s [dump at %s]' %
-            (self._url, message, self.tmpfile))
+            (self._url, message, self._tmpfile))
 
     def ok(self, message):
         # remove tempfile with the stream if all goes ok
-        os.remove(self.tmpfile)
+        os.remove(self._tmpfile)
         return util.ok('%s: %s' % (self._url, message))
 
     def unknown(self, message):
         return util.unknown('%s: %s [dump at %s]' %
-            (self._url, message, self.tmpfile))
+            (self._url, message, self._tmpfile))
 
     def connect(self, options):
         # code from main.py in this directory
