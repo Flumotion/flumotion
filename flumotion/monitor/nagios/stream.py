@@ -10,18 +10,19 @@
 # the Free Software Foundation.
 # This file is distributed without any warranty; without even the implied
 # warranty of merchantability or fitness for a particular purpose.
-# See 'LICENSE.GPL' in the source distribution for more information.
+# See "LICENSE.GPL" in the source distribution for more information.
 
 # Licensees having purchased or holding a valid Flumotion Advanced
 # Streaming Server license may use this file in accordance with the
 # Flumotion Advanced Streaming Server Commercial License Agreement.
-# See 'LICENSE.Flumotion' in the source distribution for more information.
+# See "LICENSE.Flumotion" in the source distribution for more information.
 
 # Headers in this file shall remain intact.
 
-'''
+"""
 check streams for flumotion-nagios
-'''
+"""
+
 from urllib2 import urlopen, URLError
 import urlparse
 import os

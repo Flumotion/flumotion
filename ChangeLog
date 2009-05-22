@@ -1,5 +1,11 @@
 2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/monitor/nagios/stream.py:
+	  Fix obviously unneeded search-and-replace of quotes introduced
+	  in [7822].
+
+2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/styleguide:
 	  Make Public vs Private explicit, since the API section clearly
 	  mentions public and private but fails to explain what it means.
