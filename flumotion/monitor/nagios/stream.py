@@ -33,7 +33,6 @@ import md5
 import sha
 import gst
 import gobject
-import tempfile
 from datetime import datetime
 from twisted.internet import reactor, defer
 from flumotion.common import log, errors, keycards
@@ -64,10 +63,10 @@ def gen_timed_link(relative_path, secret_key, timeout, type):
     stop_time = '%08x' % (time.time() + int(timeout))
     hashable = secret_key + relative_path + start_time + stop_time
     if type == 'md5':
-        hash = md5.md5(hashable).hexdigest()
+        hashed = md5.md5(hashable).hexdigest()
     else:
-        hash = sha.sha(hashable).hexdigest()
-    return '%s%s%s' % (hash, start_time, stop_time)
+        hashed = sha.sha(hashable).hexdigest()
+    return '%s%s%s' % (hashed, start_time, stop_time)
 
 
 def getURLFromPlaylist(url):
@@ -197,7 +196,7 @@ class CheckBase(util.LogCommand):
             counter = 1
             while not counter:
                 newtmpfile = '%s.%i' % (tmpfile, counter)
-                tmp = os.path.join(DIR, tmpfile)
+                tmp = os.path.join(DIR, newtmpfile)
                 if os.path.exists(tmp):
                     counter = False
                 counter += 1
@@ -357,13 +356,7 @@ class Check(CheckBase):
             reactor.stop()
 
         # Read config and get correct properties for each bouncers
-        properties = component.get('config')['properties']
-        if 'ical' in ctype:
-            workername = component.get('workerName')
-            ical_schedule = properties['ical_schedule']
-            k = keycards.KeycardGeneric()
-        else:
-            k = keycards.KeycardGeneric()
+        k = keycards.KeycardGeneric()
 
         e = self.model.callRemote('componentCallRemote',
             component, 'getEnabled')
@@ -413,12 +406,6 @@ class GstInfo:
 
     def run(self):
         self.pipeline.set_state(gst.STATE_PLAYING)
-        #duration
-        pads = None
-        if self.video:
-            pads = self.video.sink_pads()
-        elif self.audio:
-            pads = self.audio.sink_pads()
 
         self.mainloop.run()
         return self.have_audio, self.have_video, self.info, self.error

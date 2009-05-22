@@ -1,5 +1,13 @@
 2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/monitor/nagios/stream.py:
+	  Clean up based on pychecker's findings.
+	  This fixes an actual bug in the temporary file creation,
+	  and removes chunks of either half-implemented code or
+	  changed-but-not-cleaned-up code.
+
+2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/styleguide:
 	  Add a note on pychecker use.
 
