@@ -23,23 +23,25 @@
 check streams for flumotion-nagios
 """
 
-from urllib2 import urlopen, URLError
-import urlparse
 import os
+import sys
+import tempfile
 import re
 import time
-import tempfile
-import sys
+import datetime
 import md5
 import sha
+import urlparse
+import urllib2
+
 import gst
 import gobject
-from datetime import datetime
+
 from twisted.internet import reactor, defer
+
+from flumotion.admin import admin, connections
 from flumotion.common import log, errors, keycards
 from flumotion.monitor.nagios import util
-from flumotion.admin.connections import parsePBConnectionInfoRecent
-from flumotion.admin import admin
 
 URLFINDER = "http://[^\s']*" # to search urls in playlists
 PLAYLIST_SUFFIX = ('m3u', 'asx') # extensions for playlists
@@ -71,8 +73,8 @@ def gen_timed_link(relative_path, secret_key, timeout, type):
 
 def getURLFromPlaylist(url):
     try:
-        playlist = urlopen(url)
-    except URLError, e:
+        playlist = urllib2.urlopen(url)
+    except urllib2.URLError, e:
         raise util.NagiosCritical(e)
 
     urls = re.findall(URLFINDER, playlist.read())
@@ -194,7 +196,7 @@ class CheckBase(util.LogCommand):
             slug = slug[:-4]
         (fd, self._tmpfile) = tempfile.mkstemp(
             suffix='.flumotion-nagios.%s-%s' % (
-                datetime.now().strftime('%Y%m%dT%H%M%S'), slug))
+                datetime.datetime.now().strftime('%Y%m%dT%H%M%S'), slug))
 
         if self.options.bouncer:
             # Check for a valid IPv4 address with numbers and dots
@@ -306,7 +308,7 @@ class CheckBase(util.LogCommand):
             if failure.check(errors.ConnectionRefusedError):
                 return self.critical('Manager refused connection.')
 
-        connection = parsePBConnectionInfoRecent(options.manager,
+        connection = connections.parsePBConnectionInfoRecent(options.manager,
                                                  options.transport == 'ssl')
 
         # platform-3/trunk compatibility stuff
