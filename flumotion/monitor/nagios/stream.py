@@ -41,7 +41,7 @@ from flumotion.admin.connections import parsePBConnectionInfoRecent
 from flumotion.admin import admin
 
 URLFINDER = "http://[^\s']*" # to search urls in playlists
-PLAYLIST_SUFIX = ('m3u', 'asx') # extensions for playlists
+PLAYLIST_SUFFIX = ('m3u', 'asx') # extensions for playlists
 TIMEOUT = 5 # timeout in seconds
 DIR = '/var/tmp/flumotion/'
 
@@ -186,10 +186,10 @@ class CheckBase(util.LogCommand):
 
         # use unique names for stream dumps
         if len(self.path) <= 1:
-            self.path='unknown'
+            self.path = 'unknown'
         elif self.path[0] == '/':
             self.path = self.path[1:]
-        slug=self.path.replace('/', '_')
+        slug = self.path.replace('/', '_')
         tmpfile = '%s-%s' % (datetime.now().strftime('%Y%m%dT%H%M%S'), slug)
         tmp = os.path.join(DIR, tmpfile)
         if os.path.exists(tmp):
@@ -216,7 +216,7 @@ class CheckBase(util.LogCommand):
                 sys.exit(reactor.exitStatus)
 
         # Simple playlist detection
-        if not self.options.playlist and self._url[-3:] in PLAYLIST_SUFIX:
+        if not self.options.playlist and self._url[-3:] in PLAYLIST_SUFFIX:
             self._url = getURLFromPlaylist(self._url)
             self.options.playlist = True
         # If it is a playlist, take the correct URL
