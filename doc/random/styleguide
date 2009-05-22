@@ -189,3 +189,11 @@ DEPRECATING
 REGISTRY
 --------
 - xml tags without data should be closed with a space before />
+
+PYCHECKER
+---------
+Use pychecker to check for other style issues.
+Run 'make pychecker' to check the whole codebase.
+To check a single file the same way 'make pychecker' would, run e.g.
+make pychecker PYCHECKER_WHITELIST=flumotion/common/common.py
+

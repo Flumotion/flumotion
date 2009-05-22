@@ -1,5 +1,10 @@
 2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* doc/random/styleguide:
+	  Add a note on pychecker use.
+
+2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/worker/checks/gst010.py:
 	  Remove unused import.
 
