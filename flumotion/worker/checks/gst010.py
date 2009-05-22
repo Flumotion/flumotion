@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import os
-
 import gobject
 import gst
 import gst.interfaces
