@@ -49,9 +49,12 @@
 	* flumotion/component/feedcomponent010.py:
 	Added a force flag to the try_start_pipepline to force setting
 	pipeline to PLAYING.
+
 	* flumotion/component/producers/icecast/icecast.py:
-	Implemented a reconnect mechanism for the icecast producer component.
-	#1298 * flumotion/twisted/defer.py:
+	Implemented a reconnect mechanism for the icecast producer
+	component. Fixes #1298
+
+	* flumotion/twisted/defer.py:
 	Reset delay value when starting a RetryingDeferred.
 
 2009-05-21  Thomas Vander Stichele  <thomas at apestaart dot org>
