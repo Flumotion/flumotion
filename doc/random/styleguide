@@ -28,6 +28,33 @@ UI
 - use kbit/s and Mbit/s; also note that we follow SI so these are powers of 10
 - provide accelerators for controls
 
+PUBLIC AND PRIVATE
+------------------
+Python is intended for consenting adults.  There is no explicit protection
+mechanism for data access on objects.
+
+As such, adults need to consent and communicate intent when programming.
+If a variable/attribute/constant/method/function/... is meant to be private,
+prefix it with an underscore.  This indicates that it is not part
+of the public API and should not be relied on from the outside.
+
+In contrast, if it is not prefixed with an underscore, this indicates that
+it is part of the public API, and should be documented as such in the relevant
+docstrings.
+
+When in doubt, always err to making something private over public.  It's
+cheaper to publicize something private than it is to privatize something public
+(and usually not even possible in a stable series).
+
+FIXME: There is a problem when something is meant to be used by subclasses of a
+class, but not outside callers.  It would be great if we could make it clearly
+understood when something should only be used by subclass implementations.
+Possibly we should adopt something like:
+- no underscore for public
+- one underscore for external:private, but subclass:public
+- two underscores for completely private, which corresponds to Python's
+  attribute mangling behaviour.
+
 API DOCS
 --------
 - We use epydoc and epydoc markup for API docs (see http://epydoc.sf.net/)
