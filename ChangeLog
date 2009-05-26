@@ -1,3 +1,10 @@
+2009-05-26  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Don't interpolate the message id in the debug string, because if the
+	message id is a tuple, it will cause an error. Let the logging
+	mechanism handle that
+
 2009-05-22  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/monitor/nagios/stream.py:

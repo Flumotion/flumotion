@@ -1188,8 +1188,8 @@ class AdminWindow(Loggable, GladeDelegate):
             messages = state.get('messages')
             if messages:
                 for m in messages:
-                    self.debug('have message %r' % m)
-                    self.debug('message id %s' % m.id)
+                    self.debug('have message %r', m)
+                    self.debug('message id %s', m.id)
                     self._messageView.addMessage(m)
 
             if state.get('mood') == moods.sad.value:
