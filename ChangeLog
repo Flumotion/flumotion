@@ -1,3 +1,10 @@
+2009-05-27  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Arek
+
+	* doc/redhat/flumotion:
+	Fixed clean function to accept arguments.
+
 2009-05-26  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Arek

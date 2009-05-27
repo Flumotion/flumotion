@@ -193,7 +193,27 @@ statusone() {
 
 clean() {
         touch_logfile
+
+	if test "x$*" != "x"
+	then
+		cleanone $*
+		exit 0
+	fi
 	$prog clean
+}
+
+cleanone() {
+	type=$1
+	name=$2
+
+	if test "x$name" == "x"
+	then
+		echo $"Please specify a $type name"
+		exit 1
+	fi
+
+	echo -n $"Cleaning $type $name: "
+	$prog clean $type $name
 }
 
 list() {
@@ -227,7 +247,8 @@ case "$1" in
 	status $*
 	;;
   clean)
-        clean
+	shift
+	clean $*
 	;;
   list)
         list
