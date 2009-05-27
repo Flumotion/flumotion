@@ -185,9 +185,11 @@ class TestComponentsView(testsuite.TestCase):
         components = {}
         c = self._createComponent(
             {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
-             'type': 'foo'})
+             'type': 'foo', 'workerRequested': 'worker1'})
         components['one'] = c
         self.view.clearAndRebuild(components)
+        self.view.workerAppend('worker1')
+
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -312,13 +314,14 @@ class TestComponentsView(testsuite.TestCase):
         components = {}
         c = self._createComponent(
             {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
-             'type': 'foo'})
+             'type': 'foo', 'workerRequested': 'worker1'})
         components['one'] = c
         c = self._createComponent(
             {'name': 'two', 'mood': moods.sleeping.value, 'pid': 2,
-             'type': 'foo'})
+             'type': 'foo', 'workerRequested': 'worker1'})
         components['two'] = c
         self.view.clearAndRebuild(components)
+        self.view.workerAppend('worker1')
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False
@@ -429,6 +432,29 @@ class TestComponentsView(testsuite.TestCase):
              'type': 'foo'})
         components['two'] = c
         self.view.clearAndRebuild(components)
+        gtk.main_iteration()
+        self.view.connect('selection-changed', assertCanStart, self)
+        self.asserted = False
+        self.view._view.get_selection().select_all()
+        self.failUnless(self.asserted)
+
+    def testCanNotStartMultipleWhenWorkerIsNotLogged(self):
+
+        def assertCanStart(view, states, test):
+            test.failIf(view.canStart())
+            test.asserted = True
+
+        components = {}
+        c = self._createComponent(
+            {'name': 'one', 'mood': moods.sleeping.value, 'pid': 1,
+             'type': 'foo', 'workerRequested': 'worker1'})
+        components['one'] = c
+        c = self._createComponent(
+            {'name': 'two', 'mood': moods.sad.value, 'pid': 2,
+             'type': 'foo', 'workerRequested': 'worker2'})
+        components['two'] = c
+        self.view.clearAndRebuild(components)
+        self.view.workerAppend('worker1')
         gtk.main_iteration()
         self.view.connect('selection-changed', assertCanStart, self)
         self.asserted = False

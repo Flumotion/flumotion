@@ -1,5 +1,12 @@
 2009-05-27  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/test/test_parts.py:
+	Added the worker name to the components created in the tests.
+	Added a test for the checking the components cannot be started when
+	their worker has not logged in.
+
+2009-05-27  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	reviewed by: xmartinez
 
 	* flumotion/admin/gtk/componentlist.py:
