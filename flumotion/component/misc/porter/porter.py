@@ -30,7 +30,7 @@ from twisted.internet import protocol, reactor, address, error, defer
 from twisted.spread import pb
 from zope.interface import implements
 
-from flumotion.common import medium, log, messages
+from flumotion.common import medium, log, messages, errors
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import component
 from flumotion.component.component import moods
@@ -309,8 +309,6 @@ class Porter(component.BaseComponent, log.Loggable):
         p = portal.Portal(realm, [checker])
         serverfactory = pb.PBServerFactory(p)
 
-        # FIXME: shouldn't we be raising handled errors here?
-
         try:
             # Rather than a normal listenTCP() or listenUNIX(), we use
             # listenWith so that we can specify our particular Port, which
@@ -330,7 +328,7 @@ class Porter(component.BaseComponent, log.Loggable):
                 self._socketPath))
             self.addMessage(m)
             self.setMood(moods.sad)
-            return defer.fail(e)
+            return defer.fail(errors.ComponentSetupHandledError())
 
         # Create the class that deals with the specific protocol we're proxying
         # in this porter.
@@ -356,7 +354,7 @@ class Porter(component.BaseComponent, log.Loggable):
                 "Network error: TCP port %d is not available."), self._port))
             self.addMessage(m)
             self.setMood(moods.sad)
-            return defer.fail(e)
+            return defer.fail(errors.ComponentSetupHandledError())
 
 
 class PorterProtocolFactory(protocol.Factory):
