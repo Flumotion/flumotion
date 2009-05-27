@@ -1,3 +1,10 @@
+2009-05-26  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Arek
+
+	* flumotion/service/service.py (Servicer.clean):
+	Catch exception thrown when deleting non-existing pid files.
+
 2009-05-26  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:

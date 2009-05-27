@@ -220,8 +220,12 @@ class Servicer(log.Loggable):
                 pid = getPid(kind, name)
                 if not pid:
                     # may be a file that contains bogus data
-                    print "deleting bogus pid file for %s %s" % (kind, name)
-                    deletePidFile(kind, name)
+                    try:
+                        deletePidFile(kind, name)
+                        print "deleted bogus pid file for %s %s" % (kind, name)
+                    except OSError:
+                        print ("failed to delete pid file for %s %s "
+                               "- ignoring" % (kind, name))
                     continue
                 if not checkPidRunning(pid):
                     self.debug("Cleaning up stale pid %d for %s %s" % (
