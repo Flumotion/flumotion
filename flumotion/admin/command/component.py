@@ -135,7 +135,7 @@ class Mood(common.AdminCommand):
     description = "Check the mood of a component."
 
     def doCallback(self, args):
-        if not self.componentId:
+        if not self.parentCommand.componentId:
             common.errorRaise("Please specify a component id "
                 "with 'component -i [component-id]'")
 

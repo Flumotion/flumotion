@@ -1,3 +1,10 @@
+2009-05-27  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/admin/command/component.py:
+	Fix flumotion-command even more, cleaning up after r7224.
+	The mood subcommand was looking for the component id in the wrong
+	place.
+
 2009-05-27  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Arek
