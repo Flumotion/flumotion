@@ -1,3 +1,11 @@
+2009-05-27  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: xmartinez
+
+	* flumotion/admin/gtk/componentlist.py:
+	Disable starting a component when its worker is not present
+	Fixes #564
+
 2009-05-27  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/admin/command/component.py:

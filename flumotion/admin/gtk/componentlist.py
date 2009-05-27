@@ -197,7 +197,9 @@ class ComponentList(log.Loggable, gobject.GObject):
         canStart = True
         for state in states:
             moodname = moods.get(state.get('mood')).name
-            canStart = canStart and moodname == 'sleeping'
+            workerName = state.get('workerRequested')
+            canStart = (canStart and moodname == 'sleeping' and
+                        workerName in self._workers)
         return canStart
 
     def canStop(self):
