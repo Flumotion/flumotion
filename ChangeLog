@@ -1,3 +1,9 @@
+2009-05-28  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	* doc/random/developer-introduction.rst:
+	Link to moap project and reference 'moap cl diff' and 'moap cl ci'
+	commands.
+
 2009-05-27  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: xmartinez

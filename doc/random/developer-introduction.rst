@@ -452,9 +452,11 @@ First, generate a changelog using either prepare-ChangeLog::
 
   $ prepare-ChangeLog
 
-or moap::
+or `moap`_::
 
   $ moap cl pr
+
+.. _moap: http://thomas.apestaart.org/moap/trac/
 
 You should now end up with an auto-generated entry in the ChangeLog file.
 Open it with your favorite editor and describe what you've just done, an example
@@ -471,9 +473,13 @@ The last part of the commit message, "Fixes #263" is a directive to trac. It mea
 this commit solves the specified issue. It'll close the ticket and add a comment to it
 referencing the commit. Always include this directive if the commit closes a real bug.
 
-To commit, type the following::
+You can now do a final review of the changes to be committed using::
 
-  $ svn commit
+  $ moap cl diff
+
+and commit them with the following command::
+
+  $ moap cl ci
 
 Which will open up your editor of choice (configurable through the SVN_EDITOR variable).
 Always use the complete ChangeLog entry as the checkin message when you committing.
