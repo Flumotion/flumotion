@@ -481,8 +481,19 @@ and commit them with the following command::
 
   $ moap cl ci
 
-Which will open up your editor of choice (configurable through the SVN_EDITOR variable).
-Always use the complete ChangeLog entry as the checkin message when you committing.
+which will automatically use the ChangeLog entry as the checkin message.
+
+Alternatively, you can directly use Subversion to review the changes::
+
+  $ svn diff
+
+and commit them::
+
+  $ svn commit
+
+which will open up your editor of choice (configurable through the SVN_EDITOR variable).
+You should use the complete ChangeLog entry as the checkin message.
+
 
 Updating translation
 --------------------

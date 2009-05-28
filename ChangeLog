@@ -1,6 +1,11 @@
 2009-05-28  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	* doc/random/developer-introduction.rst:
+	Add back Subversion commit instructions as an alternate workflow.
+
+2009-05-28  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	* doc/random/developer-introduction.rst:
 	Link to moap project and reference 'moap cl diff' and 'moap cl ci'
 	commands.
 
