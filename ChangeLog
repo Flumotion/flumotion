@@ -1,3 +1,13 @@
+2009-06-02  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	Return a ComponentSetupHandledException when the setup fails if the
+	exception has already been handled, preventing the component of having
+	two messages for the same problem.
+	Really Fixes #951. At r7922 the same issue for the porter was fixed,
+	not for the streamer.
+
 2009-06-02  Arek Korbik  <arkadini@gmail.com>
 
 	reviewed by: Jan
@@ -24,7 +34,7 @@
 	* flumotion/component/misc/porter/porter.py:
 	Return a ComponentSetupHandledException when the setup fails so the
 	exception is not converted in a new message.
-	Fixes #879
+	Fixes #951
 
 2009-05-27  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 

@@ -397,7 +397,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                                       self.port))
                 self.addMessage(m)
                 self.setMood(moods.sad)
-                return defer.fail(errors.ComponentStartHandledError(t))
+                return defer.fail(errors.ComponentSetupHandledError(t))
             # fire callback so component gets happy
             d.callback(None)
         # we are responsible for setting component happy

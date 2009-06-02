@@ -802,4 +802,4 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                                       self.port))
                 self.addMessage(m)
                 self.setMood(moods.sad)
-                return defer.fail(errors.ComponentStartHandledError(t))
+                return defer.fail(errors.ComponentSetupHandledError(t))
