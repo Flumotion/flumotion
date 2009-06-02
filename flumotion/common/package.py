@@ -35,6 +35,29 @@ from flumotion.configure import configure
 __version__ = "$Rev$"
 
 
+class _PatchedModuleImporter(ihooks.ModuleImporter):
+    """
+    I am overriding ihook's ModuleImporter's import_module() method to
+    accept (and ignore) the 'level' keyword argument that appeared in
+    the built-in __import__() function in python2.5.
+
+    While no built-in modules in python2.5 seem to use that keyword
+    argument, 'encodings' module in python2.6 does and so it breaks if
+    used together with ihooks.
+
+    I make no attempt to properly support the 'level' argument -
+    ihooks didn't make it into py3k, and the only use in python2.6
+    we've seen so far, in 'encodings', serves as a performance hint
+    and it seems that can be ignored with no difference in behaviour.
+    """
+
+    def import_module(self, name, globals=None, locals=None, fromlist=None,
+                      level=-1):
+        # all we do is drop 'level' as ihooks don't support it, anyway
+        return ihooks.ModuleImporter.import_module(self, name, globals,
+                                                   locals, fromlist)
+
+
 class PackageHooks(ihooks.Hooks):
     """
     I am an import Hooks object that makes sure that every package that gets
@@ -87,7 +110,12 @@ class Packager(log.Loggable):
         self.debug('installing custom importer')
         self._hooks = PackageHooks()
         self._hooks.packager = self
-        self._importer = ihooks.ModuleImporter()
+        if sys.version_info < (2, 6):
+            self._importer = ihooks.ModuleImporter()
+        else:
+            self.debug('python2.6 or later detected - using patched'
+                       ' ModuleImporter')
+            self._importer = _PatchedModuleImporter()
         self._importer.set_hooks(self._hooks)
         self._importer.install()
 
