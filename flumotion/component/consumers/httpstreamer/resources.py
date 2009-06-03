@@ -348,6 +348,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         @type stats: GValueArray
         """
 
+        # PROBE: finishing request; see httpserver.httpserver
+        self.debug('[fd %5d] (ts %f) finishing request %r',
+                   request.transport.fileno(), time.time(), request)
+
         ip = request.getClientIP()
         if self._logRequestFromIP(ip):
             d = self.logWrite(fd, ip, request, stats)
@@ -360,7 +364,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # Request object, after cleaning up the bouncer bits.
         self.httpauth.cleanupAuth(fd)
 
-        self.debug('[fd %5d] closing transport %r' % (fd, request.transport))
+        self.debug('[fd %5d] (ts %f) closing transport %r', fd, time.time(),
+            request.transport)
         # This will close the underlying socket. We first remove the request
         # from our fd->request map, since the moment we call this the fd might
         # get re-added.
@@ -374,10 +379,20 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 self.debug("client is removed; firing deferred")
                 removeD = self._removing.pop(fd)
                 removeD.callback(None)
+
+            # PROBE: finished request; see httpserver.httpserver
+            self.debug('[fd %5d] (ts %f) finished request %r',
+                       fd, time.time(), request)
+
         d.addCallback(_done)
         return d
 
     def handleAuthenticatedRequest(self, res, request):
+
+        # PROBE: authenticated request; see httpserver.httpfile
+        self.debug('[fd %5d] (ts %f) authenticated request %r',
+                   request.transport.fileno(), time.time(), request)
+
         if request.method == 'GET':
             self._handleNewClient(request)
         elif request.method == 'HEAD':
@@ -398,6 +413,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # we store the fd again in the request using it as an id for later
         # on, so we can check when an fd went away (being -1) inbetween
         request.fdIncoming = fd
+
+        # PROBE: incoming request; see httpserver.httpfile
+        self.debug('[fd %5d] (ts %f) incoming request %r',
+                   fd, time.time(), request)
 
         self.info('[fd %5d] Incoming client connection from %s' % (
             fd, request.getClientIP()))
@@ -461,7 +480,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         # see http://twistedmatrix.com/trac/ticket/1796 for a guarantee
         # that this is a supported way of stealing the socket
         fd = fdi
-        self.debug("taking away [fd %5d] from Twisted" % fd)
+        self.debug("[fd %5d] taking away from Twisted" % fd)
         reactor.removeReader(request.transport)
         #reactor.removeWriter(request.transport)
 
@@ -481,6 +500,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.streamer.add_client(fd)
         ip = request.getClientIP()
 
+        # PROBE: started request; see httpfile.httpfile
+        self.debug('[fd %5d] (ts %f) started request %r',
+                   fd, time.time(), request)
+
         self.info('[fd %5d] Started streaming to %s' % (fd, ip))
 
     render_GET = _render
@@ -497,7 +520,8 @@ class HTTPRoot(web_resource.Resource, log.Loggable):
         fullPath = path
         if request.postpath:
             fullPath += '/' + string.join(request.postpath, '/')
-        self.debug("Incoming request %r for path %s" % (request, fullPath))
+        self.debug("[fd %5d] Incoming request %r for path %s",
+            request.transport.fileno(), request, fullPath)
         r = web_resource.Resource.getChildWithDefault(self, fullPath, request)
         self.debug("Returning resource %r" % r)
         return r

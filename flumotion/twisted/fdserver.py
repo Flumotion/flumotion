@@ -29,6 +29,7 @@ import errno
 import os
 import socket
 import struct
+import time
 
 __version__ = "$Rev$"
 
@@ -146,7 +147,9 @@ class FDPassingBroker(pb.Broker, log.Loggable):
             # Note that we hardcode IPv4 here!
             sock = socket.fromfd(fd, socket.AF_INET, socket.SOCK_STREAM)
 
-            self.debug("Received FD %d->%d" % (fd, sock.fileno()))
+            # PROBE: received fd; see porter.py
+            self.debug("[fd %5d] (ts %f) received fd from %d, created socket",
+                       sock.fileno(), time.time(), fd)
 
             # Undocumentedly (other than a comment in
             # Python/Modules/socketmodule.c), socket.fromfd() calls dup() on

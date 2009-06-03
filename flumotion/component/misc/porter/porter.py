@@ -23,6 +23,7 @@ import os
 import random
 import socket
 import string
+import time
 from urllib2 import urlparse
 
 from twisted.cred import portal
@@ -398,10 +399,17 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         self._buffer = ''
         self._porter = porter
 
-        self.debug("Accepted connection")
 
         self._timeoutDC = reactor.callLater(self.PORTER_CLIENT_TIMEOUT,
             self._timeout)
+
+    def connectionMade(self):
+
+        # PROBE: accepted connection
+        self.debug("[fd %5d] (ts %f) accepted connection",
+                   self.transport.fileno(), time.time())
+
+        protocol.Protocol.connectionMade(self)
 
     def _timeout(self):
         self._timeoutDC = None
@@ -430,7 +438,11 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             # Failed to find a valid delimiter.
             self.log("No valid delimiter found")
             if len(self._buffer) > self.MAX_SIZE:
-                self.log("Dropping connection!")
+
+                # PROBE: dropping
+                self.debug("[fd %5d] (ts %f) dropping, buffer exceeded",
+                           self.transport.fileno(), time.time())
+
                 return self.transport.loseConnection()
             else:
                 # No delimiter found; haven't reached the length limit yet.
@@ -445,6 +457,10 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             self.log("Couldn't find identifier in first line")
             return self.transport.loseConnection()
 
+        # PROBE: request
+        self.debug("[fd %5d] (ts %f) request %s", self.transport.fileno(),
+                   time.time(), identifier)
+
         # Ok, we have an identifier. Is it one we know about, or do we have
         # a default destination?
         destinationAvatar = self._porter.findDestination(identifier)
@@ -452,7 +468,12 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         if not destinationAvatar or not destinationAvatar.isAttached():
             if destinationAvatar:
                 self.debug("There was an avatar, but it logged out?")
-            self.debug("No destination avatar found for \"%s\"" % identifier)
+
+            # PROBE: no destination; see send fd
+            self.debug(
+                "[fd %5d] (ts %f) no destination avatar found for \"%s\"",
+                self.transport.fileno(), time.time(), identifier)
+
             self.writeNotFoundResponse()
             return self.transport.loseConnection()
 
@@ -462,11 +483,20 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         # so it looks to the receiver like it has read the entire data stream
         # itself.
 
+        # PROBE: send fd; see no destination and fdserver.py
+        self.debug("[fd %5d] (ts %f) send fd to avatarId %s for \"%s\"",
+                   self.transport.fileno(), time.time(),
+                   destinationAvatar.avatarId, identifier)
+
         # TODO: Check out blocking characteristics of sendFileDescriptor, fix
         # if it blocks.
-        self.debug("Attempting to send FD: %d" % self.transport.fileno())
         destinationAvatar.mind.broker.transport.sendFileDescriptor(
             self.transport.fileno(), self._buffer)
+
+        # PROBE: sent fd; see no destination and fdserver.py
+        self.debug("[fd %5d] (ts %f) sent fd to avatarId %s for \"%s\"",
+                   self.transport.fileno(), time.time(),
+                   destinationAvatar.avatarId, identifier)
 
         # After this, we don't want to do anything with the FD, other than
         # close our reference to it - but not close the actual TCP connection.

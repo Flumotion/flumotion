@@ -69,6 +69,7 @@ class FakeMind:
 
 
 class FakeAvatar:
+    avatarId = 'testAvatar'
 
     def __init__(self):
         self.mind = FakeMind()

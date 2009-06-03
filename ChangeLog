@@ -1,3 +1,23 @@
+2009-06-03  Jan Urbanski  <jurbanski@flumotion.com>
+
+	patch by: Thomas Vander Stichele  <thomas at apestaart dot org>
+	reviewed by: Jan
+
+	* flumotion/twisted/fdserver.py:
+	Improve logging of FD receiving.
+
+	* flumotion/component/misc/porter/porter.py:
+	Add and improve logging of handling and passing the connection.
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpfile.py:
+	Add logging of request handling stages.
+
+	* flumotion/test/test_porter.py:
+	Make the FakeAvatar in the porter test have an avatarId, sice it's
+	logged during the test run.
+
 2009-06-02  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:

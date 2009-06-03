@@ -21,6 +21,7 @@
 
 import string
 import os
+import time
 
 from twisted.web import resource, server, http
 from twisted.web import error as weberror, static
@@ -110,8 +111,11 @@ class File(resource.Resource, log.Loggable):
         return self._factory.create(child)
 
     def render(self, request):
-        self.debug('[fd %5d] render incoming request %r',
-                   request.transport.fileno(), request)
+
+        # PROBE: incoming request; see httpstreamer.resources
+        self.debug('[fd %5d] (ts %f) incoming request %r',
+                   request.transport.fileno(), time.time(), request)
+
         d = self._httpauth.startAuthentication(request)
         d.addCallbacks(self._requestAuthenticated, self._authenticationFailed,
                        callbackArgs=(request, ), errbackArgs=(request, ))
@@ -139,16 +143,21 @@ class File(resource.Resource, log.Loggable):
         if body:
             # render result/error page
             request.write(body)
-        self.debug('Finish request %r' % request)
+        self.debug('[fd %5d] Terminate request %r',
+                   request.transport.fileno(), request)
         request.finish()
 
     def _renderRequest(self, _, request):
+
+        # PROBE: authenticated request; see httpstreamer.resources
+        self.debug('[fd %5d] (ts %f) authenticated request %r',
+                   request.transport.fileno(), time.time(), request)
+
         # Now that we're authenticated (or authentication wasn't requested),
         # write the file (or appropriate other response) to the client.
         # We override static.File to implement Range requests, and to get
         # access to the transfer object to abort it later; the bulk of this
         # is a direct copy of static.File.render, though.
-        self.debug('Render authenticated request %r' % request)
         try:
             self.debug("Opening file %s", self._path)
             provider = self._path.open()
@@ -252,6 +261,10 @@ class File(resource.Resource, log.Loggable):
         # Call request modifiers
         for modifier in self._requestModifiers:
             modifier.modify(request)
+
+        # PROBE: started request; see httpstreamer.resources
+        self.debug('[fd %5d] (ts %f) started request %r',
+                   request.transport.fileno(), time.time(), request)
 
         if self._rateController:
             self.log("Creating RateControl object using plug %r",

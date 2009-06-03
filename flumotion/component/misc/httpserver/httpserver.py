@@ -554,10 +554,17 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         return defer.DeferredList(l)
 
     def requestStarted(self, request):
+        # request does not yet have proto and uri
         fd = request.transport.fileno() # ugly!
         self._connected_clients[fd] = request
+        self.debug("[fd %5d] request %r started", fd, request)
 
     def requestFinished(self, request, bytesWritten, timeConnected, fd):
+
+        # PROBE: finishing request; see httpstreamer.resources
+        self.debug('[fd %5d] (ts %f) finishing request %r',
+                   request.transport.fileno(), time.time(), request)
+
         self.httpauth.cleanupAuth(fd)
         ip = request.getClientIP()
         if not self._logfilter or not self._logfilter.isInRange(ip):
@@ -582,6 +589,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 pending = self._pendingDisconnects.pop(fd)
                 self.debug("Firing pending disconnect deferred")
                 pending.callback(None)
+
+            # PROBE: finished request; see httpstreamer.resources
+            self.debug('[fd %5d] (ts %f) finished request %r',
+                       fd, time.time(), request)
+
         d.addCallback(firePendingDisconnect)
 
     def getDescription(self):
