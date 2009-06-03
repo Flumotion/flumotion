@@ -1,3 +1,12 @@
+2009-06-03  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Julien
+
+	* flumotion/scenario/steps/httpstreamersteps.py:
+	Change the default port to 8800 (the defined on configuration) and
+	don't let the streamer to override the porter's port when it has not
+	been set.
+
 2009-06-03  Jan Urbanski  <jurbanski@flumotion.com>
 
 	patch by: Thomas Vander Stichele  <thomas at apestaart dot org>

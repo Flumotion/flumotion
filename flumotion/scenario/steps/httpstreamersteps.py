@@ -71,7 +71,7 @@ class HTTPStreamer(Consumer):
         super(HTTPStreamer, self).__init__()
 
         self.setPorter(
-            Porter(worker=None, port=8080))#configure.defaultHTTPStreamPort))
+            Porter(worker=None, port=configure.defaultHTTPStreamPort))
 
         self.has_plugins = False
 
@@ -81,7 +81,7 @@ class HTTPStreamer(Consumer):
         self.bandwidth_limit = 500.0
         self.set_hostname = False
         self.hostname = ''
-        self.port = 8080#configure.defaultHTTPStreamPort
+        self.port = None
 
         self.properties.burst_on_connect = False
 
@@ -126,7 +126,8 @@ class HTTPStreamer(Consumer):
         """
         porter = Consumer.getPorter(self)
         porter.worker = self.worker
-        porter.properties.port = self.port
+        if self.port:
+            porter.properties.port = self.port
         return porter
 
     def getProperties(self):
@@ -146,7 +147,7 @@ class HTTPStreamer(Consumer):
         properties.type = 'slave'
         # FIXME: Try to maintain the port empty when we are slave. Needed
         # for now as the adminwindow tab shows the URL based on this property.
-        properties.port = self.port
+        properties.port = self.port or self.getPorter().getProperties().port
 
         return properties
 
