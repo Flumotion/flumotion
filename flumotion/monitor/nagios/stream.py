@@ -79,7 +79,13 @@ def getURLFromPlaylist(url):
 
     urls = re.findall(URLFINDER, playlist.read())
     if urls:
-        return urls[-1] # new (the last) url to check
+        # Quick hack needed to remove trailing " if there, because
+        # asx playlists have <REF HREF="<url>" /> and the regex picks up
+        # the trailing "
+        last_url = urls[-1]
+        if last_url.endswith('"'):
+            last_url = last_url[:-1]
+        return last_url # new (the last) url to check
     else:
         raise util.NagiosCritical('No URLs into the playlist.')
 
