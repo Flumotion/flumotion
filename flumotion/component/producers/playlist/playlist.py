@@ -123,6 +123,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self._vsrcs = {} # { PlaylistItem -> gnlsource }
         self._asrcs = {} # { PlaylistItem -> gnlsource }
 
+        self.uiState.addListKey("playlist")
+
     def _buildAudioPipeline(self, pipeline, src):
         audiorate = gst.element_factory_make("audiorate")
         audioconvert = gst.element_factory_make('audioconvert')
@@ -335,6 +337,13 @@ class PlaylistProducer(feedcomponent.FeedComponent):
         self.debug("Done scheduling: start at %s, end at %s",
             _tsToString(start + self.basetime),
             _tsToString(start + self.basetime + item.duration))
+
+        self.uiState.append("playlist", (item.timestamp,
+                                         item.uri,
+                                         item.duration,
+                                         item.offset,
+                                         item.hasAudio,
+                                         item.hasVideo))
         return True
 
     def unscheduleItem(self, item):
@@ -347,6 +356,9 @@ class PlaylistProducer(feedcomponent.FeedComponent):
             asrc = self._asrcs.pop(item)
             self.audiocomp.remove(asrc)
             asrc.set_state(gst.STATE_NULL)
+        for entry in self.uiState.get("playlist"):
+            if entry[0] == item.timestamp:
+                self.uiState.remove("playlist", entry)
 
     def adjustItemScheduling(self, item):
         if self._hasVideo and item.hasVideo:

@@ -9,6 +9,8 @@
       <entries>
         <entry type="component" location="playlist.py"
                function="PlaylistProducer" />
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
       </entries>
 
       <synchronization required="yes" clock-priority="110" />
@@ -53,6 +55,7 @@
     <bundle name="playlist-component">
         <dependencies>
             <dependency name="component" />
+            <dependency name="base-admin-gtk" />
         </dependencies>
 
         <directories>
@@ -62,6 +65,8 @@
                 <filename location="singledecodebin.py" />
                 <filename location="playlist.py" />
                 <filename location="playlistparser.py" />
+                <filename location="admin_gtk.py" />
+                <filename location="playlist.glade" />
             </directory>
         </directories>
     </bundle>
