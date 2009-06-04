@@ -3,14 +3,11 @@
 	reviewed by: Zaheer Abbas Merali
 
 	* flumotion/component/producers/playlist/Makefile.am:
-	* flumotion/component/producers/playlist/admin_gtk.py:
-	* flumotion/component/producers/playlist/playlist.glade:
 	* flumotion/component/producers/playlist/playlist.py:
 	* flumotion/component/producers/playlist/playlist.xml:
 	* flumotion/component/producers/playlist/admin_gtk.py (added):
 	* flumotion/component/producers/playlist/playlist.glade (added):
 	Added admin UI for playlist-producer
-	Fixes #4435
 
 2009-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
