@@ -458,8 +458,8 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             return self.transport.loseConnection()
 
         # PROBE: request
-        self.debug("[fd %5d] (ts %f) request %s", self.transport.fileno(),
-                   time.time(), identifier)
+        self.debug("[fd %5d] (ts %f) request line %r, identifier %s",
+                   self.transport.fileno(), time.time(), line, identifier)
 
         # Ok, we have an identifier. Is it one we know about, or do we have
         # a default destination?
@@ -471,8 +471,9 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
             # PROBE: no destination; see send fd
             self.debug(
-                "[fd %5d] (ts %f) no destination avatar found for \"%s\"",
-                self.transport.fileno(), time.time(), identifier)
+                "[fd %5d] (ts %f) no destination avatar found "
+                "for request line %r",
+                self.transport.fileno(), time.time(), line)
 
             self.writeNotFoundResponse()
             return self.transport.loseConnection()
@@ -484,9 +485,10 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         # itself.
 
         # PROBE: send fd; see no destination and fdserver.py
-        self.debug("[fd %5d] (ts %f) send fd to avatarId %s for \"%s\"",
+        self.debug("[fd %5d] (ts %f) send fd to avatarId %s "
+                   "for request line %r",
                    self.transport.fileno(), time.time(),
-                   destinationAvatar.avatarId, identifier)
+                   destinationAvatar.avatarId, line)
 
         # TODO: Check out blocking characteristics of sendFileDescriptor, fix
         # if it blocks.
@@ -494,9 +496,10 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             self.transport.fileno(), self._buffer)
 
         # PROBE: sent fd; see no destination and fdserver.py
-        self.debug("[fd %5d] (ts %f) sent fd to avatarId %s for \"%s\"",
+        self.debug("[fd %5d] (ts %f) sent fd to avatarId %s "
+                   "for request line %r",
                    self.transport.fileno(), time.time(),
-                   destinationAvatar.avatarId, identifier)
+                   destinationAvatar.avatarId, line)
 
         # After this, we don't want to do anything with the FD, other than
         # close our reference to it - but not close the actual TCP connection.

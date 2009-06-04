@@ -1,3 +1,9 @@
+2009-06-04  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/misc/porter/porter.py:
+	Make the porter log the whole request line, not just the identifier,
+	which for example does not include GET parameters.
+
 2009-06-04  Alvin Delagon  <adelagon@flumotion.com>
 
 	reviewed by: Zaheer Abbas Merali
