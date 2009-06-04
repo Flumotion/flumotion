@@ -1,5 +1,13 @@
 2009-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	previous commit post-reviewed by: Jan Urbanski
+	
+	* flumotion/monitor/nagios/stream.py:
+	Fix regexp to not require quick hack, courtesy perl-high Jan.
+	Also remove log import, as it is not used by file.
+
+2009-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	* flumotion/monitor/nagios/stream.py:
 	Quick hack added to not pick up trailing " for url from asx
 	playlists.

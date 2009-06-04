@@ -40,10 +40,10 @@ import gobject
 from twisted.internet import reactor, defer
 
 from flumotion.admin import admin, connections
-from flumotion.common import log, errors, keycards
+from flumotion.common import errors, keycards
 from flumotion.monitor.nagios import util
 
-URLFINDER = "http://[^\s']*" # to search urls in playlists
+URLFINDER = "http://[^\s'\"]*" # to search urls in playlists
 PLAYLIST_SUFFIX = ('m3u', 'asx') # extensions for playlists
 TIMEOUT = 5 # timeout in seconds
 
@@ -79,13 +79,7 @@ def getURLFromPlaylist(url):
 
     urls = re.findall(URLFINDER, playlist.read())
     if urls:
-        # Quick hack needed to remove trailing " if there, because
-        # asx playlists have <REF HREF="<url>" /> and the regex picks up
-        # the trailing "
-        last_url = urls[-1]
-        if last_url.endswith('"'):
-            last_url = last_url[:-1]
-        return last_url # new (the last) url to check
+        return urls[-1] # new (the last) url to check
     else:
         raise util.NagiosCritical('No URLs into the playlist.')
 
