@@ -216,6 +216,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.stats = None
         self._rateControlPlug = None
         self._fileProviderPlug = None
+        self._metadataProviderPlug = None
         self._loggers = []
         self._requestModifiers = []
         self._logfilter = None
@@ -335,6 +336,13 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             plugProps = {"properties": {"path": props.get('path', None)}}
             self._fileProviderPlug = localprovider.FileProviderLocalPlug(
                 plugProps)
+
+        socket = ('flumotion.component.misc.httpserver'
+                 '.metadataprovider.MetadataProviderPlug')
+        plugs = self.plugs.get(socket, [])
+        if plugs:
+            self._metadataProviderPlug = plugs[-1]
+
         # Update uiState
         self.uiState.set('stream-url', self.getUrl())
 
@@ -501,7 +509,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         factory = httpfile.MimedFileFactory(self.httpauth,
             mimeToResource=self._mimeToResource,
             rateController=self._rateControlPlug,
-            requestModifiers=self._requestModifiers)
+            requestModifiers=self._requestModifiers,
+            metadataProvider=self._metadataProviderPlug)
 
         root = factory.create(node)
         if self.mountPoint != '/':

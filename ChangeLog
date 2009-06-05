@@ -1,3 +1,14 @@
+2009-06-05  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Arek
+
+	* flumotion/component/misc/httpserver/httpfile.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/metadataprovider.py (added):
+	Added MetadataProvider Plug for ondemand http-server component.
+	Fixes #1302
+
 2009-06-04  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/misc/porter/porter.py:
@@ -18,7 +29,7 @@
 2009-06-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	previous commit post-reviewed by: Jan Urbanski
-	
+
 	* flumotion/monitor/nagios/stream.py:
 	Fix regexp to not require quick hack, courtesy perl-high Jan.
 	Also remove log import, as it is not used by file.

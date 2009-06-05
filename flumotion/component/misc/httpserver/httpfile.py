@@ -80,7 +80,8 @@ class File(resource.Resource, log.Loggable):
     def __init__(self, path, httpauth,
                  mimeToResource=None,
                  rateController=None,
-                 requestModifiers=None):
+                 requestModifiers=None,
+                 metadataProvider=None):
         resource.Resource.__init__(self)
 
         self._path = path
@@ -88,9 +89,11 @@ class File(resource.Resource, log.Loggable):
         # mapping of mime type -> File subclass
         self._mimeToResource = mimeToResource or {}
         self._rateController = rateController
+        self._metadataProvider = metadataProvider
         self._requestModifiers = requestModifiers or []
         self._factory = MimedFileFactory(httpauth, self._mimeToResource,
                                          rateController=rateController,
+                                         metadataProvider=metadataProvider,
                                          requestModifiers=requestModifiers)
 
     def getChild(self, path, request):
@@ -266,29 +269,43 @@ class File(resource.Resource, log.Loggable):
         self.debug('[fd %5d] (ts %f) started request %r',
                    request.transport.fileno(), time.time(), request)
 
-        if self._rateController:
-            self.log("Creating RateControl object using plug %r",
-                self._rateController)
-            # What do we want to pass to this? The consumer we proxy to,
-            # perhaps the request object too? This object? The file itself?
-
-            # We probably want the filename part of the request URL - the bit
-            # after the mount-point. e.g. in /customer1/videos/video1.ogg, we
-            # probably want to provide /videos/video1.ogg to this..
-            d = defer.maybeDeferred(
-                self._rateController.createProducerConsumerProxy,
-                request, request)
+        if self._metadataProvider:
+            self.log("Retrieving metadata using %r", self._metadataProvider)
+            d = self._metadataProvider.getMetadata(self._path.path)
         else:
-            d = defer.succeed(request)
+            d = defer.succeed(None)
 
-        def attachProxy(consumer):
-            # Set the provider first, because for very small file
-            # the transfer could terminate right away.
-            request._provider = provider
-            transfer = FileTransfer(provider, last + 1, consumer)
-            request._transfer = transfer
+        def configureTransfer(metadata=None):
+            if self._rateController:
+                self.log("Creating RateControl object using plug %r",
+                    self._rateController)
 
-        d.addCallback(attachProxy)
+                # We are passing a metadata dictionary as Proxy settings.
+                # So the rate control can use it if needed.
+                d = defer.maybeDeferred(
+                    self._rateController.createProducerConsumerProxy,
+                    request, metadata)
+            else:
+                d = defer.succeed(request)
+
+            def attachProxy(consumer):
+                # Set the provider first, because for very small file
+                # the transfer could terminate right away.
+                request._provider = provider
+                transfer = FileTransfer(provider, last + 1, consumer)
+                request._transfer = transfer
+
+            d.addCallback(attachProxy)
+
+        def metadataError(failure):
+            self.warning('Error retrieving metadata for file %s'
+                        ' using plug %r. %r',
+                        self._path.path,
+                        self._metadataProvider,
+                        failure.value)
+
+        d.addErrback(metadataError)
+        d.addCallback(configureTransfer)
 
         return server.NOT_DONE_YET
 
@@ -317,11 +334,13 @@ class MimedFileFactory(log.Loggable):
     def __init__(self, httpauth,
                  mimeToResource=None,
                  rateController=None,
-                 requestModifiers=None):
+                 requestModifiers=None,
+                 metadataProvider=None):
         self._httpauth = httpauth
         self._mimeToResource = mimeToResource or {}
         self._rateController = rateController
         self._requestModifiers = requestModifiers
+        self._metadataProvider = metadataProvider
 
     def create(self, path):
         """
@@ -334,7 +353,8 @@ class MimedFileFactory(log.Loggable):
         return klazz(path, self._httpauth,
                      mimeToResource=self._mimeToResource,
                      rateController=self._rateController,
-                     requestModifiers=self._requestModifiers)
+                     requestModifiers=self._requestModifiers,
+                     metadataProvider=self._metadataProvider)
 
 
 class FLVFile(File):
