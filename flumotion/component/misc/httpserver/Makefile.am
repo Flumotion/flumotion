@@ -13,7 +13,8 @@ httpserver_PYTHON =		\
 	localpath.py		\
 	localprovider.py	\
 	ratecontrol.py          \
-	serverstats.py
+	serverstats.py		\
+	metadataprovider.py
 
 httpserver_DATA = 		\
 	httpfile.glade		\

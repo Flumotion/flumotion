@@ -1,5 +1,10 @@
 2009-06-05  Josep Joan Ribas  <jribas@flumotion.com>
 
+	* flumotion/component/misc/httpserver/Makefile.am:
+	Added missing file (metadaprovider.py)
+
+2009-06-05  Josep Joan Ribas  <jribas@flumotion.com>
+
 	reviewed by: Arek
 
 	* flumotion/component/misc/httpserver/httpfile.py:
