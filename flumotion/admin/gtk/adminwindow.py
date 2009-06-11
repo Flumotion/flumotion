@@ -990,6 +990,9 @@ class AdminWindow(Loggable, GladeDelegate):
         for f in planetState.get('flows'):
             planetStateAppend(planetState, 'flows', f)
 
+        if not planetState.get('flows'):
+            self._updateComponents()
+
     def _clearAllComponents(self):
         d = self._adminModel.cleanComponents()
 

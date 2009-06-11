@@ -1,3 +1,11 @@
+2009-06-11  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py(_setPlanetState):
+	Update the components list if it has not been updated. It can be left
+	un-updated if no component was present in the flow (only atmosphere
+	componens).
+	
+
 2009-06-05  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/component/misc/httpserver/Makefile.am:
