@@ -1,3 +1,9 @@
+2009-06-11  Arek Korbik  <arkadini@gmail.com>
+
+	* flumotion/twisted/pb.py (PingableAvatar.stopPingChecking):
+	Release reference, stored in 'self', to what might be a closure
+	over 'self' - breaks potential un-gc-able cycles, fixes #1311.
+
 2009-06-11  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py(_setPlanetState):

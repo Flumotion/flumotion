@@ -789,6 +789,10 @@ class PingableAvatar(Avatar):
             self._pingCheckDC.cancel()
         self._pingCheckDC = None
 
+        # release the disconnect function, too, to help break any
+        # potential cycles
+        self._pingCheckDisconnect = None
+
     def setMind(self, mind):
         # chain up
         Avatar.setMind(self, mind)
