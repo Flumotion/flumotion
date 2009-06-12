@@ -259,9 +259,8 @@ class JobOrphaned(util.LogCommand):
             len(orphaned), ", ".join(orphaned)))
 
 
-class JobVSize(util.LogCommand):
+class ProcessVSize(util.LogCommand):
     name = 'vsize'
-    description = "Check the vsize of job processes."
     usage = '[vsize-options]'
 
     def addOptions(self):
@@ -279,7 +278,7 @@ class JobVSize(util.LogCommand):
     def do(self, args):
         # get a list of pid, vsize and sort on vsize in reverse order
         l = []
-        processes = getProcesses(prefix='flumotion-job')
+        processes = getProcesses(prefix=self.prefix)
         if not processes:
             return util.ok('No job processes running.')
 
@@ -299,18 +298,37 @@ class JobVSize(util.LogCommand):
             # count number of critical jobs
             which = [t for t in l if t[1] >= critical]
             return util.critical(
-                '%d job(s) above critical level - highest is %d at %s' % (
-                    len(which), pid, formatStorage(vsize)))
+                '%d %s(s) above critical level - highest is %d at %s' % (
+                    len(which), self.process_type, pid, formatStorage(vsize)))
 
         if vsize >= warning:
             # count number of warning jobs
             which = [t for t in l if t[1] >= warning]
             return util.warning(
-                '%d job(s) above warning level - highest is %d at %s' % (
-                    len(which), pid, formatStorage(vsize)))
+                '%d %s(s) above warning level - highest is %d at %s' % (
+                    len(which), self.process_type, pid, formatStorage(vsize)))
 
-        return util.ok('No job processes above warning level '
-            '(highest is %d at %s)' % (pid, formatStorage(vsize)))
+        return util.ok('No %s processes above warning level '
+            '(highest is %d at %s)' % (self.process_type, pid,
+                                       formatStorage(vsize)))
+
+
+class JobVSize(ProcessVSize):
+    prefix = 'flumotion-job'
+    process_type = 'job'
+    description = "Check the vsize of job processes."
+
+
+class WorkerVSize(ProcessVSize):
+    prefix = 'flumotion-worke'
+    process_type = 'worker'
+    description = "Check the vsize of worker processes."
+
+
+class ManagerVSize(ProcessVSize):
+    prefix = 'flumotion-manag'
+    process_type = 'manager'
+    description = "Check the vsize of manager processes."
 
 
 class Job(util.LogCommand):
@@ -336,7 +354,7 @@ class ManagerMultiple(util.LogCommand):
 class Manager(util.LogCommand):
     description = "Check manager processes."
 
-    subCommandClasses = [ManagerMultiple, ]
+    subCommandClasses = [ManagerMultiple, ManagerVSize]
 
 
 class WorkerMultiple(util.LogCommand):
@@ -356,7 +374,7 @@ class WorkerMultiple(util.LogCommand):
 class Worker(util.LogCommand):
     description = "Check worker processes."
 
-    subCommandClasses = [WorkerMultiple, ]
+    subCommandClasses = [WorkerMultiple, WorkerVSize]
 
 
 class ProcessCommand(util.LogCommand):

@@ -1,3 +1,9 @@
+2009-06-12  Julien Le Goff  <jlegoff@flumotion.com>
+
+	* flumotion/monitor/nagios/process.py:
+	Abstracted JobVSize to also track the vsize of worker + manager
+	processes.
+
 2009-06-11  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/twisted/pb.py (PingableAvatar.stopPingChecking):
