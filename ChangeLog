@@ -1,3 +1,27 @@
+2009-06-15  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali
+
+	* flumotion/component/base/http.py:
+	Add a property called "allow-default" in HTTPAuthentication to permit
+	clients through if the authorization attempt failed with an unexpected
+	error. This can be caused by the manager being down and thus being
+	unable to contact the bouncer, by the bouncer not being logged in, by
+	network connection timeouts...
+	A very similar property has been added in r5134 in the platform-3
+	branch but has never been ported to trunk.
+	Fixes #1310.
+
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	Allow streaming components to read from config and set the newly added
+	property of HTTPAuthentication.
+
+	* flumotion/test/test_http.py:
+	Unit test the new property.
+
 2009-06-12  Julien Le Goff  <jlegoff@flumotion.com>
 
 	* flumotion/monitor/nagios/process.py:

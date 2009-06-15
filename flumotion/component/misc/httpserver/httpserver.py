@@ -311,6 +311,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self.httpauth.setBouncerName(props['bouncer'])
         if 'issuer-class' in props:
             self.httpauth.setIssuerClass(props['issuer-class'])
+        if 'allow-default' in props:
+            self.httpauth.setAllowDefault(props['allow-default'])
         if 'ip-filter' in props:
             logFilter = http.LogFilter()
             for f in props['ip-filter']:

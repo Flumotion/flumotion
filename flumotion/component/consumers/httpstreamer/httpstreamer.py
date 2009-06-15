@@ -508,6 +508,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if 'issuer-class' in properties:
             self.httpauth.setIssuerClass(properties['issuer-class'])
 
+        if 'allow-default' in properties:
+            self.httpauth.setAllowDefault(properties['allow-default'])
+
         if 'duration' in properties:
             self.httpauth.setDefaultDuration(
                 float(properties['duration']))
