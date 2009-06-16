@@ -1,3 +1,12 @@
+2009-06-16  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* data/glade/connections.glade:
+	Instantiate the ObjectList and set its callbacks from the glade file.
+	* flumotion/admin/gtk/connections.py:
+	Truncate hosts column when handling long hostnames. Remove unnecesary gtk
+	code and gladify the widget.
+	Fixes #879
+
 2009-06-15  Jan Urbanski  <jurbanski@flumotion.com>
 
 	reviewed by: Zaheer Abbas Merali

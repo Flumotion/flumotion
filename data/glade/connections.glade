@@ -21,7 +21,17 @@
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>
-
+      <child>
+        <widget class="Custom" id="connections">
+          <property name="creation_function">kiwi.ui.objectlist.ObjectList</property>
+          <signal name="row-activated" handler="_on_connections_row_activated"/>
+          <signal name="selection-changed" handler="_on_connections_selection_changed"/>
+        </widget>
+        <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+        </packing>
+      </child>
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox1">
 	  <property name="visible">True</property>

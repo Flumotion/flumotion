@@ -26,7 +26,9 @@ import gettext
 
 import gobject
 import gtk
-from kiwi.ui.objectlist import ObjectList, Column
+from kiwi.ui.objectlist import Column
+from pango import ELLIPSIZE_MIDDLE
+
 from flumotion.admin.connections import getRecentConnections, \
      hasRecentConnections
 from flumotion.common.pygobject import gsignal, gproperty
@@ -50,28 +52,21 @@ class Connections(GladeWidget):
     def __init__(self):
         GladeWidget.__init__(self)
 
-        columns = [Column("host", title=_("Hostname"), searchable=True),
+        self.connections.set_columns(
+                  [Column("host", title=_("Hostname"), searchable=True,
+                          ellipsize=ELLIPSIZE_MIDDLE, expand=True, width=100),
                    Column("timestamp", title=_("Last used"),
                           sorted=True,
                           order=gtk.SORT_DESCENDING,
                           format_func=format_timestamp),
-                   ]
-        self._connections = ObjectList(
-            columns,
-            objects=getRecentConnections(),
-            mode=gtk.SELECTION_SINGLE)
-        self._connections.connect(
-            'row-activated',
-            self._on_objectlist_row_activated)
-        self._connections.connect(
-            'selection-changed',
-            self._on_objectlist_selection_changed)
-        self._connections.set_size_request(-1, 160)
-        self.page.pack_start(self._connections)
-        self.page.reorder_child(self._connections, 0)
-        self._connections.get_treeview().set_search_equal_func(
+                   ])
+        self.connections.add_list(getRecentConnections())
+        self.connections.get_treeview().set_search_equal_func(
             self._searchEqual)
-        self._connections.show()
+        self.connections.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.connections.set_property('selection-mode', gtk.SELECTION_SINGLE)
+        self.connections.set_size_request(-1, 160)
+
         self._updateButtons()
 
     def _updateButtons(self):
@@ -90,23 +85,23 @@ class Connections(GladeWidget):
         return True
 
     def _clear_all(self):
-        for conn in self._connections:
+        for conn in self.connections:
             os.unlink(conn.filename)
-        self._connections.clear()
+        self.connections.clear()
 
     def _clear(self, conn):
-        self._connections.remove(conn)
+        self.connections.remove(conn)
         os.unlink(conn.filename)
 
     # Public API
 
     def grab_focus(self):
-        if len(self._connections):
-            self._connections.select(self._connections[0])
-        self._connections.grab_focus()
+        if len(self.connections):
+            self.connections.select(self.connections[0])
+        self.connections.grab_focus()
 
     def get_selected(self):
-        return self._connections.get_selected()
+        return self.connections.get_selected()
 
     def update(self, connection):
         os.utime(connection.filename, None)
@@ -114,7 +109,7 @@ class Connections(GladeWidget):
     # Callbacks
 
     def on_button_clear_clicked(self, button):
-        conn = self._connections.get_selected()
+        conn = self.connections.get_selected()
         if conn:
             self._clear(conn)
         self._updateButtons()
@@ -123,10 +118,10 @@ class Connections(GladeWidget):
         self._clear_all()
         self._updateButtons()
 
-    def _on_objectlist_row_activated(self, connections, connection):
+    def _on_connections_row_activated(self, connections, connection):
         self.emit('connection-activated', connection)
 
-    def _on_objectlist_selection_changed(self, connections, connection):
+    def _on_connections_selection_changed(self, connections, connection):
         self.emit('have-connection', bool(connection))
 
 gobject.type_register(Connections)
