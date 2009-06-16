@@ -1,3 +1,8 @@
+2009-06-16  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/misc/httpserver/httpserver.py:
+	Log the exact timestamp of the request start.
+
 2009-06-16  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* data/glade/connections.glade:

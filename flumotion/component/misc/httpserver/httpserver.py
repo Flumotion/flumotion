@@ -568,7 +568,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         # request does not yet have proto and uri
         fd = request.transport.fileno() # ugly!
         self._connected_clients[fd] = request
-        self.debug("[fd %5d] request %r started", fd, request)
+        self.debug("[fd %5d] (ts %f) request %r started",
+                   fd, time.time(), request)
 
     def requestFinished(self, request, bytesWritten, timeConnected, fd):
 
