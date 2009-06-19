@@ -1,3 +1,14 @@
+2009-06-20  Alvin Delagon  <adelagon@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali
+
+	* flumotion/component/feedcomponent.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_component_feedcomponent.py (added):
+	Ignore eatFrom calls if the feed is the same as the current one. Added
+	feedcomponent unit test.
+	Fixes #1277
+
 2009-06-16  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpserver.py:
