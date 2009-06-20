@@ -18,9 +18,11 @@ check-local-pep8:
 
 # run our hacked-up version of trial with all the reactors that we actually use and build up the final result
 coverage:
+	@test ! -z "$(COVERAGE_MODULES)" ||				\
+	(echo Define COVERAGE_MODULES in your Makefile.am; exit 1)
 	rm -f flu-saved-coverage.pickle
-	@$(top_builddir)/env bash -c "common/flumotion-trial --reactor default --temp-directory=_trial_coverage --coverage --saved-coverage=flu-saved-coverage.pickle flumotion.test"
-	@$(top_builddir)/env bash -c "common/flumotion-trial --reactor gtk2    --temp-directory=_trial_coverage --coverage --saved-coverage=flu-saved-coverage.pickle flumotion.test"
+	@$(top_builddir)/env bash -c "common/flumotion-trial --reactor default --temp-directory=_trial_coverage --coverage --saved-coverage=flu-saved-coverage.pickle $(COVERAGE_MODULES)"
+	@$(top_builddir)/env bash -c "common/flumotion-trial --reactor gtk2    --temp-directory=_trial_coverage --coverage --saved-coverage=flu-saved-coverage.pickle $(COVERAGE_MODULES)"
 	make show-coverage
 
 show-coverage:
