@@ -233,6 +233,9 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
         def sel_changed(sel):
             model, i = sel.get_selected()
+            if not i:
+                sel.select_iter(model.get_iter_first())
+                return
             self.select(i and model.get_value(i, 2))
             # don't show the feeder client stuff for a feeder
             if model.get_value(i, 3) == 'feeder':

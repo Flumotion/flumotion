@@ -1,3 +1,10 @@
+2009-06-22  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/component/base/feedersnode.py:
+	Force the first node to be selected when the selection vanishes, for
+	example, because a row is collapsed.
+	Fixes #1312
+
 2009-06-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/common.mk:
