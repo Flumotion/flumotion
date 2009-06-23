@@ -1,9 +1,10 @@
-2008-07-31  Johan Dahlin  <johan@gnome.org>
-
-	reviewed by: <delete if not using a buddy>
+2009-06-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* log.py:
-	* test_log.py:
+	  Fix various pychecker warnings.
+	  Rewrite writeMarker in less lines, although it's still ugly
+	  to special-case for errorObject, and possibly that should move to
+	  doLog instead.
 
 2008-05-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 

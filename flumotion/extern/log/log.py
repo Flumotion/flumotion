@@ -164,11 +164,11 @@ def setLogSettings(state):
     global _log_handlers_limited
 
     (_DEBUG,
-     _categories,
+     categories,
      _log_handlers,
      _log_handlers_limited) = state
 
-    for category in _categories:
+    for category in categories:
         registerCategory(category)
 
 
@@ -273,12 +273,12 @@ def getFormatArgs(startFormat, startArgs, endFormat, endArgs, args, kwargs):
     for items in kwargs.items():
         debugArgs.extend(items)
     debugArgs.extend(endArgs)
-    format = startFormat \
+    debugFormat = startFormat \
               + ', '.join(('%s', ) * len(args)) \
               + (kwargs and ', ' or '') \
               + ', '.join(('%s=%r', ) * len(kwargs)) \
               + endFormat
-    return format, debugArgs
+    return debugFormat, debugArgs
 
 
 def doLog(level, object, category, format, args, where=-1,
@@ -730,14 +730,11 @@ class Loggable:
         log.DEBUG, log.ERROR or log.LOG.
         @type  level: int
         """
-        logHandlers = {WARN: self.warning,
-                       INFO: self.info,
-                       DEBUG: self.debug,
-                       ERROR: self.error,
-                       LOG: self.log}
-        logHandler = logHandlers.get(level)
-        if logHandler:
-            logHandler('%s', marker)
+        # errorObject specifically raises, so treat it specially
+        if level == ERROR:
+            self.error('%s', marker)
+
+        doLog(level, self.logObjectName(), self.logCategory, '%s', marker)
 
     def error(self, *args):
         """Log an error.  By default this will also raise an exception."""
@@ -955,9 +952,9 @@ class TwistedLogObserver(Loggable):
         else:
             text = ' '.join(map(str, edm))
 
-        fmtDict = {'system': eventDict['system'],
-                   'text': text.replace("\n", "\n\t")}
-        msgStr = " [%(system)s] %(text)s\n" % fmtDict
+        msgStr = " [%(system)s] %(text)s\n" % {
+                'system': eventDict['system'],
+                'text': text.replace("\n", "\n\t")}
         # because msgstr can contain %, as in a backtrace, make sure we
         # don't try to splice it
         method('twisted', msgStr)
