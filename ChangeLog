@@ -1,6 +1,11 @@
 2009-06-23  Alvin Delagon  <adelagon@flumotion.com>
 
 	* flumotion/component/feedcomponent.py:
+	No need to do string interpolation in debug logging
+
+2009-06-23  Alvin Delagon  <adelagon@flumotion.com>
+
+	* flumotion/component/feedcomponent.py:
 	Include Feed info in the debug log from the last commit
 
 2009-06-23  Alvin Delagon  <adelagon@flumotion.com>

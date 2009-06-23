@@ -121,7 +121,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         if self._feederFeedServer.get(eaterAlias):
             if self._feederFeedServer[eaterAlias] == (fullFeedId, host, port):
                 self.debug("Feed:%r is the same as the current one. "\
-                           "Request ignored." % ((fullFeedId, host, port), ))
+                           "Request ignored.", (fullFeedId, host, port))
                 return
         self._feederFeedServer[eaterAlias] = (fullFeedId, host, port)
         return self.connectEater(eaterAlias)
