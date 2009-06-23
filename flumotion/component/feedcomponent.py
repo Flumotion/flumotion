@@ -122,7 +122,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             if self._feederFeedServer[eaterAlias] == (fullFeedId, host, port):
                 self.debug("Feed:%r is the same as the current one. "\
                            "Request ignored.", (fullFeedId, host, port))
-                return
+                # FIXME: Hard to distinguish if ignored or not
+                return defer.succeed(None)
         self._feederFeedServer[eaterAlias] = (fullFeedId, host, port)
         return self.connectEater(eaterAlias)
 
