@@ -296,8 +296,6 @@ class HTTPSpecificStep(ConsumerStep):
         self.port.data_type = int
         self.hostname.data_type = str
 
-        self._populatePlugins()
-
         self.model.properties.mount_point = self._getDefaultMountPath()
         self._proxy1 = self.add_proxy(self.model.properties,
                                       ['mount_point', 'burst_on_connect'])
@@ -321,7 +319,9 @@ class HTTPSpecificStep(ConsumerStep):
 
     def workerChanged(self, worker):
         self.model.worker = worker
-        self._runChecks()
+        d = self._runChecks()
+        d.addCallback(self._populatePlugins)
+        return d
 
     def getNext(self):
         next = ConsumerStep.getNext(self)
@@ -360,7 +360,9 @@ class HTTPSpecificStep(ConsumerStep):
             digit = 2
         return mountPoint + str(digit) + '/'
 
-    def _populatePlugins(self):
+    def _populatePlugins(self, canPopulate):
+        if not canPopulate:
+            return
 
         def gotEntries(entries):
             log.debug('httpwizard', 'got %r' % (entries, ))
@@ -422,55 +424,43 @@ class HTTPSpecificStep(ConsumerStep):
     def _runChecks(self):
         self.wizard.waitForTask('http streamer check')
 
+        def hostnameErrback(failure):
+            failure.trap(errors.RemoteRunError)
+            self.wizard.taskFinished(blockNext=True)
+            return False
+
         def gotHostname(hostname):
             self.model.hostname = hostname
             self._proxy2.update('hostname')
-            self.wizard.taskFinished(True)
-            self._checkMountPoint(need_fix=True)
+            self.wizard.taskFinished()
+            return True
 
-        def importError(failure):
-            print 'FIXME: trap', failure, 'in .../httpstreamer/wizard_gtk.py'
-            self.info('could not import twisted-web')
-            message = messages.Warning(T_(N_(
-                "Worker '%s' cannot import module '%s'."),
-                self.worker, 'twisted.web'))
-            message.add(T_(N_("\nThis module is part of the '%s'."),
-                           'Twisted Project'))
-            message.add(T_(N_("\nThe project's homepage is %s"),
-                           'http://www.twistedmatrix.com/'))
-            message.id = 'module-twisted-web'
-            self.wizard.add_msg(message)
-            self.wizard.taskFinished(True)
+        def getHostname(result):
+            if not result:
+                return False
 
-        def getHostname(_):
             d = self.wizard.runInWorker(
-                self.worker, 'flumotion.worker.checks.http',
-                'runHTTPStreamerChecks')
-            return d.addCallback(gotHostname)
+                    self.worker, 'flumotion.worker.checks.http',
+                    'runHTTPStreamerChecks')
+            d.addCallback(gotHostname)
+            d.addErrback(getHostnameErrback)
+            return d
 
-        def checkElements(elements):
+        def checkImport(elements):
             if elements:
-                f = ngettext("Worker '%s' is missing GStreamer element '%s'.",
-                    "Worker '%s' is missing GStreamer elements '%s'.",
-                    len(elements))
-                message = messages.Warning(
-                    T_(f, self.worker, "', '".join(elements)),
-                    mid='httpstreamer')
-                self.wizard.add_msg(message)
-                self.wizard.taskFinished(True)
-                return defer.fail(
-                    errors.FlumotionError('missing multifdsink element'))
+                self.wizard.taskFinished(blockNext=True)
+                return False
 
-            self.wizard.clear_msg('httpstreamer')
-
-            # now check import
-            d = self.wizard.checkImport(self.worker, 'twisted.web')
+            d = self.wizard.requireImport(
+                    self.worker, 'twisted.web', projectName='Twisted project',
+                    projectURL='http://www.twistedmatrix.com/')
             d.addCallback(getHostname)
-            return d.addErrback(importError)
+            return d
 
         # first check elements
         d = self.wizard.requireElements(self.worker, 'multifdsink')
-        return d.addCallback(checkElements)
+        d.addCallback(checkImport)
+        return d
 
     def _checkMountPoint(self, port=None, worker=None,
                          mount_point=None, need_fix=False):

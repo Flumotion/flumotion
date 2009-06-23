@@ -51,7 +51,7 @@ def getMessageWebLink(message):
         projectURL = None
 
     return getWebLink(section=message.section,
-                      anchor=message.anchor,
+                      anchor=(message.anchor or ''),
                       version=message.version,
                       projectURL=projectURL)
 
@@ -82,8 +82,10 @@ def getWebLink(section, anchor, version=None, projectURL=None):
 
     if projectURL is None:
         projectURL = 'http://www.flumotion.net/doc/flumotion/manual'
+    if anchor:
+        anchor = '#%s' % anchor
 
-    return '%s/%s/%s/html/%s.html#%s' % (
+    return '%s/%s/%s/html/%s.html%s' % (
         projectURL, getLL(), version, section, anchor)
 
 
@@ -96,3 +98,21 @@ def messageAddPythonInstall(message, moduleName):
     message.description = T_(N_("Learn how to install Python modules."))
     message.section = 'appendix-installing-dependencies'
     message.anchor = 'section-installing-python-modules'
+
+
+def messageAddFixBadPermissions(message):
+    """
+    Add link on how to change device permissions on Linux.
+    """
+    message.description = T_(N_("Learn how to change device permissions."))
+    message.section = 'section-flumotion-troubleshoot'
+    message.anchor = 'section-not-open'
+
+
+def messageAddGStreamerInstall(message):
+    """
+    Add text and link on how to install the given python module to the
+    given message.
+    """
+    message.description = T_(N_('Learn how to install GStreamer elements.'))
+    message.section = 'section-installing-gstreamer-plugins'

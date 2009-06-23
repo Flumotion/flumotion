@@ -24,7 +24,7 @@ import os
 import gst
 from twisted.internet import defer
 
-from flumotion.common import errors, log, messages, gstreamer
+from flumotion.common import documentation, errors, gstreamer, log, messages
 from flumotion.common.i18n import N_, gettexter
 
 __version__ = "$Rev$"
@@ -53,14 +53,17 @@ def handleGStreamerDeviceError(failure, device, mid=None):
                 m = messages.Error(T_(
                     N_("Could not open device '%s' for reading.  "
                        "Check permissions on the device."), device), mid=mid)
+                documentation.messageAddFixBadPermissions(m)
             if gerror.code == int(gst.RESOURCE_ERROR_OPEN_WRITE):
                 m = messages.Error(T_(
                     N_("Could not open device '%s' for writing.  "
                        "Check permissions on the device."), device), mid=mid)
+                documentation.messageAddFixBadPermissions(m)
             elif gerror.code == int(gst.RESOURCE_ERROR_OPEN_READ_WRITE):
                 m = messages.Error(T_(
                     N_("Could not open device '%s'.  "
                        "Check permissions on the device."), device), mid=mid)
+                documentation.messageAddFixBadPermissions(m)
             elif gerror.code == int(gst.RESOURCE_ERROR_BUSY):
                 m = messages.Error(T_(
                     N_("Device '%s' is already in use."), device), mid=mid)
@@ -236,6 +239,7 @@ def checkPlugin(pluginName, packageName, minimumVersion=None,
                 pluginName))
         m.add(T_(N_(
             "Please install '%s'.\n"), packageName))
+        documentation.messageAddGStreamerInstall(m)
         result.add(m)
     elif featureName:
         r = gst.registry_get_default()
@@ -249,6 +253,7 @@ def checkPlugin(pluginName, packageName, minimumVersion=None,
             m.add(T_(N_(
                 "Please upgrade '%s' to version %s or higher."),
                 packageName, ".".join([str(x) for x in minimumVersion])))
+            documentation.messageAddGStreamerInstall(m)
             result.add(m)
     elif version < minimumVersion:
         m = messages.Error(T_(
@@ -258,6 +263,7 @@ def checkPlugin(pluginName, packageName, minimumVersion=None,
         m.add(T_(N_(
             "Please upgrade '%s' to version %s."), packageName,
                ".".join([str(x) for x in minimumVersion])))
+        documentation.messageAddGStreamerInstall(m)
         result.add(m)
 
     result.succeed(None)

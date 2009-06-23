@@ -1,3 +1,24 @@
+2009-06-23  Xavier Queralt  <xqueralt@flumotion.com>
+	
+	reviewed by: Jan
+
+	* flumotion/admin/gtk/configurationassistant.py:
+	* flumotion/admin/gtk/overlaystep.py:
+	Add help hyperlinks to online documentation on how to install new
+	GStreamer elements and/or new python modules.
+	* flumotion/admin/gtk/message.py:
+	Insert a space between the message and an hyperlink.
+	* flumotion/common/documentation.py:
+	Added two methods to insert an hyperlink to a documentation's section.
+	* flumotion/scenario/steps/httpstreamersteps.py:
+	Wizard's methods requireElements and requireImport already set a
+	proper error message. Don't do things twice!
+	Don't populate the plugs if the worker checks have failed.
+	* flumotion/worker/checks/check.py:
+	Add hyperlinks to online documentation on how to fix permissions
+	problems with the devices and how to install new GStreamer elements.
+	Fixes #114
+
 2009-06-23  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/extern/log/test_log.py:

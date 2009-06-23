@@ -21,9 +21,8 @@
 
 import gettext
 
-from flumotion.common import messages
-
 from flumotion.admin.assistant.models import VideoConverter
+from flumotion.common import documentation, messages
 from flumotion.common.i18n import N_, gettexter, ngettext
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
 
@@ -128,6 +127,7 @@ class OverlayStep(WorkerWizardStep):
             message.add(
                 T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
             message.id = 'module-PIL'
+            documentation.messageAddPythonInstall(message, 'PIL')
             self.wizard.add_msg(message)
             self.wizard.taskFinished()
             self._setSensitive(False)

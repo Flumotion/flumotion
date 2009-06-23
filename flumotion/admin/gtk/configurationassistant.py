@@ -62,7 +62,7 @@ from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.admin.gtk.workerlist import WorkerList
 from flumotion.common import errors, messages
 from flumotion.common.common import pathToModuleName
-from flumotion.common.documentation import getWebLink
+from flumotion.common import documentation
 from flumotion.common.i18n import N_, ngettext, gettexter
 from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
@@ -490,6 +490,7 @@ class ConfigurationAssistant(SectionWizard):
                 message.add(T_(N_("\n\n"
                     "You will not be able to go forward using this worker.")))
                 message.id = 'element' + '-'.join(elementNames)
+                documentation.messageAddGStreamerInstall(message)
                 self.add_msg(message)
             self.taskFinished(bool(elements))
             return elements
@@ -552,8 +553,10 @@ class ConfigurationAssistant(SectionWizard):
             message.add(T_(N_("\n\n"
                 "You will not be able to go forward using this worker.")))
             message.id = 'module-%s' % moduleName
+            documentation.messageAddPythonInstall(message, moduleName)
             self.add_msg(message)
-            self.taskFinished(True)
+            self.taskFinished(blockNext=True)
+            return False
 
         d = self.checkImport(workerName, moduleName)
         d.addErrback(_checkImportErrback)
@@ -756,7 +759,7 @@ class ConfigurationAssistant(SectionWizard):
         else:
             version = configure.version
 
-        url = getWebLink(section, anchor, version=version)
+        url = documentation.getWebLink(section, anchor, version=version)
         webbrowser.open(url)
 
     def _fetchDescription(self, step):

@@ -201,14 +201,6 @@ class MessagesView(gtk.VBox):
         # applicable, instead of always showing the text
         text = self._translator.translate(message)
 
-        timestamp = message.getTimeStamp()
-        if timestamp and not self._disableTimestamps:
-            text += _("\nPosted on %s.\n") % time.strftime(
-                "%c", time.localtime(timestamp))
-
-        if message.debug:
-            text += "\n\n" + _("Debug information:\n") + message.debug + '\n'
-
         textbuffer = gtk.TextBuffer()
         textbuffer.set_text(text)
         self.textview.set_buffer(textbuffer)
@@ -216,10 +208,9 @@ class MessagesView(gtk.VBox):
             _headings.get(message.level, _('Message')))
 
         # if we have help information, add it to the end of the text view
-        # FIXME: it probably looks nicer right after the message and
-        # before the timestamp
         description = message.getDescription()
         if description:
+            textbuffer.insert(textbuffer.get_end_iter(), ' ')
             titer = textbuffer.get_end_iter()
             # we set the 'link' data field on tags to identify them
             translated = self._translator.translateTranslatable(description)
@@ -229,6 +220,16 @@ class MessagesView(gtk.VBox):
             tag.set_data('link', getMessageWebLink(message))
             textbuffer.insert_with_tags_by_name(titer, translated,
                                                 tag.get_property('name'))
+
+        timestamp = message.getTimeStamp()
+        if timestamp and not self._disableTimestamps:
+            text = _("\nPosted on %s.\n") % time.strftime(
+                "%c", time.localtime(timestamp))
+            textbuffer.insert(textbuffer.get_end_iter(), text)
+
+        if message.debug:
+            text = "\n\n" + _("Debug information:\n") + message.debug + '\n'
+            textbuffer.insert(textbuffer.get_end_iter(), text)
 
     def _sortMessages(self):
         # Sort all messages first by (reverse of) level, then priority
