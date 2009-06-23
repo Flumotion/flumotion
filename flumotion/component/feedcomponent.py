@@ -119,8 +119,9 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         Called on by the manager-side ComponentAvatar.
         """
         if self._feederFeedServer.get(eaterAlias):
-            # Ignore if the feed specified is the same as the current one
             if self._feederFeedServer[eaterAlias] == (fullFeedId, host, port):
+                self.debug("Feed specified is the same as the current one. "\
+                           "Request ignored.")
                 return
         self._feederFeedServer[eaterAlias] = (fullFeedId, host, port)
         return self.connectEater(eaterAlias)
