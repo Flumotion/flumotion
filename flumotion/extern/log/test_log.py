@@ -51,7 +51,43 @@ class TestLog(unittest.TestCase):
         log.setDebug("*")
         log.setDebug("5")
 
+    def testGetLevelName(self):
+        self.assertRaises(AssertionError, log.getLevelName, -1)
+        self.assertRaises(AssertionError, log.getLevelName, 6)
+
+    def testGetLevelInt(self):
+        self.assertRaises(AssertionError, log.getLevelInt, "NOLEVEL")
+
+    def testGetFormattedLevelName(self):
+        self.assertRaises(AssertionError, log.getFormattedLevelName, -1)
+        # FIXME: we're poking at internals here, but without calling this
+        # no format levels are set at all.
+        log._preformatLevels("ENVVAR")
+        self.failUnless("LOG" in log.getFormattedLevelName(log.LOG))
+
+    def testGetFileLine(self):
+        # test a function object
+        (filename, line) = log.getFileLine(where=self.testGetFileLine)
+        self.failUnless(filename.endswith('test_log.py'))
+        self.assertEquals(line, 68)
+
+        # test a lambda
+        f = lambda x: x + 1
+        (filename, line) = log.getFileLine(where=f)
+        self.failUnless(filename.endswith('test_log.py'))
+        self.assertEquals(line, 75)
+
+        # test an eval
+        f = eval("lambda x: x + 1")
+        (filename, line) = log.getFileLine(where=f)
+        self.assertEquals(filename, '<string>')
+        self.assertEquals(line, 1)
+
     # test for adding a log handler
+
+    def testEllipsize(self):
+        self.assertEquals(log.ellipsize("*" * 1000),
+            "'" + "*" * 59 + ' ... ' + "*" * 14 + "'")
 
     def handler(self, level, object, category, file, line, message):
         self.level = level
@@ -137,6 +173,9 @@ class TestLog(unittest.TestCase):
 
         self.tester.warning("also visible")
         assert self.message == 'also visible'
+
+    def testAddLogHandlerRaises(self):
+        self.assertRaises(TypeError, log.addLogHandler, 1)
 
 
 class TestOwnLogHandler(unittest.TestCase):

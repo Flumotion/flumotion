@@ -1,3 +1,8 @@
+2009-06-23  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/extern/log/test_log.py:
+	  Improve coverage some more by adding tests.
+
 2009-06-24  Alvin Delagon  <adelagon@flumotion.com>
 
 	* flumotion/component/feedcomponent.py:
