@@ -1,3 +1,8 @@
+2009-06-24  Alvin Delagon  <adelagon@flumotion.com>
+
+	* flumotion/component/feedcomponent.py:
+	Reverting to NoneType return. Fixed the connectEater docstring
+
 2009-06-23  Alvin Delagon  <adelagon@flumotion.com>
 
 	* flumotion/component/feedcomponent.py:

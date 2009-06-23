@@ -122,8 +122,7 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             if self._feederFeedServer[eaterAlias] == (fullFeedId, host, port):
                 self.debug("Feed:%r is the same as the current one. "\
                            "Request ignored.", (fullFeedId, host, port))
-                # FIXME: Hard to distinguish if ignored or not
-                return defer.succeed(None)
+                return
         self._feederFeedServer[eaterAlias] = (fullFeedId, host, port)
         return self.connectEater(eaterAlias)
 
@@ -146,9 +145,9 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         Called by the component, both on initial connection and for
         reconnecting.
 
-        @returns: (deferred, cancel) pair, where cancel is a thunk that
-        you can call to cancel any pending connection attempt.
+        @returns: deferred that will fire with a value of None
         """
+        # FIXME: There's no indication if the connection was made or not
 
         def gotFeed((feedId, fd)):
             self._feederPendingConnections.pop(eaterAlias, None)
