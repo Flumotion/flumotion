@@ -24,7 +24,7 @@ import time
 import gst
 from twisted.internet import defer, reactor
 
-from flumotion.common import messages, fxml, gstreamer
+from flumotion.common import messages, fxml, gstreamer, documentation
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.base import watcher
@@ -451,6 +451,21 @@ class PlaylistProducer(feedcomponent.FeedComponent):
                 messages.Warning(T_(N_(
                     "Failed to parse a playlist from file %s: %s" %
                         (file, e))), mid=msgid))
+
+    def do_check(self):
+
+        def check_gnl(element):
+            exists = gstreamer.element_factory_exists(element)
+            if not exists:
+                m = messages.Error(T_(N_(
+                    "%s is missing. Make sure your gnonlin "
+                    "installation is complete."), element))
+                documentation.messageAddGStreamerInstall(m)
+                self.debug(m)
+                self.addMessage(m)
+
+        for el in ["gnlsource", "gnlcomposition"]:
+            check_gnl(el)
 
     def do_setup(self):
         playlist = playlistparser.Playlist(self)

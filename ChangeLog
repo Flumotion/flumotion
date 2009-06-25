@@ -1,5 +1,13 @@
+2009-06-25  Alvin Delagon  <adelagon@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/component/producers/playlist/playlist.py:
+	Throw a meaningful error message if gnonlin is not installed
+	Fixes #1313
+
 2009-06-23  Xavier Queralt  <xqueralt@flumotion.com>
-	
+
 	reviewed by: Jan
 
 	* flumotion/admin/gtk/configurationassistant.py:
