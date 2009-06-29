@@ -443,7 +443,7 @@ class HTTPSpecificStep(ConsumerStep):
                     self.worker, 'flumotion.worker.checks.http',
                     'runHTTPStreamerChecks')
             d.addCallback(gotHostname)
-            d.addErrback(getHostnameErrback)
+            d.addErrback(hostnameErrback)
             return d
 
         def checkImport(elements):

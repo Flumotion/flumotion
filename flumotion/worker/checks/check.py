@@ -159,6 +159,7 @@ class CheckProcError(Exception):
 def checkImport(moduleName):
     log.debug('check', 'checkImport: %s', moduleName)
     __import__(moduleName)
+    return True
 
 
 def checkElements(elementNames):

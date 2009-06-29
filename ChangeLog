@@ -1,3 +1,10 @@
+2009-06-29  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/scenario/steps/httpstreamersteps.py:
+	Fix errback method name
+	* flumotion/worker/checks/check.py:
+	Return True when the import check succeeds
+
 2009-06-25  Alvin Delagon  <adelagon@flumotion.com>
 
 	reviewed by: Jan Urbanski
