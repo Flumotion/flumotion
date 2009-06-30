@@ -1,3 +1,13 @@
+2009-06-30  Julien Le Goff  <jlegoff@flumotion.com>
+
+	reviewed by: Arek, Sebastien
+
+	* flumotion/component/base/http.py:
+	Ask the bouncer to delete its reference to a keycard when the
+	corresponding request was interrupted before the authentification was
+	finished.
+	Fixes #1264
+
 2009-06-29  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/scenario/steps/httpstreamersteps.py:

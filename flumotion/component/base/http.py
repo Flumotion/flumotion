@@ -389,6 +389,13 @@ class HTTPAuthentication(log.Loggable):
             fd = request.transport.fileno()
 
             if self.bouncerName:
+                # the request was finished before the callback was executed
+                if fd == -1:
+                    self.debug('Request interrupted before authentification '
+                               'was finished: asking bouncer %s to remove '
+                               'keycard id %s', self.bouncerName, keycard.id)
+                    self.doCleanupKeycard(self.bouncerName, keycard)
+                    return None
                 if keycard.id in self._idToKeycard:
                     self.warning("Duplicate keycard id: refusing")
                     raise errors.NotAuthenticatedError()
