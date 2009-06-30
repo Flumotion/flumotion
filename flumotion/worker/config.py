@@ -135,11 +135,15 @@ class WorkerConfigXML(log.Loggable):
                 else:
                     host = 'localhost'
             elif child.nodeName == "port":
+                if not child.firstChild:
+                    raise ConfigError("<port> value must not be empty")
                 try:
                     port = int(child.firstChild.nodeValue)
                 except ValueError:
                     raise ConfigError("<port> value must be an integer")
             elif child.nodeName == "transport":
+                if not child.firstChild:
+                    raise ConfigError("<transport> value must not be empty")
                 transport = str(child.firstChild.nodeValue)
                 if not transport in ('tcp', 'ssl'):
                     raise ConfigError("<transport> must be ssl or tcp")
