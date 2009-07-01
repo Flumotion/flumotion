@@ -19,6 +19,10 @@
 
 # Headers in this file shall remain intact.
 
+import cgi
+import string
+from urllib2 import urlparse
+
 from flumotion.common import testsuite
 from flumotion.component.misc.porter import porter
 
@@ -147,39 +151,107 @@ class TestHTTPPorterProtocolParser(testsuite.TestCase):
         self.pp = porter.HTTPPorterProtocol(self.p)
         self.t = FakeTransport(self.pp)
         self.pp.transport = self.t
+        self.param = self.pp.requestIdParameter
 
     def tearDown(self):
         self.t.loseConnection()
 
+    def containsSameInfo(self, line, line2, extra={}):
+        """
+        Check if two HTTP request lines contain the same info.
+
+        We define lines as containing same info, when they have the same
+        scheme, protocol, path and the same query parameters and values.
+
+        The extra argument should be a dictionary, that will be used to extend
+        the parsed query parameters of the first line.
+        """
+
+        scheme, url, protocol = map(string.strip, line.split(' ', 2))
+        scheme2, url2, protocol2 = map(string.strip, line2.split(' ', 2))
+        if '?' in url:
+            path, qs = url.split('?', 1)
+        else:
+            path, qs = url, ''
+        if '?' in url2:
+            path2, qs2 = url2.split('?', 1)
+        else:
+            path2, qs2 = url2, ''
+        args = cgi.parse_qs(qs, True)
+        args.update(extra)
+        args2 = cgi.parse_qs(qs2, True)
+
+        self.assertEquals(scheme, scheme2)
+        self.assertEquals(protocol, protocol2)
+        self.assertEquals(path, path2)
+        self.assertEquals(args, args2)
+
+    def testWrongLine(self):
+        parsed = self.pp.parseLine('GET /test HTTP/666.0\r\n')
+        self.assertIdentical(parsed, None)
+
     def testSimpleParse(self):
-        result = self.pp.parseLine('GET /test HTTP/1.0\r\n')
-        self.assertEquals(result, '/test')
+        parsed = self.pp.parseLine('GET /test HTTP/1.0\r\n')
+        identifier = self.pp.extractIdentifier(parsed)
+        self.assertEquals(identifier, '/test')
 
-        result = self.pp.parseLine('GET /test HTTP/1.1\n')
-        self.assertEquals(result, '/test')
+        parsed = self.pp.parseLine('GET /test HTTP/1.1\n')
+        identifier = self.pp.extractIdentifier(parsed)
+        self.assertEquals(identifier, '/test')
 
-        result = self.pp.parseLine('GET / HTTP/1.0\r\n')
-        self.assertEquals(result, '/')
+        parsed = self.pp.parseLine('GET / HTTP/1.0\r\n')
+        identifier = self.pp.extractIdentifier(parsed)
+        self.assertEquals(identifier, '/')
 
     def testParseWithHost(self):
-        result = self.pp.parseLine(
+        parsed = self.pp.parseLine(
             'GET http://some.server.somewhere/test HTTP/1.1\n')
-        self.assertEquals(result, '/test')
+        identifier = self.pp.extractIdentifier(parsed)
+        self.assertEquals(identifier, '/test')
 
-        result = self.pp.parseLine(
+        parsed = self.pp.parseLine(
             'GET http://some.server.somewhere:1234/ HTTP/1.1\n')
-        self.assertEquals(result, '/')
+        identifier = self.pp.extractIdentifier(parsed)
+        self.assertEquals(identifier, '/')
 
     def testParseWithParams(self):
-        result = self.pp.parseLine(
+        parsed = self.pp.parseLine(
             'GET http://some.server.somewhere:1234/test?'
             'arg1=val1&arg2=val2 HTTP/1.1\n')
-        self.assertEquals(result, '/test')
+        identifier = self.pp.extractIdentifier(parsed)
+        self.assertEquals(identifier, '/test')
 
-        result = self.pp.parseLine(
+        parsed = self.pp.parseLine(
             'GET /test?arg1=val1&arg2=val2 HTTP/1.1\n')
-        self.assertEquals(result, '/test')
+        identifier = self.pp.extractIdentifier(parsed)
+        self.assertEquals(identifier, '/test')
 
-        result = self.pp.parseLine(
+        parsed = self.pp.parseLine(
             'GET /?arg1=val1&arg2=val2 HTTP/1.1\n')
-        self.assertEquals(result, '/')
+        identifier = self.pp.extractIdentifier(parsed)
+        self.assertEquals(identifier, '/')
+
+    def testUnparse(self):
+        lines = ['GET http://some.server.somewhere:1234/'
+                 'test?arg1=val1&arg2=val2 HTTP/1.1\n',
+                 'GET /?arg1=val1&arg2=val2 HTTP/1.0\n',
+                 'GET /test/test2 HTTP/1.1\n',
+                 'GET /test/test2?arg1=&arg2=val2 HTTP/1.1\n']
+
+        for line in lines:
+            parsed = self.pp.parseLine(line)
+            unparsed = self.pp.unparseLine(parsed)
+            self.containsSameInfo(line, unparsed)
+
+    def testInjectRequestId(self):
+        lines = ['GET http://some.server.somewhere:1234/'
+                 'test?arg1=val1&arg2=val2 HTTP/1.1\n',
+                 'GET /?arg1=val1&arg2=val2 HTTP/1.0\n',
+                 'GET /test/test2 HTTP/1.1\n']
+
+        for line in lines:
+            parsed = self.pp.parseLine(line)
+            injected = self.pp.injectRequestId(parsed, 'ID')
+            unparsed = self.pp.unparseLine(injected)
+            self.containsSameInfo(line, unparsed,
+                                  {self.pp.requestIdParameter: ['ID']})

@@ -398,16 +398,17 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
     def __init__(self, porter):
         self._buffer = ''
         self._porter = porter
-
+        self.requestId = None # a string that should identify the request
 
         self._timeoutDC = reactor.callLater(self.PORTER_CLIENT_TIMEOUT,
             self._timeout)
 
     def connectionMade(self):
 
+        self.requestId = self.generateRequestId()
         # PROBE: accepted connection
-        self.debug("[fd %5d] (ts %f) accepted connection",
-                   self.transport.fileno(), time.time())
+        self.debug("[fd %5d] (ts %f) (request-id %r) accepted connection",
+                   self.transport.fileno(), time.time(), self.requestId)
 
         protocol.Protocol.connectionMade(self)
 
@@ -440,8 +441,10 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             if len(self._buffer) > self.MAX_SIZE:
 
                 # PROBE: dropping
-                self.debug("[fd %5d] (ts %f) dropping, buffer exceeded",
-                           self.transport.fileno(), time.time())
+                self.debug("[fd %5d] (ts %f) (request-id %r) dropping, "
+                           "buffer exceeded",
+                           self.transport.fileno(), time.time(),
+                           self.requestId)
 
                 return self.transport.loseConnection()
             else:
@@ -451,15 +454,29 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
         # Got a line. self._buffer is still our entire buffer, should be
         # provided to the slaved process.
-        identifier = self.parseLine(line)
+        parsed = self.parseLine(line)
+        if not parsed:
+            self.log("Couldn't parse the first line")
+            return self.transport.loseConnection()
 
+        identifier = self.extractIdentifier(parsed)
         if not identifier:
             self.log("Couldn't find identifier in first line")
             return self.transport.loseConnection()
 
+        if self.requestId:
+            self.log("Injecting request-id %r", self.requestId)
+            parsed = self.injectRequestId(parsed, self.requestId)
+            # Since injecting the token might have modified the parsed
+            # representation of the request, we need to reconstruct the buffer.
+            # Fortunately, we know what delimiter did we split on, what's the
+            # remaining part and that we only split the buffer in two parts
+            self._buffer = delim.join((self.unparseLine(parsed), remaining))
+
         # PROBE: request
-        self.debug("[fd %5d] (ts %f) request line %r, identifier %s",
-                   self.transport.fileno(), time.time(), line, identifier)
+        self.debug("[fd %5d] (ts %f) (request-id %r) identifier %s",
+                   self.transport.fileno(), time.time(), self.requestId,
+                   identifier)
 
         # Ok, we have an identifier. Is it one we know about, or do we have
         # a default destination?
@@ -471,9 +488,8 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
             # PROBE: no destination; see send fd
             self.debug(
-                "[fd %5d] (ts %f) no destination avatar found "
-                "for request line %r",
-                self.transport.fileno(), time.time(), line)
+                "[fd %5d] (ts %f) (request-id %r) no destination avatar found",
+                self.transport.fileno(), time.time(), self.requestId)
 
             self.writeNotFoundResponse()
             return self.transport.loseConnection()
@@ -485,10 +501,9 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         # itself.
 
         # PROBE: send fd; see no destination and fdserver.py
-        self.debug("[fd %5d] (ts %f) send fd to avatarId %s "
-                   "for request line %r",
-                   self.transport.fileno(), time.time(),
-                   destinationAvatar.avatarId, line)
+        self.debug("[fd %5d] (ts %f) (request-id %r) send fd to avatarId %s",
+                   self.transport.fileno(), time.time(), self.requestId,
+                   destinationAvatar.avatarId)
 
         # TODO: Check out blocking characteristics of sendFileDescriptor, fix
         # if it blocks.
@@ -496,10 +511,9 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             self.transport.fileno(), self._buffer)
 
         # PROBE: sent fd; see no destination and fdserver.py
-        self.debug("[fd %5d] (ts %f) sent fd to avatarId %s "
-                   "for request line %r",
-                   self.transport.fileno(), time.time(),
-                   destinationAvatar.avatarId, line)
+        self.debug("[fd %5d] (ts %f) (request-id %r) sent fd to avatarId %s",
+                   self.transport.fileno(), time.time(), self.requestId,
+                   destinationAvatar.avatarId)
 
         # After this, we don't want to do anything with the FD, other than
         # close our reference to it - but not close the actual TCP connection.
@@ -510,13 +524,57 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
     def parseLine(self, line):
         """
-        Parse the initial line of the response. Return a string usable for
-        uniquely identifying the stream being requested, or None if the request
-        is unreadable.
+        Parse the initial line of the request. Return an object that can be
+        used to uniquely identify the stream being requested by passing it to
+        extractIdentifier, or None if the request is unreadable.
 
         Subclasses should override this.
         """
         raise NotImplementedError
+
+    def unparseLine(self, parsed):
+        """
+        Recreate the initial request line from the parsed representation. The
+        recreated line does not need to be exactly identical, but both
+        parsedLine(unparseLine(line)) and line should contain the same
+        information (i.e. unparseLine should not lose information).
+
+        UnparseLine has to return a valid line from the porter protocol's
+        scheme point of view (for instance, HTTP).
+
+        Subclasses should override this.
+        """
+        raise NotImplementedError
+
+    def extractIdentifier(self, parsed):
+        """
+        Extract a string that uniquely identifies the requested stream from the
+        parsed representation of the first request line.
+
+        Subclasses should override this, depending on how they implemented
+        parseLine.
+        """
+        raise NotImplementedError
+
+    def generateRequestId(self):
+        """
+        Return a string that will uniquely identify the request.
+
+        Subclasses should override this if they want to use request-ids and
+        also implement injectRequestId.
+        """
+        raise NotImplementedError
+
+    def injectRequestId(self, parsed, requestId):
+        """
+        Take the parsed representation of the first request line and a string
+        token, return a parsed representation of the request line with the
+        request-id possibly mixed into it.
+
+        Subclasses should override this if they generate request-ids.
+        """
+        # by default, ignore the request-id
+        return parsed
 
     def writeNotFoundResponse(self):
         """
@@ -531,6 +589,8 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 class HTTPPorterProtocol(PorterProtocol):
     scheme = 'http'
     protos = ["HTTP/1.0", "HTTP/1.1"]
+    requestIdParameter = 'FLUREQID'
+    requestIdBitsNo = 256
 
     def parseLine(self, line):
         try:
@@ -539,17 +599,42 @@ class HTTPPorterProtocol(PorterProtocol):
             if proto not in self.protos:
                 return None
 
-            # Currently, we just return the path part of the URL.
-            # Use the URL parsing from urllib2.
-            location = urlparse.urlparse(location, 'http')[2]
-            self.log('parsed %s %s %s' % (method, location, proto))
-            if not location or location == '':
-                return None
+            # Currently, we just use the URL parsing code from urllib2
+            parsed_url = urlparse.urlparse(location)
 
-            return location
+            return method, parsed_url, proto
 
         except ValueError:
             return None
+
+    def unparseLine(self, parsed):
+        method, parsed_url, proto = parsed
+        return ' '.join((method, urlparse.urlunparse(parsed_url), proto))
+
+    def generateRequestId(self):
+        # Remember to return something that does not need quoting to be put in
+        # a GET parameter. This way we spare ourselves the effort of quoting in
+        # injectRequestId.
+        return hex(random.getrandbits(self.requestIdBitsNo))[2:]
+
+    def injectRequestId(self, parsed, requestId):
+        method, parsed_url, proto = parsed
+        # assuming no need to escape the requestId, see generateRequestId
+        sep = ''
+        if parsed_url[4] != '':
+            sep = '&'
+        query_string = ''.join((parsed_url[4],
+                                sep, self.requestIdParameter, '=',
+                                requestId))
+        parsed_url = (parsed_url[:4] +
+                      (query_string, )
+                      + parsed_url[5:])
+        return method, parsed_url, proto
+
+    def extractIdentifier(self, parsed):
+        method, parsed_url, proto = parsed
+        # Currently, we just return the path part of the URL.
+        return parsed_url[2]
 
     def writeNotFoundResponse(self):
         self.transport.write("HTTP/1.0 404 Not Found\r\n\r\nResource unknown")
