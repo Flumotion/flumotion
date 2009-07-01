@@ -150,6 +150,10 @@ class AdminAvatar(base.ManagerAvatar):
             return self.perspective_componentStart(componentState)
 
         m = self.vishnu.getComponentMapper(componentState)
+        if not m:
+            self.warning('Component not mapped. Maybe deleted.')
+            raise errors.UnknownComponentError(componentState)
+
         avatar = m.avatar
 
         if not avatar:

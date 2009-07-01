@@ -1,3 +1,12 @@
+2009-07-01  Alvin Delagon  <adelagon@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/manager/admin.py:
+	Raise an UnknownComponentError on a remote call to a component that
+	no longer exists or has already been deleted.
+	Fixes #1243
+
 2009-07-01  Jan Urbanski  <jurbanski@flumotion.com>
 
 	Reviewed by: Arek
