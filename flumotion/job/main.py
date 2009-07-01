@@ -60,23 +60,6 @@ def main(args):
     reactor.connectWith(fdserver.FDConnector, socket, job_factory,
         10, checkPID=False)
 
-    # should probably move this to boot
-    if 'FLU_PROFILE' in os.environ:
-        try:
-            import statprof
-            statprof.start()
-            print 'Profiling started.'
-
-            def stop_profiling():
-                statprof.stop()
-                statprof.display()
-
-            reactor.addSystemEventTrigger('before', 'shutdown',
-                stop_profiling)
-        except ImportError, e:
-            print ('Profiling requested, but statprof is not available (%s)'
-                   % e)
-
     reactor.addSystemEventTrigger('before', 'shutdown',
         job_factory.medium.shutdownHandler)
 

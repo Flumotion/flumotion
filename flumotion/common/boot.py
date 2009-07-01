@@ -162,6 +162,54 @@ def init_option_parser(gtk, gst):
             USE_GOPTION_PARSER = False
 
 
+def wrap_for_statprof(main, output_file):
+    try:
+        import statprof
+    except ImportError, e:
+        print "Profiling requested, but statprof not available (%s)" % e
+        return main
+
+    def wrapped(*args, **kwargs):
+        statprof.start()
+        try:
+            return main(*args, **kwargs)
+        finally:
+            statprof.stop()
+            statprof.display(OUT=file(output_file, 'wb'))
+    return wrapped
+
+
+def wrap_for_builtin_profiler(main, output_file):
+    try:
+        import cProfile as profile
+    except ImportError:
+        import profile
+
+    def wrapped(*args, **kwargs):
+        prof = profile.Profile()
+        try:
+            return prof.runcall(main, *args, **kwargs)
+        finally:
+            prof.dump_stats(output_file)
+    return wrapped
+
+
+def wrap_for_profiling(main):
+
+    def generate_output_file():
+        import tempfile
+        return os.path.join(tempfile.gettempdir(),
+                            'flustat.%s.%s.%d' %
+                            (main.__module__, main.__name__, os.getpid()))
+
+    if os.getenv('FLU_PROFILE'):
+        return wrap_for_statprof(main, generate_output_file())
+    elif os.getenv('FLU_BUILTIN_PROFILE'):
+        return wrap_for_builtin_profiler(main, generate_output_file())
+    else:
+        return main
+
+
 def boot(path, gtk=False, gst=True, installReactor=True):
     # python 2.5 and twisted < 2.5 don't work together
     pythonMM = sys.version_info[0:2]
@@ -218,43 +266,13 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     from flumotion.common import log
     log.logTwisted()
 
-    # we redefine catching
-    __pychecker__ = 'no-reuseattr'
-
-    if os.getenv('FLU_PROFILE'):
-
-        def catching(proc, *args, **kwargs):
-            import statprof
-            statprof.start()
-            try:
-                return proc(*args, **kwargs)
-            finally:
-                statprof.stop()
-                statprof.display()
-    elif os.getenv('FLU_ATEXIT'):
-
-        def catching(proc, *args, **kwargs):
-            env = os.getenv('FLU_ATEXIT').split(' ')
-            fqfn = env.pop(0)
-            log.info('atexit', 'FLU_ATEXIT set, will call %s(*%r) on exit',
-                     fqfn, env)
-            atexitproc = reflect.namedAny(fqfn)
-
-            try:
-                return proc(*args, **kwargs)
-            finally:
-                log.info('atexit', 'trying to call %r(*%r)',
-                         atexitproc, env)
-                atexitproc(*env)
-    else:
-
-        def catching(proc, *args, **kwargs):
-            return proc(*args, **kwargs)
-
     main = reflect.namedAny(path)
 
+    wrapped = wrap_for_profiling(main)
+    wrapped.__name__ = main.__name__
+
     try:
-        sys.exit(catching(main, sys.argv))
+        sys.exit(wrapped(sys.argv))
     except (errors.FatalError, SystemError), e:
         safeprintf(sys.stderr, 'ERROR: %s\n', e)
         sys.exit(1)

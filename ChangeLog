@@ -2,6 +2,24 @@
 
 	Reviewed by: Arek
 
+	* flumotion/common/boot.py:
+	Make it possible to run Flumotion processes under profiling.
+	Exporting the FLU_PROFILE environment variable the process
+	will be profiled using the statprof module, if it's found.
+	Exporting FLU_BUILTIN_PROFILE will use the builtin Python profiler.
+	The results are stored in the system's temporary directory when the
+	profiled process exits.
+	Remove support for the FLU_ATEXIT environment variable kludge that has
+	been added in r4060, for the sake of simplicity and cleanliness.
+
+	* flumotion/job/main.py:
+	Remove support for the FLU_PROFILE variable, it's now handled in
+	boot.py.
+
+2009-07-01  Jan Urbanski  <jurbanski@flumotion.com>
+
+	Reviewed by: Arek
+
 	* flumotion/component/misc/porter/porter.py:
 	Make the porter inject a GET parameter into the accepted request before
 	passing the file descriptor to the slaved component.
