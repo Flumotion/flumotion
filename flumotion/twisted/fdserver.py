@@ -69,8 +69,8 @@ class FDClient(unix.Client): #, log.Loggable):
             return
         try:
             (fds, message) = fdpass.readfds(self.fileno(), 64 * 1024)
-        except socket.error, se:
-            if se.args[0] == errno.EWOULDBLOCK:
+        except OSError, e:
+            if e.errno in (errno.EWOULDBLOCK, errno.EAGAIN):
                 return
             else:
                 return main.CONNECTION_LOST

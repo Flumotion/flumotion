@@ -1,3 +1,27 @@
+2009-07-07  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/extern/fdpass/fdpass.c:
+	Handle out of memory conditions.
+	Raise OSError, not a RuntimeError, when a system call fails.
+
+	* flumotion/twisted/fdserver.py:
+	Handle the right exception when trying to read file descriptors.
+
+	* flumotion/worker/base.py:
+	Handle the right exception when trying to send file descriptors.
+
+	* flumotion/component/misc/porter/porter.py:
+	Handle the exception that can happen when sending the request file
+	descriptor to the component by writing a Service Unavailable response
+	to the client and dropping the connection.
+	Add a logCategory for the porter protocol.
+	This is a partial forward-port of [7580].
+	Fixes #1167.
+	See #1304.
+
+	* flumotion/test/test_porter.py:
+	Unit test the new behaviour.
+
 2009-07-01  Alvin Delagon  <adelagon@flumotion.com>
 
 	reviewed by: Jan Urbanski

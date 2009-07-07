@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import cgi
+import errno
 import string
 from urllib2 import urlparse
 
@@ -31,16 +32,18 @@ class FakeTransport:
     connected = True
     _fileno = 5
 
-    def __init__(self, protocol):
+    def __init__(self, protocol, overloaded=False):
         self.written = ''
         self.protocol = protocol
+        self.overloaded = overloaded
 
     def loseConnection(self):
         self.connected = False
         self.protocol.connectionLost(None)
 
     def sendFileDescriptor(self, fd, data):
-        pass
+        if self.overloaded:
+            raise OSError(errno.EAGAIN, 'Resource temporarily unavailable')
 
     def write(self, data):
         self.written += data
@@ -55,28 +58,30 @@ class FakePorter:
     def findDestination(self, path):
         self.foundDestination = True
         if path == '/existing':
-            return FakeAvatar()
+            return FakeAvatar(overloaded=False)
+        elif path == '/overloaded':
+            return FakeAvatar(overloaded=True)
 
         return None
 
 
 class FakeBroker:
 
-    def __init__(self):
-        self.transport = FakeTransport(self)
+    def __init__(self, overloaded=False):
+        self.transport = FakeTransport(self, overloaded)
 
 
 class FakeMind:
 
-    def __init__(self):
-        self.broker = FakeBroker()
+    def __init__(self, overloaded=False):
+        self.broker = FakeBroker(overloaded)
 
 
 class FakeAvatar:
     avatarId = 'testAvatar'
 
-    def __init__(self):
-        self.mind = FakeMind()
+    def __init__(self, overloaded=False):
+        self.mind = FakeMind(overloaded)
 
     def isAttached(self):
         return True
@@ -142,6 +147,16 @@ class TestHTTPPorterProtocol(testsuite.TestCase):
         self.failIf(self.t.connected)
         self.failUnless(self.p.foundDestination)
         self.failIf(self.t.written)
+
+    def testErrorSendingFileDescriptors(self):
+        self.pp.dataReceived('GET ')
+        self.failUnless(self.t.connected)
+        self.pp.dataReceived('http://localhost:8800/overloaded ')
+        self.pp.dataReceived('HTTP/1.1\r\n')
+        self.failIf(self.t.connected)
+        self.failUnless(self.p.foundDestination)
+        self.failUnless(self.t.written)
+        self.failIf(self.t.written.find('503') < 0)
 
 
 class TestHTTPPorterProtocolParser(testsuite.TestCase):

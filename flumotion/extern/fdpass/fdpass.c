@@ -59,12 +59,20 @@ readfds(PyObject *self, PyObject *args)
   /* Stevens: Unix Network Programming, 3rd Ed. p 426. */
   msg.msg_controllen = CMSG_SPACE (sizeof (int) * MAX_RECEIVED_FDS);
   msg.msg_control = malloc (msg.msg_controllen);
+  if (msg.msg_control == NULL) {
+    return PyErr_NoMemory();
+  }
 
   msg.msg_name = NULL;
   msg.msg_namelen = 0;
 
   iov[0].iov_len = size;
   iov[0].iov_base = malloc (iov[0].iov_len);
+  if (iov[0].iov_base == NULL) {
+    free (msg.msg_control);
+    return PyErr_NoMemory();
+  }
+
   msg.msg_iov = iov;
   msg.msg_iovlen = 1;
 
@@ -73,7 +81,7 @@ readfds(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   if (n < 0) {
-    ret = PyErr_SetFromErrno(PyExc_RuntimeError);
+    ret = PyErr_SetFromErrno(PyExc_OSError);
     goto done;
   }
 
@@ -145,6 +153,9 @@ writefds(PyObject *self, PyObject *args)
 
     msg.msg_controllen = CMSG_SPACE (sizeof (int) * numfds);
     msg.msg_control = malloc (msg.msg_controllen);
+    if (msg.msg_control == NULL) {
+      return PyErr_NoMemory();
+    }
 
     msgptr = CMSG_FIRSTHDR (&msg);
     for (i = 0; i < numfds; i++)
@@ -195,7 +206,7 @@ writefds(PyObject *self, PyObject *args)
 
   if (ret < 0) {
     /* Failure. Throw an appropriate Python exception */
-    return PyErr_SetFromErrno(PyExc_RuntimeError);
+    return PyErr_SetFromErrno(PyExc_OSError);
   }
 
   return Py_BuildValue("i", ret);

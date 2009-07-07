@@ -382,6 +382,9 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
     @cvar MAX_SIZE:   the maximum number of bytes allowed for the first line
     @cvar delimiters: a list of valid line delimiters I check for
     """
+
+    logCategory = 'porterprotocol'
+
     # Don't permit a first line longer than this.
     MAX_SIZE = 4096
 
@@ -507,8 +510,14 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
         # TODO: Check out blocking characteristics of sendFileDescriptor, fix
         # if it blocks.
-        destinationAvatar.mind.broker.transport.sendFileDescriptor(
-            self.transport.fileno(), self._buffer)
+        try:
+            destinationAvatar.mind.broker.transport.sendFileDescriptor(
+                self.transport.fileno(), self._buffer)
+        except OSError, e:
+            self.warning("[fd %5d] failed to send FD: %s",
+                         self.transport.fileno(), log.getExceptionMessage(e))
+            self.writeServiceUnavailableResponse()
+            return self.transport.loseConnection()
 
         # PROBE: sent fd; see no destination and fdserver.py
         self.debug("[fd %5d] (ts %f) (request-id %r) sent fd to avatarId %s",
@@ -585,6 +594,15 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         """
         raise NotImplementedError
 
+    def writeServiceUnavailableResponse(self):
+        """
+        Write a response indicating that the requested resource was
+        temporarily uavailable in this protocol.
+
+        Subclasses should override this to use the correct protocol.
+        """
+        raise NotImplementedError
+
 
 class HTTPPorterProtocol(PorterProtocol):
     scheme = 'http'
@@ -639,6 +657,9 @@ class HTTPPorterProtocol(PorterProtocol):
     def writeNotFoundResponse(self):
         self.transport.write("HTTP/1.0 404 Not Found\r\n\r\nResource unknown")
 
+    def writeServiceUnavailableResponse(self):
+        self.transport.write("HTTP/1.0 503 Service Unavailable\r\n")
+
 
 class RTSPPorterProtocol(HTTPPorterProtocol):
     scheme = 'rtsp'
@@ -646,3 +667,6 @@ class RTSPPorterProtocol(HTTPPorterProtocol):
 
     def writeNotFoundResponse(self):
         self.transport.write("RTSP/1.0 404 Not Found\r\n\r\nResource unknown")
+
+    def writeServiceUnavailableResponse(self):
+        self.transport.write("RTSP/1.0 503 Service Unavailable\r\n")

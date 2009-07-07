@@ -344,10 +344,10 @@ class BaseJobAvatar(fpb.Avatar, log.Loggable):
             # sendmsg(2)
             self.mind.broker.transport.sendFileDescriptor(fd, message)
             return True
-        except RuntimeError, e:
-            # RuntimeError is what is thrown by the C code doing this
+        except OSError, e:
+            # OSError is what is thrown by the C code doing this
             # when there are issues
-            self.warning("RuntimeError %s sending file descriptors",
+            self.warning("Error %s sending file descriptors",
                          log.getExceptionMessage(e))
             return False
 
