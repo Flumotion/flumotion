@@ -51,6 +51,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
 
         self.extraTenacious = extraTenacious
         self.hasBeenConnected = 0
+        self.hasBeenAuthenticated = 0
 
         self._connector = None
 
@@ -63,6 +64,13 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         self.hasBeenConnected = 1
 
         fpb.ReconnectingFPBClientFactory.clientConnectionMade(self, broker)
+
+    def clientConnectionLost(self, connector, reason):
+        if not self.hasBeenAuthenticated:
+            self.medium.connectionFailed(reason)
+        else:
+            RFC = fpb.ReconnectingFPBClientFactory
+            RFC.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
         """
@@ -95,7 +103,6 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
             else:
                 self.log("telling medium about connection failure")
                 self.medium.connectionFailed(reason)
-                # return
                 return
 
         fpb.ReconnectingFPBClientFactory.clientConnectionFailed(self,
@@ -106,6 +113,7 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
     def gotDeferredLogin(self, d):
 
         def success(remote):
+            self.hasBeenAuthenticated = 1
             self.medium.setRemoteReference(remote)
 
         def error(failure):
@@ -186,7 +194,8 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
         if self.clientFactory:
             # We are disconnecting, so we don't want to be
             # notified by the model about it.
-            self.remote.dontNotifyOnDisconnect(self._remoteDisconnected)
+            if self.remote:
+                self.remote.dontNotifyOnDisconnect(self._remoteDisconnected)
 
             self.clientFactory.stopTrying()
 
@@ -356,11 +365,16 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     def connectionFailed(self, failure):
         # called by client factory
+        from twisted.internet.ssl import SSL
         if failure.check(error.DNSLookupError):
             message = ("Could not look up host '%s'."
                        % self.connectionInfo.host)
         elif failure.check(error.ConnectionRefusedError):
             message = ("Could not connect to host '%s' on port %d."
+                       % (self.connectionInfo.host,
+                          self.connectionInfo.port))
+        elif failure.check(SSL.Error):
+            message = ("Could not connect to host '%s' on port %d using SSL."
                        % (self.connectionInfo.host,
                           self.connectionInfo.port))
         else:

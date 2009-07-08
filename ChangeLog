@@ -1,3 +1,29 @@
+2009-07-08  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: Julien
+
+	* flumotion/admin/admin.py:
+	Make the connection to fail when it's the first time we're connecting
+	and stop trying to reconnect.
+	Show an useful error message when the connection failed because the
+	manager is not using a secure connection (only plain TCP)
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Don't quit the application only because the reconnection failed and
+	let the model to keep trying to connect.
+	Set the window un/sensitive when we are dis/connected and only allow
+	to connect to a manager.
+
+	* flumotion/admin/gtk/configurationassistant.py:
+	Be aware of the dis/connection to manager and make the assistant
+	un/sensitive accordingly.
+
+	* flumotion/admin/gtk/main.py:
+	Show the greeter and don't fail cowardly when the connection to the
+	manager specified through command line doesn't succeed.
+	Fixes #1252, #1315 and #1163
+
+
 2009-07-08  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/misc/porter/porter.py:

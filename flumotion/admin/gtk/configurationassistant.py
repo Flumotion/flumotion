@@ -317,6 +317,10 @@ class ConfigurationAssistant(SectionWizard):
         @type adminModel: L{AdminModel}
         """
         self._adminModel = adminModel
+        self._adminModel.connect('connected',
+                                 self.on_admin_connected_cb)
+        self._adminModel.connect('disconnected',
+                                 self.on_admin_disconnected_cb)
 
     def setHTTPPorters(self, porters):
         """
@@ -795,3 +799,9 @@ class ConfigurationAssistant(SectionWizard):
 
     def _on_assistant__help_clicked(self, assistant, section, anchor, version):
         self._showHelpLink(section, anchor, version)
+
+    def on_admin_connected_cb(self, admin):
+        self.window1.set_sensitive(True)
+
+    def on_admin_disconnected_cb(self, admin):
+        self.window1.set_sensitive(False)

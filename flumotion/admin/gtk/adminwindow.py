@@ -87,8 +87,8 @@ from flumotion.admin.gtk.debugmarkerview import DebugMarkerDialog
 from flumotion.admin.gtk.statusbar import AdminStatusbar
 from flumotion.common.common import componentId
 from flumotion.common.connection import PBConnectionInfo
-from flumotion.common.errors import ConnectionRefusedError, \
-     ConnectionFailedError, BusyComponentError
+from flumotion.common.errors import ConnectionCancelledError, \
+     ConnectionRefusedError, ConnectionFailedError, BusyComponentError
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.log import Loggable
 from flumotion.common.planet import AdminComponentState, moods
@@ -555,10 +555,6 @@ class AdminWindow(Loggable, GladeDelegate):
                                  self._admin_connected_cb)
         self._adminModel.connect('disconnected',
                                  self._admin_disconnected_cb)
-        self._adminModel.connect('connection-refused',
-                                 self._admin_connection_refused_cb)
-        self._adminModel.connect('connection-failed',
-                                 self._admin_connection_failed_cb)
         self._adminModel.connect('update', self._admin_update_cb)
 
         self._runConfigurationAssistantAction.set_sensitive(True)
@@ -642,15 +638,6 @@ class AdminWindow(Loggable, GladeDelegate):
         errorDialog = ErrorDialog(message, self._window,
                                   close_on_response=True)
         errorDialog.show()
-
-    def _fatalError(self, message, tray=None):
-        if tray:
-            self._trayicon.set_tooltip(tray)
-
-        self.info(message)
-        errorDialog = ErrorDialog(message, self._window)
-        errorDialog.show()
-        errorDialog.connect('response', self._close)
 
     def _setStatusbarText(self, text):
         return self._statusbar.push('main', text)
@@ -758,6 +745,11 @@ class AdminWindow(Loggable, GladeDelegate):
             yield component
 
     def _runAddNewFormatAssistant(self):
+        if not self._adminModel.isConnected():
+            self._error(
+               _('Cannot run assistant without being connected to a manager'))
+            return
+
         from flumotion.admin.gtk.configurationassistant import \
                 ConfigurationAssistant
 
@@ -799,6 +791,11 @@ class AdminWindow(Loggable, GladeDelegate):
         d.addCallback(gotWizardEntries)
 
     def _runConfigurationAssistant(self):
+        if not self._adminModel.isConnected():
+            self._error(
+               _('Cannot run assistant without being connected to a manager'))
+            return
+
         from flumotion.admin.gtk.configurationassistant import \
              ConfigurationAssistant
 
@@ -806,7 +803,6 @@ class AdminWindow(Loggable, GladeDelegate):
             configurationAssistant = ConfigurationAssistant(self._window)
             configurationAssistant.addInitialSteps()
             self._runAssistant(configurationAssistant)
-            self._configurationAssistantIsRunning = True
 
         if not self._componentStates:
             runAssistant()
@@ -845,6 +841,7 @@ class AdminWindow(Loggable, GladeDelegate):
                   'logged in.'))
             return
 
+        self._configurationAssistantIsRunning = True
         assistant.setExistingComponentNames(
             self._componentList.getComponentNames())
         assistant.setAdminModel(self._adminModel)
@@ -854,6 +851,7 @@ class AdminWindow(Loggable, GladeDelegate):
             assistant.setHTTPPorters(httpPorters)
         assistant.connect('finished', self._assistant_finished_cb)
         assistant.connect('destroy', self.on_assistant_destroy)
+
         assistant.run(main=False)
 
     def _clearAdmin(self):
@@ -862,13 +860,28 @@ class AdminWindow(Loggable, GladeDelegate):
 
         self._adminModel.disconnect_by_func(self._admin_connected_cb)
         self._adminModel.disconnect_by_func(self._admin_disconnected_cb)
-        self._adminModel.disconnect_by_func(self._admin_connection_refused_cb)
-        self._adminModel.disconnect_by_func(self._admin_connection_failed_cb)
         self._adminModel.disconnect_by_func(self._admin_update_cb)
         self._adminModel = None
 
         self._addFormatAction.set_sensitive(False)
         self._runConfigurationAssistantAction.set_sensitive(False)
+
+    def _updateUIStatus(self, connected):
+        self._window.set_sensitive(connected)
+        group = self._actiongroup
+        group.get_action('ImportConfig').set_sensitive(connected)
+        group.get_action('ExportConfig').set_sensitive(connected)
+        group.get_action('EnableDebugging').set_sensitive(connected)
+
+        self._clearLastStatusbarText()
+        if connected:
+            self._window.set_title(_('%s - Flumotion Administration') %
+                                   self._adminModel.adminInfoStr())
+            self._trayicon.set_tooltip(_('Flumotion: %s') % (
+                self._adminModel.adminInfoStr(), ))
+        else:
+            self._setStatusbarText(_('Not connected'))
+            self._trayicon.set_tooltip(_('Flumotion: Not connected'))
 
     def _updateConnectionActions(self):
         self._openRecentAction.set_sensitive(hasRecentConnections())
@@ -994,6 +1007,9 @@ class AdminWindow(Loggable, GladeDelegate):
             self._updateComponents()
 
     def _clearAllComponents(self):
+        if not self._adminModel.isConnected():
+            return
+
         d = self._adminModel.cleanComponents()
 
         def busyComponentError(failure):
@@ -1224,11 +1240,7 @@ class AdminWindow(Loggable, GladeDelegate):
             self._disconnectedDialog.destroy()
             self._disconnectedDialog = None
 
-        # FIXME: have a method for this
-        self._window.set_title(_('%s - Flumotion Administration') %
-            self._adminModel.adminInfoStr())
-        self._trayicon.set_tooltip(_('Flumotion: %s') % (
-            self._adminModel.adminInfoStr(), ))
+        self._updateUIStatus(connected=True)
 
         self.emit('connected')
 
@@ -1244,7 +1256,6 @@ class AdminWindow(Loggable, GladeDelegate):
             # ensure our window is shown
             self._componentList.clearAndRebuild(self._componentStates)
             self.show()
-            self._configurationAssistantIsRunning = True
             self._runConfigurationAssistant()
         else:
             self.show()
@@ -1254,12 +1265,20 @@ class AdminWindow(Loggable, GladeDelegate):
 
         def response(dialog, response_id):
             if response_id == RESPONSE_REFRESH:
-                self._adminModel.reconnect()
+
+                def errback(failure):
+                    # Swallow connection errors. We keep trying
+                    failure.trap(ConnectionCancelledError,
+                                 ConnectionFailedError,
+                                 ConnectionRefusedError)
+
+                d = self._adminModel.reconnect(keepTrying=True)
+                d.addErrback(errback)
             else:
-                # FIXME: notify admin of cancel
-                dialog.stop()
-                dialog.destroy()
-                return
+                self._disconnectedDialog.destroy()
+                self._disconnectedDialog = None
+                self._adminModel.disconnectFromManager()
+                self._window.set_sensitive(True)
 
         dialog = ProgressDialog(
             _("Reconnecting ..."),
@@ -1271,6 +1290,7 @@ class AdminWindow(Loggable, GladeDelegate):
         dialog.connect("response", response)
         dialog.start()
         self._disconnectedDialog = dialog
+        self._window.set_sensitive(False)
 
     def _connectionLost(self):
         self._componentStates = {}
@@ -1281,26 +1301,7 @@ class AdminWindow(Loggable, GladeDelegate):
             self._planetState = None
 
         self._showConnectionLostDialog()
-
-    def _connectionRefused(self):
-
-        def refusedLater():
-            self._fatalError(
-                _("Connection to manager on %s was refused.") % (
-                self._adminModel.connectionInfoStr()),
-                _("Connection to %s was refused") %
-                (self._adminModel.adminInfoStr(), ))
-
-        self.debug("handling connection-refused")
-        reactor.callLater(0, refusedLater)
-        self.debug("handled connection-refused")
-
-    def _connectionFailed(self, reason):
-        return self._fatalError(
-            _("Connection to manager on %s failed (%s).") % (
-            self._adminModel.connectionInfoStr(), reason),
-            _("Connection to %s failed") %
-            (self._adminModel.adminInfoStr(), ))
+        self._updateUIStatus(connected=False)
 
     def _openRecentConnection(self):
         d = ConnectionsDialog(parent=self._window)
@@ -1464,12 +1465,6 @@ You can do remote component calls using:
 
     def _admin_disconnected_cb(self, admin):
         self._connectionLost()
-
-    def _admin_connection_refused_cb(self, admin):
-        self._connectionRefused()
-
-    def _admin_connection_failed_cb(self, admin, reason):
-        self._connectionFailed(reason)
 
     def _admin_update_cb(self, admin):
         self._updateComponents()

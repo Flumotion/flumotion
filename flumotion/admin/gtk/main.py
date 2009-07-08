@@ -29,12 +29,20 @@ from twisted.python import log as twistedlog
 
 from flumotion.admin.connections import parsePBConnectionInfoRecent
 from flumotion.common import log, i18n
-from flumotion.common.errors import ConnectionRefusedError, OptionError
+from flumotion.common.errors import  OptionError, ConnectionRefusedError,\
+        ConnectionFailedError
 from flumotion.common.options import OptionParser
 
 __version__ = "$Rev$"
 _ = gettext.gettext
 _retval = 0
+
+
+def showGreeter(adminWindow):
+    from flumotion.admin.gtk.greeter import Greeter
+    greeter = Greeter(adminWindow)
+    d = greeter.runAsync()
+    return d
 
 
 def _connectToManager(win, manager, ssl):
@@ -43,24 +51,24 @@ def _connectToManager(win, manager, ssl):
     except OptionError, e:
         raise SystemExit("ERROR: %s" % (e, ))
 
-    d = win.openConnection(info)
-
-    def errbackConnectionRefused(failure):
-        global _retval
-        failure.trap(ConnectionRefusedError)
-        print >> sys.stderr, _(
-            "ERROR: Could not connect to manager:\n"
-            "       The connection to %r was refused.") % (
-            manager, )
-        _retval = 1
-        reactor.stop()
-
     def errback(failure):
         global _retval
         print >> sys.stderr, "ERROR: %s" % (failure.value, )
         _retval = 1
         reactor.stop()
-    d.addErrback(errbackConnectionRefused)
+
+    def errorDialogShown(unused):
+        return showGreeter(win)
+
+    def connectionFailed(failure):
+        failure.trap(ConnectionRefusedError, ConnectionFailedError)
+        from flumotion.admin.gtk.dialogs import showConnectionErrorDialog
+        d = showConnectionErrorDialog(failure, info)
+        d.addCallback(errorDialogShown)
+        return d
+
+    d = win.openConnection(info)
+    d.addErrback(connectionFailed)
     d.addErrback(errback)
     return d
 
@@ -100,9 +108,7 @@ def main(args):
     if options.manager:
         d = _connectToManager(win, options.manager, options.ssl)
     else:
-        from flumotion.admin.gtk.greeter import Greeter
-        greeter = Greeter(win)
-        d = greeter.runAsync()
+        d = showGreeter(win)
 
     # Printout unhandled exception to stderr
     d.addErrback(twistedlog.err)
