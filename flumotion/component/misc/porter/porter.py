@@ -658,7 +658,8 @@ class HTTPPorterProtocol(PorterProtocol):
         self.transport.write("HTTP/1.0 404 Not Found\r\n\r\nResource unknown")
 
     def writeServiceUnavailableResponse(self):
-        self.transport.write("HTTP/1.0 503 Service Unavailable\r\n")
+        self.transport.write("HTTP/1.0 503 Service Unavailable\r\n\r\n"
+                             "Service temporarily unavailable")
 
 
 class RTSPPorterProtocol(HTTPPorterProtocol):
@@ -669,4 +670,5 @@ class RTSPPorterProtocol(HTTPPorterProtocol):
         self.transport.write("RTSP/1.0 404 Not Found\r\n\r\nResource unknown")
 
     def writeServiceUnavailableResponse(self):
-        self.transport.write("RTSP/1.0 503 Service Unavailable\r\n")
+        self.transport.write("RTSP/1.0 503 Service Unavailable\r\n\r\n"
+                             "Service temporarily unavailable")
