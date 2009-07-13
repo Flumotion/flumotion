@@ -100,7 +100,7 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         self.info("Cached file provider initialized")
         self.debug("Source directory: '%s'", self._sourceDir)
         self.debug("Cache directory: '%s'", self._cacheDir)
-        self.debug("Cache size: %d MB", self._cacheSize)
+        self.debug("Cache size: %d bytes", self._cacheSize)
         self.debug("Cache cleanup enabled: %s", self._cleanupEnabled)
 
         common.ensureDir(self._sourceDir, "source")

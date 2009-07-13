@@ -1,3 +1,9 @@
+2009-07-13  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	Fix debug message that prints cache size in bytes and claims it's in
+	megabytes.
+
 2009-07-08  Xavier Queralt  <xqueralt@flumotion.com>
 
 	reviewed by: Julien
