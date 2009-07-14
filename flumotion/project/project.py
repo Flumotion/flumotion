@@ -63,10 +63,14 @@ def get(project, attribute, default=None):
     try:
         exec("import %s" % moduleName)
     except ImportError, e:
-        log.warning('project', 'Could not load project %s: %s',
-            project, log.getExceptionMessage(e))
-        raise errors.NoProjectError(moduleName)
-    except SyntaxError:
-        raise errors.NoProjectError(moduleName)
+        msg = ('Could not load project %s: %s' %
+               (project, log.getExceptionMessage(e)))
+        log.warning('project', msg)
+        raise errors.NoProjectError(project, msg)
+    except SyntaxError, e:
+        msg = ('Syntax error while loading project %s: %s' %
+               (project, log.getExceptionMessage(e)))
+        log.warning('project', msg)
+        raise errors.NoProjectError(project, msg)
     m = sys.modules[moduleName]
     return getattr(m, attribute, default)

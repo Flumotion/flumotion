@@ -44,7 +44,20 @@ class ConfigError(Exception):
 
 
 class NoProjectError(Exception):
-    "The given project does not exist"
+    """
+    The given project does not exist
+
+    @ivar projectName: name of the project
+    @type projectName: str
+    @ivar debug:       optional additional debug message
+    @type debug:       str
+    """
+
+    def __init__(self, projectName, debug=None):
+        self.projectName = projectName
+        self.debug = debug
+        # work like a normal Exception too
+        self.args = (projectName, debug)
 
 
 class NoSSLError(Exception):

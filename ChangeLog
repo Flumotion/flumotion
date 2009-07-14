@@ -1,3 +1,13 @@
+2009-07-14  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/errors.py:
+	Extend the NoProjectError exception to include additional debug
+	message.
+
+	* flumotion/project/project.py:
+	Include an additional debug message when raising NoProjectError.
+	Fixes #955.
+
 2009-07-13  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/misc/httpserver/cachedprovider.py:
