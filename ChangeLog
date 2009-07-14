@@ -1,5 +1,10 @@
 2009-07-14  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* doc/random/http-ondemand-rendering.rst:
+	Fix typos, add some RST formatting.
+
+2009-07-14  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* doc/random/http-ondemand-rendering.rst (added):
 	Add documentation explaining how the http-ondemand component renders
 	requests.
