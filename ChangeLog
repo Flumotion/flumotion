@@ -1,5 +1,11 @@
 2009-07-14  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* doc/random/http-ondemand-rendering.rst (added):
+	Add documentation explaining how the http-ondemand component renders
+	requests.
+
+2009-07-14  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/common/errors.py:
 	Extend the NoProjectError exception to include additional debug
 	message.
