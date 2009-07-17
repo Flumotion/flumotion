@@ -1,3 +1,12 @@
+2009-07-17  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali
+
+	* common/pep8.py:
+	Do not consider comments which are one a line by itself
+	as blank lines and work around bug in Python < 2.6 tokenize.py.
+	Fixes #1306.
+
 2009-07-14  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* doc/random/http-ondemand-rendering.rst:
