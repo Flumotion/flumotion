@@ -17,7 +17,8 @@ _old_showwarning = warnings.showwarning
 
 
 def showwarning(message, category, filename, lineno, file=None, line=None):
-    _old_showwarning(message, category, filename, lineno, file, line=line)
+    # python 2.4 does not have line as a kwarg
+    _old_showwarning(message, category, filename, lineno, file)
     if category is not DeprecationWarning:
         return
     # uncomment to see better where the problem comes from when it claims
