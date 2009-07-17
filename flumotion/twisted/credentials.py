@@ -23,11 +23,9 @@
 Flumotion Twisted credentials
 """
 
-import md5
-
 import random
 
-from flumotion.common import log
+from flumotion.common import log, python
 from twisted.cred import credentials
 from zope.interface import implements
 
@@ -137,8 +135,7 @@ def cryptRespond(challenge, cryptPassword):
     """
     Respond to a given crypt challenge with our cryptPassword.
     """
-    import md5
-    md = md5.new()
+    md = python.md5()
     md.update(cryptPassword)
     md.update(challenge)
     return md.digest()
@@ -163,7 +160,7 @@ def cryptChallenge():
     crap = ''
     for x in range(random.randrange(15, 25)):
         crap = crap + chr(random.randint(65, 90) + x - x) # pychecker madness
-    crap = md5.new(crap).digest()
+    crap = python.md5(crap).digest()
     return crap
 
 
@@ -367,7 +364,7 @@ class HTTPDigestChallenger(log.Loggable):
         elif self._algorithm == 'MD5-sess':
             HA1 = ha1.decode('hex')
 
-            m = md5.md5()
+            m = python.md5()
             m.update(HA1)
             m.update(':')
             m.update(nonce)
@@ -380,7 +377,7 @@ class HTTPDigestChallenger(log.Loggable):
     def _calculateHA2(self, method, uri):
         # We don't support auth-int, otherwise we'd optionally need to do
         # some more work here
-        m = md5.md5()
+        m = python.md5()
         m.update(method)
         m.update(':')
         m.update(uri)
@@ -391,7 +388,7 @@ class HTTPDigestChallenger(log.Loggable):
         HA1 = self._calculateHA1(ha1, nonce, cnonce)
         HA2 = self._calculateHA2(method, uri)
 
-        m = md5.md5()
+        m = python.md5()
         m.update(HA1)
         m.update(':')
         m.update(nonce)

@@ -16,10 +16,13 @@ exitCode = 0
 _old_showwarning = warnings.showwarning
 
 
-def showwarning(message, category, filename, lineno, file=None):
-    _old_showwarning(message, category, filename, lineno, file)
+def showwarning(message, category, filename, lineno, file=None, line=None):
+    _old_showwarning(message, category, filename, lineno, file, line=line)
     if category is not DeprecationWarning:
         return
+    # uncomment to see better where the problem comes from when it claims
+    # to be in ihooks.py
+    # import traceback; traceback.print_stack()
     global exitCode
     exitCode += 1
 warnings.showwarning = showwarning

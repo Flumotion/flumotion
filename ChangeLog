@@ -1,3 +1,23 @@
+2009-07-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	reviewed by: Zaheer Abbas Merali
+
+	* flumotion/admin/admin.py:
+	* flumotion/common/bundle.py:
+	* flumotion/common/python.py:
+	* flumotion/component/bouncers/bouncer.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/plug.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/monitor/nagios/stream.py:
+	* flumotion/test/test_common_bundle.py:
+	* flumotion/twisted/credentials.py:
+	  Fix Python 2.6 DeprecationWarnings for sha and md5
+	* common/validate-registry.py:
+	  Add a comment with a line to uncomment when warnings are hard to
+	  find.
+
 2009-07-17  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	reviewed by: Zaheer Abbas Merali

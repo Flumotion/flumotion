@@ -25,13 +25,12 @@ bundles of files used to implement caching over the network
 
 import StringIO
 import errno
-import md5
 import os
 import sys
 import tempfile
 import zipfile
 
-from flumotion.common import errors, dag
+from flumotion.common import errors, dag, python
 from flumotion.common.python import makedirs
 
 __all__ = ['Bundle', 'Bundler', 'Unbundler', 'BundlerBasket']
@@ -77,7 +76,7 @@ class BundledFile:
         @returns: the md5 sum a 32 character string of hex characters.
         """
         data = open(self.source, "r").read()
-        return md5.new(data).hexdigest()
+        return python.md5(data).hexdigest()
 
     def timestamp(self):
         """
@@ -135,7 +134,7 @@ class Bundle:
         Set the bundle to the given data representation of the zip file.
         """
         self.zip = zip
-        self.md5sum = md5.new(self.zip).hexdigest()
+        self.md5sum = python.md5(self.zip).hexdigest()
 
     def getZip(self):
         """

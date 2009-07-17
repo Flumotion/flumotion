@@ -21,7 +21,6 @@
 
 import errno
 import os
-import sha # hashlib is not available with python 2.4
 import stat
 import tempfile
 import threading
@@ -29,7 +28,7 @@ import time
 
 from twisted.internet import defer, reactor, abstract
 
-from flumotion.common import log, format, common
+from flumotion.common import log, format, common, python
 from flumotion.component.misc.httpserver import cachestats
 from flumotion.component.misc.httpserver import fileprovider
 from flumotion.component.misc.httpserver import localpath
@@ -168,7 +167,7 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         """
         ident = self._identifiers.get(path, None)
         if ident is None:
-            hash = sha.sha()
+            hash = python.sha()
             hash.update(path)
             ident = hash.digest().encode("hex").strip('\n')
             # Prevent the cache from growing endlessly

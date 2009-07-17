@@ -421,8 +421,8 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
                          '</connection>'])
 
             import os
-            import md5
-            md5sum = md5.new(s).hexdigest()
+            from flumotion.common import python
+            md5sum = python.md5(s).hexdigest()
             f = os.path.join(configure.registrydir, '%s.connection' % md5sum)
             try:
                 h = open(f, 'w')

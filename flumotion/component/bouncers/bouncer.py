@@ -83,13 +83,12 @@ preferred, albeit not strictly necessary, that callers of authenticate()
 call removeKeycardId when the keycard is no longer used.
 """
 
-import md5
 import random
 import time
 
 from twisted.internet import defer, reactor
 
-from flumotion.common import interfaces, keycards, errors
+from flumotion.common import interfaces, keycards, errors, python
 from flumotion.common.poller import Poller
 from flumotion.common.componentui import WorkerComponentUIState
 
@@ -703,7 +702,7 @@ class ChallengeResponseBouncer(AuthSessionBouncer):
                 else:
                     # random-ish salt, otherwise it's too obvious
                     string = str(random.randint(pow(10, 10), pow(10, 11)))
-                    md = md5.new()
+                    md = python.md5()
                     md.update(string)
                     keycard.salt = md.hexdigest()[:2]
                     self.debug("user not found, inventing bogus salt")

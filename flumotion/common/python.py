@@ -88,3 +88,13 @@ if sys.version_info[:2] < (2, 5):
         mkdir(name, mode)
 else:
     from os import makedirs
+
+# python 2.6 deprecates sha and md5 modules in favor of hashlib
+try:
+    _hashlib = __import__("hashlib")
+except ImportError:
+    from md5 import md5
+    from sha import sha as sha1
+else:
+    from hashlib import md5 as md5
+    from hashlib import sha1 as sha1

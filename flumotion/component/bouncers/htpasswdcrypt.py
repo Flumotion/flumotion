@@ -23,7 +23,6 @@
 an htpasswd-backed bouncer with crypt passwords
 """
 
-import md5
 import random
 
 from twisted.python import components

@@ -23,12 +23,12 @@ from twisted.trial import unittest
 
 from flumotion.common import testsuite
 
-from flumotion.common import bundle
+from flumotion.common import bundle, python
+
 import tempfile
 import os
 import StringIO
 import zipfile
-import md5
 import time
 
 
@@ -76,7 +76,7 @@ class TestBundler(testsuite.TestCase):
 
     def testBundlerOneFile(self):
         data = open(self.filename, "r").read()
-        md5sum = md5.new(data).hexdigest()
+        md5sum = python.md5(data).hexdigest()
         name = os.path.split(self.filename)[1]
         b = self.bundler.bundle()
         sum = b.md5sum
@@ -88,7 +88,7 @@ class TestBundler(testsuite.TestCase):
         self.failIf(zip.testzip())
         data = zip.read(name)
         self.failUnless(data)
-        self.assertEquals(md5sum, md5.new(data).hexdigest())
+        self.assertEquals(md5sum, python.md5(data).hexdigest())
 
     # create a bundle of two files then update one of them and check
     # the md5sum changes

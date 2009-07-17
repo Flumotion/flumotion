@@ -29,8 +29,6 @@ import tempfile
 import re
 import time
 import datetime
-import md5
-import sha
 import urlparse
 import urllib2
 
@@ -40,7 +38,7 @@ import gobject
 from twisted.internet import reactor, defer
 
 from flumotion.admin import admin, connections
-from flumotion.common import errors, keycards
+from flumotion.common import errors, keycards, python
 from flumotion.monitor.nagios import util
 
 URLFINDER = "http://[^\s'\"]*" # to search urls in playlists
@@ -65,9 +63,9 @@ def gen_timed_link(relative_path, secret_key, timeout, type):
     stop_time = '%08x' % (time.time() + int(timeout))
     hashable = secret_key + relative_path + start_time + stop_time
     if type == 'md5':
-        hashed = md5.md5(hashable).hexdigest()
+        hashed = python.md5(hashable).hexdigest()
     else:
-        hashed = sha.sha(hashable).hexdigest()
+        hashed = python.sha(hashable).hexdigest()
     return '%s%s%s' % (hashed, start_time, stop_time)
 
 

@@ -20,10 +20,9 @@
 # Headers in this file shall remain intact.
 
 """
-an bouncer with a username/salt/sha256 data backend
+a bouncer with a username/salt/sha256 data backend
 """
 
-import md5
 import random
 
 from twisted.python import components
