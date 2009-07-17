@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import sets
 import gst
 import gobject
 
@@ -440,9 +439,9 @@ class AVSwitch(Switch):
         raise errors.ComponentSetupHandledError()
 
     def do_check(self):
-        propkeys = sets.Set(self.config['properties'].keys())
-        vparms = sets.Set(self.vparms.keys())
-        aparms = sets.Set(self.aparms.keys())
+        propkeys = set(self.config['properties'].keys())
+        vparms = set(self.vparms.keys())
+        aparms = set(self.aparms.keys())
 
         for kind, parms in ('Video', vparms), ('Audio', aparms):
             missing = parms - (propkeys & parms)

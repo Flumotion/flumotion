@@ -2,6 +2,19 @@
 
 	reviewed by: Zaheer Abbas Merali
 
+	* flumotion/common/python.py:
+	  Add 'set' name because sets.Set was deprecated in 2.6.
+	* flumotion/admin/gtk/configurationassistant.py:
+	* flumotion/common/fxml.py:
+	* flumotion/common/messages.py:
+	* flumotion/common/registry.py:
+	* flumotion/component/combiners/switch/switch.py:
+	  Adapt.
+
+2009-07-17  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	reviewed by: Zaheer Abbas Merali
+
 	* flumotion/admin/admin.py:
 	* flumotion/common/bundle.py:
 	* flumotion/common/python.py:

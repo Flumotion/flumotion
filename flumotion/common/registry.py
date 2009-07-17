@@ -23,7 +23,6 @@
 """
 
 import os
-import sets
 import stat
 import errno
 import sys
@@ -32,13 +31,14 @@ from StringIO import StringIO
 from xml.sax import saxutils
 from twisted.spread import pb
 
-from flumotion.common import common, log, errors, fxml
+from flumotion.common import common, log, errors, fxml, python
 from flumotion.common.python import makedirs
 from flumotion.common.bundle import BundlerBasket, MergedBundler
 from flumotion.configure import configure
 
 __all__ = ['ComponentRegistry', 'registry']
 __version__ = "$Rev$"
+
 # Re-enable when reading the registry cache is lighter-weight, or we
 # decide that it's a good idea, or something. See #799.
 READ_CACHE = False
@@ -1695,9 +1695,9 @@ class ComponentRegistry(log.Loggable):
 
         # A bit complicated because we want to allow FLU_PROJECT_PATH to
         # point to nonexistent directories
-        registryPaths = sets.Set(self._getRegistryPathsFromEnviron())
-        oldRegistryPaths = sets.Set([directory.getPath()
-                                     for directory in self.getDirectories()])
+        registryPaths = python.set(self._getRegistryPathsFromEnviron())
+        oldRegistryPaths = python.set([directory.getPath()
+                                for directory in self.getDirectories()])
         if registryPaths != oldRegistryPaths:
             if oldRegistryPaths - registryPaths:
                 return True

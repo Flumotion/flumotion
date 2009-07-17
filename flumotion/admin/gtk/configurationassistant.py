@@ -50,7 +50,6 @@ client where the code runs).
 """
 import gettext
 import os
-import sets
 import webbrowser
 
 import gtk
@@ -60,7 +59,7 @@ from twisted.internet import defer
 from flumotion.admin.assistant.save import AssistantSaver
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.admin.gtk.workerlist import WorkerList
-from flumotion.common import errors, messages
+from flumotion.common import errors, messages, python
 from flumotion.common.common import pathToModuleName
 from flumotion.common import documentation
 from flumotion.common.i18n import N_, ngettext, gettexter
@@ -440,10 +439,10 @@ class ConfigurationAssistant(SectionWizard):
             self.debug('No admin connected, not checking presence of elements')
             return
 
-        asked = sets.Set(elementNames)
+        asked = set(elementNames)
 
         def _checkElementsCallback(existing, workerName):
-            existing = sets.Set(existing)
+            existing = set(existing)
             self.taskFinished()
             return tuple(asked.difference(existing))
 

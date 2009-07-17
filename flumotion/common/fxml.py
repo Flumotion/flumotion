@@ -26,11 +26,10 @@ correspond to data and schema, more or less. This file defines some base
 parsing routines shared between both kinds of XML.
 """
 
-import sets
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
-from flumotion.common import log
+from flumotion.common import log, python
 
 __version__ = "$Rev$"
 
@@ -107,10 +106,10 @@ class Parser(log.Loggable):
         @param optional: Set of optional attributes, or None.
         @type optional: Sequence (list, tuple, ...) of strings.
         """
-        attrs = sets.Set([k for k in node.attributes.keys()
+        attrs = set([k for k in node.attributes.keys()
                           if node.getAttribute(k)])
-        required = sets.Set(required or ())
-        optional = sets.Set(optional or ())
+        required = set(required or ())
+        optional = set(optional or ())
         for x in attrs - required.union(optional):
             raise self.parserError("Unknown attribute in <%s>: %s"
                                    % (node.nodeName, x))

@@ -98,3 +98,9 @@ except ImportError:
 else:
     from hashlib import md5 as md5
     from hashlib import sha1 as sha1
+
+# python 2.6 deprecated the sets module in favor of a builtin set class
+try:
+    set = set
+except NameError:
+    from sets import Set as set

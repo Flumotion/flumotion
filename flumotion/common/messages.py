@@ -30,6 +30,7 @@ from twisted.spread import pb
 from flumotion.common import log
 from flumotion.configure import configure
 from flumotion.common.i18n import FancyEqMixin, Translatable
+from flumotion.common.i18n import *
 
 __version__ = "$Rev$"
 
