@@ -110,8 +110,14 @@ class FakeRequest:
 class FakeAuthMedium:
     # this medium allows HTTP auth with fakeuser/fakepasswd
 
+    def __init__(self):
+        self.count = 0
+
     def authenticate(self, bouncerName, keycard):
         if keycard.username == 'fakeuser' and keycard.password == 'fakepasswd':
+            # the medium should also generate a unique keycard ID
+            keycard.id = self.count
+            self.count += 1
             keycard.state = keycards.AUTHENTICATED
             return defer.succeed(keycard)
 
@@ -121,8 +127,14 @@ class FakeAuthMedium:
 class FakeTokenMedium:
     # this medium allows HTTP auth if there is a "LETMEIN" token
 
+    def __init__(self):
+        self.count = 0
+
     def authenticate(self, bouncerName, keycard):
         if keycard.token == 'LETMEIN':
+            # the medium should also generate a unique keycard ID
+            keycard.id = self.count
+            self.count += 1
             keycard.state = keycards.AUTHENTICATED
             return defer.succeed(keycard)
 
