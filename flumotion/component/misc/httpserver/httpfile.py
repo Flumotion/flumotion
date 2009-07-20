@@ -269,11 +269,21 @@ class File(resource.Resource, log.Loggable):
                               (first, last, fileSize))
 
         request.setResponseRange(first, last, fileSize)
-        self.do_prepareBody(request, provider, first, last)
+        d = defer.maybeDeferred(self.do_prepareBody,
+                                request, provider, first, last)
 
-        if request.method == 'HEAD':
-            return ''
+        def dispatchMethod(header, request):
+            if request.method == 'HEAD':
+                # the _terminateRequest callback will be fired, and the request
+                # will be finished
+                return ''
+            return self._startRequest(request, header, provider, first, last)
 
+        d.addCallback(dispatchMethod, request)
+
+        return d
+
+    def _startRequest(self, request, header, provider, first, last):
         # Call request modifiers
         for modifier in self._requestModifiers:
             modifier.modify(request)
@@ -288,28 +298,6 @@ class File(resource.Resource, log.Loggable):
         else:
             d = defer.succeed(None)
 
-        def configureTransfer(metadata=None):
-            if self._rateController:
-                self.log("Creating RateControl object using plug %r",
-                    self._rateController)
-
-                # We are passing a metadata dictionary as Proxy settings.
-                # So the rate control can use it if needed.
-                d = defer.maybeDeferred(
-                    self._rateController.createProducerConsumerProxy,
-                    request, metadata)
-            else:
-                d = defer.succeed(request)
-
-            def attachProxy(consumer):
-                # Set the provider first, because for very small file
-                # the transfer could terminate right away.
-                request._provider = provider
-                transfer = FileTransfer(provider, last + 1, consumer)
-                request._transfer = transfer
-
-            d.addCallback(attachProxy)
-
         def metadataError(failure):
             self.warning('Error retrieving metadata for file %s'
                         ' using plug %r. %r',
@@ -318,9 +306,46 @@ class File(resource.Resource, log.Loggable):
                         failure.value)
 
         d.addErrback(metadataError)
-        d.addCallback(configureTransfer)
+        d.addCallback(self._configureTransfer, request, header,
+                      provider, first, last)
 
-        return server.NOT_DONE_YET
+        return d
+
+    def _configureTransfer(self, metadata, request, header,
+                           provider, first, last):
+        if self._rateController:
+            self.debug("Creating RateControl object using plug %r and "
+                       "metadata %r", self._rateController, metadata)
+
+            # We are passing a metadata dictionary as Proxy settings.
+            # So the rate control can use it if needed.
+            d = defer.maybeDeferred(
+                self._rateController.createProducerConsumerProxy,
+                request, metadata)
+        else:
+            d = defer.succeed(request)
+
+        def attachProxy(consumer, provider, header, first, last):
+            # If we have a header, give it to the consumer first
+            if header:
+                consumer.write(header)
+
+            # Set the provider first, because for very small file
+            # the transfer could terminate right away.
+            request._provider = provider
+            transfer = FileTransfer(provider, last + 1, consumer)
+            request._transfer = transfer
+
+            # The important NOT_DONE_YET was already returned by the render()
+            # method and the value returned here is just part of a convention
+            # between _renderRequest and _terminateRequest. The latter assumes
+            # that if the deferred chain initiated by _renderRequest will fire
+            # with NOT_DONE_YET if the transfer is in progress.
+            return server.NOT_DONE_YET
+
+        d.addCallback(attachProxy, provider, header, first, last)
+
+        return d
 
     def do_prepareBody(self, request, provider, first, last):
         """
@@ -331,6 +356,9 @@ class File(resource.Resource, log.Loggable):
 
         Override me to send additional headers, or to prefix the body
         with data headers.
+
+        I can return a Deferred, that should fire with a string header. That
+        header will be written to the request.
         """
         request.setHeader("Content-Length", str(last - first + 1))
 
@@ -383,24 +411,22 @@ class FLVFile(File):
     def do_prepareBody(self, request, provider, first, last):
         self.log('do_prepareBody for FLV')
         length = last - first + 1
+        ret = ''
 
         # if there is a non-zero start get parameter, prefix the body with
         # our FLV header
         # each value is a list
         start = int(request.args.get('start', ['0'])[0])
         # range request takes precedence over our start parsing
-        if first == 0 and start:
+        if request.getHeader('range') is None and start:
             self.debug('Start %d passed, seeking', start)
             provider.seek(start)
             length = last - start + 1 + len(self.header)
+            ret = self.header
 
         request.setHeader("Content-Length", str(length))
 
-        if request.method == 'HEAD':
-            return ''
-
-        if first == 0 and start:
-            request.write(self.header)
+        return ret
 
 
 class FileTransfer(log.Loggable):
