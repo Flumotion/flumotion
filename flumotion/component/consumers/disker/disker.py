@@ -413,7 +413,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.setMood(moods.sad)
         messageId = "error-writing-%s" % self.location
         m = messages.Error(T_(N_(
-            "Error writing to file '%s'.", self.location)),
+            "Error writing to file '%s'."), self.location),
             mid=messageId, priority=40)
         self.addMessage(m)
 

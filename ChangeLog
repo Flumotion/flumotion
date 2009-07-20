@@ -1,5 +1,11 @@
 2009-07-20  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/consumers/disker/disker.py:
+	Fix usage of N_ and T_ i18n methods. N_ expects a format string, T_
+	does the interpolation.
+
+2009-07-20  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/plugs/rrd.py:
 	* flumotion/component/misc/httpserver/httpfile.py:
 	Remove unused imports. Thanks, pychecker!
