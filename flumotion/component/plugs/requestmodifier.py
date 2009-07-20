@@ -23,6 +23,7 @@
 import os
 import urllib
 
+from flumotion.common import python
 from flumotion.component.plugs import base
 
 __version__ = "$Rev$"
@@ -51,13 +52,13 @@ class RequestModifierForceDownloadPlug(RequestModifierPlug):
     def start(self, component):
         properties = self.args['properties']
         self._argument = properties['argument-name']
-        self._triggers = set(properties.get('trigger-value', ['1']))
+        self._triggers = python.set(properties.get('trigger-value', ['1']))
         self.log("Argument name: %s", self._argument)
         self.log("Trigger values: %s", self._triggers)
 
     def modify(self, request):
         if self._argument in request.args:
-            if self._triggers & set(request.args[self._argument]):
+            if self._triggers & python.set(request.args[self._argument]):
                 filename = os.path.basename(urllib.unquote_plus(request.path))
                 filename = filename.encode('UTF-8')
                 filename = urllib.quote(filename)
