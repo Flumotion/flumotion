@@ -261,7 +261,7 @@ class HTTPAuthentication(log.Loggable):
         keycard.requesterId = self.requesterId
         keycard.issuerName = self.issuerName
         keycard._fd = request.transport.fileno()
-        keycard.setDomain(self._domain)
+        keycard.domain = self._domain
 
         if self.plug:
             self.debug('authenticating against plug')
