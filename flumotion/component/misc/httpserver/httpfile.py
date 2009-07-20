@@ -22,6 +22,14 @@
 import string
 import time
 
+# mp4seek is a library to split MP4 files, see the MP4File class docstring
+HAS_MP4SEEK = False
+try:
+    import mp4seek.async
+    HAS_MP4SEEK = True
+except ImportError:
+    pass
+
 from twisted.web import resource, server, http
 from twisted.web import error as weberror, static
 from twisted.internet import defer, reactor, error, abstract
@@ -427,6 +435,67 @@ class FLVFile(File):
         request.setHeader("Content-Length", str(length))
 
         return ret
+
+
+class MP4File(File):
+    """
+    I am a File resource for MP4 files.
+    If I have a library for manipulating MP4 files available, I can handle
+    requests with a 'start' GET parameter, Without the library, I ignore this
+    parameter.
+    The 'start' parameter represents the time offset from where to start, in
+    seconds.  If it is non-zero, I will seek inside the file to the sample with
+    that time, and prepend the content with rebuilt MP4 tables, to make the
+    output playable.
+    """
+
+    def do_prepareBody(self, request, provider, first, last):
+        self.log('do_prepareBody for MP4')
+        length = last - first + 1
+        ret = ''
+
+        # if there is a non-zero start get parameter, split the file, prefix
+        # the body with the regenerated header and seek inside the provider
+        start = float(request.args.get('start', ['0'])[0])
+        # range request takes precedence over our start parsing
+        if request.getHeader('range') is None and start and HAS_MP4SEEK:
+            self.debug('Start %f passed, seeking', start)
+            provider.seek(0)
+            d = self._split_file(provider, start)
+
+            def seekAndSetContentLength(header_and_offset):
+                header, offset = header_and_offset
+                # the header is a file-like object with the file pointer at the
+                # end, the offset is a number
+                length = last - offset + 1 + header.tell()
+                if offset:
+                    provider.seek(offset)
+                request.setHeader("Content-Length", str(length))
+                header.seek(0)
+                return header.read()
+
+            d.addCallback(seekAndSetContentLength)
+            return d
+        else:
+            request.setHeader('Content-Length', str(length))
+            return defer.succeed(ret)
+
+    def _split_file(self, provider, start):
+        d = defer.Deferred()
+
+        def read_some_data(how_much, from_where):
+            if how_much:
+                provider.seek(from_where)
+                read_d = provider.read(how_much)
+                read_d.addCallback(splitter.feed)
+                read_d.addErrback(d.errback)
+            else:
+                d.callback(splitter.result())
+
+        splitter = mp4seek.async.Splitter(start)
+        splitter.start(read_some_data)
+
+        return d
 
 
 class FileTransfer(log.Loggable):

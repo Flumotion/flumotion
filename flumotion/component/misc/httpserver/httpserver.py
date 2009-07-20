@@ -242,6 +242,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         # additional mime -> File class mapping ?
         self._mimeToResource = {
             'video/x-flv': httpfile.FLVFile,
+            'video/mp4': httpfile.MP4File,
         }
 
         self.uiState.addKey('stream-url', None)
