@@ -440,11 +440,14 @@ class FakeSplitter(object):
 
     Always asks for one chunk of data with offset 0 and size CHUNK_SIZE.
     Always returns HEADER as the header and OFFSET as the offset.
+
+    Simulates having a failure if you set the failure property.
     """
 
     OFFSET = 3
     CHUNK_SIZE = 3
     HEADER = 'fake header'
+    failure = None
 
     def __init__(self, t):
         self.t = t
@@ -455,6 +458,8 @@ class FakeSplitter(object):
         data_cb(self.CHUNK_SIZE, 0)
 
     def feed(self, data):
+        if self.failure:
+            raise self.failure
         self.data.write(data)
         self.data_cb(0, 0)
 
@@ -593,6 +598,28 @@ class TestDirectory(testsuite.TestCase):
             self.assertEquals(fr.getHeader('Content-Length'),
                 str(len(expected)))
         fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
+    def testMP4Fail(self):
+        fr = FakeRequest(args={'start': [2]})
+        old, FakeSplitter.failure = FakeSplitter.failure, Exception("boom")
+
+        self.assertEquals(self.resource.getChild('test.mp4', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/mp4')
+            expected = 'a fake MP4 file'
+            self.assertEquals(fr.data, expected)
+            self.assertEquals(fr.getHeader('Content-Length'),
+                str(len(expected)))
+
+        def restoreOldFailure(ret, old):
+            FakeSplitter.failure = old
+            return ret
+
+        fr.finishDeferred.addCallback(finish)
+        fr.finishDeferred.addBoth(restoreOldFailure, old)
         return fr.finishDeferred
 
     def testMP4StartZero(self):

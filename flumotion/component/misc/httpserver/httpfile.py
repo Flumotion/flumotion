@@ -473,7 +473,16 @@ class MP4File(File):
                 header.seek(0)
                 return header.read()
 
+            def seekingFailed(failure):
+                # swallow the failure and serve the file from the beginning
+                self.warning("Seeking in MP4 file %s failed: %s", provider,
+                             log.getFailureMessage(failure))
+                provider.seek(0)
+                request.setHeader('Content-Length', str(length))
+                return ret
+
             d.addCallback(seekAndSetContentLength)
+            d.addErrback(seekingFailed)
             return d
         else:
             request.setHeader('Content-Length', str(length))
