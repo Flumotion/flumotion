@@ -468,8 +468,7 @@ class MP4File(File):
                 # the header is a file-like object with the file pointer at the
                 # end, the offset is a number
                 length = last - offset + 1 + header.tell()
-                if offset:
-                    provider.seek(offset)
+                provider.seek(offset)
                 request.setHeader("Content-Length", str(length))
                 header.seek(0)
                 return header.read()
