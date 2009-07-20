@@ -12,7 +12,7 @@ html/index.html: $(patsubst %, $(top_srcdir)/%, $(MODULE_FILES)) $(top_srcdir)/c
 	@echo Generating HTML documentation...
 	@$(PYTHON) -c "import os; print os.getpid() + 10" > display
 	@Xvfb -ac :`cat display` & echo $$! > Xvfb.pid
-	@DISPLAY=:`cat display` PYTHONPATH=$(pypath) $(PYTHON) $(top_srcdir)/common/gendoc.py $(EPYDOC_ARGS) $(MODULES) 2>&1; echo $$? > ret
+	DISPLAY=:`cat display` PYTHONPATH=$(FLUMOTION_DIR):$(pypath) $(PYTHON) $(top_srcdir)/common/gendoc.py $(EPYDOC_ARGS) $(MODULES) 2>&1; echo $$? > ret
 	@kill `cat Xvfb.pid`
 	@rm Xvfb.pid display
 	@exit `cat ret; rm -f ret`
