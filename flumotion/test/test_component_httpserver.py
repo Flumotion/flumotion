@@ -543,6 +543,17 @@ class TestDirectory(testsuite.TestCase):
         fr.finishDeferred.addCallback(finish)
         return fr.finishDeferred
 
+    def testFLVStartMalformed(self):
+        fr = FakeRequest(args={'start': ['w00t']})
+        self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
+            self.assertEquals(fr.data, 'a fake FLV file')
+        fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
     def testFLVRangeStart(self):
         # range should take precedence over start parameter
         fr = FakeRequest(headers={'range': 'bytes=7-'}, args={'start': [2]})
@@ -597,6 +608,17 @@ class TestDirectory(testsuite.TestCase):
             self.assertEquals(fr.data, expected)
             self.assertEquals(fr.getHeader('Content-Length'),
                 str(len(expected)))
+        fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
+    def testMP4StartMalformed(self):
+        fr = FakeRequest(args={'start': ['w00t']})
+        self.assertEquals(self.resource.getChild('test.mp4', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/mp4')
+            self.assertEquals(fr.data, 'a fake MP4 file')
         fr.finishDeferred.addCallback(finish)
         return fr.finishDeferred
 

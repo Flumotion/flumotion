@@ -424,7 +424,10 @@ class FLVFile(File):
         # if there is a non-zero start get parameter, prefix the body with
         # our FLV header
         # each value is a list
-        start = int(request.args.get('start', ['0'])[0])
+        try:
+            start = int(request.args.get('start', ['0'])[0])
+        except ValueError:
+            start = 0
         # range request takes precedence over our start parsing
         if request.getHeader('range') is None and start:
             self.debug('Start %d passed, seeking', start)
@@ -456,7 +459,10 @@ class MP4File(File):
 
         # if there is a non-zero start get parameter, split the file, prefix
         # the body with the regenerated header and seek inside the provider
-        start = float(request.args.get('start', ['0'])[0])
+        try:
+            start = float(request.args.get('start', ['0'])[0])
+        except ValueError:
+            start = 0
         # range request takes precedence over our start parsing
         if request.getHeader('range') is None and start and HAS_MP4SEEK:
             self.debug('Start %f passed, seeking', start)

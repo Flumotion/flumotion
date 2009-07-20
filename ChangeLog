@@ -3,6 +3,16 @@
 	reviewed by: Sebastien Merle
 
 	* flumotion/component/misc/httpserver/httpfile.py:
+	Ignore malformed start GET parameters when serving FLV or MP4
+	files.
+	* flumotion/test/test_component_httpserver.py:
+	Unit test the new behaviour.
+
+2009-07-20  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Sebastien Merle
+
+	* flumotion/component/misc/httpserver/httpfile.py:
 	When splitting the MP4 file fails, serve the file from the
 	beginning instead of returning a HTTP 500 error.
 	* flumotion/test/test_component_httpserver.py:
