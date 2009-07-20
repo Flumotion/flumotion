@@ -1,3 +1,12 @@
+2009-07-20  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* common/common.mk:
+	Preserve PYTHONPATH and FLU_PROJECT_PATH set by ./env in
+	check-local-registry.  Properly quote command to delay evaluation
+	of PYTHONPATH and FLU_PROJECT_PATH to the context set by ./env.
+
 2009-07-20  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/epydoc.mk:
