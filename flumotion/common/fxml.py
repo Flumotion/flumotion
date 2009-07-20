@@ -106,10 +106,10 @@ class Parser(log.Loggable):
         @param optional: Set of optional attributes, or None.
         @type optional: Sequence (list, tuple, ...) of strings.
         """
-        attrs = set([k for k in node.attributes.keys()
+        attrs = python.set([k for k in node.attributes.keys()
                           if node.getAttribute(k)])
-        required = set(required or ())
-        optional = set(optional or ())
+        required = python.set(required or ())
+        optional = python.set(optional or ())
         for x in attrs - required.union(optional):
             raise self.parserError("Unknown attribute in <%s>: %s"
                                    % (node.nodeName, x))

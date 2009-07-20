@@ -439,9 +439,9 @@ class AVSwitch(Switch):
         raise errors.ComponentSetupHandledError()
 
     def do_check(self):
-        propkeys = set(self.config['properties'].keys())
-        vparms = set(self.vparms.keys())
-        aparms = set(self.aparms.keys())
+        propkeys = python.set(self.config['properties'].keys())
+        vparms = python.set(self.vparms.keys())
+        aparms = python.set(self.aparms.keys())
 
         for kind, parms in ('Video', vparms), ('Audio', aparms):
             missing = parms - (propkeys & parms)

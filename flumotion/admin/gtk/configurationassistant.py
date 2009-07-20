@@ -439,10 +439,10 @@ class ConfigurationAssistant(SectionWizard):
             self.debug('No admin connected, not checking presence of elements')
             return
 
-        asked = set(elementNames)
+        asked = python.set(elementNames)
 
         def _checkElementsCallback(existing, workerName):
-            existing = set(existing)
+            existing = python.set(existing)
             self.taskFinished()
             return tuple(asked.difference(existing))
 
