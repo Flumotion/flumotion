@@ -418,6 +418,13 @@ class TestTextFile(testsuite.TestCase):
             'a text file', 0, 10)
         return fr.finishDeferred
 
+    def testHead(self):
+        fr = FakeRequest(method='HEAD')
+        self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
+        fr.finishDeferred.addCallback(self.finishCallback, fr,
+            http.OK, '', 11)
+        return fr.finishDeferred
+
     def testRangeHead(self):
         fr = FakeRequest(method='HEAD', headers={'range': 'bytes=2-5'})
         self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
