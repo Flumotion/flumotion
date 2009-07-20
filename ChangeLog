@@ -2,6 +2,13 @@
 
 	reviewed by: Sebastien Merle
 
+	* flumotion/test/test_component_httpserver.py:
+	Test the MP4 file handling code in the HTTP server component.
+
+2009-07-20  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Sebastien Merle
+
 	* flumotion/component/misc/httpserver/httpfile.py:
 	Add a subclass for handling MP4 files. Implement handling of
 	the start GET parameter, tailored after the Apache

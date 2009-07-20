@@ -21,6 +21,7 @@
 
 import os
 import tempfile
+from StringIO import StringIO
 
 from twisted.internet import defer
 from twisted.trial import unittest
@@ -433,6 +434,36 @@ class TestTextFile(testsuite.TestCase):
         return fr.finishDeferred
 
 
+class FakeSplitter(object):
+    """
+    An object simulating the Splitter interface from mp4seek.async
+
+    Always asks for one chunk of data with offset 0 and size CHUNK_SIZE.
+    Always returns HEADER as the header and OFFSET as the offset.
+    """
+
+    OFFSET = 3
+    CHUNK_SIZE = 3
+    HEADER = 'fake header'
+
+    def __init__(self, t):
+        self.t = t
+        self.data = StringIO()
+
+    def start(self, data_cb):
+        self.data_cb = data_cb
+        data_cb(self.CHUNK_SIZE, 0)
+
+    def feed(self, data):
+        self.data.write(data)
+        self.data_cb(0, 0)
+
+    def result(self):
+        s = StringIO(self.HEADER)
+        s.seek(0, 2)
+        return s, self.OFFSET
+
+
 class TestDirectory(testsuite.TestCase):
 
     def setUp(self):
@@ -440,10 +471,26 @@ class TestDirectory(testsuite.TestCase):
         h = open(os.path.join(self.path, 'test.flv'), 'w')
         h.write('a fake FLV file')
         h.close()
+        h = open(os.path.join(self.path, 'test.mp4'), 'w')
+        h.write('a fake MP4 file')
+        h.close()
+
+        # insert a mock mp4seek library into the httpfile module, regardless of
+        # whether we have the real one or not
+        httpfile.HAS_MP4SEEK = True
+
+        class Dummy(object):
+            pass
+        fakemp4seek = Dummy()
+        fakemp4seek.async = Dummy()
+        fakemp4seek.async.Splitter = FakeSplitter
+        httpfile.mp4seek = fakemp4seek
+
         self.component = FakeComponent(self.path)
         # a directory resource
         self.resource = httpfile.File(self.component.getRoot(), self.component,
-            {'video/x-flv': httpfile.FLVFile})
+            {'video/x-flv': httpfile.FLVFile,
+             'video/mp4': httpfile.MP4File})
 
     def tearDown(self):
         os.system('rm -r %s' % self.path)
@@ -503,6 +550,86 @@ class TestDirectory(testsuite.TestCase):
             self.assertEquals(fr.data, expected)
             self.assertEquals(fr.getHeader('Content-Length'),
                 str(len(expected)))
+        fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
+    def testFLVRangeZeroStart(self):
+        # range should take precedence over start parameter even if the range
+        # starts at zero
+        fr = FakeRequest(headers={'range': 'bytes=0-'}, args={'start': [2]})
+        self.assertEquals(self.resource.getChild('test.flv', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/x-flv')
+            expected = 'a fake FLV file'
+            self.assertEquals(fr.data, expected)
+            self.assertEquals(fr.getHeader('Content-Length'),
+                str(len(expected)))
+        fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
+    def testMP4(self):
+        fr = FakeRequest()
+        self.assertEquals(self.resource.getChild('test.mp4', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/mp4')
+            self.assertEquals(fr.data, 'a fake MP4 file')
+        fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
+    def testMP4Start(self):
+        fr = FakeRequest(args={'start': [2]})
+        self.assertEquals(self.resource.getChild('test.mp4', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/mp4')
+            expected = (FakeSplitter.HEADER +
+                        'a fake MP4 file'[FakeSplitter.OFFSET:])
+            self.assertEquals(fr.data, expected)
+            self.assertEquals(fr.getHeader('Content-Length'),
+                str(len(expected)))
+        fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
+    def testMP4StartZero(self):
+        fr = FakeRequest(args={'start': [0]})
+        self.assertEquals(self.resource.getChild('test.mp4', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/mp4')
+            expected = 'a fake MP4 file'
+            self.assertEquals(fr.data, expected)
+            self.assertEquals(fr.getHeader('Content-Length'),
+                              str(len(expected)))
+        fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
+    def testMP4RangeZeroStart(self):
+        fr = FakeRequest(headers={'range': 'bytes=0-0'}, args={'start': [2]})
+        self.assertEquals(self.resource.getChild('test.mp4', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/mp4')
+            self.assertEquals(fr.data, 'a')
+            self.assertEquals(fr.getHeader('Content-Length'), '1')
+        fr.finishDeferred.addCallback(finish)
+        return fr.finishDeferred
+
+    def testMP4RangeStart(self):
+        fr = FakeRequest(headers={'range': 'bytes=2-5'}, args={'start': [4]})
+        self.assertEquals(self.resource.getChild('test.mp4', fr).render(fr),
+            server.NOT_DONE_YET)
+
+        def finish(result):
+            self.assertEquals(fr.getHeader('content-type'), 'video/mp4')
+            self.assertEquals(fr.data, 'fake')
+            self.assertEquals(fr.getHeader('Content-Length'), '4')
         fr.finishDeferred.addCallback(finish)
         return fr.finishDeferred
 
