@@ -113,6 +113,11 @@ class File(resource.Resource, log.Loggable):
         return self._factory.create(child)
 
     def render(self, request):
+        """
+        The request gets rendered by asking the httpauth object for
+        authentication, which returns a deferred.
+        This deferred will callback when the request gets authenticated.
+        """
 
         # PROBE: incoming request; see httpstreamer.resources
         self.debug('[fd %5d] (ts %f) incoming request %r',
@@ -121,13 +126,19 @@ class File(resource.Resource, log.Loggable):
         d = self._httpauth.startAuthentication(request)
         d.addCallbacks(self._requestAuthenticated, self._authenticationFailed,
                        callbackArgs=(request, ), errbackArgs=(request, ))
+        # return NOT_DONE_YET, as required by the twisted.web interfaces
         return server.NOT_DONE_YET
 
     def _authenticationFailed(self, failure, request):
-        # Authentication failed; nothing more to do, just swallow the failure.
+        # Authentication failed; nothing more to do, just swallow the
+        # failure. The object responsible for authentication has already
+        # written a proper response to the client and closed the request.
         pass
 
     def _requestAuthenticated(self, result, request):
+        # Authentication suceeded. Start rendering the request.
+        # We always want to call _terminateRequest after rendering,
+        # regardless of whether there's a failure while rendering it or not.
         d = defer.succeed(result)
         d.addCallback(self._renderRequest, request)
         d.addBoth(self._terminateRequest, request)
@@ -135,15 +146,18 @@ class File(resource.Resource, log.Loggable):
 
     def _terminateRequest(self, body, request):
         if body == server.NOT_DONE_YET:
-            # Currently serving the file
+            # _renderRequest will return NOT_DONE_YET if it started serving the
+            # file. This means the callback chain started by _renderRequest has
+            # finished and we're currently serving the file.
             return
         if isinstance(body, Failure):
-            # Something goes wrong, log it
+            # Something went wrong, log it
             self.warning("Failure during request rendering: %s",
                          log.getFailureMessage(body))
             body = self.internalServerError.render(request)
         if body:
-            # render result/error page
+            # the callback chain from _renderRequest chose to return a string
+            # body, write it out to the client
             request.write(body)
         self.debug('[fd %5d] Terminate request %r',
                    request.transport.fileno(), request)
