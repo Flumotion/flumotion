@@ -20,7 +20,6 @@
 # Headers in this file shall remain intact.
 
 import string
-import os
 import time
 
 from twisted.web import resource, server, http

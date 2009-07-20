@@ -1,3 +1,9 @@
+2009-07-20  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/plugs/rrd.py:
+	* flumotion/component/misc/httpserver/httpfile.py:
+	Remove unused imports. Thanks, pychecker!
+
 2009-07-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/plugs/requestmodifier.py:

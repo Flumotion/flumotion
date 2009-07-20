@@ -19,7 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import types
 import os
 
 # FIXME: use a variable like HAS_RRDTOOL like we do in similar code
