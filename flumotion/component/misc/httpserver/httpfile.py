@@ -369,6 +369,7 @@ class File(resource.Resource, log.Loggable):
         header will be written to the request.
         """
         request.setHeader("Content-Length", str(last - first + 1))
+        return ''
 
 
 class MimedFileFactory(log.Loggable):
