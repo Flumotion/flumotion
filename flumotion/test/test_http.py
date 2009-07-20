@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 from twisted.internet import defer
-from twisted.web import server
+from twisted.web import http, server
 
 from flumotion.component.base.http import HTTPAuthentication
 from flumotion.component.consumers.httpstreamer import resources
@@ -69,7 +69,7 @@ class FakeRequest:
     def __init__(self, **kwargs):
         self.headers = {}
         self.args = {}
-        self.response = -1
+        self.response = http.OK
         self.data = ""
 
         self.user = "fakeuser"
@@ -212,7 +212,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         # the request is authorized
 
         def checkResult(res):
-            self.failIfEquals(request.response, http.OK)
+            self.assertEquals(request.response, http.OK)
 
         d = httpauth.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
