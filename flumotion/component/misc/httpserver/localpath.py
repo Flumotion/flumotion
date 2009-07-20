@@ -32,6 +32,7 @@ def loadMimeTypes():
     # Add our own mime types to the ones parsed from /etc/mime.types
     d = static.loadMimeTypes()
     d['.flv'] = 'video/x-flv'
+    d['.mp4'] = 'video/mp4'
     return d
 
 

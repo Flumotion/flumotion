@@ -1,5 +1,10 @@
 2009-07-20  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/misc/httpserver/localpath.py:
+	Make sure the .mp4 get a video/mp4 mime type.
+
+2009-07-20  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/misc/httpserver/httpfile.py:
 	Make the default do_prepareBody implementation return an empty header
 	string, as documented in the docstring. Returning None worked only by
