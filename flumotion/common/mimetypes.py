@@ -63,7 +63,19 @@ def launchApplicationByUrl(url, mimeType):
     except ImportError:
         win32shell = None
 
-    if gnomevfs:
+    try:
+        import gio
+    except ImportError:
+        gio = None
+
+    if gio:
+        app = gio.app_info_get_default_for_type(mimeType, True)
+        if not app:
+            return
+        args = '%s %s' % (app.get_executable(), url)
+        executable = None
+        shell = True
+    elif gnomevfs:
         app = gnomevfs.mime_get_default_application(mimeType)
         if not app:
             return

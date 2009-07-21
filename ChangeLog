@@ -1,3 +1,11 @@
+2009-07-20  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/common/mimetypes.py:
+	Use gio if available when obtaining the application that handles a
+	given content-type. GnomeVFS has been deprecated in favour of GIO.
+	* flumotion/ui/linkwidget.py:
+	Set the uri_hook for the LinkButton so the uri is not opened twice.
+
 2009-07-20  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	reviewed by: Jan Urbanski

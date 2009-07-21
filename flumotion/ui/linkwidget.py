@@ -115,16 +115,15 @@ if hasattr(gtk, 'LinkButton'):
 
         def __init__(self, uri):
             gtk.LinkButton.__init__(self, uri)
-            self.connect('pressed', self._on_pressed)
             self.set_property('can-focus', False)
             self._callback = None
+            gtk.link_button_set_uri_hook(self.on_link_button_clicked)
 
         def set_callback(self, callback):
             self._callback = callback
 
-        def _on_pressed(self, widget):
+        def on_link_button_clicked(self, widget, uri):
             if self._callback:
-                self._callback(self.get_label())
-
+                self._callback(uri)
 else:
     LinkWidget = LinkWidgetOld
