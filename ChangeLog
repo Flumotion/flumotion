@@ -1,3 +1,9 @@
+2009-07-21  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Ignore the NumLock key mask when reading the Ctrl-w combination.
+	See #1074
+
 2009-07-20  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/common/mimetypes.py:

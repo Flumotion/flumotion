@@ -1501,7 +1501,9 @@ You can do remote component calls using:
     def _window_key_press_event_cb(self, window, event):
         # This should be removed if we're going to support connecting
         # to multiple managers in the same application (MDI/tabs)
-        if event.state == gdk.CONTROL_MASK and event.keyval == keysyms.w:
+        state = event.state & (gtk.gdk.MODIFIER_MASK ^ gtk.gdk.MOD2_MASK)
+
+        if state == gdk.CONTROL_MASK and event.keyval == keysyms.w:
             self._quit()
 
     def _trayicon_quit_cb(self, trayicon):
