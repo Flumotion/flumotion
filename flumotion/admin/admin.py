@@ -66,11 +66,24 @@ class AdminClientFactory(fpb.ReconnectingFPBClientFactory):
         fpb.ReconnectingFPBClientFactory.clientConnectionMade(self, broker)
 
     def clientConnectionLost(self, connector, reason):
-        if not self.hasBeenAuthenticated:
-            self.medium.connectionFailed(reason)
+        """
+        @type  connector: implementation of
+                          L{twisted.internet.interfaces.IConnector}
+        @param reason:    L{twisted.spread.pb.failure.Failure}
+        """
+        self.debug("Lost connection to %s: %s",
+                   connector.getDestination(), log.getFailureMessage(reason))
+        if self.hasBeenAuthenticated:
+            self.log("Have been authenticated before. Trying again.")
+        elif self.extraTenacious:
+            self.log("We are extra tenacious, trying again")
         else:
-            RFC = fpb.ReconnectingFPBClientFactory
-            RFC.clientConnectionLost(self, connector, reason)
+            self.log("Telling medium about connection failure")
+            self.medium.connectionFailed(reason)
+            return
+
+        RFC = fpb.ReconnectingFPBClientFactory
+        RFC.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
         """
@@ -365,16 +378,11 @@ class AdminModel(medium.PingingMedium, signals.SignalMixin):
 
     def connectionFailed(self, failure):
         # called by client factory
-        from twisted.internet.ssl import SSL
         if failure.check(error.DNSLookupError):
             message = ("Could not look up host '%s'."
                        % self.connectionInfo.host)
         elif failure.check(error.ConnectionRefusedError):
             message = ("Could not connect to host '%s' on port %d."
-                       % (self.connectionInfo.host,
-                          self.connectionInfo.port))
-        elif failure.check(SSL.Error):
-            message = ("Could not connect to host '%s' on port %d using SSL."
                        % (self.connectionInfo.host,
                           self.connectionInfo.port))
         else:

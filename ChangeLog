@@ -1,3 +1,14 @@
+2009-07-22  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: Arek, Jan
+
+	* flumotion/admin/admin.py (AdminClientFactory.clientConnectionLost):
+	Fallback to the default behaviour when the extraTenacious attribute has
+	been set or the admin has been authenticated before. Stop trying to
+	connect otherwise.
+	Don't import the whole SSL module only for catching a failure. The
+	default message is ok.
+
 2009-07-21  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
