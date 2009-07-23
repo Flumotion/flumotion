@@ -167,7 +167,7 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         """
         ident = self._identifiers.get(path, None)
         if ident is None:
-            hash = python.sha()
+            hash = python.sha1()
             hash.update(path)
             ident = hash.digest().encode("hex").strip('\n')
             # Prevent the cache from growing endlessly

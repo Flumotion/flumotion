@@ -65,7 +65,7 @@ def gen_timed_link(relative_path, secret_key, timeout, type):
     if type == 'md5':
         hashed = python.md5(hashable).hexdigest()
     else:
-        hashed = python.sha(hashable).hexdigest()
+        hashed = python.sha1(hashable).hexdigest()
     return '%s%s%s' % (hashed, start_time, stop_time)
 
 
