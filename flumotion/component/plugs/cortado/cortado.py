@@ -72,6 +72,7 @@ class CortadoDirectoryResource(Resource):
 
         self.putChild(self._index_name,
                       self._index_content)
+        self.putChild('', self._index_content)
 
     def _get_template_filename(self):
         filename = self._properties.get('html-template')
@@ -95,14 +96,6 @@ class CortadoDirectoryResource(Resource):
         data = open(html_template, 'r').read()
         content = data % ns
         return Data(content, 'text/html')
-
-    # Resource
-
-    def getChildWithDefault(self, pathEl, request):
-        # Maps /index.html to /
-        if request.uri == self._mount_point_root:
-            return self._index_content
-        return Resource.getChildWithDefault(self, pathEl, request)
 
 
 class ComponentCortadoPlug(ComponentPlug):

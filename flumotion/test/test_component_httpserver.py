@@ -34,6 +34,7 @@ from flumotion.common import testsuite
 from flumotion.component.misc.httpserver import httpfile, httpserver
 from flumotion.component.misc.httpserver import localprovider
 from flumotion.component.plugs.base import ComponentPlug
+from flumotion.component.plugs.cortado.cortado import CortadoDirectoryResource
 from flumotion.test import test_http
 
 
@@ -231,6 +232,20 @@ class PlugTest(testsuite.TestCase):
               }}}]
             }
 
+    def _cortadoPlug(self):
+        return {
+            PLUGTYPE:
+            [{'entries': {'default': {
+                'module-name': 'flumotion.component.plugs.cortado.cortado',
+                'function-name': 'ComponentCortadoPlug', }},
+              'properties': {'buffer-size': 40,
+                             'codebase': 'http://url/m/c/',
+                             'has-audio': True,
+                             'has-video': True,
+                             'height': 240,
+                             'stream-url': 'http://url/m/',
+                             'width': 320}}]}
+
     def testSetRootResource(self):
         properties = {
             u'mount-point': '/mount',
@@ -263,6 +278,68 @@ class PlugTest(testsuite.TestCase):
 
         return defer.DeferredList([d1, d2], fireOnOneErrback=True)
     testSetRootResourceMultiple.skip = "This is a bug in the httpserver api"
+
+    def testCortadoGetResources(self):
+        properties = {
+            u'mount-point': '/m/c/',
+            u'port': 0,
+        }
+
+        CortadoDirectoryResource._get_index_content = \
+                (lambda s: Data('Testing cortado plug', 'text/html'))
+
+        plugs = self._cortadoPlug()
+        self._makeComponent(properties, plugs)
+
+        def gotCortadoHTML(result):
+            testsuite.diffStrings('Testing cortado plug', result)
+
+        d1 = client.getPage(self._getURL('/m/c/'))
+        d1.addCallback(gotCortadoHTML)
+
+        d2 = client.getPage(self._getURL('/m/c/index.html'))
+        d2.addErrback(gotCortadoHTML)
+
+        return defer.DeferredList([d1, d2], fireOnOneErrback=True)
+
+    def testCortadoGetResourcesWithGetParameter(self):
+        properties = {
+            u'mount-point': '/m/c/',
+            u'port': 0,
+        }
+
+        CortadoDirectoryResource._get_index_content = \
+                (lambda s: Data('Testing cortado plug', 'text/html'))
+
+        plugs = self._cortadoPlug()
+        self._makeComponent(properties, plugs)
+
+        def gotCortadoHTML(result):
+            testsuite.diffStrings('Testing cortado plug', result)
+
+        d1 = client.getPage(self._getURL('/m/c/?FLUREQID=blabla'))
+        d1.addCallback(gotCortadoHTML)
+
+        d2 = client.getPage(self._getURL('/m/c/index.html?FLUREQID=blabla'))
+        d2.addErrback(gotCortadoHTML)
+
+        return defer.DeferredList([d1, d2], fireOnOneErrback=True)
+
+    def testCortadoResourceNotFound(self):
+        properties = {
+            u'mount-point': '/m/c/',
+            u'port': 0,
+        }
+
+        plugs = self._cortadoPlug()
+        self._makeComponent(properties, plugs)
+
+        def errorNotFound(failure):
+            failure.trap(error.Error)
+
+        d = client.getPage(self._getURL('/m/c/bar.html'))
+        d.addErrback(errorNotFound)
+        return d
 
 
 # FIXME: maybe merge into test_http's fake request ?
