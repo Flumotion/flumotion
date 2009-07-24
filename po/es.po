@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2009-03-25 12:17+0100\n"
-"PO-Revision-Date: 2009-03-25 12:35+0100\n"
+"POT-Creation-Date: 2009-07-24 12:36+0200\n"
+"PO-Revision-Date: 2009-07-24 12:46+0200\n"
 "Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -476,7 +476,7 @@ msgstr ""
 "\n"
 "Le recomendamos que en caso de duda use las opciones por defecto."
 
-#: ../flumotion/admin/admin.py:469
+#: ../flumotion/admin/admin.py:491
 msgid "Internal error in component."
 msgstr "Error interno en el componente."
 
@@ -673,20 +673,26 @@ msgid "Writes a debug marker to all the logs"
 msgstr "Escribe una marca de depuración en todos los logs"
 
 #: ../flumotion/admin/gtk/adminwindow.py:488
+#: ../flumotion/admin/gtk/adminwindow.py:884
 msgid "Flumotion: Not connected"
 msgstr "Flumotion: No conectado"
 
-#: ../flumotion/admin/gtk/adminwindow.py:568
+#: ../flumotion/admin/gtk/adminwindow.py:563
 #, python-format
 msgid "Flumotion: Connecting to %s:%s"
 msgstr "Flumotion: Conectando a %s:%s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:617
+#: ../flumotion/admin/gtk/adminwindow.py:612
 #, python-format
 msgid "Connect to the manager on %s"
 msgstr "Conectar al \"manager\" en %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:819
+#: ../flumotion/admin/gtk/adminwindow.py:750
+#: ../flumotion/admin/gtk/adminwindow.py:796
+msgid "Cannot run assistant without being connected to a manager"
+msgstr "No es posible ejecutar el asistente sin estar conectado a un manager"
+
+#: ../flumotion/admin/gtk/adminwindow.py:814
 msgid ""
 "Cannot run the configuration assistant since there is at least one component "
 "in the lost state"
@@ -694,7 +700,7 @@ msgstr ""
 "No puedo ejecutar el asistente para la configuración desde que al menos uno "
 "de los componentes está en estado perdido."
 
-#: ../flumotion/admin/gtk/adminwindow.py:823
+#: ../flumotion/admin/gtk/adminwindow.py:818
 msgid ""
 "Running the Configuration Assistant again will remove all components from "
 "the current stream and create a new one."
@@ -702,19 +708,33 @@ msgstr ""
 "Ejecutando el asistente de configuración de nuevo eliminará todos los "
 "componentes del flujo actual y creará uno nuevo."
 
-#: ../flumotion/admin/gtk/adminwindow.py:827
+#: ../flumotion/admin/gtk/adminwindow.py:822
 msgid "Keep the current stream"
 msgstr "Mantener el actual \"stream\""
 
-#: ../flumotion/admin/gtk/adminwindow.py:829
+#: ../flumotion/admin/gtk/adminwindow.py:824
 msgid "Run the Assistant anyway"
 msgstr "Ejecutar el asistente de todas formas"
 
-#: ../flumotion/admin/gtk/adminwindow.py:845
+#: ../flumotion/admin/gtk/adminwindow.py:840
 msgid "The assistant cannot be run because no workers are logged in."
 msgstr "El asistente no puede funcionar porque no hay \"workers\" conectados."
 
-#: ../flumotion/admin/gtk/adminwindow.py:996
+#: ../flumotion/admin/gtk/adminwindow.py:878
+#, python-format
+msgid "%s - Flumotion Administration"
+msgstr "%s - Administración de Flumotion"
+
+#: ../flumotion/admin/gtk/adminwindow.py:880
+#, python-format
+msgid "Flumotion: %s"
+msgstr "Flumotion: %s"
+
+#: ../flumotion/admin/gtk/adminwindow.py:883
+msgid "Not connected"
+msgstr "No conectado"
+
+#: ../flumotion/admin/gtk/adminwindow.py:1018
 msgid ""
 "Some component(s) are still busy and cannot be removed.\n"
 "Try again later."
@@ -724,23 +744,23 @@ msgstr ""
 
 #. first %s is one of Stopping/Starting/Deleting
 #. second %s is a component name like "audio-producer"
-#: ../flumotion/admin/gtk/adminwindow.py:1076
-#: ../flumotion/admin/gtk/adminwindow.py:1104
+#: ../flumotion/admin/gtk/adminwindow.py:1097
+#: ../flumotion/admin/gtk/adminwindow.py:1125
 #, python-format
 msgid "%s component %s"
 msgstr "%s componente %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1083
+#: ../flumotion/admin/gtk/adminwindow.py:1104
 #, python-format
 msgid "Failed to %(action)s component %(name)s."
 msgstr "Falló %(action)s en el componente %(name)s."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1091
+#: ../flumotion/admin/gtk/adminwindow.py:1112
 #, python-format
 msgid "%s components."
 msgstr "%s componentes."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1098
+#: ../flumotion/admin/gtk/adminwindow.py:1119
 #, python-format
 msgid "Failed to %s some components."
 msgstr "Falló %s en algunos componentes."
@@ -748,82 +768,50 @@ msgstr "Falló %s en algunos componentes."
 #. first %s is one of Stopping/Starting/Deleting
 #. second %s is a list of component names, like
 #. "audio-producer, video-producer"
-#: ../flumotion/admin/gtk/adminwindow.py:1108
+#: ../flumotion/admin/gtk/adminwindow.py:1129
 #, python-format
 msgid "%s components %s"
 msgstr "%s componentes %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1196
+#: ../flumotion/admin/gtk/adminwindow.py:1217
 #, python-format
 msgid "Component %s is sad. "
 msgstr "El componente %s está triste."
 
-#. FIXME: have a method for this
-#: ../flumotion/admin/gtk/adminwindow.py:1223
-#, python-format
-msgid "%s - Flumotion Administration"
-msgstr "%s - Administración de Flumotion"
-
-#: ../flumotion/admin/gtk/adminwindow.py:1225
-#, python-format
-msgid "Flumotion: %s"
-msgstr "Flumotion: %s"
-
-#: ../flumotion/admin/gtk/adminwindow.py:1260
+#: ../flumotion/admin/gtk/adminwindow.py:1284
 msgid "Reconnecting ..."
 msgstr "Reconectando..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1261
+#: ../flumotion/admin/gtk/adminwindow.py:1285
 #, python-format
 msgid "Lost connection to manager %s, reconnecting ..."
 msgstr "Conexión perdida con el manager %s, volviendo a conectar ..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1284
-#, python-format
-msgid "Connection to manager on %s was refused."
-msgstr "La conexión al \"manager\" en %s fue rechazada."
-
-#: ../flumotion/admin/gtk/adminwindow.py:1286
-#, python-format
-msgid "Connection to %s was refused"
-msgstr "La conexión con %s fue rechazada"
-
-#: ../flumotion/admin/gtk/adminwindow.py:1295
-#: ../flumotion/admin/gtk/dialogs.py:217
-#, python-format
-msgid "Connection to manager on %s failed (%s)."
-msgstr "La conexión con el \"manager\" en %s falló (%s)."
-
-#: ../flumotion/admin/gtk/adminwindow.py:1297
-#, python-format
-msgid "Connection to %s failed"
-msgstr "La conexión a %s falló."
-
-#: ../flumotion/admin/gtk/adminwindow.py:1333
+#: ../flumotion/admin/gtk/adminwindow.py:1339
 msgid "Import Configuration..."
 msgstr "Importar la configuración..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1336
+#: ../flumotion/admin/gtk/adminwindow.py:1342
 msgid "Import"
 msgstr "Importar"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1340
+#: ../flumotion/admin/gtk/adminwindow.py:1346
 msgid "Flumotion XML Configuration files"
 msgstr "Ficheros de configuración XML de Flumotion"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1344
+#: ../flumotion/admin/gtk/adminwindow.py:1350
 msgid "All files"
 msgstr "Todos los ficheros"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1360
+#: ../flumotion/admin/gtk/adminwindow.py:1366
 msgid "Export Configuration..."
 msgstr "Exportar la configuración..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1363
+#: ../flumotion/admin/gtk/adminwindow.py:1369
 msgid "Export"
 msgstr "Exportar"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1377
+#: ../flumotion/admin/gtk/adminwindow.py:1383
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -831,13 +819,13 @@ msgstr ""
 "El archivo ya existe.\n"
 "¿Desea sobreescribirlo?"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1450
+#: ../flumotion/admin/gtk/adminwindow.py:1456
 msgid "Cannot find a program to display the flumotion manual."
 msgstr "No puedo encontrar un programa para mostrar el manual de Flumotion."
 
 #: ../flumotion/admin/gtk/basesteps.py:32
 #: ../flumotion/admin/gtk/basesteps.py:40
-#: ../flumotion/admin/gtk/overlaystep.py:71
+#: ../flumotion/admin/gtk/overlaystep.py:70
 #: ../flumotion/scenario/steps/ondemandstep.py:88
 #: ../flumotion/scenario/steps/productionsteps.py:46
 #: ../flumotion/scenario/steps/productionsteps.py:47
@@ -854,7 +842,7 @@ msgid "Conversion"
 msgstr "Conversión"
 
 #: ../flumotion/admin/gtk/basesteps.py:80
-#: ../flumotion/scenario/steps/httpstreamersteps.py:258
+#: ../flumotion/scenario/steps/httpstreamersteps.py:259
 #: ../flumotion/scenario/steps/consumptionsteps.py:42
 #: ../flumotion/scenario/steps/consumptionsteps.py:43
 msgid "Consumption"
@@ -899,16 +887,16 @@ msgstr "PID"
 
 #. FIXME: Should we raise an error here?
 #. It's an impossible situation.
-#: ../flumotion/admin/gtk/componentlist.py:338
+#: ../flumotion/admin/gtk/componentlist.py:353
 msgid "[any worker]"
 msgstr "[cualquier \"worker\"]"
 
-#: ../flumotion/admin/gtk/componentlist.py:343
+#: ../flumotion/admin/gtk/componentlist.py:358
 #, python-format
 msgid "<b>Worker %s is not connected</b>"
 msgstr "<b>El \"worker\" %s no está conectado</b>"
 
-#: ../flumotion/admin/gtk/componentlist.py:362
+#: ../flumotion/admin/gtk/componentlist.py:377
 #, python-format
 msgid "<b>Component is %s</b>"
 msgstr "<b>El componente es %s</b>"
@@ -932,17 +920,17 @@ msgstr "El componente '%s' está aún durmiendo."
 msgid "Component '%s' has a UI bug."
 msgstr "El componente '%s' tiene un fallo de IU."
 
+#: ../flumotion/admin/gtk/configurationassistant.py:96
 #: ../flumotion/admin/gtk/configurationassistant.py:97
-#: ../flumotion/admin/gtk/configurationassistant.py:98
 msgid "Welcome"
 msgstr "Bienvenido"
 
+#: ../flumotion/admin/gtk/configurationassistant.py:115
 #: ../flumotion/admin/gtk/configurationassistant.py:116
-#: ../flumotion/admin/gtk/configurationassistant.py:117
 msgid "Scenario"
 msgstr "Escenario"
 
-#: ../flumotion/admin/gtk/configurationassistant.py:467
+#: ../flumotion/admin/gtk/configurationassistant.py:470
 #, python-format
 msgid "Checking the existence of GStreamer element '%s' on %s worker."
 msgid_plural "Checking the existence of GStreamer elements '%s' on %s worker."
@@ -952,16 +940,15 @@ msgstr[1] ""
 "Compruebe la existencia de los elementos de Gstreamer '%s' en el \"worker\" %"
 "s."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:482
+#: ../flumotion/admin/gtk/configurationassistant.py:485
 #: ../flumotion/admin/gtk/overlaystep.py:142
-#: ../flumotion/scenario/steps/httpstreamersteps.py:452
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
 msgstr[0] "El \"Worker\" '%s' no dispone del elemento de GStreamer '%s'."
 msgstr[1] "El \"Worker\" '%s' no dispone de los elementos de GStreamer '%s'."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:487
+#: ../flumotion/admin/gtk/configurationassistant.py:490
 msgid ""
 "\n"
 "Please install the necessary GStreamer plug-ins that provide these elements "
@@ -971,8 +958,8 @@ msgstr ""
 "Por favor, instale todos los complementos de GStreamer necesarios que "
 "proporcionen estos elementos y reinicie el \"worker\"."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:490
-#: ../flumotion/admin/gtk/configurationassistant.py:552
+#: ../flumotion/admin/gtk/configurationassistant.py:493
+#: ../flumotion/admin/gtk/configurationassistant.py:556
 msgid ""
 "\n"
 "\n"
@@ -982,16 +969,15 @@ msgstr ""
 "\n"
 "No será capaz de avanzar más usando este \"worker\"."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:544
-#: ../flumotion/admin/gtk/overlaystep.py:120
-#: ../flumotion/scenario/steps/httpstreamersteps.py:434
+#: ../flumotion/admin/gtk/configurationassistant.py:548
+#: ../flumotion/admin/gtk/overlaystep.py:119
 #: ../flumotion/scenario/steps/ondemandstep.py:147
 #, python-format
 msgid "Worker '%s' cannot import module '%s'."
 msgstr "El \"Worker\" '%s' no puede importar el módulo '%s'."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:547
-#: ../flumotion/admin/gtk/overlaystep.py:123
+#: ../flumotion/admin/gtk/configurationassistant.py:551
+#: ../flumotion/admin/gtk/overlaystep.py:122
 #, python-format
 msgid ""
 "\n"
@@ -1000,9 +986,8 @@ msgstr ""
 "\n"
 "Este módulo es parte de '%s'."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:550
-#: ../flumotion/admin/gtk/overlaystep.py:126
-#: ../flumotion/scenario/steps/httpstreamersteps.py:438
+#: ../flumotion/admin/gtk/configurationassistant.py:554
+#: ../flumotion/admin/gtk/overlaystep.py:125
 #: ../flumotion/scenario/steps/ondemandstep.py:151
 #, python-format
 msgid ""
@@ -1012,12 +997,12 @@ msgstr ""
 "\n"
 "La página web del proyecto es %s"
 
-#: ../flumotion/admin/gtk/configurationassistant.py:597
-#: ../flumotion/admin/gtk/configurationassistant.py:625
+#: ../flumotion/admin/gtk/configurationassistant.py:603
+#: ../flumotion/admin/gtk/configurationassistant.py:631
 msgid "Internal error: could not run check code on worker."
 msgstr "Error interno: no puede ejecutar código de pruebas en el \"worker\"."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:787
+#: ../flumotion/admin/gtk/configurationassistant.py:793
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
@@ -1026,11 +1011,11 @@ msgstr ""
 "Asegúrese que la red de su Flumotion está funcionando adecuadamente e "
 "inténtelo de nuevo."
 
-#: ../flumotion/admin/gtk/connections.py:53
+#: ../flumotion/admin/gtk/connections.py:56
 msgid "Hostname"
 msgstr "Nombre del servidor:"
 
-#: ../flumotion/admin/gtk/connections.py:54
+#: ../flumotion/admin/gtk/connections.py:58
 msgid "Last used"
 msgstr "Último usado"
 
@@ -1048,15 +1033,15 @@ msgstr ""
 "\n"
 "© 2004, 2005, 2006, 2007, 2008 Fluendo S.L."
 
-#: ../flumotion/admin/gtk/dialogs.py:195
+#: ../flumotion/admin/gtk/dialogs.py:196
 msgid "Authors"
 msgstr "Autores"
 
-#: ../flumotion/admin/gtk/dialogs.py:210
+#: ../flumotion/admin/gtk/dialogs.py:211
 msgid "Connection Refused"
 msgstr "Conexión rechazada"
 
-#: ../flumotion/admin/gtk/dialogs.py:212
+#: ../flumotion/admin/gtk/dialogs.py:213
 #, python-format
 msgid ""
 "\"%s\" refused your connection.\n"
@@ -1065,16 +1050,21 @@ msgstr ""
 "\"%s\" rechazó su conexión.\n"
 "Compruebe su nombre de usuario y contraseña e inténtelo de nuevo."
 
-#: ../flumotion/admin/gtk/dialogs.py:216
+#: ../flumotion/admin/gtk/dialogs.py:217
 msgid "Connection Failed"
 msgstr "La conexión falló"
 
-#: ../flumotion/admin/gtk/dialogs.py:221
+#: ../flumotion/admin/gtk/dialogs.py:218
+#, python-format
+msgid "Connection to manager on %s failed (%s)."
+msgstr "La conexión con el \"manager\" en %s falló (%s)."
+
+#: ../flumotion/admin/gtk/dialogs.py:222
 #, python-format
 msgid "Already Connected to %s"
 msgstr "Ya está conectado a %s"
 
-#: ../flumotion/admin/gtk/dialogs.py:222
+#: ../flumotion/admin/gtk/dialogs.py:223
 msgid "You cannot connect twice to the same manager. Try disconnecting first."
 msgstr ""
 "No puede conectar dos veces al mismo 'manager'. Intente desconectarse "
@@ -1181,15 +1171,6 @@ msgstr ""
 "\n"
 "<i>%s</i>\n"
 
-#: ../flumotion/admin/gtk/main.py:52
-#, python-format
-msgid ""
-"ERROR: Could not connect to manager:\n"
-"       The connection to %r was refused."
-msgstr ""
-"Error: No se pudo conectar con el \"manager\":\n"
-"       La conexión a %r fue rechazada."
-
 #: ../flumotion/admin/gtk/message.py:45 ../flumotion/launch/main.py:78
 msgid "Error"
 msgstr "Error"
@@ -1208,7 +1189,11 @@ msgstr "Aviso"
 msgid "Note"
 msgstr "Nota"
 
-#: ../flumotion/admin/gtk/message.py:206
+#: ../flumotion/admin/gtk/message.py:208
+msgid "Message"
+msgstr "Mensaje"
+
+#: ../flumotion/admin/gtk/message.py:226
 #, python-format
 msgid ""
 "\n"
@@ -1217,23 +1202,19 @@ msgstr ""
 "\n"
 "Publicado en %s.\n"
 
-#: ../flumotion/admin/gtk/message.py:210
+#: ../flumotion/admin/gtk/message.py:231
 msgid "Debug information:\n"
 msgstr "Información de depuración:\n"
 
-#: ../flumotion/admin/gtk/message.py:216
-msgid "Message"
-msgstr "Mensaje"
-
-#: ../flumotion/admin/gtk/overlaystep.py:44
+#: ../flumotion/admin/gtk/overlaystep.py:43
 msgid "Flumotion"
 msgstr "Flumotion"
 
-#: ../flumotion/admin/gtk/overlaystep.py:70
+#: ../flumotion/admin/gtk/overlaystep.py:69
 msgid "Overlay"
 msgstr "Sobreimpresión"
 
-#: ../flumotion/admin/gtk/overlaystep.py:129
+#: ../flumotion/admin/gtk/overlaystep.py:128
 #: ../flumotion/admin/gtk/overlaystep.py:149
 msgid ""
 "\n"
@@ -1248,14 +1229,22 @@ msgstr ""
 msgid "Worker:"
 msgstr "\"Worker\":"
 
-#: ../flumotion/common/documentation.py:95
+#: ../flumotion/common/documentation.py:97
 #, python-format
 msgid "Please install the '%s' python module."
 msgstr "Por favor, instale el módulo de python '%s'."
 
-#: ../flumotion/common/documentation.py:96
+#: ../flumotion/common/documentation.py:98
 msgid "Learn how to install Python modules."
 msgstr "Aprenda como instalar módulos de Python."
+
+#: ../flumotion/common/documentation.py:107
+msgid "Learn how to change device permissions."
+msgstr "Aprenda como cambiar los permisos de los dispositivos."
+
+#: ../flumotion/common/documentation.py:117
+msgid "Learn how to install GStreamer elements."
+msgstr "Aprenda como instalar elementos de GStreamer."
 
 #: ../flumotion/common/format.py:106
 #, python-format
@@ -1633,7 +1622,7 @@ msgstr ""
 "El valor suministrado por el \"eater\" con marcadores de \"stream debe ser "
 "video-backup o video-master."
 
-#: ../flumotion/component/combiners/switch/switch.py:77
+#: ../flumotion/component/combiners/switch/switch.py:76
 #: ../flumotion/component/consumers/disker/disker.py:273
 #, python-format
 msgid "Error parsing ical file %s, so not scheduling any events."
@@ -1641,7 +1630,7 @@ msgstr ""
 "Error leyendo el fichero ical %s, así que no se puede programar ningún "
 "evento."
 
-#: ../flumotion/component/combiners/switch/switch.py:81
+#: ../flumotion/component/combiners/switch/switch.py:80
 msgid ""
 "An ical file has been specified for scheduling, but the necessary modules "
 "are not installed."
@@ -1649,7 +1638,7 @@ msgstr ""
 "Un fichero \"ical\" ha sido elegido para la programación, pero los módulos "
 "necesariosno están instalados."
 
-#: ../flumotion/component/combiners/switch/switch.py:345
+#: ../flumotion/component/combiners/switch/switch.py:344
 #, python-format
 msgid ""
 "Tried to switch to %s, but feed is unavailable. Will retry when the feed is "
@@ -1658,25 +1647,25 @@ msgstr ""
 "Se ha intentado cambiar a %s, pero el 'feed' no está disponible. Se "
 "reintentará cuando el 'feed' esté disponible."
 
-#: ../flumotion/component/combiners/switch/switch.py:382
+#: ../flumotion/component/combiners/switch/switch.py:381
 #, python-format
 msgid "When switching to %s, feed timestamps out of sync by %us"
 msgstr ""
 "Cuando se ha cambiado al feed %s, los 'timestamps' está fuera de sincronismo "
 "por %us"
 
-#: ../flumotion/component/combiners/switch/switch.py:450
+#: ../flumotion/component/combiners/switch/switch.py:449
 #, python-format
 msgid "%s parameter(s) were specified but not all. Missing parameters are: %r"
 msgstr ""
 "El/los parámetro/s %s fue/ron especificado/s, pero no todos. Los parámetros "
 "pendientes son: %r"
 
-#: ../flumotion/component/component.py:516
+#: ../flumotion/component/component.py:504
 msgid "Could not setup component."
 msgstr "No se ha podido configurar el componente."
 
-#: ../flumotion/component/component.py:659
+#: ../flumotion/component/component.py:636
 msgid ""
 "Your configuration uses deprecated properties.  Please update your "
 "configuration and correct them.\n"
@@ -1684,7 +1673,7 @@ msgstr ""
 "Su configuración usa propiedades obsoletas. Por favor, actualize su "
 "configuración y corríjalas.\n"
 
-#: ../flumotion/component/component.py:664
+#: ../flumotion/component/component.py:641
 #, python-format
 msgid "Please rename '%s' to '%s'.\n"
 msgstr "Por favor, renombre '%s' a '%s'.\n"
@@ -1835,17 +1824,17 @@ msgid "of"
 msgstr "de"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:351
-#: ../flumotion/worker/checks/check.py:255
+#: ../flumotion/worker/checks/check.py:261
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in is too old.\n"
 msgstr ""
 "La versión '%s' del componente '%s' de GStreamer es demasiado antigüa.\n"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:353
-#: ../flumotion/component/feedcomponent010.py:389
+#: ../flumotion/component/feedcomponent010.py:395
 #: ../flumotion/component/muxers/checks.py:46
 #: ../flumotion/component/producers/gdp/gdp.py:42
-#: ../flumotion/worker/checks/check.py:259
+#: ../flumotion/worker/checks/check.py:265
 #: ../flumotion/worker/checks/encoder.py:47
 #: ../flumotion/worker/checks/encoder.py:69
 #, python-format
@@ -1865,25 +1854,25 @@ msgstr ""
 msgid "Learn how to increase the maximum number of clients."
 msgstr "Aprenda cómo incrementar el número máximo de clientes."
 
-#: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:801
-#: ../flumotion/component/misc/httpserver/httpserver.py:396
-#: ../flumotion/component/misc/porter/porter.py:356
+#: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:804
+#: ../flumotion/component/misc/httpserver/httpserver.py:407
+#: ../flumotion/component/misc/porter/porter.py:355
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Error de red: El puerto TCP %d no está disponible."
 
-#: ../flumotion/component/converters/overlay/overlay.py:77
+#: ../flumotion/component/converters/overlay/overlay.py:109
 #, python-format
 msgid "Overlayed text '%s' too wide for the video image."
 msgstr "El Texto sobreimpreso '%s' es demasiado ancho para la imagen de video."
 
-#: ../flumotion/component/converters/overlay/overlay.py:83
+#: ../flumotion/component/converters/overlay/overlay.py:115
 msgid "Overlayed logotypes too wide for the video image."
 msgstr ""
 "Los logotipos sobreimpresionados son demasiado anchos para la imagen de "
 "video."
 
-#: ../flumotion/component/converters/overlay/overlay.py:93
+#: ../flumotion/component/converters/overlay/overlay.py:137
 msgid ""
 "The 'videomixer' GStreamer element has a bug in this version (0.10.7). You "
 "may see many errors in the debug output, but it should work correctly anyway."
@@ -1891,17 +1880,6 @@ msgstr ""
 "El elemento de GStreamer 'videomixer' tiene un fallo en esta versión "
 "(0.10.7). Podría haber muchos errores en la salida del 'debug', pero debería "
 "funcionar correctamente de todas formas."
-
-#: ../flumotion/component/converters/overlay/overlay.py:101
-msgid ""
-"The 'videomixer' GStreamer element has a bug since version (0.10.10) "
-"resulting in no overlay. The bug should be fixed in version 0.10.12. Please "
-"disregard this warning if you can see the overlay."
-msgstr ""
-"El elemento de Gstreamer 'videomixer' tiene un bug desde la versión 0.10.10 "
-"dando como resultado que no hay sobreimpresión. El fallo debiera de estar "
-"corregido en la versión 0.10.12. Por favor, ignore este mensaje si puede ver "
-"la sobreimpresión."
 
 #: ../flumotion/component/effects/colorbalance/colorbalance.glade.h:2
 #: ../flumotion/component/encoders/theora/wizard.glade.h:2
@@ -2226,27 +2204,27 @@ msgstr "Vorbis"
 msgid "Vorbis Encoder"
 msgstr "Codificador Vorbis"
 
-#: ../flumotion/component/feedcomponent010.py:221
-#: ../flumotion/worker/checks/check.py:80
+#: ../flumotion/component/feedcomponent010.py:224
+#: ../flumotion/worker/checks/check.py:83
 msgid "Internal GStreamer error."
 msgstr "Error interno de GStreamer."
 
-#: ../flumotion/component/feedcomponent010.py:246
+#: ../flumotion/component/feedcomponent010.py:249
 msgid "Programming error in component."
 msgstr "Error de programación en el componente."
 
-#: ../flumotion/component/feedcomponent010.py:385
+#: ../flumotion/component/feedcomponent010.py:391
 msgid ""
 "Your gst-plugins-base is too old, so feeder statistics will be unavailable."
 msgstr ""
 "Su gst-plugins-base es demasiado antigüo, así que el \"feeder\" de "
 "estadísticas no estará disponible."
 
-#: ../flumotion/component/feedcomponent010.py:669
+#: ../flumotion/component/feedcomponent010.py:677
 msgid "Internal Flumotion error."
 msgstr "Error interno en Flumotion."
 
-#: ../flumotion/component/feedcomponent.py:308
+#: ../flumotion/component/feedcomponent.py:313
 msgid ""
 "You will get more debugging information if you upgrade to GStreamer 0.10.13 "
 "or later."
@@ -2254,7 +2232,7 @@ msgstr ""
 "Tendrá más información de depuración si actualiza a GStreamer 0.10.13 o "
 "superior."
 
-#: ../flumotion/component/feedcomponent.py:327
+#: ../flumotion/component/feedcomponent.py:332
 #, python-format
 msgid ""
 "The worker does not have the '%s' element installed.\n"
@@ -2263,7 +2241,7 @@ msgstr ""
 "El \"worker\" no tiene el elemento '%s' instalado.\n"
 "Por favor, instale el complemento necesario y reinicie el componente.\n"
 
-#: ../flumotion/component/feedcomponent.py:340
+#: ../flumotion/component/feedcomponent.py:345
 msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 "Error del GStreamer: no se ha podido analizar la tubería del componente."
@@ -2401,7 +2379,7 @@ msgstr "Tamaño:"
 msgid "Usage:"
 msgstr "Uso:"
 
-#: ../flumotion/component/misc/porter/porter.py:329
+#: ../flumotion/component/misc/porter/porter.py:328
 #, python-format
 msgid "Network error: socket path %s is not available."
 msgstr "Error de red: el \"path\" %s del \"socket\" no está disponible."
@@ -2507,30 +2485,20 @@ msgstr "Qué audio debiera estar en \"stream\"."
 msgid "Whether video should be streamed."
 msgstr "Si el vídeo debiera ser \"streamed\"."
 
-#: ../flumotion/component/producers/audiotest/admin_gtk.py:94
+#: ../flumotion/component/producers/audiotest/admin_gtk.py:96
 msgid "Volume"
 msgstr "Volumen"
 
-#: ../flumotion/component/producers/audiotest/admin_gtk.py:97
+#: ../flumotion/component/producers/audiotest/admin_gtk.py:99
 #: ../flumotion/component/producers/audiotest/audiotest.glade.h:1
 msgid "Audio Test"
 msgstr "Prueba de audio"
 
 #: ../flumotion/component/producers/audiotest/audiotest.glade.h:2
-msgid ""
-"Sine\n"
-"Square\n"
-"Saw"
-msgstr ""
-"Sinusoidal\n"
-"Cuadrada\n"
-"Sierra"
-
-#: ../flumotion/component/producers/audiotest/audiotest.glade.h:5
 msgid "_Frequency:"
 msgstr "F_recuencia:"
 
-#: ../flumotion/component/producers/audiotest/audiotest.glade.h:6
+#: ../flumotion/component/producers/audiotest/audiotest.glade.h:3
 msgid "_Wave form:"
 msgstr "_Forma de onda:"
 
@@ -2648,7 +2616,7 @@ msgid "Video _source:"
 msgstr "Fuente de _video:"
 
 #: ../flumotion/component/producers/bttv/wizard.glade.h:4
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:6
+#: ../flumotion/component/producers/soundcard/wizard.glade.h:5
 #: ../flumotion/component/producers/webcam/wizard.glade.h:3
 msgid "_Device:"
 msgstr "_Dispositivo:"
@@ -2884,15 +2852,20 @@ msgstr "_Reiniciar"
 msgid "Restart looping:"
 msgstr "Reiniciar el bucle:"
 
-#: ../flumotion/component/producers/looper/looper.py:140
+#: ../flumotion/component/producers/looper/looper.py:141
 #, python-format
 msgid "Could not open file '%s' for reading."
 msgstr "No se ha podido abrir el fichero '%s' para lectura."
 
-#: ../flumotion/component/producers/playlist/playlist.py:433
+#: ../flumotion/component/producers/playlist/playlist.py:452
 #, python-format
 msgid "Failed to parse a playlist from file %s: %s"
 msgstr "Fallo al leer una playlist desde el fichero %s: %s"
+
+#: ../flumotion/component/producers/playlist/playlist.py:461
+#, python-format
+msgid "%s is missing. Make sure your gnonlin installation is complete."
+msgstr "%s no está. Asegurese que la instalación de gnonlin es completa."
 
 #: ../flumotion/component/producers/soundcard/soundcard.py:80
 msgid ""
@@ -2968,53 +2941,56 @@ msgid "Bi_t depth:"
 msgstr "Profundidad de bi_t:"
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:2
-#: ../flumotion/component/producers/webcam/wizard.glade.h:2
-msgid "Name:"
-msgstr "Nombre"
-
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:3
 msgid "Sample _rate:"
 msgstr "Tasa de muestreo:"
 
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:4
+#: ../flumotion/component/producers/soundcard/wizard.glade.h:3
 msgid "Sound _system:"
 msgstr "Sistema de sonido"
 
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:5
+#: ../flumotion/component/producers/soundcard/wizard.glade.h:4
 msgid "_Channels:"
 msgstr "_Canales:"
 
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:7
+#: ../flumotion/component/producers/soundcard/wizard.glade.h:6
 msgid "_Input:"
 msgstr "_Entrada:"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:44
-msgid "Stereo"
-msgstr "Estéreo"
-
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:45
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:38
 msgid "Mono"
 msgstr "Mono"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:46
-msgid "16-bit"
-msgstr "16-bit"
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:39
+msgid "Stereo"
+msgstr "Estéreo"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:54
+#. TODO: Add other sources (pulse, jack, ...)
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:50
 msgid "Alsa"
 msgstr "Alsa"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:55
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:51
 msgid "OSS"
 msgstr "Oss"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:74
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:63
 msgid "Sound Card"
 msgstr "Tarjeta de sonido"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:158
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:119
+msgid ""
+"Looking for the sound devices present on the system.This can take a while..."
+msgstr ""
+"Buscando dispositivos de sonido en su sistema. Esto podría llevar un rato..."
+
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:154
 msgid "Probing the sound card. This can take a while..."
 msgstr "Probando la tarjeta de sonido. Esto podría llevar un rato..."
+
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:187
+#, python-format
+msgid "%d-bit"
+msgstr "%d-bit"
 
 #: ../flumotion/component/producers/videotest/admin_gtk.py:36
 #: ../flumotion/component/producers/videotest/wizard_gtk.py:63
@@ -3132,6 +3108,10 @@ msgstr "Ancho del video a capturar."
 #: ../flumotion/component/producers/webcam/webcam.xml.h:14
 msgid "Web camera"
 msgstr "Cámara web"
+
+#: ../flumotion/component/producers/webcam/wizard.glade.h:2
+msgid "Name:"
+msgstr "Nombre"
 
 #: ../flumotion/component/producers/webcam/wizard.glade.h:4
 msgid "_Size:"
@@ -3277,17 +3257,7 @@ msgstr "Video de Icecast"
 msgid "Summary"
 msgstr "Sumario"
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:436
-#: ../flumotion/scenario/steps/ondemandstep.py:149
-#, python-format
-msgid ""
-"\n"
-"This module is part of the '%s'."
-msgstr ""
-"\n"
-"Este módulo es parte del '%s'."
-
-#: ../flumotion/scenario/steps/httpstreamersteps.py:519
+#: ../flumotion/scenario/steps/httpstreamersteps.py:510
 #, python-format
 msgid ""
 "The mount point %s is already been used for worker %s and port %s. Correct "
@@ -3296,7 +3266,7 @@ msgstr ""
 "El punto de montaje %s está ya siendo usado por el \"worker\" %s en el "
 "puerto %s. Corríjalo para poder continuar."
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:533
+#: ../flumotion/scenario/steps/httpstreamersteps.py:524
 msgid ""
 "Mountpoint cannot be left empty.\n"
 "Fill the text field with a correct mount point tobe able to go forward."
@@ -3304,27 +3274,27 @@ msgstr ""
 "El punto de montaje no puede dejarse vacío.\n"
 "Introduzca en el campo de texto del punto de montaje para poder continuar."
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:558
+#: ../flumotion/scenario/steps/httpstreamersteps.py:549
 msgid "HTTP Streamer (Audio and Video)"
 msgstr "Flujo de HTTP (audio y vídeo)"
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:559
+#: ../flumotion/scenario/steps/httpstreamersteps.py:550
 msgid "HTTP Audio/Video"
 msgstr "Audio/video HTTP"
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:572
+#: ../flumotion/scenario/steps/httpstreamersteps.py:563
 msgid "HTTP Streamer (Audio Only)"
 msgstr "Flujo de HTTP (sólo audio)"
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:573
+#: ../flumotion/scenario/steps/httpstreamersteps.py:564
 msgid "HTTP Audio"
 msgstr "Audio HTTP"
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:586
+#: ../flumotion/scenario/steps/httpstreamersteps.py:577
 msgid "HTTP Streamer (Video Only)"
 msgstr "Flujo de HTTP (sólo vídeo)"
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:587
+#: ../flumotion/scenario/steps/httpstreamersteps.py:578
 msgid "HTTP Video"
 msgstr "Video HTTP"
 
@@ -3332,6 +3302,15 @@ msgstr "Video HTTP"
 #: ../flumotion/scenario/steps/ondemandstep.py:87
 msgid "On Demand"
 msgstr "Bajo demanda"
+
+#: ../flumotion/scenario/steps/ondemandstep.py:149
+#, python-format
+msgid ""
+"\n"
+"This module is part of the '%s'."
+msgstr ""
+"\n"
+"Este módulo es parte del '%s'."
 
 #: ../flumotion/scenario/steps/ondemandstep.py:160
 #, python-format
@@ -3407,8 +3386,8 @@ msgid "Encoding"
 msgstr "Codificación"
 
 #: ../flumotion/scenario/ondemand/ondemand.xml.h:1
-msgid "Creates an ondemand stream."
-msgstr "Crear un flujo de video a petición."
+msgid "Create an ondemand stream."
+msgstr "Crear un flujo de video a petición (ondemand)."
 
 #: ../flumotion/scenario/ondemand/wizard_gtk.py:35
 msgid "Stream files on demand"
@@ -3419,8 +3398,8 @@ msgid "Allows you to serve a collection of files from disk."
 msgstr "Esta opción permite servir una colección de ficheros desde el disco."
 
 #: ../flumotion/scenario/live/live.xml.h:1
-msgid "Creates a live stream."
-msgstr "Configurar un flujo en directo."
+msgid "Create a live stream."
+msgstr "Crear un flujo de directo (live)."
 
 #: ../flumotion/scenario/live/wizard_gtk.py:45
 msgid "Stream live"
@@ -3510,7 +3489,30 @@ msgstr "Seleccione una carpeta..."
 msgid "_Finish"
 msgstr "_Finalizar"
 
-#: ../flumotion/worker/checks/audio.py:86
+#: ../flumotion/worker/checks/audio.py:95
+msgid ""
+"There has been an error while fetching the OSS audio devicesthrough Hal.\n"
+"The listed devices have been guessed and may not work properly."
+msgstr ""
+"Ha habido un error mientras se accedía a los dispositivo de sonido OSS a "
+"través de Hal. Los dispositivos listados han sido supuestos y podrían no "
+"funcionar correctamente."
+
+#: ../flumotion/worker/checks/audio.py:105
+msgid "Could not probe devices."
+msgstr "No se han podido probar los dispositivos."
+
+#: ../flumotion/worker/checks/audio.py:115
+msgid ""
+"Could not find any device in the system.\n"
+"Please, check whether the device is correctly plugged and/or the modules are "
+"correctly loaded."
+msgstr ""
+"No se ha podido encontrar ningún dispositivo en el sistema.\n"
+"Por favor, compruebe que el dispositivo esté correctamente enchufado y que "
+"los módulos (del kernel) hayan cargado correctamente."
+
+#: ../flumotion/worker/checks/audio.py:180
 #: ../flumotion/worker/checks/check.py:54
 #, python-format
 msgid ""
@@ -3519,7 +3521,7 @@ msgstr ""
 "No puedo abrir el dispositivo '%s' para lectura. Compruebe los permisos en "
 "el dispositivo."
 
-#: ../flumotion/worker/checks/check.py:58
+#: ../flumotion/worker/checks/check.py:59
 #, python-format
 msgid ""
 "Could not open device '%s' for writing.  Check permissions on the device."
@@ -3527,52 +3529,52 @@ msgstr ""
 "No puedo abrir el dispositivo '%s' para escritura. Compruebe permisos en el "
 "dispositivo."
 
-#: ../flumotion/worker/checks/check.py:62
+#: ../flumotion/worker/checks/check.py:64
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
 msgstr ""
 "No puedo abrir el dispositivo '%s'. Compruebe los permisos en el dispositivo."
 
-#: ../flumotion/worker/checks/check.py:66
+#: ../flumotion/worker/checks/check.py:69
 #, python-format
 msgid "Device '%s' is already in use."
 msgstr "El dispositivo '%s' ya se encuentra en uso."
 
-#: ../flumotion/worker/checks/check.py:69
+#: ../flumotion/worker/checks/check.py:72
 #, python-format
 msgid "Device '%s' did not accept the requested settings."
 msgstr "El dispositivo '%s' no acepta la configuración pedida."
 
-#: ../flumotion/worker/checks/check.py:75
+#: ../flumotion/worker/checks/check.py:78
 msgid "Internal unhandled GStreamer error."
 msgstr "Error interno no controlado de GStreamer."
 
-#: ../flumotion/worker/checks/check.py:119
+#: ../flumotion/worker/checks/check.py:122
 #, python-format
 msgid "Could not probe device '%s'."
 msgstr "No se ha podido probar el dispositivo '%s'."
 
-#: ../flumotion/worker/checks/check.py:140
+#: ../flumotion/worker/checks/check.py:143
 #, python-format
 msgid "No device found on %s."
 msgstr "Dispositivo no encontrado en %s."
 
-#: ../flumotion/worker/checks/check.py:235
+#: ../flumotion/worker/checks/check.py:239
 #, python-format
 msgid "This host is missing the '%s' GStreamer plug-in.\n"
 msgstr "El \"host\" no tiene el \"plug-in\" de GStreamer '%s'.\n"
 
-#: ../flumotion/worker/checks/check.py:238
+#: ../flumotion/worker/checks/check.py:242
 #, python-format
 msgid "Please install '%s'.\n"
 msgstr "Por favor, instale '%s'.\n"
 
-#: ../flumotion/worker/checks/check.py:247
+#: ../flumotion/worker/checks/check.py:252
 #, python-format
 msgid "Your '%s' GStreamer plug-in is too old.\n"
 msgstr "La versión del componente '%s' de GStreamer es demasiado antigüa.\n"
 
-#: ../flumotion/worker/checks/check.py:250
+#: ../flumotion/worker/checks/check.py:255
 #, python-format
 msgid "Please upgrade '%s' to version %s or higher."
 msgstr "Por favor, actualize '%s' a la versión %s o superior."
@@ -3583,7 +3585,7 @@ msgid "Synchronization between audio and video may not be correct.\n"
 msgstr ""
 "La sincronización entre el audio y el video podría no estar correcta.\n"
 
-#: ../flumotion/worker/checks/gst010.py:201
+#: ../flumotion/worker/checks/gst010.py:199
 msgid ""
 "Could not find or open the Firewire device. Check the device node and its "
 "permissions."
@@ -3591,22 +3593,22 @@ msgstr ""
 "No se ha podido encontrar o abrir el dispositivo Firewire. Compruebe el nodo "
 "del dispositivo y sus permisos."
 
-#: ../flumotion/worker/checks/gst010.py:205
+#: ../flumotion/worker/checks/gst010.py:203
 msgid "No Firewire device found."
 msgstr "No se ha encontrado ningún dispositivo Firewire."
 
-#: ../flumotion/worker/checks/gst010.py:208
+#: ../flumotion/worker/checks/gst010.py:206
 msgid ""
 "Could not open Firewire device for reading. Check permissions on the device."
 msgstr ""
 "No se ha podido abrir el dispositivo Firewire para lectura. Compruebe los "
 "permisos en el dispositivo."
 
-#: ../flumotion/worker/checks/gst010.py:216
+#: ../flumotion/worker/checks/gst010.py:214
 msgid "Could not probe Firewire device."
 msgstr "No se ha podido probar el dispositivo Firewire."
 
-#: ../flumotion/worker/checks/gst010.py:248
+#: ../flumotion/worker/checks/gst010.py:246
 msgid ""
 "GStreamer error, dv1394src factory could not be found.\n"
 "Maybe gstreamer-plugins-good is not properly installed."
@@ -3614,7 +3616,7 @@ msgstr ""
 "Error de Gstreamer: la factoría dv1394src no puede ser encontrada.\n"
 "Podría ser que gstreamer-plugins-good no esté bien instalado."
 
-#: ../flumotion/worker/checks/gst010.py:275
+#: ../flumotion/worker/checks/gst010.py:273
 msgid ""
 "Could not find any Firewire device on the system.\n"
 "Please, check whether the device is correctly plugged or the modules are "
@@ -3627,4 +3629,3 @@ msgstr ""
 #: ../flumotion/worker/job.py:334
 msgid "Check timed out."
 msgstr "Tiempo de comprobación excedido."
-
