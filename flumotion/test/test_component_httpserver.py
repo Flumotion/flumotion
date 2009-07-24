@@ -34,7 +34,7 @@ from flumotion.common import testsuite
 from flumotion.component.misc.httpserver import httpfile, httpserver
 from flumotion.component.misc.httpserver import localprovider
 from flumotion.component.plugs.base import ComponentPlug
-from flumotion.component.plugs.cortado.cortado import CortadoDirectoryResource
+from flumotion.component.plugs.cortado import cortado
 from flumotion.test import test_http
 
 
@@ -200,6 +200,8 @@ class PlugTest(testsuite.TestCase):
 
     def setUp(self):
         self.component = None
+        cortado.getCortadoFilename = \
+                (lambda: '/tmp/cortado.jar')
 
     def tearDown(self):
         if self.component:
@@ -221,7 +223,7 @@ class PlugTest(testsuite.TestCase):
 
     def _getURL(self, path):
         # path should start with /
-        return 'http://localhost:%d%s' % (self.component.port, path)
+        return 'http://localhost:%s%s' % (self.component.port, path)
 
     def _localPlug(self, plugname):
         return {
@@ -285,7 +287,7 @@ class PlugTest(testsuite.TestCase):
             u'port': 0,
         }
 
-        CortadoDirectoryResource._get_index_content = \
+        cortado.CortadoDirectoryResource._get_index_content = \
                 (lambda s: Data('Testing cortado plug', 'text/html'))
 
         plugs = self._cortadoPlug()
@@ -308,7 +310,7 @@ class PlugTest(testsuite.TestCase):
             u'port': 0,
         }
 
-        CortadoDirectoryResource._get_index_content = \
+        cortado.CortadoDirectoryResource._get_index_content = \
                 (lambda s: Data('Testing cortado plug', 'text/html'))
 
         plugs = self._cortadoPlug()

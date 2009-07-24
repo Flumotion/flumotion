@@ -1,5 +1,11 @@
 2009-07-24  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/test/test_component_httpserver.py:
+	Obviously cortado is not going to be installed always. Install a
+	modified getCortadoFilename method to correct this.
+
+2009-07-24  Xavier Queralt  <xqueralt@flumotion.com>
+
 	reviewed by: Jan
 
 	* flumotion/component/plugs/cortado/cortado.py:
