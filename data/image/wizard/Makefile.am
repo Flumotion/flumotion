@@ -3,6 +3,7 @@ image_DATA = 		\
 	firewire.png 	\
 	flow.png	\
 	licenses.png 	\
+	looper.png 	\
 	kcmdevices.png 	\
 	overlay.png 	\
 	placeholder.png \

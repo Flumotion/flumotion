@@ -14,6 +14,8 @@ looping continuously.">
                function="UIClass"/>
         <entry type="component" location="looper.py"
                function="Looper" />
+        <entry type="wizard" location="wizard_gtk.py"
+        	   function="LoopWizardPlugin" />
       </entries>
 
       <synchronization required="yes" clock-priority="110" />
@@ -28,6 +30,10 @@ looping continuously.">
         <property name="location" type="string" required="yes"
                   _description="The location of the source file to loop." />
       </properties>
+      <wizard type="audio-producer" _description="Loop audio" feeder="audio">
+      </wizard>
+      <wizard type="video-producer" _description="Loop video" feeder="video">
+      </wizard>
     </component>
   </components>
   <bundles>
@@ -71,6 +77,20 @@ looping continuously.">
                 <filename location="looper.py" />
             </directory>
         </directories>
+    </bundle>
+
+    <bundle name="wizard">
+    	<dependencies>
+    		<dependency name="looper-base" />
+    		<dependency name="component" />
+    	</dependencies>
+    	
+    	<directories>
+    		<directory name="flumotion/component/producers/looper">
+    			<filename location="wizard_gtk.py" />
+    			<filename location="wizard.glade" />
+    		</directory>
+    	</directories>		
     </bundle>
 
   </bundles>
