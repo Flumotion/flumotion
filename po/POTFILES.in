@@ -283,6 +283,8 @@ flumotion/component/producers/looper/flufileinfo.glade
 flumotion/component/producers/looper/__init__.py
 flumotion/component/producers/looper/looper.glade
 flumotion/component/producers/looper/looper.py
+flumotion/component/producers/looper/wizard.glade
+flumotion/component/producers/looper/wizard_gtk.py
 flumotion/component/producers/pipeline/__init__.py
 flumotion/component/producers/pipeline/pipeline.py
 flumotion/component/producers/playlist/__init__.py

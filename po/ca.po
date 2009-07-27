@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2009-07-27 11:45+0200\n"
+"POT-Creation-Date: 2009-07-27 12:49+0200\n"
 "PO-Revision-Date: 2008-05-15 19:26+0100\n"
 "Last-Translator: Xavier Queralt Mateu <xqueralt@flumotion.com>\n"
 "Language-Team: cat\n"
@@ -2788,6 +2788,7 @@ msgid "_Stretch to multiple of 8 pixels"
 msgstr "_Estira al múltiple de 8 pixeles"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:14
+#: ../flumotion/component/producers/looper/wizard.glade.h:6
 #: ../flumotion/component/producers/videotest/wizard.glade.h:5
 msgid "frames per second"
 msgstr "imatges per segon"
@@ -2874,6 +2875,45 @@ msgstr "Reinicia la repetició:"
 #, python-format
 msgid "Could not open file '%s' for reading."
 msgstr "No es pot obrir el fitxer '%s' en mode lectura."
+
+#: ../flumotion/component/producers/looper/wizard.glade.h:1
+msgid "..."
+msgstr "..."
+
+#: ../flumotion/component/producers/looper/wizard.glade.h:2
+msgid "Frame Rate:"
+msgstr "Imatges per segon:"
+
+#: ../flumotion/component/producers/looper/wizard.glade.h:3
+msgid "Height:"
+msgstr "Altura:"
+
+#: ../flumotion/component/producers/looper/wizard.glade.h:4
+msgid "Location:"
+msgstr "Ruta al fitxer:"
+
+#: ../flumotion/component/producers/looper/wizard.glade.h:5
+msgid "Width:"
+msgstr "Amplària:"
+
+#: ../flumotion/component/producers/looper/wizard.glade.h:7
+#: ../flumotion/component/producers/videotest/wizard.glade.h:6
+msgid "pixels"
+msgstr "píxels"
+
+#: ../flumotion/component/producers/looper/wizard_gtk.py:99
+#, python-format
+msgid "'%s' is not a valid file, or is not readable on worker '%s'."
+msgstr ""
+"El directori '%s' no existeix, o no és llegible en el treballador '%s'."
+
+#: ../flumotion/component/producers/looper/wizard_gtk.py:178
+msgid "Loop Video"
+msgstr "Bucle de vídeo"
+
+#: ../flumotion/component/producers/looper/wizard_gtk.py:209
+msgid "Loop audio"
+msgstr "Bucle d'àudio"
 
 #: ../flumotion/component/producers/playlist/playlist.py:452
 #, python-format
@@ -3069,10 +3109,6 @@ msgstr "Format de vídeo"
 #: ../flumotion/component/producers/videotest/videotest.xml.h:10
 msgid "Whether to overlay buffer timestamps."
 msgstr "Si s'ha de superposar la marca horària."
-
-#: ../flumotion/component/producers/videotest/wizard.glade.h:6
-msgid "pixels"
-msgstr "píxels"
 
 #: ../flumotion/component/producers/videotest/wizard_gtk.py:47
 msgid "Test Video Producer"
