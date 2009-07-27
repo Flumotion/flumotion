@@ -1,16 +1,3 @@
-2009-07-27  Guillaume Quintard,,,  <Please set CHANGE_LOG_EMAIL_ADDRESS or EMAIL_ADDRESS environment variable>
-
-	reviewed by: <delete if not using a buddy>
-	patch by: <delete if not someone else's patch>
-
-	* ChangeLog:
-	* ca.po:
-	* es.po:
-	* nb.po:
-	* nl.po:
-	* pt_BR.po:
-	* sv.po:
-
 # Flumotion
 # This file is put in the public domain.
 # Thomas Vander Stichele <thomas at fluendo dot com>, 2006.

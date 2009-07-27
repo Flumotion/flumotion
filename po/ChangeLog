@@ -1,5 +1,9 @@
 2009-07-27  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
+	* fr.po: corrects previous manipulation error
+
+2009-07-27  Guillaume Quintard  <guillaume.quintard@gmail.com>
+
 	* fr.po: first handful of french translations, not clean, but better than what we had
 
 2009-07-24  Pedro Gracia  <pedro@flumotion.com>
