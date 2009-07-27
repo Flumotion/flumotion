@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flumotion 0.1.9\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2008-11-14 11:02+0100\n"
+"POT-Creation-Date: 2009-07-27 11:45+0200\n"
 "PO-Revision-Date: 2008-05-15 19:26+0100\n"
 "Last-Translator: Xavier Queralt Mateu <xqueralt@flumotion.com>\n"
 "Language-Team: cat\n"
@@ -74,7 +74,7 @@ msgid "Open Connection..."
 msgstr "Obre la connexió..."
 
 #: ../data/glade/connection-dialog.glade.h:2
-#: ../flumotion/admin/gtk/greeter.py:169
+#: ../flumotion/admin/gtk/greeter.py:174
 msgid "Please choose a connection from the box below."
 msgstr "Trieu si us plau una connexió de la caixa de baix."
 
@@ -215,23 +215,23 @@ msgstr ""
 "\n"
 "El podrà aturar a posteriori:"
 
-#: ../data/glade/http-wizard.glade.h:1
+#: ../data/glade/httpstreamer-wizard.glade.h:1
 msgid "Bandwidth limit:"
 msgstr "Límit de l'ampla de b_anda:"
 
-#: ../data/glade/http-wizard.glade.h:2
+#: ../data/glade/httpstreamer-wizard.glade.h:2
 msgid "Bu_rst on connect"
 msgstr "_Ràfega en connectar"
 
-#: ../data/glade/http-wizard.glade.h:3
+#: ../data/glade/httpstreamer-wizard.glade.h:3
 msgid "Mbit/s"
 msgstr "Mbit/s"
 
-#: ../data/glade/http-wizard.glade.h:4
+#: ../data/glade/httpstreamer-wizard.glade.h:4
 msgid "Public hostname:"
 msgstr "Nom públic de l'amfitrió"
 
-#: ../data/glade/http-wizard.glade.h:5
+#: ../data/glade/httpstreamer-wizard.glade.h:5
 msgid ""
 "Send buffered data to new clients.  This reduces the delay before playback "
 "starts, but increases the latency."
@@ -239,28 +239,33 @@ msgstr ""
 "S'està enviant dades emmagatzemades als clients. Això redueix l'espera abans "
 "d'iniciar el playback, però incrementa la latència."
 
-#: ../data/glade/http-wizard.glade.h:6
+#: ../data/glade/httpstreamer-wizard.glade.h:6
 msgid "User limit:"
 msgstr "_Límit d'usuaris:"
 
-#: ../data/glade/http-wizard.glade.h:7 ../data/glade/ondemand-wizard.glade.h:9
+#: ../data/glade/httpstreamer-wizard.glade.h:7
+msgid "_Advanced settings"
+msgstr "Paràmetres _avançats"
+
+#: ../data/glade/httpstreamer-wizard.glade.h:8
+#: ../data/glade/ondemand-wizard.glade.h:9
+#: ../data/glade/shout2-wizard.glade.h:9
+msgid "_Mount point:"
+msgstr "P_unt de muntatge:"
+
+#: ../data/glade/httpstreamer-wizard.glade.h:9
+#: ../data/glade/ondemand-wizard.glade.h:10
 #: ../data/glade/open-connection.glade.h:2
 msgid "_Port:"
 msgstr "_Port:"
 
-#: ../data/glade/http-wizard.glade.h:8
+#: ../data/glade/httpstreamer-wizard.glade.h:10
 msgid "clients"
 msgstr "clients"
 
-#: ../data/glade/http-wizard.glade.h:9
+#: ../data/glade/httpstreamer-wizard.glade.h:11
 msgid "localhost.localdomain"
 msgstr "localhost.localdomain"
-
-#: ../data/glade/httpstreamer-wizard.glade.h:1
-#: ../data/glade/ondemand-wizard.glade.h:8
-#: ../data/glade/shout2-wizard.glade.h:9
-msgid "_Mount point:"
-msgstr "P_unt de muntatge:"
 
 #: ../data/glade/license-wizard.glade.h:1
 msgid "Specify _license:"
@@ -271,10 +276,18 @@ msgid "/tmp"
 msgstr "/tmp"
 
 #: ../data/glade/ondemand-wizard.glade.h:2
+msgid "<b>Log requests to a file (apache log):</b>"
+msgstr "<b>Registrar les peticions a un fitxer (registre de l'apache):</b>"
+
+#: ../data/glade/ondemand-wizard.glade.h:3
+msgid "<b>Server configuration:</b>"
+msgstr "<b>Configuració del servidor:</b>"
+
+#: ../data/glade/ondemand-wizard.glade.h:4
 msgid "Port the on demand server will listen to."
 msgstr "Port on el servidor sota demanda escoltarà."
 
-#: ../data/glade/ondemand-wizard.glade.h:3
+#: ../data/glade/ondemand-wizard.glade.h:5
 msgid ""
 "The base path of the streamer, all urls will be prefixed with this. Defaults "
 "to '/'."
@@ -282,7 +295,7 @@ msgstr ""
 "La base del camí del flux, totes les urls tindràn aquest prefix. Per defecte "
 "és '/'."
 
-#: ../data/glade/ondemand-wizard.glade.h:4
+#: ../data/glade/ondemand-wizard.glade.h:6
 msgid ""
 "This is the directory which will be exported. All files in this and its "
 "subdirectories will be accessible over http."
@@ -290,19 +303,15 @@ msgstr ""
 "Aquest és el directori que s'exportarà. Tots els fitxers i subdirectoris "
 "seran accessibles per http."
 
-#: ../data/glade/ondemand-wizard.glade.h:5
-msgid ""
-"This page allows you to configure\n"
-" your on demand video server:"
-msgstr ""
-"Aquesta pàgina us permet configurar\n"
-" el vostre servidor de vídeo sota demanda:"
-
 #: ../data/glade/ondemand-wizard.glade.h:7
 msgid "_Directory:"
 msgstr "_Directori:"
 
-#: ../data/glade/ondemand-wizard.glade.h:10
+#: ../data/glade/ondemand-wizard.glade.h:8
+msgid "_File name:"
+msgstr "Nom del _fitxer"
+
+#: ../data/glade/ondemand-wizard.glade.h:11
 msgid "_Select..."
 msgstr "_Seleccioneu..."
 
@@ -452,233 +461,244 @@ msgstr "Am_plària:"
 
 #: ../data/glade/welcome-wizard.glade.h:1
 msgid ""
-"Welcome to the Flumotion configuration assistant.\n"
+"Welcome to the Flumotion assistant.\n"
 "\n"
-"This assistant helps to create a Flumotion configuration for simple "
-"scenarios such as live streaming from a webcam, camera, or file, or on-"
-"demand streaming of files."
+"The next steps will configure a Flumotion streaming server for simple "
+"scenarios such as <b>live</b> (from a webcam, a firewire camera or a TV "
+"card) or <b>on demand</b> (from a set of files or a directory).\n"
+"\n"
+"If in doubt just use the default options."
 msgstr ""
 "Benvingut al assistent de configuració de Flumotion.\n"
 "\n"
-"Aquest assistent us ajudarà a configurar el servidor Flumotion per escenaris "
-"simples com ara un fluxe en directe des d'una càmera, un fitxer, o la "
-"transmissió de fitxers sota demanda."
+"Les següents pàgines us ajudaran a configurar un servidor de fluxes "
+"Flumotion per a escenaris simples com ara una emissió <b>en directe</b> (amb "
+"una càmera web, firewire o una capturadora de televisió) o <b>sota demanda</"
+"b> (a partir d'un conjunt de fitxers o un directori).\n"
+"\n"
+"Si teniu algun dubte, simplement utilitzeu les opcions inicials."
 
-#: ../flumotion/admin/admin.py:469
+#: ../flumotion/admin/admin.py:491
 msgid "Internal error in component."
 msgstr "Error intern en el component."
 
-#: ../flumotion/admin/gtk/adminwindow.py:287
+#: ../flumotion/admin/gtk/adminwindow.py:288
 #, python-format
 msgid "Worker %s logged in."
 msgstr "Treballador %s ha iniciat sessió."
 
-#: ../flumotion/admin/gtk/adminwindow.py:292
+#: ../flumotion/admin/gtk/adminwindow.py:294
 #, python-format
 msgid "Worker %s logged out."
 msgstr "Treballador %s ha finalitzat la sessió."
 
 #. Connection
-#: ../flumotion/admin/gtk/adminwindow.py:356
+#: ../flumotion/admin/gtk/adminwindow.py:358
 msgid "_Connection"
 msgstr "_Connexió"
 
-#: ../flumotion/admin/gtk/adminwindow.py:357
+#: ../flumotion/admin/gtk/adminwindow.py:359
 msgid "_Open Recent Connection..."
 msgstr "_Obre la connexió recent"
 
-#: ../flumotion/admin/gtk/adminwindow.py:358
+#: ../flumotion/admin/gtk/adminwindow.py:360
 msgid "Connect to a recently used connection"
 msgstr "Obre una connexió recent"
 
 #
-#: ../flumotion/admin/gtk/adminwindow.py:360
+#: ../flumotion/admin/gtk/adminwindow.py:362
 msgid "Connect to _running manager..."
 msgstr "Connecta amb un g_estor en funcionament..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:361
+#: ../flumotion/admin/gtk/adminwindow.py:363
 msgid "Connect to an previously used connection"
 msgstr "Connecta a una connexió usada recentment."
 
-#: ../flumotion/admin/gtk/adminwindow.py:363
+#: ../flumotion/admin/gtk/adminwindow.py:365
 msgid "_Import Configuration..."
 msgstr "_Importa la configuració...."
 
-#: ../flumotion/admin/gtk/adminwindow.py:364
+#: ../flumotion/admin/gtk/adminwindow.py:366
 msgid "Import configuration from a file"
 msgstr "Importa la configuració des d'un fitxer"
 
-#: ../flumotion/admin/gtk/adminwindow.py:366
+#: ../flumotion/admin/gtk/adminwindow.py:368
 msgid "_Export Configuration..."
 msgstr "_Exporta la configuració..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:367
+#: ../flumotion/admin/gtk/adminwindow.py:369
 msgid "Export current configuration to a file"
 msgstr "Exporta la configuració a un fitxer"
 
-#: ../flumotion/admin/gtk/adminwindow.py:369
+#: ../flumotion/admin/gtk/adminwindow.py:371
 msgid "_Quit"
 msgstr "_Sortir"
 
-#: ../flumotion/admin/gtk/adminwindow.py:370
+#: ../flumotion/admin/gtk/adminwindow.py:372
 msgid "Quit the application and disconnect from the manager"
 msgstr "Surt de l'aplicació i desconnecta't del gestor."
 
 #. Manage
-#: ../flumotion/admin/gtk/adminwindow.py:374
+#: ../flumotion/admin/gtk/adminwindow.py:376
 msgid "_Manage"
 msgstr "_Gestiona"
 
-#: ../flumotion/admin/gtk/adminwindow.py:375
+#: ../flumotion/admin/gtk/adminwindow.py:377
 msgid "_Start Component(s)"
 msgstr "Ini_cia el(s) component(s)"
 
-#: ../flumotion/admin/gtk/adminwindow.py:376
+#: ../flumotion/admin/gtk/adminwindow.py:378
 msgid "Start the selected component(s)"
 msgstr "I_nicia el(s) component(s) seleccionats"
 
-#: ../flumotion/admin/gtk/adminwindow.py:378
+#: ../flumotion/admin/gtk/adminwindow.py:380
 msgid "St_op Component(s)"
 msgstr "Pa_ra el(s) component(s)"
 
-#: ../flumotion/admin/gtk/adminwindow.py:379
+#: ../flumotion/admin/gtk/adminwindow.py:381
 msgid "Stop the selected component(s)"
 msgstr "Para el(s) component(s) seleccionat(s)."
 
-#: ../flumotion/admin/gtk/adminwindow.py:381
+#: ../flumotion/admin/gtk/adminwindow.py:383
 msgid "_Delete Component(s)"
 msgstr "_Esborra el(s) component(s)"
 
-#: ../flumotion/admin/gtk/adminwindow.py:382
+#: ../flumotion/admin/gtk/adminwindow.py:384
 msgid "Delete the selected component(s)"
 msgstr "Esborra el(s) component(s) seleccionat(s)"
 
-#: ../flumotion/admin/gtk/adminwindow.py:384
+#: ../flumotion/admin/gtk/adminwindow.py:386
 msgid "Start _All"
 msgstr "Inicia _tots"
 
-#: ../flumotion/admin/gtk/adminwindow.py:385
+#: ../flumotion/admin/gtk/adminwindow.py:387
 msgid "Start all components"
 msgstr "Inicia tots els components"
 
-#: ../flumotion/admin/gtk/adminwindow.py:387
+#: ../flumotion/admin/gtk/adminwindow.py:389
 msgid "Stop A_ll"
 msgstr "_Para Tots"
 
-#: ../flumotion/admin/gtk/adminwindow.py:388
+#: ../flumotion/admin/gtk/adminwindow.py:390
 msgid "Stop all components"
 msgstr "Pa_ra tots els components"
 
-#: ../flumotion/admin/gtk/adminwindow.py:390
+#: ../flumotion/admin/gtk/adminwindow.py:392
 msgid "_Clear All"
 msgstr "Esborra tot_s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:391
+#: ../flumotion/admin/gtk/adminwindow.py:393
 msgid "Remove all components"
 msgstr "Esborra tots els components"
 
-#: ../flumotion/admin/gtk/adminwindow.py:393
+#: ../flumotion/admin/gtk/adminwindow.py:395
 msgid "Add new encoding _format..."
 msgstr "Afegeix un nou format de codificació..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:395
+#: ../flumotion/admin/gtk/adminwindow.py:397
 msgid "Add a new format to the current stream"
 msgstr "Afegeix un nou format al flux actual"
 
-#: ../flumotion/admin/gtk/adminwindow.py:398
+#: ../flumotion/admin/gtk/adminwindow.py:400
 msgid "Run _Assistant"
 msgstr "Executeu l'_assistent"
 
-#: ../flumotion/admin/gtk/adminwindow.py:399
+#: ../flumotion/admin/gtk/adminwindow.py:401
 msgid "Run the configuration assistant"
 msgstr "Executa l'assistent de configuració"
 
 #. Debug
-#: ../flumotion/admin/gtk/adminwindow.py:403
+#: ../flumotion/admin/gtk/adminwindow.py:405
 msgid "_Debug"
 msgstr "_Depuració"
 
 #. Help
-#: ../flumotion/admin/gtk/adminwindow.py:406
+#: ../flumotion/admin/gtk/adminwindow.py:408
 msgid "_Help"
 msgstr "_Ajuda"
 
-#: ../flumotion/admin/gtk/adminwindow.py:407
+#: ../flumotion/admin/gtk/adminwindow.py:409
 msgid "_Contents"
 msgstr "_Continguts"
 
-#: ../flumotion/admin/gtk/adminwindow.py:408
+#: ../flumotion/admin/gtk/adminwindow.py:410
 msgid "Open the flumotion manual"
 msgstr "Obrir el manual de Flumotion"
 
-#: ../flumotion/admin/gtk/adminwindow.py:410
+#: ../flumotion/admin/gtk/adminwindow.py:412
 msgid "_About"
 msgstr "_Quant a"
 
-#: ../flumotion/admin/gtk/adminwindow.py:411
+#: ../flumotion/admin/gtk/adminwindow.py:413
 msgid "Displays an about dialog"
 msgstr "Mostra un quadre de diàleg de quant a"
 
 #. Only in context menu
-#: ../flumotion/admin/gtk/adminwindow.py:415
+#: ../flumotion/admin/gtk/adminwindow.py:417
 msgid "_Kill Component"
 msgstr "_Mata component"
 
-#: ../flumotion/admin/gtk/adminwindow.py:416
+#: ../flumotion/admin/gtk/adminwindow.py:418
 msgid "Kills the currently selected component"
 msgstr "Mata el(s) component(s) seleccionat(s)"
 
-#: ../flumotion/admin/gtk/adminwindow.py:421
+#: ../flumotion/admin/gtk/adminwindow.py:423
 msgid "Enable _Debugging"
 msgstr "Habilita la _depuració"
 
-#: ../flumotion/admin/gtk/adminwindow.py:422
+#: ../flumotion/admin/gtk/adminwindow.py:424
 msgid "Enable debugging in the admin interface"
 msgstr "Habilita la depuració en l'interfície d'administració"
 
 #. Debug
-#: ../flumotion/admin/gtk/adminwindow.py:432
+#: ../flumotion/admin/gtk/adminwindow.py:434
 msgid "Start _Shell"
 msgstr "Inicar _Intèrpret"
 
-#: ../flumotion/admin/gtk/adminwindow.py:433
+#: ../flumotion/admin/gtk/adminwindow.py:435
 msgid "Start an interactive debugging shell"
 msgstr "Inicia un intèrpret de comandes interactiu"
 
 #
-#: ../flumotion/admin/gtk/adminwindow.py:436
+#: ../flumotion/admin/gtk/adminwindow.py:438
 msgid "Dump configuration"
 msgstr "Volca la configuració"
 
 # i
-#: ../flumotion/admin/gtk/adminwindow.py:437
+#: ../flumotion/admin/gtk/adminwindow.py:439
 msgid "Dumps the current manager configuration"
 msgstr "Volca la configuració d'un gestor"
 
-#: ../flumotion/admin/gtk/adminwindow.py:440
+#: ../flumotion/admin/gtk/adminwindow.py:442
 msgid "Write debug marker..."
 msgstr "Escriu un marcador de depuració..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:441
+#: ../flumotion/admin/gtk/adminwindow.py:443
 msgid "Writes a debug marker to all the logs"
 msgstr "Escriu un marcador de depuració a tots els logs"
 
-#: ../flumotion/admin/gtk/adminwindow.py:486
+#: ../flumotion/admin/gtk/adminwindow.py:488
+#: ../flumotion/admin/gtk/adminwindow.py:884
 msgid "Flumotion: Not connected"
 msgstr "Flumotion: No hi ha connexió"
 
 #
-#: ../flumotion/admin/gtk/adminwindow.py:561
+#: ../flumotion/admin/gtk/adminwindow.py:563
 #, python-format
 msgid "Flumotion: Connecting to %s:%s"
 msgstr "Flumotion: S'està connectant a %s:%s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:610
+#: ../flumotion/admin/gtk/adminwindow.py:612
 #, python-format
 msgid "Connect to the manager on %s"
 msgstr "Connectar-se al gestor de %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:773
+#: ../flumotion/admin/gtk/adminwindow.py:750
+#: ../flumotion/admin/gtk/adminwindow.py:796
+msgid "Cannot run assistant without being connected to a manager"
+msgstr "No es pot executar el assistent si no s'està connectat a un gestor"
+
+#: ../flumotion/admin/gtk/adminwindow.py:814
 msgid ""
 "Cannot run the configuration assistant since there is at least one component "
 "in the lost state"
@@ -686,7 +706,7 @@ msgstr ""
 "No s'ha pogut executar l'assistent de configuració ja que almenys un "
 "component està perdut."
 
-#: ../flumotion/admin/gtk/adminwindow.py:777
+#: ../flumotion/admin/gtk/adminwindow.py:818
 msgid ""
 "Running the Configuration Assistant again will remove all components from "
 "the current stream and create a new one."
@@ -695,22 +715,37 @@ msgstr ""
 "eliminats i se'n crearà un de nou."
 
 #
-#: ../flumotion/admin/gtk/adminwindow.py:781
+#: ../flumotion/admin/gtk/adminwindow.py:822
 msgid "Keep the current stream"
 msgstr "Manté el flux l'actual"
 
 #
-#: ../flumotion/admin/gtk/adminwindow.py:783
+#: ../flumotion/admin/gtk/adminwindow.py:824
 msgid "Run the Assistant anyway"
 msgstr "Executar l'_Assistent de totes formes"
 
 #
-#: ../flumotion/admin/gtk/adminwindow.py:797
+#: ../flumotion/admin/gtk/adminwindow.py:840
 msgid "The assistant cannot be run because no workers are logged in."
 msgstr ""
 "L'assistent no s'ha pogut iniciar perquè no hi ha cap treballador connectat."
 
-#: ../flumotion/admin/gtk/adminwindow.py:948
+#: ../flumotion/admin/gtk/adminwindow.py:878
+#, python-format
+msgid "%s - Flumotion Administration"
+msgstr "%s - Administració de Flumotion"
+
+#
+#: ../flumotion/admin/gtk/adminwindow.py:880
+#, python-format
+msgid "Flumotion: %s"
+msgstr "Flumotion: %s"
+
+#: ../flumotion/admin/gtk/adminwindow.py:883
+msgid "Not connected"
+msgstr "No hi ha connexió"
+
+#: ../flumotion/admin/gtk/adminwindow.py:1018
 msgid ""
 "Some component(s) are still busy and cannot be removed.\n"
 "Try again later."
@@ -720,23 +755,23 @@ msgstr ""
 
 #. first %s is one of Stopping/Starting/Deleting
 #. second %s is a component name like "audio-producer"
-#: ../flumotion/admin/gtk/adminwindow.py:1028
-#: ../flumotion/admin/gtk/adminwindow.py:1056
+#: ../flumotion/admin/gtk/adminwindow.py:1097
+#: ../flumotion/admin/gtk/adminwindow.py:1125
 #, python-format
 msgid "%s component %s"
 msgstr "%s component %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1035
+#: ../flumotion/admin/gtk/adminwindow.py:1104
 #, python-format
 msgid "Failed to %(action)s component %(name)s."
 msgstr "S'ha fallat en %(action)s el component %(name)s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1043
+#: ../flumotion/admin/gtk/adminwindow.py:1112
 #, python-format
 msgid "%s components."
 msgstr "components %s."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1050
+#: ../flumotion/admin/gtk/adminwindow.py:1119
 #, python-format
 msgid "Failed to %s some components."
 msgstr "S'ha fallat en %s alguns components"
@@ -744,84 +779,51 @@ msgstr "S'ha fallat en %s alguns components"
 #. first %s is one of Stopping/Starting/Deleting
 #. second %s is a list of component names, like
 #. "audio-producer, video-producer"
-#: ../flumotion/admin/gtk/adminwindow.py:1060
+#: ../flumotion/admin/gtk/adminwindow.py:1129
 #, python-format
 msgid "%s components %s"
 msgstr "%s components %s"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1148
+#: ../flumotion/admin/gtk/adminwindow.py:1217
 #, python-format
 msgid "Component %s is sad. "
 msgstr "Component %s està trist"
 
-#. FIXME: have a method for this
-#: ../flumotion/admin/gtk/adminwindow.py:1175
-#, python-format
-msgid "%s - Flumotion Administration"
-msgstr "%s - Administració de Flumotion"
-
-#
-#: ../flumotion/admin/gtk/adminwindow.py:1177
-#, python-format
-msgid "Flumotion: %s"
-msgstr "Flumotion: %s"
-
-#: ../flumotion/admin/gtk/adminwindow.py:1212
+#: ../flumotion/admin/gtk/adminwindow.py:1284
 msgid "Reconnecting ..."
 msgstr "Reconnectant ..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1213
+#: ../flumotion/admin/gtk/adminwindow.py:1285
 #, python-format
 msgid "Lost connection to manager %s, reconnecting ..."
 msgstr "Connexió perduda amb el gestor %s, tornant a connectar ..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1236
-#, python-format
-msgid "Connection to manager on %s was refused."
-msgstr "Connexió al gestor en %s ha estat rebutjada."
-
-#: ../flumotion/admin/gtk/adminwindow.py:1238
-#, python-format
-msgid "Connection to %s was refused"
-msgstr "Connexió en %s ha estat rebutjada "
-
-#: ../flumotion/admin/gtk/adminwindow.py:1247
-#: ../flumotion/admin/gtk/dialogs.py:184
-#, python-format
-msgid "Connection to manager on %s failed (%s)."
-msgstr "Connexió al gestor en %s ha fallat (%s)."
-
-#: ../flumotion/admin/gtk/adminwindow.py:1249
-#, python-format
-msgid "Connection to %s failed"
-msgstr "Connexió en %s ha fallat "
-
-#: ../flumotion/admin/gtk/adminwindow.py:1285
+#: ../flumotion/admin/gtk/adminwindow.py:1339
 msgid "Import Configuration..."
 msgstr "Importar la configuració..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1288
+#: ../flumotion/admin/gtk/adminwindow.py:1342
 msgid "Import"
 msgstr "Importa"
 
 #
-#: ../flumotion/admin/gtk/adminwindow.py:1292
+#: ../flumotion/admin/gtk/adminwindow.py:1346
 msgid "Flumotion XML Configuration files"
 msgstr "Fitxers de configuració XML de Flumotion"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1296
+#: ../flumotion/admin/gtk/adminwindow.py:1350
 msgid "All files"
 msgstr "Tots els fitxers"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1312
+#: ../flumotion/admin/gtk/adminwindow.py:1366
 msgid "Export Configuration..."
 msgstr "Exportar la configuració..."
 
-#: ../flumotion/admin/gtk/adminwindow.py:1315
+#: ../flumotion/admin/gtk/adminwindow.py:1369
 msgid "Export"
 msgstr "Exporta"
 
-#: ../flumotion/admin/gtk/adminwindow.py:1329
+#: ../flumotion/admin/gtk/adminwindow.py:1383
 msgid ""
 "File already exists.\n"
 "Overwrite?"
@@ -829,18 +831,16 @@ msgstr ""
 "L'arxiu ja existeix.\n"
 "sobreescriu ja? "
 
-#: ../flumotion/admin/gtk/adminwindow.py:1402
+#: ../flumotion/admin/gtk/adminwindow.py:1456
 msgid "Cannot find a program to display the flumotion manual."
 msgstr "No s'ha pogut trobar cap aplicació per mostrar el manual de flumotion."
 
 #: ../flumotion/admin/gtk/basesteps.py:32
 #: ../flumotion/admin/gtk/basesteps.py:40
-#: ../flumotion/admin/gtk/overlaystep.py:71
-#: ../flumotion/scenario/steps/ondemandstep.py:68
+#: ../flumotion/admin/gtk/overlaystep.py:70
+#: ../flumotion/scenario/steps/ondemandstep.py:88
 #: ../flumotion/scenario/steps/productionsteps.py:46
 #: ../flumotion/scenario/steps/productionsteps.py:47
-#: ../flumotion/scenario/steps/productionsteps.py:242
-#: ../flumotion/scenario/steps/productionsteps.py:243
 msgid "Production"
 msgstr "Producció"
 
@@ -848,15 +848,15 @@ msgstr "Producció"
 #: ../flumotion/admin/gtk/basesteps.py:67
 #: ../flumotion/component/encoders/jpeg/wizard_gtk.py:61
 #: ../flumotion/component/encoders/mulaw/wizard_gtk.py:43
-#: ../flumotion/component/encoders/smoke/wizard_gtk.py:43
-#: ../flumotion/scenario/steps/conversionsteps.py:49
+#: ../flumotion/component/encoders/smoke/wizard_gtk.py:60
+#: ../flumotion/scenario/steps/conversionsteps.py:50
 msgid "Conversion"
 msgstr "Conversió"
 
 #: ../flumotion/admin/gtk/basesteps.py:80
-#: ../flumotion/scenario/steps/consumptionsteps.py:54
-#: ../flumotion/scenario/steps/consumptionsteps.py:55
-#: ../flumotion/scenario/steps/consumptionsteps.py:260
+#: ../flumotion/scenario/steps/httpstreamersteps.py:259
+#: ../flumotion/scenario/steps/consumptionsteps.py:42
+#: ../flumotion/scenario/steps/consumptionsteps.py:43
 msgid "Consumption"
 msgstr "Consum"
 
@@ -884,27 +884,35 @@ msgstr "Afamat"
 msgid "Lost"
 msgstr "Perdut"
 
-#: ../flumotion/admin/gtk/componentlist.py:126
+#: ../flumotion/admin/gtk/componentlist.py:129
 #: ../flumotion/component/base/componentnode.py:49
 msgid "Component"
 msgstr "Component"
 
-#: ../flumotion/admin/gtk/componentlist.py:131
+#: ../flumotion/admin/gtk/componentlist.py:134
 msgid "Worker"
 msgstr "Treballador"
 
-#: ../flumotion/admin/gtk/componentlist.py:137
+#: ../flumotion/admin/gtk/componentlist.py:140
 msgid "PID"
 msgstr "PID"
 
-#: ../flumotion/admin/gtk/componentlist.py:334
+#. FIXME: Should we raise an error here?
+#. It's an impossible situation.
+#: ../flumotion/admin/gtk/componentlist.py:353
 msgid "[any worker]"
 msgstr "[qualsevol treballador]"
 
-#: ../flumotion/admin/gtk/componentlist.py:416
+#: ../flumotion/admin/gtk/componentlist.py:358
 #, python-format
-msgid "Component is %s"
-msgstr "Component és %s"
+msgid "<b>Worker %s is not connected</b>"
+msgstr "<b>El treballador %s no està connectat</b>"
+
+#
+#: ../flumotion/admin/gtk/componentlist.py:377
+#, python-format
+msgid "<b>Component is %s</b>"
+msgstr "<b>El component està %s</b>"
 
 #: ../flumotion/admin/gtk/componentview.py:126
 #, python-format
@@ -925,19 +933,29 @@ msgstr "El component '%s' encara està dormint"
 msgid "Component '%s' has a UI bug."
 msgstr "El component '%s' té un error a la interfície d'usuari."
 
+#: ../flumotion/admin/gtk/configurationassistant.py:96
 #: ../flumotion/admin/gtk/configurationassistant.py:97
-#: ../flumotion/admin/gtk/configurationassistant.py:98
 msgid "Welcome"
 msgstr "Benvingut"
 
+#: ../flumotion/admin/gtk/configurationassistant.py:115
 #: ../flumotion/admin/gtk/configurationassistant.py:116
-#: ../flumotion/admin/gtk/configurationassistant.py:117
 msgid "Scenario"
 msgstr "Escenari"
 
-#: ../flumotion/admin/gtk/configurationassistant.py:422
+#: ../flumotion/admin/gtk/configurationassistant.py:470
+#, python-format
+msgid "Checking the existence of GStreamer element '%s' on %s worker."
+msgid_plural "Checking the existence of GStreamer elements '%s' on %s worker."
+msgstr[0] ""
+"S'està comprovant l'existència de l'element de GStreamer '%s' en el "
+"treballador '%s'."
+msgstr[1] ""
+"S'està comprovant l'existència dels elements de GStreamer '%s' en el "
+"treballador '%s'."
+
+#: ../flumotion/admin/gtk/configurationassistant.py:485
 #: ../flumotion/admin/gtk/overlaystep.py:142
-#: ../flumotion/scenario/steps/httpstreamersteps.py:347
 #, python-format
 msgid "Worker '%s' is missing GStreamer element '%s'."
 msgid_plural "Worker '%s' is missing GStreamer elements '%s'."
@@ -945,7 +963,7 @@ msgstr[0] "El treballador '%s' no té instal·lat l'element de GStreamer '%s'"
 msgstr[1] ""
 "El treballador '%s' no té instal·lats els elements de GStreamer '%s'"
 
-#: ../flumotion/admin/gtk/configurationassistant.py:427
+#: ../flumotion/admin/gtk/configurationassistant.py:490
 msgid ""
 "\n"
 "Please install the necessary GStreamer plug-ins that provide these elements "
@@ -955,8 +973,8 @@ msgstr ""
 "Si us plau instal·li els connectors de GStreamer necessaris que proveeixen "
 "aquests elements i reiniciï el treballador."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:430
-#: ../flumotion/admin/gtk/configurationassistant.py:492
+#: ../flumotion/admin/gtk/configurationassistant.py:493
+#: ../flumotion/admin/gtk/configurationassistant.py:556
 msgid ""
 "\n"
 "\n"
@@ -966,16 +984,15 @@ msgstr ""
 "\n"
 "No podrà continuar usant aquest treballador."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:484
-#: ../flumotion/admin/gtk/overlaystep.py:120
-#: ../flumotion/scenario/steps/httpstreamersteps.py:331
-#: ../flumotion/scenario/steps/ondemandstep.py:114
+#: ../flumotion/admin/gtk/configurationassistant.py:548
+#: ../flumotion/admin/gtk/overlaystep.py:119
+#: ../flumotion/scenario/steps/ondemandstep.py:147
 #, python-format
 msgid "Worker '%s' cannot import module '%s'."
 msgstr "El treballador '%s' no pot importar el mòdul '%s'."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:487
-#: ../flumotion/admin/gtk/overlaystep.py:123
+#: ../flumotion/admin/gtk/configurationassistant.py:551
+#: ../flumotion/admin/gtk/overlaystep.py:122
 #, python-format
 msgid ""
 "\n"
@@ -984,10 +1001,9 @@ msgstr ""
 "\n"
 "Aquest mòdul és part de '%s'."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:490
-#: ../flumotion/admin/gtk/overlaystep.py:126
-#: ../flumotion/scenario/steps/httpstreamersteps.py:335
-#: ../flumotion/scenario/steps/ondemandstep.py:118
+#: ../flumotion/admin/gtk/configurationassistant.py:554
+#: ../flumotion/admin/gtk/overlaystep.py:125
+#: ../flumotion/scenario/steps/ondemandstep.py:151
 #, python-format
 msgid ""
 "\n"
@@ -996,13 +1012,13 @@ msgstr ""
 "\n"
 "La pàgina del projecte és %s"
 
-#: ../flumotion/admin/gtk/configurationassistant.py:537
-#: ../flumotion/admin/gtk/configurationassistant.py:565
+#: ../flumotion/admin/gtk/configurationassistant.py:603
+#: ../flumotion/admin/gtk/configurationassistant.py:631
 msgid "Internal error: could not run check code on worker."
 msgstr ""
 "Error intern: no s'ha pogut executar codi de validació en el treballador."
 
-#: ../flumotion/admin/gtk/configurationassistant.py:727
+#: ../flumotion/admin/gtk/configurationassistant.py:793
 msgid ""
 "All workers have logged out.\n"
 "Make sure your Flumotion network is running properly and try again."
@@ -1011,19 +1027,19 @@ msgstr ""
 "Asseguri's que la xarxa de Flumotion funciona correctament i intenti-ho de "
 "nou."
 
-#: ../flumotion/admin/gtk/connections.py:53
+#: ../flumotion/admin/gtk/connections.py:56
 msgid "Hostname"
 msgstr "Nom de l'amfitrió"
 
-#: ../flumotion/admin/gtk/connections.py:54
+#: ../flumotion/admin/gtk/connections.py:58
 msgid "Last used"
 msgstr "Últim utilitzat"
 
-#: ../flumotion/admin/gtk/dialogs.py:127
+#: ../flumotion/admin/gtk/dialogs.py:157
 msgid "About Flumotion"
 msgstr "Sobre Flumotion"
 
-#: ../flumotion/admin/gtk/dialogs.py:148
+#: ../flumotion/admin/gtk/dialogs.py:178
 msgid ""
 "Flumotion is a streaming media server.\n"
 "\n"
@@ -1033,15 +1049,15 @@ msgstr ""
 "\n"
 "(C) 2004,2005, 2006, 2007, 2008 Fluendo S.L."
 
-#: ../flumotion/admin/gtk/dialogs.py:162
+#: ../flumotion/admin/gtk/dialogs.py:196
 msgid "Authors"
 msgstr "Autors"
 
-#: ../flumotion/admin/gtk/dialogs.py:177
+#: ../flumotion/admin/gtk/dialogs.py:211
 msgid "Connection Refused"
 msgstr "Connexió rebutjada"
 
-#: ../flumotion/admin/gtk/dialogs.py:179
+#: ../flumotion/admin/gtk/dialogs.py:213
 #, python-format
 msgid ""
 "\"%s\" refused your connection.\n"
@@ -1051,60 +1067,65 @@ msgstr ""
 "Verifiqui el seu nom d'usuari i la seva contrasenya i torni-ho a provar."
 
 #
-#: ../flumotion/admin/gtk/dialogs.py:183
+#: ../flumotion/admin/gtk/dialogs.py:217
 msgid "Connection Failed"
 msgstr "La connexió ha fallat"
 
-#: ../flumotion/admin/gtk/dialogs.py:188
+#: ../flumotion/admin/gtk/dialogs.py:218
+#, python-format
+msgid "Connection to manager on %s failed (%s)."
+msgstr "Connexió al gestor en %s ha fallat (%s)."
+
+#: ../flumotion/admin/gtk/dialogs.py:222
 #, python-format
 msgid "Already Connected to %s"
 msgstr "Ja esteu connectat a %s"
 
-#: ../flumotion/admin/gtk/dialogs.py:189
+#: ../flumotion/admin/gtk/dialogs.py:223
 msgid "You cannot connect twice to the same manager. Try disconnecting first."
 msgstr ""
 "No us podeu connectar dues vegades al mateix gestor. Proveu de desconnectar-"
 "vos primer."
 
-#: ../flumotion/admin/gtk/greeter.py:49
+#: ../flumotion/admin/gtk/greeter.py:51
 msgid "Connect to Flumotion Manager"
 msgstr "Connecteu-vos al gestor de Flumotion"
 
-#: ../flumotion/admin/gtk/greeter.py:50
+#: ../flumotion/admin/gtk/greeter.py:52
 msgid "Flumotion Admin needs to connect to a Flumotion manager.\n"
 msgstr ""
 "L'Administració de Flumotion necessita connectar amb un gestor de "
 "Flumotion.\n"
 
-#: ../flumotion/admin/gtk/greeter.py:51
+#: ../flumotion/admin/gtk/greeter.py:53
 msgid "Choose an option from the list and click \"Forward\" to begin."
 msgstr "Trieu una opció de la llista i feu clic a \"Endavant\" per començar."
 
-#: ../flumotion/admin/gtk/greeter.py:103
+#: ../flumotion/admin/gtk/greeter.py:108
 msgid "Host Information"
 msgstr "Informació de l'amfitrió"
 
-#: ../flumotion/admin/gtk/greeter.py:104
+#: ../flumotion/admin/gtk/greeter.py:109
 msgid "Please enter the address where the manager is running."
 msgstr "Introduïu si us plau l'adreça on el gestor està funcionant."
 
-#: ../flumotion/admin/gtk/greeter.py:132
+#: ../flumotion/admin/gtk/greeter.py:137
 msgid "Authentication"
 msgstr "Autenticació"
 
-#: ../flumotion/admin/gtk/greeter.py:133
+#: ../flumotion/admin/gtk/greeter.py:138
 msgid "Please enter your username and password."
 msgstr "Introduïu el vostre nom d'usuari i la contrassenya."
 
-#: ../flumotion/admin/gtk/greeter.py:168
+#: ../flumotion/admin/gtk/greeter.py:173
 msgid "Recent Connections"
 msgstr "Connexions recents"
 
-#: ../flumotion/admin/gtk/greeter.py:196
+#: ../flumotion/admin/gtk/greeter.py:201
 msgid "Start a New Manager and Worker"
 msgstr "Iniciar un nou gestor i treballador"
 
-#: ../flumotion/admin/gtk/greeter.py:197
+#: ../flumotion/admin/gtk/greeter.py:202
 msgid ""
 "This will start a new manager and worker for you.\n"
 "\n"
@@ -1118,16 +1139,16 @@ msgstr ""
 "El gestor només acceptarà connexions de la màquina local.\n"
 "Aquest mode només és útil per a provar Flumotion.\n"
 
-#: ../flumotion/admin/gtk/greeter.py:274
+#: ../flumotion/admin/gtk/greeter.py:279
 msgid "Failed to Start"
 msgstr "Ha fallat l'iniciació"
 
-#: ../flumotion/admin/gtk/greeter.py:287
+#: ../flumotion/admin/gtk/greeter.py:292
 #, python-format
 msgid "The command exited with an exit code of %d."
 msgstr "L'ordre ha finalitzat amb un el codi %d."
 
-#: ../flumotion/admin/gtk/greeter.py:289
+#: ../flumotion/admin/gtk/greeter.py:294
 #, python-format
 msgid ""
 "The command that failed was:\n"
@@ -1138,11 +1159,11 @@ msgstr ""
 "<i>%s</i>\n"
 "%s"
 
-#: ../flumotion/admin/gtk/greeter.py:296
+#: ../flumotion/admin/gtk/greeter.py:301
 msgid "Started Manager and Worker"
 msgstr "S'han iniciat un nou gestor i treballador"
 
-#: ../flumotion/admin/gtk/greeter.py:313
+#: ../flumotion/admin/gtk/greeter.py:318
 #, python-format
 msgid ""
 "The admin client will now connect to the manager.\n"
@@ -1167,16 +1188,6 @@ msgstr ""
 "\n"
 "<i>%s</i>\n"
 
-#
-#: ../flumotion/admin/gtk/main.py:52
-#, python-format
-msgid ""
-"ERROR: Could not connect to manager:\n"
-"       The connection to %r was refused."
-msgstr ""
-"ERROR: No s'ha pogut connectar al gestor:\n"
-"       La connexió a %r ha estat rebutjada."
-
 #: ../flumotion/admin/gtk/message.py:45 ../flumotion/launch/main.py:78
 msgid "Error"
 msgstr "Error"
@@ -1195,7 +1206,11 @@ msgstr "Avís"
 msgid "Note"
 msgstr "Nota"
 
-#: ../flumotion/admin/gtk/message.py:206
+#: ../flumotion/admin/gtk/message.py:208
+msgid "Message"
+msgstr "Missatge"
+
+#: ../flumotion/admin/gtk/message.py:226
 #, python-format
 msgid ""
 "\n"
@@ -1204,24 +1219,20 @@ msgstr ""
 "\n"
 "Escrit a %s.\n"
 
-#: ../flumotion/admin/gtk/message.py:210
+#: ../flumotion/admin/gtk/message.py:231
 msgid "Debug information:\n"
 msgstr "Informació de depuració\n"
 
-#: ../flumotion/admin/gtk/message.py:216
-msgid "Message"
-msgstr "Missatge"
-
 #
-#: ../flumotion/admin/gtk/overlaystep.py:44
+#: ../flumotion/admin/gtk/overlaystep.py:43
 msgid "Flumotion"
 msgstr "Flumotion"
 
-#: ../flumotion/admin/gtk/overlaystep.py:70
+#: ../flumotion/admin/gtk/overlaystep.py:69
 msgid "Overlay"
 msgstr "Recobriment"
 
-#: ../flumotion/admin/gtk/overlaystep.py:129
+#: ../flumotion/admin/gtk/overlaystep.py:128
 #: ../flumotion/admin/gtk/overlaystep.py:149
 msgid ""
 "\n"
@@ -1236,14 +1247,22 @@ msgstr ""
 msgid "Worker:"
 msgstr "Treballador:"
 
-#: ../flumotion/common/documentation.py:95
+#: ../flumotion/common/documentation.py:97
 #, python-format
 msgid "Please install the '%s' python module."
 msgstr "Si us plau, instal·leu el mòdul '%s' de python."
 
-#: ../flumotion/common/documentation.py:96
+#: ../flumotion/common/documentation.py:98
 msgid "Learn how to install Python modules."
 msgstr "Apreneu com instal·lar mòduls de python."
+
+#: ../flumotion/common/documentation.py:107
+msgid "Learn how to change device permissions."
+msgstr "Aprèn com canviar els permisos dels dispositius."
+
+#: ../flumotion/common/documentation.py:117
+msgid "Learn how to install GStreamer elements."
+msgstr "Apreneu com instal·lar elements de GStreamer."
 
 #: ../flumotion/common/format.py:106
 #, python-format
@@ -1271,18 +1290,6 @@ msgid "%02d:%02d"
 msgstr "%02d:%02d"
 
 #
-#: ../flumotion/common/managerspawner.py:92
-#: ../flumotion/common/managerspawner.py:126
-msgid "manager"
-msgstr "gestor"
-
-#
-#: ../flumotion/common/managerspawner.py:92
-#: ../flumotion/common/managerspawner.py:126
-msgid "worker"
-msgstr "treballador"
-
-#
 #: ../flumotion/common/managerspawner.py:99
 #, python-format
 msgid "Creating %s ..."
@@ -1305,6 +1312,16 @@ msgstr "Iniciant %s ..."
 #, python-format
 msgid "Could not start %s."
 msgstr "No s'ha pogut iniciar %s."
+
+#
+#: ../flumotion/common/managerspawner.py:126
+msgid "manager"
+msgstr "gestor"
+
+#
+#: ../flumotion/common/managerspawner.py:126
+msgid "worker"
+msgstr "treballador"
 
 #: ../flumotion/common/worker.py:80
 #, python-format
@@ -1385,7 +1402,7 @@ msgstr "Executant-se des de:"
 #: ../flumotion/component/base/eaters.glade.h:16
 #: ../flumotion/component/base/feeders.glade.h:12
 #: ../flumotion/component/base/properties.glade.h:2
-#: ../flumotion/component/consumers/httpstreamer/admin_gtk.py:141
+#: ../flumotion/component/consumers/httpstreamer/admin_gtk.py:146
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:11
 #: ../flumotion/component/misc/httpserver/admin_gtk.py:281
 #: ../flumotion/component/misc/httpserver/httpfile.glade.h:5
@@ -1632,7 +1649,7 @@ msgstr ""
 "backup o video-master."
 
 #: ../flumotion/component/combiners/switch/switch.py:76
-#: ../flumotion/component/consumers/disker/disker.py:187
+#: ../flumotion/component/consumers/disker/disker.py:273
 #, python-format
 msgid "Error parsing ical file %s, so not scheduling any events."
 msgstr ""
@@ -1711,7 +1728,7 @@ msgstr "Nom de fitxer actual:"
 msgid "Start New File"
 msgstr "Inicia un nou fitxer"
 
-#: ../flumotion/component/consumers/disker/disker.py:122
+#: ../flumotion/component/consumers/disker/disker.py:133
 #, python-format
 msgid ""
 "The configuration property 'rotate-type' should be set to 'size', time', or "
@@ -1720,7 +1737,7 @@ msgstr ""
 "La propietat de configuració 'rotate-type' hauria de ser 'size', 'time', or "
 "'none', però no '%s'. Si us plau modifiqueu la configuració."
 
-#: ../flumotion/component/consumers/disker/disker.py:133
+#: ../flumotion/component/consumers/disker/disker.py:144
 #, python-format
 msgid ""
 "The configuration property '%s' should be set. Please fix the configuration."
@@ -1728,7 +1745,7 @@ msgstr ""
 "La propietat de configuració %s hauria d'estar fixada. Si us plau modifiqueu "
 "la configuració."
 
-#: ../flumotion/component/consumers/disker/disker.py:196
+#: ../flumotion/component/consumers/disker/disker.py:176
 #, python-format
 msgid ""
 "An iCal file has been specified for scheduling, but the '%s' module is not "
@@ -1737,7 +1754,7 @@ msgstr ""
 "S'ha especificat un fitxer ical per al planificador, però el mòdul '%s' no "
 "està instal·lat.\n"
 
-#: ../flumotion/component/consumers/disker/disker.py:314
+#: ../flumotion/component/consumers/disker/disker.py:326
 #, python-format
 msgid ""
 "Failed to open output file '%s' for writing. Check permissions on the file."
@@ -1745,22 +1762,30 @@ msgstr ""
 "No es pot obrir el dispositiu '%s' en  mode escritura. Comproveu els "
 "permisos sobre el dispositiu."
 
-#: ../flumotion/component/consumers/disker/disker.py:346
+#: ../flumotion/component/consumers/disker/disker.py:358
 #, python-format
 msgid "Failed to update symbolic link '%s'. Check your permissions."
 msgstr ""
 "Ha fallat l'actualització del enllaç simbòlic '%s'. Comproveu els vostres "
 "permisos."
 
-#: ../flumotion/component/consumers/disker/disker.py:404
+#: ../flumotion/component/consumers/disker/disker.py:416
 #, python-format
 msgid "Error writing to file '%s'."
 msgstr "Hi ha hagut un error en escriure al fitxer '%s'."
 
-#: ../flumotion/component/consumers/disker/disker.py:493
+#: ../flumotion/component/consumers/disker/disker.py:505
 #, python-format
 msgid "Failed expanding filename prefix: %r <-- %r."
 msgstr "S'ha produït un error al expandir el nom del fitxer: %r <-- %r."
+
+#: ../flumotion/component/consumers/httpstreamer/admin_gtk.py:119
+msgid ""
+"The stream is temporarly unavailable.\n"
+"No data is being transmitted right now."
+msgstr ""
+"El fluxe no està disponible temporalment.\n"
+"No s'estan transmetent dades en aquest moment."
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.glade.h:1
 msgid "<b>Client consumption</b>"
@@ -1825,16 +1850,16 @@ msgid "of"
 msgstr "de"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:351
-#: ../flumotion/worker/checks/check.py:239
+#: ../flumotion/worker/checks/check.py:261
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in is too old.\n"
 msgstr "La versió de %s del connector de GStreamer '%s' és massa antiga.\n"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:353
-#: ../flumotion/component/feedcomponent010.py:389
+#: ../flumotion/component/feedcomponent010.py:395
 #: ../flumotion/component/muxers/checks.py:46
 #: ../flumotion/component/producers/gdp/gdp.py:42
-#: ../flumotion/worker/checks/check.py:243
+#: ../flumotion/worker/checks/check.py:265
 #: ../flumotion/worker/checks/encoder.py:47
 #: ../flumotion/worker/checks/encoder.py:69
 #, python-format
@@ -1854,23 +1879,23 @@ msgstr ""
 msgid "Learn how to increase the maximum number of clients."
 msgstr "Apreneu com incrementar el nombre màxim de clients."
 
-#: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:801
-#: ../flumotion/component/misc/httpserver/httpserver.py:392
-#: ../flumotion/component/misc/porter/porter.py:356
+#: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:804
+#: ../flumotion/component/misc/httpserver/httpserver.py:407
+#: ../flumotion/component/misc/porter/porter.py:355
 #, python-format
 msgid "Network error: TCP port %d is not available."
 msgstr "Error de xarxa: port TCP %d no està disponible."
 
-#: ../flumotion/component/converters/overlay/overlay.py:77
+#: ../flumotion/component/converters/overlay/overlay.py:109
 #, python-format
 msgid "Overlayed text '%s' too wide for the video image."
 msgstr "El text sobreposat '%s' és massa ampla per a la imatge del vídeo."
 
-#: ../flumotion/component/converters/overlay/overlay.py:83
+#: ../flumotion/component/converters/overlay/overlay.py:115
 msgid "Overlayed logotypes too wide for the video image."
 msgstr "Els logotips sobreposats són massa amples per la imatge del vídeo."
 
-#: ../flumotion/component/converters/overlay/overlay.py:92
+#: ../flumotion/component/converters/overlay/overlay.py:137
 msgid ""
 "The 'videomixer' GStreamer element has a bug in this version (0.10.7). You "
 "may see many errors in the debug output, but it should work correctly anyway."
@@ -1950,8 +1975,12 @@ msgid "Change _volume:"
 msgstr "Canviar el _volum:"
 
 #: ../flumotion/component/effects/volume/volume.glade.h:2
-msgid "_Allow increasing the volume"
-msgstr "_Permetre augmentar el volum"
+msgid "When increasing above 0 dB, you risk distorting the audio signal"
+msgstr "Per sobre els 0 dB correu el risc de distorsionar el senyal d'àudio"
+
+#: ../flumotion/component/effects/volume/volume.glade.h:3
+msgid "_Allow increasing the volume above 0dB"
+msgstr "Permetre _augmentar el volum per sobre els 0dB"
 
 #: ../flumotion/component/encoders/dirac/dirac.xml.h:1
 #: ../flumotion/component/encoders/dirac/wizard_gtk.py:47
@@ -1991,7 +2020,7 @@ msgid "The quality of the JPEG encoding (from 0 to 100 %)."
 msgstr "La qualitat de la codificació a JPEG (de 0 a 100 %)."
 
 #: ../flumotion/component/encoders/jpeg/wizard.glade.h:1
-#: ../flumotion/component/producers/firewire/wizard.glade.h:6
+#: ../flumotion/component/producers/firewire/wizard.glade.h:7
 msgid "Frame _rate:"
 msgstr "Imatges pe_r segon:"
 
@@ -2027,6 +2056,14 @@ msgstr "No hi ha paràmetres de configuració per a configurar."
 msgid "Mulaw Encoder"
 msgstr "Codificador Mulaw"
 
+#: ../flumotion/component/encoders/smoke/smoke.py:45
+msgid ""
+"The 'smoke' encoder has a bug on versions previous to (0.10.11). It will not "
+"work unless it is updated."
+msgstr ""
+"El codificador 'smoke' té un error en les versions anteriors a la (0.10.11). "
+"No funcionarà si no l'actualitzeu."
+
 #: ../flumotion/component/encoders/smoke/smoke.xml.h:1
 msgid "An encoder using JPEG frames and delta frames."
 msgstr "Codificador que utilitza fotogrames JPEG i delta."
@@ -2038,7 +2075,7 @@ msgstr ""
 "20)"
 
 #: ../flumotion/component/encoders/smoke/smoke.xml.h:3
-#: ../flumotion/component/encoders/smoke/wizard_gtk.py:42
+#: ../flumotion/component/encoders/smoke/wizard_gtk.py:59
 msgid "Smoke"
 msgstr "Smoke"
 
@@ -2065,7 +2102,7 @@ msgid "M_inimum quality:"
 msgstr "Qualitat Mín_ima:"
 
 #: ../flumotion/component/encoders/smoke/wizard.glade.h:3
-msgid "_Key frame spacing: every"
+msgid "_Key frame interval: every"
 msgstr "_Espaiament entre imatges clau: cada"
 
 #: ../flumotion/component/encoders/smoke/wizard.glade.h:4
@@ -2073,10 +2110,11 @@ msgid "_Threshold:"
 msgstr "_Llindar:"
 
 #: ../flumotion/component/encoders/smoke/wizard.glade.h:5
-msgid "frames"
-msgstr "imatges"
+#: ../flumotion/component/encoders/theora/wizard.glade.h:11
+msgid "seconds"
+msgstr "segons"
 
-#: ../flumotion/component/encoders/smoke/wizard_gtk.py:41
+#: ../flumotion/component/encoders/smoke/wizard_gtk.py:58
 msgid "Smoke Encoder"
 msgstr "Codificador Smoke"
 
@@ -2160,10 +2198,6 @@ msgstr "Sensibilitat al soroll:"
 msgid "_Sharpness:"
 msgstr "Nitidesa:"
 
-#: ../flumotion/component/encoders/theora/wizard.glade.h:11
-msgid "seconds"
-msgstr "segons"
-
 #: ../flumotion/component/encoders/theora/wizard_gtk.py:85
 msgid "Theora Encoder"
 msgstr "Codificador Theora"
@@ -2193,27 +2227,27 @@ msgstr "Vorbis"
 msgid "Vorbis Encoder"
 msgstr "Codificador Vorbis"
 
-#: ../flumotion/component/feedcomponent010.py:221
-#: ../flumotion/worker/checks/check.py:80
+#: ../flumotion/component/feedcomponent010.py:224
+#: ../flumotion/worker/checks/check.py:83
 msgid "Internal GStreamer error."
 msgstr "Error intern del Gstreamer."
 
-#: ../flumotion/component/feedcomponent010.py:246
+#: ../flumotion/component/feedcomponent010.py:249
 msgid "Programming error in component."
 msgstr "Hi ha un error de programació en el component."
 
-#: ../flumotion/component/feedcomponent010.py:385
+#: ../flumotion/component/feedcomponent010.py:391
 msgid ""
 "Your gst-plugins-base is too old, so feeder statistics will be unavailable."
 msgstr ""
 "El vostre gst-plugins-base és massa antic, per tant les estadístiques de no "
 "estaran disponibles."
 
-#: ../flumotion/component/feedcomponent010.py:669
+#: ../flumotion/component/feedcomponent010.py:677
 msgid "Internal Flumotion error."
 msgstr "Error intern de Flumotion."
 
-#: ../flumotion/component/feedcomponent.py:308
+#: ../flumotion/component/feedcomponent.py:313
 msgid ""
 "You will get more debugging information if you upgrade to GStreamer 0.10.13 "
 "or later."
@@ -2221,7 +2255,7 @@ msgstr ""
 "Obtindreu més informació de depuració si us actualitzeu a Gstreamer 0.10.13 "
 "o superior."
 
-#: ../flumotion/component/feedcomponent.py:327
+#: ../flumotion/component/feedcomponent.py:332
 #, python-format
 msgid ""
 "The worker does not have the '%s' element installed.\n"
@@ -2230,7 +2264,7 @@ msgstr ""
 "El treballador no té l'element '%s' instal·lat.\n"
 "Instal·leu el connector necessari i torneu a reiniciar el component.\n"
 
-#: ../flumotion/component/feedcomponent.py:340
+#: ../flumotion/component/feedcomponent.py:345
 msgid "GStreamer error: could not parse component pipeline."
 msgstr ""
 "S'ha produït un error del GStreamer: no es pot analitzar el conducte del "
@@ -2286,9 +2320,8 @@ msgid "0"
 msgstr "0"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:2
-#, fuzzy
 msgid "<b>Cache</b>"
-msgstr "<b>Cache</b>"
+msgstr "<b>Memòria cau</b>"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:5
 msgid "<b>Copies</b>"
@@ -2370,7 +2403,7 @@ msgstr "Mida:"
 msgid "Usage:"
 msgstr "Ús:"
 
-#: ../flumotion/component/misc/porter/porter.py:329
+#: ../flumotion/component/misc/porter/porter.py:328
 #, python-format
 msgid "Network error: socket path %s is not available."
 msgstr "Error de xarxa: el camí de xarxa %s no està disponible."
@@ -2476,30 +2509,20 @@ msgstr "Si l'àudio ha de ser transmès."
 msgid "Whether video should be streamed."
 msgstr "Si el vídeo ha de ser transmès."
 
-#: ../flumotion/component/producers/audiotest/admin_gtk.py:94
+#: ../flumotion/component/producers/audiotest/admin_gtk.py:96
 msgid "Volume"
 msgstr "Volum:"
 
-#: ../flumotion/component/producers/audiotest/admin_gtk.py:97
+#: ../flumotion/component/producers/audiotest/admin_gtk.py:99
 #: ../flumotion/component/producers/audiotest/audiotest.glade.h:1
 msgid "Audio Test"
 msgstr "Prova d'àudio"
 
 #: ../flumotion/component/producers/audiotest/audiotest.glade.h:2
-msgid ""
-"Sine\n"
-"Square\n"
-"Saw"
-msgstr ""
-"Sinusoide\n"
-"Quadràtica\n"
-"Dent de serra"
-
-#: ../flumotion/component/producers/audiotest/audiotest.glade.h:5
 msgid "_Frequency:"
 msgstr "F_reqüència:"
 
-#: ../flumotion/component/producers/audiotest/audiotest.glade.h:6
+#: ../flumotion/component/producers/audiotest/audiotest.glade.h:3
 msgid "_Wave form:"
 msgstr "_Forma de l'ona:"
 
@@ -2512,8 +2535,8 @@ msgid "Test audio producer"
 msgstr "Productor de so de proves"
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:3
-msgid "The Sample rate (in Hz)."
-msgstr "La velocitat de mostreig (en Hz)."
+msgid "The Sample rate (in Hz).  Defaults to 44100."
+msgstr "La velocitat de mostreig a capturar (en Hz). Inicialitzat a 4100."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:4
 #: ../flumotion/component/producers/videotest/videotest.xml.h:3
@@ -2522,12 +2545,12 @@ msgstr ""
 "La fracció de buffers a perdre (0.0 - 1.0). Útil únicament per depuració."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:5
-msgid "The frequency of the test signal (in Hz)."
-msgstr "La freqüència del senyal de test (en Hz)."
+msgid "The frequency of the test signal (in Hz). Defaults to 440."
+msgstr "La freqüència del senyal de test (en Hz). Inicialitzat a 440."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:6
-msgid "The volume of the test signal (0.0 - 1.0)."
-msgstr "El volum del senyal de test (0.0 - 1.0)."
+msgid "The volume of the test signal (0.0 - 1.0). Defaults to 1.0."
+msgstr "El volum del senyal de test (0.0 - 1.0). Inicialitzat a 1.0."
 
 #: ../flumotion/component/producers/audiotest/wizard.glade.h:1
 msgid "F_requency:"
@@ -2615,7 +2638,7 @@ msgid "Video _source:"
 msgstr "Font del_video:"
 
 #: ../flumotion/component/producers/bttv/wizard.glade.h:4
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:6
+#: ../flumotion/component/producers/soundcard/wizard.glade.h:5
 #: ../flumotion/component/producers/webcam/wizard.glade.h:3
 msgid "_Device:"
 msgstr "_Dispositiu:"
@@ -2721,73 +2744,81 @@ msgid "<b>Camera settings</b>"
 msgstr "<b>Ajustaments de la càmera fotogràfica </b>"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:2
+msgid "<b>Device:</b>"
+msgstr "<b>Dispositiu:</b>"
+
+#: ../flumotion/component/producers/firewire/wizard.glade.h:3
 msgid "<b>Output format</b>"
 msgstr "<b>Format de sortida</b>"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:3
+#: ../flumotion/component/producers/firewire/wizard.glade.h:4
 msgid "<b>Scaling</b>"
 msgstr "<b>Escalat</b>"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:4
+#: ../flumotion/component/producers/firewire/wizard.glade.h:5
 msgid "<b>Width correction</b>"
 msgstr "<b>Correcció de l'amplària</b>"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:5
+#: ../flumotion/component/producers/firewire/wizard.glade.h:6
 msgid "Convert to s_quare pixels"
 msgstr "Converteix a píxels quadrats"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:7
+#: ../flumotion/component/producers/firewire/wizard.glade.h:8
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
 msgstr "PAL, 4:3 (59/54 relació d'aspecte del píxel)"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:8
+#: ../flumotion/component/producers/firewire/wizard.glade.h:9
 msgid "Recommended if you are outputting to a computer screen"
 msgstr "Recomanat si envia la senyal a una pantalla d'ordinador"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:9
+#: ../flumotion/component/producers/firewire/wizard.glade.h:10
 msgid "Scaled _height:"
 msgstr "Altura _escalada:"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:10
+#: ../flumotion/component/producers/firewire/wizard.glade.h:11
 msgid "_No width correction"
 msgstr "No hi ha _cap correcció de l'amplària "
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:11
+#: ../flumotion/component/producers/firewire/wizard.glade.h:12
 msgid "_Pad to multiple of 8 pixels"
 msgstr "_Emplena al múltiple de 8 pixeles"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:12
+#: ../flumotion/component/producers/firewire/wizard.glade.h:13
 msgid "_Stretch to multiple of 8 pixels"
 msgstr "_Estira al múltiple de 8 pixeles"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:13
+#: ../flumotion/component/producers/firewire/wizard.glade.h:14
 #: ../flumotion/component/producers/videotest/wizard.glade.h:5
 msgid "frames per second"
 msgstr "imatges per segon"
 
-#: ../flumotion/component/producers/firewire/wizard.glade.h:14
+#: ../flumotion/component/producers/firewire/wizard.glade.h:15
 msgid "none"
 msgstr "cap"
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:120
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:122
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
 msgstr "%s, %s (%d/%d relació d'aspecte del píxel)"
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:144
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:143
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
 msgstr "%dx%d %d/%d relació d'aspecte del píxel"
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:178
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:180
+msgid "Checking for Firewire devices..."
+msgstr "S'està cercant dispositius firewire..."
+
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:204
 msgid "Checking for Firewire device..."
 msgstr "S'està comprovant el dispositiu firewire..."
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:227
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:260
 msgid "Firewire Video"
 msgstr "Video firewire"
 
-#: ../flumotion/component/producers/firewire/wizard_gtk.py:239
+#: ../flumotion/component/producers/firewire/wizard_gtk.py:278
 msgid "Firewire Audio"
 msgstr "Àudio firewire"
 
@@ -2839,15 +2870,22 @@ msgstr "Reinicia"
 msgid "Restart looping:"
 msgstr "Reinicia la repetició:"
 
-#: ../flumotion/component/producers/looper/looper.py:131
+#: ../flumotion/component/producers/looper/looper.py:141
 #, python-format
 msgid "Could not open file '%s' for reading."
 msgstr "No es pot obrir el fitxer '%s' en mode lectura."
 
-#: ../flumotion/component/producers/playlist/playlist.py:433
+#: ../flumotion/component/producers/playlist/playlist.py:452
 #, python-format
 msgid "Failed to parse a playlist from file %s: %s"
 msgstr "No s'ha pogut analitzar la llista de reproducció del fitxer %s: %s"
+
+#: ../flumotion/component/producers/playlist/playlist.py:461
+#, python-format
+msgid "%s is missing. Make sure your gnonlin installation is complete."
+msgstr ""
+"No s'ha trobat el %s. Comprovi que la seva instal·lació de gnolin està "
+"completa."
 
 #: ../flumotion/component/producers/soundcard/soundcard.py:80
 msgid ""
@@ -2920,53 +2958,57 @@ msgid "Bi_t depth:"
 msgstr "Profunditat del bi_t:"
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:2
-#: ../flumotion/component/producers/webcam/wizard.glade.h:2
-msgid "Name:"
-msgstr "Nom:"
-
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:3
 msgid "Sample _rate:"
 msgstr "Velocitat del _mostreix:"
 
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:4
+#: ../flumotion/component/producers/soundcard/wizard.glade.h:3
 msgid "Sound _system:"
 msgstr "Sistema del _so"
 
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:5
+#: ../flumotion/component/producers/soundcard/wizard.glade.h:4
 msgid "_Channels:"
 msgstr "_Canals:"
 
-#: ../flumotion/component/producers/soundcard/wizard.glade.h:7
+#: ../flumotion/component/producers/soundcard/wizard.glade.h:6
 msgid "_Input:"
 msgstr "_Entrada:"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:44
-msgid "Stereo"
-msgstr "Estèreo"
-
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:45
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:38
 msgid "Mono"
 msgstr "Mono"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:46
-msgid "16-bit"
-msgstr "16-bit"
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:39
+msgid "Stereo"
+msgstr "Estèreo"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:54
+#. TODO: Add other sources (pulse, jack, ...)
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:50
 msgid "Alsa"
 msgstr "Alsa"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:55
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:51
 msgid "OSS"
 msgstr "OSS"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:74
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:63
 msgid "Sound Card"
 msgstr "Targeta de so"
 
-#: ../flumotion/component/producers/soundcard/wizard_gtk.py:158
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:119
+msgid ""
+"Looking for the sound devices present on the system.This can take a while..."
+msgstr ""
+"S'està cercant els dispositius de so presents al sistema. Això pot trigar "
+"una estona..."
+
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:154
 msgid "Probing the sound card. This can take a while..."
 msgstr "S'està provant la targeta so, això pot trigar una estona..."
+
+#: ../flumotion/component/producers/soundcard/wizard_gtk.py:187
+#, python-format
+msgid "%d-bit"
+msgstr "%d-bit"
 
 #: ../flumotion/component/producers/videotest/admin_gtk.py:36
 #: ../flumotion/component/producers/videotest/wizard_gtk.py:63
@@ -3084,6 +3126,10 @@ msgstr "L'amplada del vídeo a capturar."
 #: ../flumotion/component/producers/webcam/webcam.xml.h:14
 msgid "Web camera"
 msgstr "Càmera web"
+
+#: ../flumotion/component/producers/webcam/wizard.glade.h:2
+msgid "Name:"
+msgstr "Nom:"
 
 #: ../flumotion/component/producers/webcam/wizard.glade.h:4
 msgid "_Size:"
@@ -3229,8 +3275,53 @@ msgstr "Vídeo Icecast"
 msgid "Summary"
 msgstr "Resum"
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:333
-#: ../flumotion/scenario/steps/ondemandstep.py:116
+#: ../flumotion/scenario/steps/httpstreamersteps.py:510
+#, python-format
+msgid ""
+"The mount point %s is already been used for worker %s and port %s. Correct "
+"it to be able to go forward."
+msgstr ""
+"El punt de muntatge %s ja està utilitzat al treballador %s i port %s. Triïn "
+"un de nou per a poder seguir endavant."
+
+#: ../flumotion/scenario/steps/httpstreamersteps.py:524
+msgid ""
+"Mountpoint cannot be left empty.\n"
+"Fill the text field with a correct mount point tobe able to go forward."
+msgstr ""
+"El punt de muntatge no es pot deixar buit.\n"
+"Ompli el camp amb un punt de muntatge vàlid per a poder seguir endavant."
+
+#: ../flumotion/scenario/steps/httpstreamersteps.py:549
+msgid "HTTP Streamer (Audio and Video)"
+msgstr "Distribuïdor de flux HTTP (àudio i vídeo)"
+
+#: ../flumotion/scenario/steps/httpstreamersteps.py:550
+msgid "HTTP Audio/Video"
+msgstr "HTTP àudio/vídeo"
+
+#: ../flumotion/scenario/steps/httpstreamersteps.py:563
+msgid "HTTP Streamer (Audio Only)"
+msgstr "Distribuïdor de flux HTTP (només àudio)"
+
+#: ../flumotion/scenario/steps/httpstreamersteps.py:564
+msgid "HTTP Audio"
+msgstr "Àudio HTTP"
+
+#: ../flumotion/scenario/steps/httpstreamersteps.py:577
+msgid "HTTP Streamer (Video Only)"
+msgstr "Distribuïdor de flux HTTP (només vídeo)"
+
+#: ../flumotion/scenario/steps/httpstreamersteps.py:578
+msgid "HTTP Video"
+msgstr "Vídeo HTTP"
+
+#: ../flumotion/scenario/steps/ondemandstep.py:86
+#: ../flumotion/scenario/steps/ondemandstep.py:87
+msgid "On Demand"
+msgstr "Sota demanda"
+
+#: ../flumotion/scenario/steps/ondemandstep.py:149
 #, python-format
 msgid ""
 "\n"
@@ -3239,119 +3330,83 @@ msgstr ""
 "\n"
 "Aquest mòdul és part de '%s'."
 
-#: ../flumotion/scenario/steps/httpstreamersteps.py:392
-msgid "HTTP Streamer (Audio and Video)"
-msgstr "Distribuïdor de flux HTTP (àudio i vídeo)"
-
-#: ../flumotion/scenario/steps/httpstreamersteps.py:393
-msgid "HTTP Audio/Video"
-msgstr "HTTP àudio/vídeo"
-
-#: ../flumotion/scenario/steps/httpstreamersteps.py:406
-msgid "HTTP Streamer (Audio Only)"
-msgstr "Distribuïdor de flux HTTP (només àudio)"
-
-#: ../flumotion/scenario/steps/httpstreamersteps.py:407
-msgid "HTTP Audio"
-msgstr "Àudio HTTP"
-
-#: ../flumotion/scenario/steps/httpstreamersteps.py:420
-msgid "HTTP Streamer (Video Only)"
-msgstr "Distribuïdor de flux HTTP (només vídeo)"
-
-#: ../flumotion/scenario/steps/httpstreamersteps.py:421
-msgid "HTTP Video"
-msgstr "Vídeo HTTP"
-
-#: ../flumotion/scenario/steps/ondemandstep.py:66
-#: ../flumotion/scenario/steps/ondemandstep.py:67
-msgid "On Demand"
-msgstr "Sota demanda"
-
-#: ../flumotion/scenario/steps/ondemandstep.py:127
+#: ../flumotion/scenario/steps/ondemandstep.py:160
 #, python-format
 msgid "Directory '%s' does not exist, or is not readable on worker '%s'."
 msgstr ""
 "El directori '%s' no existeix, o no és llegible en el treballador '%s'."
 
 #: ../flumotion/scenario/steps/productionsteps.py:142
-#: ../flumotion/scenario/steps/productionsteps.py:309
 msgid "Select this if you want to stream video"
 msgstr "Seleccioneu-ho si voleu crear un flux de vídeo"
 
 #: ../flumotion/scenario/steps/productionsteps.py:144
-#: ../flumotion/scenario/steps/productionsteps.py:311
 msgid "Select this if you want to stream audio"
 msgstr "Seleccioneu-ho si voleu crear un flux d'àudio"
 
-#
-#: ../flumotion/scenario/steps/consumptionsteps.py:259
-msgid "HTTP Streaming"
-msgstr "Distribuïdor de flux HTTP"
-
-#: ../flumotion/scenario/steps/diskersteps.py:114
+#: ../flumotion/scenario/steps/diskersteps.py:116
 msgid "kB"
 msgstr "kB"
 
-#: ../flumotion/scenario/steps/diskersteps.py:115
+#: ../flumotion/scenario/steps/diskersteps.py:117
 msgid "MB"
 msgstr "MB"
 
-#: ../flumotion/scenario/steps/diskersteps.py:116
+#: ../flumotion/scenario/steps/diskersteps.py:118
 msgid "GB"
 msgstr "GB"
 
-#: ../flumotion/scenario/steps/diskersteps.py:117
+#: ../flumotion/scenario/steps/diskersteps.py:119
 msgid "TB"
 msgstr "TB"
 
-#: ../flumotion/scenario/steps/diskersteps.py:120
+#: ../flumotion/scenario/steps/diskersteps.py:122
 msgid "minute(s)"
 msgstr "minut/s"
 
-#: ../flumotion/scenario/steps/diskersteps.py:121
+#: ../flumotion/scenario/steps/diskersteps.py:123
 msgid "hour(s)"
 msgstr "hora/es"
 
-#: ../flumotion/scenario/steps/diskersteps.py:122
+#: ../flumotion/scenario/steps/diskersteps.py:124
 msgid "day(s)"
 msgstr "dia/es"
 
-#: ../flumotion/scenario/steps/diskersteps.py:123
+#: ../flumotion/scenario/steps/diskersteps.py:125
 msgid "week(s)"
 msgstr "setmana/es"
 
-#: ../flumotion/scenario/steps/diskersteps.py:193
+#: ../flumotion/scenario/steps/diskersteps.py:197
 msgid "Disk (Audio and Video)"
 msgstr "Disc (àudio i vídeo)"
 
-#: ../flumotion/scenario/steps/diskersteps.py:194
+#: ../flumotion/scenario/steps/diskersteps.py:198
 msgid "Disk Audio/Video"
 msgstr "Disc àudio/vídeo"
 
-#: ../flumotion/scenario/steps/diskersteps.py:204
+#: ../flumotion/scenario/steps/diskersteps.py:208
 msgid "Disk (Audio Only)"
 msgstr "Disc (només àudio)"
 
-#: ../flumotion/scenario/steps/diskersteps.py:205
+#: ../flumotion/scenario/steps/diskersteps.py:209
 msgid "Disk Audio"
 msgstr "Disc àudio"
 
-#: ../flumotion/scenario/steps/diskersteps.py:215
+#: ../flumotion/scenario/steps/diskersteps.py:219
 msgid "Disk (Video Only)"
 msgstr "Disc (només vídeo)"
 
-#: ../flumotion/scenario/steps/diskersteps.py:216
+#: ../flumotion/scenario/steps/diskersteps.py:220
 msgid "Disk Video"
 msgstr "Disc vídeo"
 
-#: ../flumotion/scenario/steps/conversionsteps.py:48
+#: ../flumotion/scenario/steps/conversionsteps.py:49
 msgid "Encoding"
 msgstr "Codificació"
 
 #: ../flumotion/scenario/ondemand/ondemand.xml.h:1
-msgid "Creates an ondemand stream."
-msgstr "Crea un fluxe sota demanda."
+msgid "Create an ondemand stream."
+msgstr "Crear un fluxe sota demanda."
 
 #: ../flumotion/scenario/ondemand/wizard_gtk.py:35
 msgid "Stream files on demand"
@@ -3362,8 +3417,8 @@ msgid "Allows you to serve a collection of files from disk."
 msgstr "Us permet servir una col·lecció de fitxers des del disc."
 
 #: ../flumotion/scenario/live/live.xml.h:1
-msgid "Creates a live stream."
-msgstr "Crea un fluxe en directe."
+msgid "Create a live stream."
+msgstr "Crear un fluxe en directe."
 
 #: ../flumotion/scenario/live/wizard_gtk.py:45
 msgid "Stream live"
@@ -3441,15 +3496,44 @@ msgstr "Alguna cosa va realment malament."
 msgid "But does %s know what ?"
 msgstr "Però, %s sap què?"
 
-#: ../flumotion/ui/fileselector.py:172
+#: ../flumotion/ui/fileselector.py:89
+msgid "You don't have enough privileges to view thecontents of that directory"
+msgstr ""
+"No teniu suficients privilegis per a poder veure els continguts d'aquest "
+"directori"
+
+#: ../flumotion/ui/fileselector.py:186
 msgid "Select a folder..."
 msgstr "Seleccioneu una carpeta..."
 
-#: ../flumotion/ui/wizard.py:731
+#: ../flumotion/ui/wizard.py:747
 msgid "_Finish"
 msgstr "Finalitza"
 
-#: ../flumotion/worker/checks/audio.py:86
+#: ../flumotion/worker/checks/audio.py:95
+msgid ""
+"There has been an error while fetching the OSS audio devicesthrough Hal.\n"
+"The listed devices have been guessed and may not work properly."
+msgstr ""
+"S'ha trobat un error mentre s'estava cercant els dispositius OSS utilitzant "
+"Hal.\n"
+"Els següents dispositius podrien no funcionar correctament."
+
+#: ../flumotion/worker/checks/audio.py:105
+msgid "Could not probe devices."
+msgstr "No s'ha pogut trobar dispositius."
+
+#: ../flumotion/worker/checks/audio.py:115
+msgid ""
+"Could not find any device in the system.\n"
+"Please, check whether the device is correctly plugged and/or the modules are "
+"correctly loaded."
+msgstr ""
+"No s'ha trobat cap dispositiu al sistema.\n"
+"Comprovi que el dispositiu està connectat correctament i/o els mòduls "
+"corresponents estan carregats."
+
+#: ../flumotion/worker/checks/audio.py:180
 #: ../flumotion/worker/checks/check.py:54
 #, python-format
 msgid ""
@@ -3458,7 +3542,7 @@ msgstr ""
 "No s'ha pogut accedir al dispositiu '%s' en mode lectura. Verifiqui els "
 "permisos."
 
-#: ../flumotion/worker/checks/check.py:58
+#: ../flumotion/worker/checks/check.py:59
 #, python-format
 msgid ""
 "Could not open device '%s' for writing.  Check permissions on the device."
@@ -3466,51 +3550,51 @@ msgstr ""
 "No es pot obrir el dispositiu '%s' en mode escriptura. Comproveu els "
 "permisos sobre el dispositiu."
 
-#: ../flumotion/worker/checks/check.py:62
+#: ../flumotion/worker/checks/check.py:64
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
 msgstr "No s'ha pogut accedir al dispositiu '%s'. Comprovi els permisos."
 
-#: ../flumotion/worker/checks/check.py:66
+#: ../flumotion/worker/checks/check.py:69
 #, python-format
 msgid "Device '%s' is already in use."
 msgstr "El dispositiu '%s' ja s'està usant."
 
-#: ../flumotion/worker/checks/check.py:69
+#: ../flumotion/worker/checks/check.py:72
 #, python-format
 msgid "Device '%s' did not accept the requested settings."
 msgstr "El dispositiu '%s' no ha acceptat les configuracions."
 
-#: ../flumotion/worker/checks/check.py:75
+#: ../flumotion/worker/checks/check.py:78
 msgid "Internal unhandled GStreamer error."
 msgstr "Error intern del Gstreamer."
 
-#: ../flumotion/worker/checks/check.py:119
+#: ../flumotion/worker/checks/check.py:122
 #, python-format
 msgid "Could not probe device '%s'."
 msgstr "No s'ha pogut provar el dispositiu '%s'."
 
-#: ../flumotion/worker/checks/check.py:140
+#: ../flumotion/worker/checks/check.py:143
 #, python-format
 msgid "No device found on %s."
 msgstr "No s'ha trobat el dispositiu a %s."
 
-#: ../flumotion/worker/checks/check.py:219
+#: ../flumotion/worker/checks/check.py:239
 #, python-format
 msgid "This host is missing the '%s' GStreamer plug-in.\n"
 msgstr "Falta el connector de GStreamer '%s' en aquest amfitrió.\n"
 
-#: ../flumotion/worker/checks/check.py:222
+#: ../flumotion/worker/checks/check.py:242
 #, python-format
 msgid "Please install '%s'.\n"
 msgstr "Si us plau instal·li '%s'.\n"
 
-#: ../flumotion/worker/checks/check.py:231
+#: ../flumotion/worker/checks/check.py:252
 #, python-format
 msgid "Your '%s' GStreamer plug-in is too old.\n"
 msgstr "El connector de GStreamer '%s' és massa antic.\n"
 
-#: ../flumotion/worker/checks/check.py:234
+#: ../flumotion/worker/checks/check.py:255
 #, python-format
 msgid "Please upgrade '%s' to version %s or higher."
 msgstr "Actualitzeu-vos el '%s' a la versió %s o superior."
@@ -3520,11 +3604,7 @@ msgstr "Actualitzeu-vos el '%s' a la versió %s o superior."
 msgid "Synchronization between audio and video may not be correct.\n"
 msgstr "La sincronització entre l'àudio i el vídeo pot no ser correcta.\n"
 
-#: ../flumotion/worker/checks/gst010.py:190
-msgid "Neither device node /dev/fw0 nor /dev/raw1394 exists."
-msgstr "No s'han pogut trobar ni el node /dev/raw1394 ni el /dev/fw0."
-
-#: ../flumotion/worker/checks/gst010.py:212
+#: ../flumotion/worker/checks/gst010.py:199
 msgid ""
 "Could not find or open the Firewire device. Check the device node and its "
 "permissions."
@@ -3532,24 +3612,92 @@ msgstr ""
 "No s'ha pogut accedir al dispositiu Firewire. Verifica l'existència del "
 "dispositiu i dels permisos en aquest."
 
-#: ../flumotion/worker/checks/gst010.py:216
+#: ../flumotion/worker/checks/gst010.py:203
 msgid "No Firewire device found."
 msgstr "No s'ha detectat cap dispositiu firewire."
 
-#: ../flumotion/worker/checks/gst010.py:219
+#: ../flumotion/worker/checks/gst010.py:206
 msgid ""
 "Could not open Firewire device for reading. Check permissions on the device."
 msgstr ""
 "No s'ha pogut accedir al dispositiu Firewire en mode lectura. Verifica els "
 "permisos en aquest dispositiu."
 
-#: ../flumotion/worker/checks/gst010.py:227
+#: ../flumotion/worker/checks/gst010.py:214
 msgid "Could not probe Firewire device."
 msgstr "No s'ha pogut provar el dispositiu Firewire."
+
+#: ../flumotion/worker/checks/gst010.py:246
+msgid ""
+"GStreamer error, dv1394src factory could not be found.\n"
+"Maybe gstreamer-plugins-good is not properly installed."
+msgstr ""
+"Error del GStreamer, la factoria dv1394src no existeix.\n"
+"Possiblement el paquet gstreamer-plugins-good no està correctament "
+"instal·lat."
+
+#: ../flumotion/worker/checks/gst010.py:273
+msgid ""
+"Could not find any Firewire device on the system.\n"
+"Please, check whether the device is correctly plugged or the modules are "
+"correctly loaded."
+msgstr ""
+"No s'ha trobat cap dispositiu Firewire al sistema.\n"
+"Comprovi que el dispositiu està connectat correctament i/o els mòduls "
+"corresponents estan carregats."
 
 #: ../flumotion/worker/job.py:334
 msgid "Check timed out."
 msgstr "Verifica el temps excedit."
+
+#~ msgid ""
+#~ "This page allows you to configure\n"
+#~ " your on demand video server:"
+#~ msgstr ""
+#~ "Aquesta pàgina us permet configurar\n"
+#~ " el vostre servidor de vídeo sota demanda:"
+
+#~ msgid "Connection to manager on %s was refused."
+#~ msgstr "Connexió al gestor en %s ha estat rebutjada."
+
+#~ msgid "Connection to %s was refused"
+#~ msgstr "Connexió en %s ha estat rebutjada "
+
+#~ msgid "Connection to %s failed"
+#~ msgstr "Connexió en %s ha fallat "
+
+#~ msgid "Component is %s"
+#~ msgstr "Component és %s"
+
+#
+#~ msgid ""
+#~ "ERROR: Could not connect to manager:\n"
+#~ "       The connection to %r was refused."
+#~ msgstr ""
+#~ "ERROR: No s'ha pogut connectar al gestor:\n"
+#~ "       La connexió a %r ha estat rebutjada."
+
+#~ msgid "frames"
+#~ msgstr "imatges"
+
+#~ msgid ""
+#~ "Sine\n"
+#~ "Square\n"
+#~ "Saw"
+#~ msgstr ""
+#~ "Sinusoide\n"
+#~ "Quadràtica\n"
+#~ "Dent de serra"
+
+#~ msgid "The Sample rate (in Hz)."
+#~ msgstr "La velocitat de mostreig (en Hz)."
+
+#
+#~ msgid "HTTP Streaming"
+#~ msgstr "Distribuïdor de flux HTTP"
+
+#~ msgid "Neither device node /dev/fw0 nor /dev/raw1394 exists."
+#~ msgstr "No s'han pogut trobar ni el node /dev/raw1394 ni el /dev/fw0."
 
 #~ msgid "Please select one of the available scenarios:"
 #~ msgstr "Si us plau seleccioneu un els escenaris disponibles:"
