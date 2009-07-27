@@ -81,13 +81,13 @@
           </widget>
           <packing>
             <property name="expand">False</property>
+            <property name="fill">False</property>
             <property name="position">1</property>
           </packing>
         </child>
         <child>
           <widget class="GtkHBox" id="hbox3">
             <property name="visible">True</property>
-            <property name="homogeneous">True</property>
             <child>
               <widget class="GtkFrame" id="frame_scaling">
                 <property name="visible">True</property>
@@ -111,6 +111,10 @@
                                 <property name="label" translatable="yes">Scaled _height:</property>
                                 <property name="use_underline">True</property>
                               </widget>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="padding">6</property>
+                              </packing>
                             </child>
                             <child>
                               <widget class="GtkComboBox" id="combobox_scaled_height">
@@ -120,6 +124,7 @@
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">False</property>
+                                <property name="padding">6</property>
                                 <property name="position">1</property>
                               </packing>
                             </child>
@@ -136,8 +141,8 @@
                             <property name="tooltip" translatable="yes">Recommended if you are outputting to a computer screen</property>
                             <property name="label" translatable="yes">Convert to s_quare pixels</property>
                             <property name="use_underline">True</property>
-                            <property name="active">True</property>
                             <property name="response_id">0</property>
+                            <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="on_is_square_toggled"/>
                           </widget>
@@ -164,7 +169,6 @@
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="fill">False</property>
               </packing>
             </child>
             <child>
@@ -239,12 +243,12 @@
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
+            <property name="expand">False</property>
             <property name="position">2</property>
           </packing>
         </child>
@@ -285,6 +289,7 @@
                       </widget>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="fill">False</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
@@ -315,6 +320,8 @@
             </child>
           </widget>
           <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
             <property name="position">3</property>
           </packing>
         </child>
@@ -350,6 +357,7 @@
           </widget>
           <packing>
             <property name="expand">False</property>
+            <property name="fill">False</property>
             <property name="position">4</property>
           </packing>
         </child>
