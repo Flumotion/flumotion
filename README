@@ -79,7 +79,7 @@ terminal 2:
   flumotion-worker -v -T tcp -u user -p test
 
 terminal 3:
-  flumotion-admin -
+  flumotion-admin
   Unselect 'Secure connection via SSL', press Next, then enter "user" and
   "test" in the dialog.
 
@@ -88,7 +88,7 @@ terminal 3:
   Double-click the http component after the wizard has completed
 
 terminal 4:
-  gst-launch playbin uri=http://localhost:8800
+  gst-launch playbin2 uri=http://localhost:8800/ogg-audio-video/
 
   Some systems may not have gst-launch, but only gst-launch-0.8 or
   gst-launch-0.10, in that case you can substitute either of those commands.
@@ -97,7 +97,7 @@ terminal 4:
   stream.
 
 terminal 5:
-  for a in `seq 1 9`; do ( flumotion-tester http://localhost:8800 & ); done
+  for a in `seq 1 9`; do ( flumotion-tester http://localhost:8800/ogg-audio-video/ & ); done
 
   This will throw 9 processes with 100 clients each at the server.  Hopefully,
   all of them will return success at the end of their run!
