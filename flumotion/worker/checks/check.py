@@ -213,6 +213,57 @@ def checkFile(filePath):
     return result
 
 
+def checkMediaFile(filePath, mimetype=None, audio=True, video=True):
+    """
+    Checks if a path is a valid media file, and returns its properties.
+
+    @param filePath : The path of the file
+    @type  filePath : str
+    @param mimetype : File mimetype to check
+    @type  mimetype : str
+    @param audio : Audio required
+    @type  audio : str
+    @param video : Video required
+    @type  video : str
+
+    @returns : Tuple (valid, properties). valid is set to True if it is a valid
+    media file. properties is a dictonary with the video properties (width,
+    height, framerate)
+    @rtype: L{twisted.internet.defer.Deferred} of
+            L{flumotion.common.messages.Result}
+    """
+    d = defer.Deferred()
+
+    def discovered(dcv, ismedia):
+        result = messages.Result()
+        if not ismedia:
+            result.succeed((False, None))
+            return d.callback(result)
+        if mimetype and not (mimetype in dcv.mimetype):
+            result.succeed((False, None))
+            return d.callback(result)
+        if not dcv.is_audio and audio:
+            result.succeed((False, None))
+            return d.callback(result)
+        properties = dict()
+        if video:
+            if not dcv.is_video or not dcv.videorate:
+                result.succeed((False, None))
+                return d.callback(result)
+            properties['width'] = dcv.videowidth
+            properties['height'] = dcv.videoheight
+            properties['framerate'] = (float(dcv.videorate.num) /
+                                       dcv.videorate.denom)
+        result.succeed((True, properties))
+        return d.callback(result)
+
+    from gst.extend import discoverer
+    dcv = discoverer.Discoverer(filePath)
+    dcv.connect('discovered', discovered)
+    dcv.discover()
+    return d
+
+
 def checkPlugin(pluginName, packageName, minimumVersion=None,
                 featureName=None, featureCheck=None):
     """

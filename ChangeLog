@@ -2,6 +2,13 @@
 
 	reviewed by: jlegoff
 
+	* flumotion/worker/checks/check.py:
+	Add a worker check for media files. Missing from r8025.
+
+2009-07-27  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: jlegoff
+
 	* data/image/wizard/Makefile.am:
 	* data/image/wizard/looper.png (added):
 	* flumotion/component/producers/looper/Makefile.am:
