@@ -101,9 +101,12 @@ class FileSelector(ObjectList):
             raise NotImplementedError(vfsFile)
 
     def _renderIcon(self, iconNames):
+        iconNames.append(gtk.STOCK_FILE)
         iconInfo = self._iconTheme.choose_icon(iconNames,
                                                gtk.ICON_SIZE_MENU,
                                                gtk.ICON_LOOKUP_USE_BUILTIN)
+        if not iconInfo:
+            return
         return iconInfo.load_icon()
 
     def _populateList(self, vfsFiles):
@@ -183,7 +186,7 @@ class FileSelectorDialog(gtk.Dialog):
         @param adminModel: the admin model
         @type adminModel: L{AdminModel}
         """
-        gtk.Dialog.__init__(self, _('Select a folder...'),
+        gtk.Dialog.__init__(self, _('Select ...'),
                             parent, gtk.DIALOG_MODAL)
         self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CANCEL)
         self.add_button(gtk.STOCK_OPEN, gtk.RESPONSE_OK)
