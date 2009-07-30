@@ -467,9 +467,7 @@ class TestTextFile(testsuite.TestCase):
             'text', 2, 5)
         return fr.finishDeferred
 
-    # FIXME: this test hangs
-
-    def notestRangeTooBig(self):
+    def testRangeTooBig(self):
         # a too big range just gets the whole file
         fr = FakeRequest(headers={'range': 'bytes=0-100'})
         self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
@@ -510,6 +508,15 @@ class TestTextFile(testsuite.TestCase):
         self.assertEquals(self.resource.render(fr), server.NOT_DONE_YET)
         fr.finishDeferred.addCallback(self.finishCallback, fr,
             http.PARTIAL_CONTENT, '', 4)
+        return fr.finishDeferred
+
+    def testNotFound(self):
+        component = FakeComponent("foobar")
+        resource = httpfile.File(component.getRoot(), component)
+        fr = FakeRequest()
+        self.assertEquals(resource.render(fr), server.NOT_DONE_YET)
+        fr.finishDeferred.addCallback(lambda res, req:
+            self.assertEquals(req.response, http.NOT_FOUND), fr)
         return fr.finishDeferred
 
 
