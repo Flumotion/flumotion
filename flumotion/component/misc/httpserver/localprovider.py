@@ -77,6 +77,7 @@ class LocalFile(fileprovider.File, log.Loggable):
     logCategory = LOG_CATEGORY
 
     _errorLookup = {errno.ENOENT: fileprovider.NotFoundError,
+                    errno.ENOTDIR: fileprovider.NotFoundError,
                     errno.EISDIR: fileprovider.CannotOpenError,
                     errno.EACCES: fileprovider.AccessError}
 

@@ -1,3 +1,10 @@
+2009-07-30  Guillaume Quintard  <guillaume.quintard@gmail.com>
+
+	reviewed by: arek  
+
+	* flumotion/component/misc/httpserver/localprovider.py:
+	Handles the case where a directory of the path is actually a file, so httpserver returns a 404 error and not a 500 one.
+
 2009-07-29  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
 	reviewed by: jlegoff

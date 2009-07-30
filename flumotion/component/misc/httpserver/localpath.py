@@ -53,8 +53,8 @@ class LocalPath(fileprovider.FilePath):
 
     def child(self, name):
         childpath = self._getChildPath(name)
-        if not os.path.exists(childpath):
-            raise NotFoundError("Path '%s' not found" % childpath)
+        '''if not os.path.exists(childpath):
+            raise NotFoundError("Path '%s' not found" % childpath)'''
         return type(self)(childpath)
 
     def open(self):
