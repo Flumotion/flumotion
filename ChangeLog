@@ -1,17 +1,18 @@
 2009-07-30  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
-	reviewed by: arek  
+	reviewed by: arek
 
 	* flumotion/component/misc/httpserver/localprovider.py:
-	Handles the case where a directory of the path is actually a file, so httpserver returns a 404 error and not a 500 one.
+	Handles the case where a directory of the path is actually a file, so 
+	httpserver returns a 404 error and not a 500 one.
 
 2009-07-29  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
 	reviewed by: jlegoff
 
 	* flumotion/test/test_component_httpserver.py:
-	Adds testNotFound that check we actually get a 404 for an non-existing ressource
-	Plus reactivate testRangeTooBig as it seems to pass
+	Adds testNotFound that check we actually get a 404 for an non-existing 
+	ressource. Plus reactivate testRangeTooBig as it seems to pass
 
 2009-07-27  Xavier Queralt  <xqueralt@flumotion.com>
 
