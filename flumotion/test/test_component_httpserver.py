@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import os
+import shutil
 import tempfile
 from StringIO import StringIO
 
@@ -510,14 +511,48 @@ class TestTextFile(testsuite.TestCase):
             http.PARTIAL_CONTENT, '', 4)
         return fr.finishDeferred
 
-    def testNotFound(self):
-        component = FakeComponent("foobar")
+
+class TestNotFound(testsuite.TestCase):
+    """
+    Checks that we correctly get a Not Found (404) error from the server in
+    different cases.
+    """
+
+    def setUp(self):
+        self.path = tempfile.mkdtemp(suffix=".flumotion.test")
+        self.A = os.path.join(self.path, 'A')
+        open(self.A, "w").write('test file A')
+        self.B = os.path.join(self.path, 'B')
+        os.mkdir(self.B)
+
+    def tearDown(self):
+        shutil.rmtree(self.path, ignore_errors=True)
+
+    def assertNotFound(self, path):
+        """
+        Helper to request a file and attach a callback to the Deferred to
+        verify the answer is http.NOT_FOUND
+        """
+
+        component = FakeComponent(path)
         resource = httpfile.File(component.getRoot(), component)
         fr = FakeRequest()
-        self.assertEquals(resource.render(fr), server.NOT_DONE_YET)
-        fr.finishDeferred.addCallback(lambda res, req:
-            self.assertEquals(req.response, http.NOT_FOUND), fr)
+        resource.render(fr)
+        fr.finishDeferred.addCallback(lambda res:
+            self.assertEquals(fr.response, http.NOT_FOUND))
         return fr.finishDeferred
+
+    def testDirNotEmpty(self):
+        return self.assertNotFound(self.path)
+
+    def testDirEmpty(self):
+        return self.assertNotFound(self.B)
+
+    def testNotDirEnding(self):
+        return self.assertNotFound(os.path.join(self.A, "."))
+
+    def testNotDirTraversing(self):
+        return self.assertNotFound(os.path.join(self.A, "foobar"))
 
 
 class FakeSplitter(object):
