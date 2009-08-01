@@ -51,7 +51,7 @@
                       <widget class="GtkSpinButton" id="port">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="tooltip" translatable="yes">Port the on demand server will listen to.</property>
+                        <property name="tooltip" translatable="yes">Port the ondemand server will listen on.</property>
                         <property name="adjustment">1024 1024 65535 1 10 10</property>
                         <property name="climb_rate">1</property>
                         <property name="numeric">True</property>
@@ -76,7 +76,7 @@
                     <property name="width_request">100</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="tooltip" translatable="yes">The base path of the streamer, all urls will be prefixed with this. Defaults to '/'.</property>
+                    <property name="tooltip" translatable="yes">The base path the streamer serves on. All URLs will be prefixed with this. Defaults to '/'.</property>
                     <property name="invisible_char">*</property>
                     <signal name="changed" handler="on_mount_point__changed"/>
                   </widget>
@@ -93,8 +93,8 @@
                   <widget class="GtkEntry" id="path">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="tooltip" translatable="yes">This is the directory which will be exported. All files in this and its subdirectories will be accessible over http.</property>
-                    <property name="text" translatable="yes">/tmp</property>
+                    <property name="tooltip" translatable="yes">The directory from which files will be served. All files in this and its subdirectories will be accessible over HTTP.</property>
+                    <property name="text" translatable="no">/tmp</property>
                     <signal name="changed" handler="on_path__changed"/>
                   </widget>
                   <packing>

@@ -120,7 +120,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">•</property>
-                        <property name="text" translatable="yes">localhost.localdomain</property>
+                        <property name="text" translatable="no">localhost.localdomain</property>
                       </widget>
                     </child>
                   </widget>

@@ -1,3 +1,9 @@
+2009-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* data/glade/httpstreamer-wizard.glade:
+	* data/glade/ondemand-wizard.glade:
+	  Change some strings.  Unmark some for translation.
+
 2009-07-31  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
 	reviewed by: xmartinez 
