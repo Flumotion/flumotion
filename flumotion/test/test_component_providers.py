@@ -46,29 +46,29 @@ class LocalPath(testsuite.TestCase):
 
     def testExistingPath(self):
         local = localpath.LocalPath(self.path)
-        self.assertIsInstance(local, localpath.LocalPath)
+        self.failUnless(isinstance(local, localpath.LocalPath))
 
     def testChildExistingFile(self):
         child = localpath.LocalPath(self.path).child('a')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildExistingDir(self):
         child = localpath.LocalPath(self.path).child('B')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildTraversingDir(self):
         local = localpath.LocalPath(self.path)
         child = local.child('B').child('c')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildNonExistingFile(self):
         child = localpath.LocalPath(self.path).child('foo')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildTraversingNonExistingDir(self):
         local = localpath.LocalPath(self.path)
         child = local.child('foo').child('bar')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildInsecurePathTooDeep(self):
         local = localpath.LocalPath(self.path)
@@ -107,29 +107,29 @@ class LocalPathCachedProvider(testsuite.TestCase):
 
     def testExistingPath(self):
         local = self.fileProviderPlug.getRootPath()
-        self.assertIsInstance(local, cachedprovider.LocalPath)
+        self.failUnless(isinstance(local, cachedprovider.LocalPath))
 
     def testChildExistingFile(self):
         child = self.fileProviderPlug.getRootPath().child('a')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildExistingDir(self):
         child = self.fileProviderPlug.getRootPath().child('B')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildTraversingDir(self):
         local = self.fileProviderPlug.getRootPath()
         child = local.child('B').child('c')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildNonExistingFile(self):
         child = self.fileProviderPlug.getRootPath().child('foo')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildTraversingNonExistingDir(self):
         local = self.fileProviderPlug.getRootPath()
         child = local.child('foo').child('bar')
-        self.assertIsInstance(child, localpath.LocalPath)
+        self.failUnless(isinstance(child, localpath.LocalPath))
 
     def testChildInsecurePathTooDeep(self):
         local = self.fileProviderPlug.getRootPath()

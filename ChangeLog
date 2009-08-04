@@ -1,5 +1,11 @@
 2009-08-04  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
+	* flumotion/test/test_component_providers.py:
+	Changes from assertIsInstance() to failUnless(isinstance())
+	for compatibility with the buildbot.
+
+2009-08-04  Guillaume Quintard  <guillaume.quintard@gmail.com>
+
 	reviewed by: xmartinez
 
 	* flumotion/component/misc/httpserver/cachedprovider.py:
