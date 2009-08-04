@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_component_providers -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -53,8 +53,6 @@ class LocalPath(fileprovider.FilePath):
 
     def child(self, name):
         childpath = self._getChildPath(name)
-        if not os.path.exists(childpath):
-            raise NotFoundError("Path '%s' not found" % childpath)
         return type(self)(childpath)
 
     def open(self):

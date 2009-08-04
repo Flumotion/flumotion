@@ -1,3 +1,19 @@
+2009-08-04  Guillaume Quintard  <guillaume.quintard@gmail.com>
+
+	reviewed by: xmartinez
+
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/localpath.py:
+	LocalPaths now won't check if the file exist before returning a child as
+	the verification is done in the open()
+	* flumotion/component/misc/httpserver/localprovider.py:
+	For the three previous file, added a reference to the new test suite
+	module
+	* flumotion/test/test_component_providers.py:
+	* flumotion/test/test_component_providers.py (added):
+	New test suite for LocalPaths, covering the child and open methods.
+	Fixes #1319
+
 2009-08-04  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/test/bouncertest.py:

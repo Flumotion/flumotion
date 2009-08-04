@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_component_providers -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -366,14 +366,14 @@ class LocalPath(localpath.LocalPath, log.Loggable):
 
     def child(self, name):
         childpath = self._getChildPath(name)
-        if not os.path.exists(childpath):
-            # Delete the cached file and outdate the copying session
-            self.plug.outdateCopySession(childpath)
-            self._removeCachedFile(childpath)
-            raise NotFoundError("Path '%s' not found" % childpath)
         return LocalPath(self.plug, childpath)
 
     def open(self):
+        if not os.path.exists(self.path):
+            # Delete the cached file and outdate the copying session
+            self.plug.outdateCopySession(self.path)
+            self._removeCachedFile(self.path)
+            raise NotFoundError("Path '%s' not found" % self.path)
         return CachedFile(self.plug, self.path, self.mimeType)
 
 
