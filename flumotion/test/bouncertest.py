@@ -37,6 +37,41 @@ class FakeMedium:
         return defer.succeed(None)
 
 
+class BouncerTestHelper(testsuite.TestCase):
+
+    bouncerClass = None
+
+    def _generate_config(self, properties):
+        conf = {'name': 'fake',
+                'avatarId': '/default/fake',
+                'plugs': {},
+                'properties': properties}
+        return conf
+
+    def get_bouncer(self, properties={}):
+        if not self.bouncerClass:
+            raise NotImplemented("Subclass should set bouncerClass")
+        return self.bouncerClass(self._generate_config(properties))
+
+    def stop_bouncer(self, bouncer, d):
+
+        def _stop(res):
+            bouncer.stop()
+            return res
+        return d.addBoth(_stop)
+
+    def check_auth(self, keycard, bouncer, successful):
+
+        def check_result(result):
+            if successful:
+                self.assertEquals(result.state, keycards.AUTHENTICATED)
+            else:
+                self.assertIdentical(result, None)
+        d = defer.maybeDeferred(bouncer.authenticate, keycard)
+        d.addCallback(check_result)
+        return d
+
+
 class TrivialBouncerTest(testsuite.TestCase):
     obj = None
     medium = None

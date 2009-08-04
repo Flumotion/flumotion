@@ -1,3 +1,8 @@
+2009-08-04  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/test/bouncertest.py:
+	* flumotion/test/test_bouncers_ipbouncer.py:
+
 2009-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* data/glade/httpstreamer-wizard.glade:
