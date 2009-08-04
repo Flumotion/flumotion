@@ -1,7 +1,10 @@
 2009-08-04  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/test/bouncertest.py:
+	Add a helper class for writing bouncer tests.
+
 	* flumotion/test/test_bouncers_ipbouncer.py:
+	Use the helper class to test the IPBouncer.
 
 2009-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
