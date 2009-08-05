@@ -1,6 +1,11 @@
 2009-08-05  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
 	* po/fr.po:
+	Last batch of translations, 11  left.
+
+2009-08-05  Guillaume Quintard  <guillaume.quintard@gmail.com>
+
+	* po/fr.po:
 	Untranslated strings now down to less than 100 (doesn't mean the
 	translated ones are all good, but it's an enhancement).
 
