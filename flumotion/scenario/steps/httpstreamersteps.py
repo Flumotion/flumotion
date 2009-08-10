@@ -507,8 +507,8 @@ class HTTPSpecificStep(ConsumerStep):
                 return True
 
             message = messages.Error(T_(N_(
-                "The mount point %s is already been used for worker %s and "
-                "port %s. Correct it to be able to go forward."),
+                "The mount point %s is already being used for worker %s and "
+                "port %s. Please correct this to be able to go forward."),
                 mount_point, worker, port))
             message.id = 'http-streamer-mountpoint'
             self.wizard.add_msg(message)

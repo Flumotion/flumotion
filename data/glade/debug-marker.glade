@@ -29,8 +29,8 @@
 	<widget class="GtkLabel" id="help_label">
 	  <property name="visible">True</property>
 	  <property name="label" translatable="yes">
-Please write the debug marker you want to write 
-to your logs and select the debug level. Press Ok
+Please enter the debug marker you wish to write 
+to your logs and select the debug level. Press OK
 when you are ready.
 </property>
 	  <property name="use_underline">False</property>

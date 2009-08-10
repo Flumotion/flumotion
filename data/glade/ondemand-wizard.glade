@@ -51,7 +51,7 @@
                       <widget class="GtkSpinButton" id="port">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="tooltip" translatable="yes">Port the ondemand server will listen on.</property>
+                        <property name="tooltip" translatable="yes">The port on which the ondemand server will listen.</property>
                         <property name="adjustment">1024 1024 65535 1 10 10</property>
                         <property name="climb_rate">1</property>
                         <property name="numeric">True</property>
@@ -93,7 +93,7 @@
                   <widget class="GtkEntry" id="path">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="tooltip" translatable="yes">The directory from which files will be served. All files in this and its subdirectories will be accessible over HTTP.</property>
+                    <property name="tooltip" translatable="yes">The directory from which files will be served. All files in this directory and its subdirectories will be accessible over HTTP.</property>
                     <property name="text" translatable="no">/tmp</property>
                     <signal name="changed" handler="on_path__changed"/>
                   </widget>

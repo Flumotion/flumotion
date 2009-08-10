@@ -42,7 +42,7 @@ def checkOgg():
                string.join([str(x) for x in version], '.'), 'ogg'),
             mid='ogg-check')
         m.add(T_(N_("The generated Ogg stream will not be fully compliant, "
-            "and possibly not even play correctly.\n")))
+            "and might not even play correctly.\n")))
         m.add(T_(N_("Please upgrade '%s' to version %s."), 'gst-plugins-base',
             '0.10.4'))
         result.add(m)

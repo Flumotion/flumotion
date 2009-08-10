@@ -35,7 +35,7 @@
         <property name="format" type="string"
                   _description="Video format" />
         <property name="pattern" type="int"
-                  _description="Thhe test pattern to show (smpte/snow/black/...)." />
+                  _description="The test pattern to show (smpte/snow/black/...)." />
         <property name="drop-probability" type="float"
                   _description="The fraction of buffers to drop (0.0 - 1.0). Only useful for debugging." />
         <property name="overlay-timestamps" type="bool"

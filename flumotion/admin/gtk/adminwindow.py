@@ -360,13 +360,13 @@ class AdminWindow(Loggable, GladeDelegate):
               None, _('Connect to a recently used connection'),
              self._connection_open_recent_cb),
             ('OpenExisting', None, _('Connect to _running manager...'), None,
-             _('Connect to an previously used connection'),
+             _('Connect to a previously used connection'),
              self._connection_open_existing_cb),
             ('ImportConfig', None, _('_Import Configuration...'), None,
-             _('Import configuration from a file'),
+             _('Import a configuration from a file'),
              self._connection_import_configuration_cb),
             ('ExportConfig', None, _('_Export Configuration...'), None,
-             _('Export current configuration to a file'),
+             _('Export the current configuration to a file'),
              self._connection_export_configuration_cb),
             ('Quit', gtk.STOCK_QUIT, _('_Quit'), None,
              _('Quit the application and disconnect from the manager'),
@@ -407,10 +407,10 @@ class AdminWindow(Loggable, GladeDelegate):
             # Help
             ('Help', None, _('_Help')),
             ('Contents', gtk.STOCK_HELP, _('_Contents'), 'F1',
-             _('Open the flumotion manual'),
+             _('Open the Flumotion manual'),
              self._help_contents_cb),
             ('About', gtk.STOCK_ABOUT, _('_About'), None,
-             _('Displays an about dialog'),
+             _('About this software'),
              self._help_about_cb),
 
             # Only in context menu
@@ -1282,7 +1282,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         dialog = ProgressDialog(
             _("Reconnecting ..."),
-            _("Lost connection to manager %s, reconnecting ...")
+            _("Lost connection to manager %s. Reconnecting ...")
             % (self._adminModel.adminInfoStr(), ), self._window)
 
         dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
@@ -1343,7 +1343,7 @@ class AdminWindow(Loggable, GladeDelegate):
         dialog.set_modal(True)
         dialog.set_default_response(gtk.RESPONSE_ACCEPT)
         ffilter = gtk.FileFilter()
-        ffilter.set_name(_("Flumotion XML Configuration files"))
+        ffilter.set_name(_("Flumotion XML configuration files"))
         ffilter.add_pattern("*.xml")
         dialog.add_filter(ffilter)
         ffilter = gtk.FileFilter()
@@ -1453,7 +1453,7 @@ You can do remote component calls using:
                 break
         else:
             self._error(
-                _("Cannot find a program to display the flumotion manual."))
+                _("Cannot find a program to display the Flumotion manual."))
             return
         gobject.spawn_async([executable,
                              'ghelp:%s' % (configure.PACKAGE, )])

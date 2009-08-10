@@ -116,7 +116,7 @@ class SoundcardStep(AudioProducerStep):
         self.wizard.clear_msg('soundcard-device')
 
         msg = Info(T_(
-            N_("Looking for the sound devices present on the system."
+            N_("Looking for the sound devices present on the system. "
                "This can take a while...")), mid='soundcard-check')
         self.wizard.add_msg(msg)
 

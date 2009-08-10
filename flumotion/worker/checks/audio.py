@@ -92,7 +92,7 @@ def getAudioDevices(source_factory, mid=None):
 
         failure = defer.failure.Failure()
         m = messages.Warning(T_(
-             N_("There has been an error while fetching the OSS audio devices"
+             N_("There has been an error while fetching the OSS audio devices "
                 "through Hal.\nThe listed devices have been guessed and may "
                 "not work properly.")), debug=check.debugFailure(failure))
         m.id = mid
@@ -112,9 +112,10 @@ def getAudioDevices(source_factory, mid=None):
         result.succeed(devices)
         if not devices:
             m = messages.Error(T_(
-                N_("Could not find any device in the system.\n"
-                   "Please, check whether the device is correctly plugged "
-                   "and/or the modules are correctly loaded."), sound_system))
+                    N_("Could not find any device in the system.\n"
+                       "Please check whether the device is correctly plugged "
+                       "in and whether the modules are correctly loaded."),
+                    sound_system))
 
             m.id = mid
             result.add(m)

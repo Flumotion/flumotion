@@ -11,7 +11,7 @@
         <property name="yalign">0</property>
         <property name="label" translatable="yes">Welcome to the Flumotion assistant.
 
-The next steps will configure a Flumotion streaming server for simple scenarios such as &lt;b&gt;live&lt;/b&gt; (from a webcam, a firewire camera or a TV card) or &lt;b&gt;on demand&lt;/b&gt; (from a set of files or a directory).
+The following steps will configure a Flumotion streaming server for simple scenarios such as &lt;b&gt;live&lt;/b&gt; (from a webcam, a firewire camera or a TV card) or &lt;b&gt;on demand&lt;/b&gt; (from a set of files or a directory).
 
 If in doubt just use the default options.</property>
         <property name="use_markup">True</property>

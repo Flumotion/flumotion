@@ -64,7 +64,8 @@ def checkTicket347():
             major, minor, nano),
             mid='ticket-347')
         m.add(T_(N_("The Soundcard and Firewire sources may leak a lot of "
-            "memory as a result, and need to be restarted frequently.\n")))
+                    "memory as a result, and would need to be restarted "
+                    "frequently.\n")))
         m.add(T_(N_("Please upgrade '%s' to version %s or later."),
             'pygtk', '2.8.6'))
         result.add(m)

@@ -86,8 +86,8 @@ class FileSelector(ObjectList):
         registerVFSJelly()
 
     def showErrorMessage(self, fail, var2):
-        dialog = ErrorDialog(_("You don't have enough privileges to view the"
-                               "contents of that directory"),
+        dialog = ErrorDialog(_("You don't have enough privileges to view the "
+                               "contents of that directory."),
                                self._parent, close_on_response=True)
         dialog.show()
 

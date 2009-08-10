@@ -271,8 +271,8 @@ def check1394devices(mid):
     else:
         m = messages.Error(T_(
             N_("Could not find any Firewire device on the system.\n"
-               "Please, check whether the device is correctly plugged "
-               "or the modules are correctly loaded.")))
+               "Please check whether the device is correctly plugged in "
+               "and whether the modules are correctly loaded.")))
 
         m.id = mid
         result.add(m)

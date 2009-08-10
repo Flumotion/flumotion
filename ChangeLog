@@ -1,3 +1,26 @@
+2009-08-10  Jan Urbanski  <jurbanski@flumotion.com>
+
+	patch by: Murray Cumming  <murrayc@openismus.com>
+
+	* data/glade/debug-marker.glade:
+	* data/glade/encoding-wizard.glade:
+	* data/glade/ondemand-wizard.glade:
+	* data/glade/overlay-wizard.glade:
+	* data/glade/welcome-wizard.glade:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/greeter.py:
+	* flumotion/component/encoders/smoke/smoke.py:
+	* flumotion/component/muxers/checks.py:
+	* flumotion/component/producers/checks.py:
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	* flumotion/component/producers/videotest/videotest.xml:
+	* flumotion/scenario/steps/httpstreamersteps.py:
+	* flumotion/ui/fileselector.py:
+	* flumotion/worker/checks/audio.py:
+	* flumotion/worker/checks/gst010.py:
+	Minor improvements to user-visible strings after a review at the
+	request of Thomas Vander Stichele.
+
 2009-08-05  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
 	* po/fr.po:

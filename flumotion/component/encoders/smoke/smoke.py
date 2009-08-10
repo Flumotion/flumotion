@@ -42,7 +42,7 @@ class Smoke(feedcomponent.ParseLaunchComponent):
         jpegVersion = gstreamer.get_plugin_version('jpeg')
         if jpegVersion < (0, 10, 11, 1):
             m = messages.Warning(
-                T_(N_("The 'smoke' encoder has a bug on versions previous "
-                      "to (0.10.11). It will not work unless it is updated.")),
+                T_(N_("The 'smoke' encoder has a bug in versions previous "
+                      "to 0.10.11. It will not work unless it is updated.")),
                 mid="smokeenc-bug")
             self.addMessage(m)

@@ -106,7 +106,7 @@ class Initial(WizardStep):
 class ConnectToExisting(WizardStep):
     name = 'connect_to_existing'
     title = _('Host Information')
-    text = _('Please enter the address where the manager is running.')
+    text = _('Please enter the address at which the manager is running.')
     next_pages = ['authenticate']
     open_connection = None
 
