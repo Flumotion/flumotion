@@ -1,3 +1,15 @@
+2009-08-11  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/base/http.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/test/test_http.py:
+	Revert r7950, the allow-default property of streaming components. There
+	is no consensus about what the property should do and how it should be
+	named. It may be reintroduced after the 0.6.0 release.
+
 2009-08-10  Jan Urbanski  <jurbanski@flumotion.com>
 
 	patch by: Murray Cumming  <murrayc@openismus.com>
