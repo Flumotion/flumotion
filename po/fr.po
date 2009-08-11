@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
 "POT-Creation-Date: 2009-08-05 12:46+0200\n"
-"PO-Revision-Date: 2009-08-11 17:43+0200\n"
+"PO-Revision-Date: 2009-08-11 18:00+0200\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -890,7 +890,7 @@ msgstr "[n'importe quel worker]"
 #: ../flumotion/admin/gtk/componentlist.py:358
 #, python-format
 msgid "<b>Worker %s is not connected</b>"
-msgstr "<b>Connexion courante</b>"
+msgstr "<b>Le worker %s n'est pas connecté</b>"
 
 #: ../flumotion/admin/gtk/componentlist.py:377
 #, python-format
@@ -1228,7 +1228,7 @@ msgstr "Worker:"
 #: ../flumotion/common/documentation.py:97
 #, python-format
 msgid "Please install the '%s' python module."
-msgstr "Veuillez mettre à jour '%s' vers la version %s."
+msgstr "Veuillez installer le module python '%s'."
 
 #: ../flumotion/common/documentation.py:98
 msgid "Learn how to install Python modules."
@@ -1270,7 +1270,7 @@ msgstr "%02d:%02d"
 #: ../flumotion/common/managerspawner.py:99
 #, python-format
 msgid "Creating %s ..."
-msgstr "Re-chargement"
+msgstr "Création de %s..."
 
 #: ../flumotion/common/managerspawner.py:100
 #, python-format
@@ -1285,7 +1285,7 @@ msgstr "Démarrage de %s ..."
 #: ../flumotion/common/managerspawner.py:107
 #, python-format
 msgid "Could not start %s."
-msgstr "Impossible de relancer le composant:"
+msgstr "Impossible de démarrer %s."
 
 #: ../flumotion/common/managerspawner.py:126
 msgid "manager"
@@ -1670,7 +1670,7 @@ msgstr ""
 #: ../flumotion/component/component.py:641
 #, python-format
 msgid "Please rename '%s' to '%s'.\n"
-msgstr "Veuillez mettre à jour '%s' vers la version %s."
+msgstr "Veuillez renommer '%s' en '%s'.\n"
 
 #: ../flumotion/component/consumers/disker/admin_gtk.py:64
 msgid "When"
@@ -2366,9 +2366,9 @@ msgid "Usage:"
 msgstr "Utilisation :"
 
 #: ../flumotion/component/misc/porter/porter.py:328
-#, python-format
+#, fuzzy, python-format
 msgid "Network error: socket path %s is not available."
-msgstr "Erreur de réseau: le port TCP %d n'est pas disponible."
+msgstr "Erreur réseau: le chemin %s n'est pas disponible."
 
 #: ../flumotion/component/misc/repeater/repeater.py:41
 #: ../flumotion/component/producers/audiotest/audiotest.py:103
@@ -2810,7 +2810,7 @@ msgstr "Audio:"
 
 #: ../flumotion/component/producers/looper/flufileinfo.glade.h:4
 msgid "Duration:"
-msgstr "Information de débogage:\n"
+msgstr "Durée :"
 
 #: ../flumotion/component/producers/looper/flufileinfo.glade.h:5
 msgid "File:"
@@ -2855,7 +2855,7 @@ msgstr "_Hauteur"
 
 #: ../flumotion/component/producers/looper/wizard.glade.h:4
 msgid "Location:"
-msgstr "Information de débogage:\n"
+msgstr "Position :"
 
 #: ../flumotion/component/producers/looper/wizard.glade.h:5
 msgid "Width:"
@@ -3150,7 +3150,7 @@ msgstr "Rapporter un bogue."
 
 #: ../flumotion/extern/exceptiondialog.py:194
 msgid "Show debug information"
-msgstr "Information de débogage:\n"
+msgstr "Montrer l'information de débogage"
 
 #: ../flumotion/extern/pytrayicon/eggtrayicon.c:119
 msgid "Orientation"
@@ -3442,7 +3442,7 @@ msgstr "Quelque chose ne va vraiment pas."
 #: ../flumotion/test/test_common_messages.py:55
 #, python-format
 msgid "%s is really wrong."
-msgstr "Quelque chose ne va vraiment pas."
+msgstr "%s ne va vraiment pas."
 
 #: ../flumotion/test/test_common_messages.py:60
 msgid "warning"
@@ -3587,12 +3587,12 @@ msgstr "Cet hôte a besoin du plug-in GStreamer '%s'.\n"
 #: ../flumotion/worker/checks/check.py:293
 #, python-format
 msgid "Please install '%s'.\n"
-msgstr "Veuillez mettre à jour '%s' vers la version %s."
+msgstr "Veuillez installer '%s'.\n"
 
 #: ../flumotion/worker/checks/check.py:303
 #, python-format
 msgid "Your '%s' GStreamer plug-in is too old.\n"
-msgstr "La version %s du plug-in GStreamer '%s' contient un bogue.\n"
+msgstr "Vote plug-in GStreamer '%s' est trop vieux.\n"
 
 #: ../flumotion/worker/checks/check.py:306
 #, python-format
