@@ -1,3 +1,8 @@
+2009-08-11  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	* po/fr.po:
+	Refine the first 200 french strings.
+
 2009-08-11  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/base/http.py:
