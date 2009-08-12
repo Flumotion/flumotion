@@ -4,13 +4,15 @@
 #
 # Thomas Vander Stichele <thomas at fluendo dot com>, 2005.
 # Pedro Gracia <pedro@flumotion.com>, 2007, 2009.
+# Xavier Queralt <xqueralt@flumotion.com>, 2009
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: es\n"
+"Project-Id-Version: flumotion 0.5.4\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
-"POT-Creation-Date: 2009-07-27 12:49+0200\n"
+"POT-Creation-Date: 2009-08-12 12:17+0200\n"
 "PO-Revision-Date: 2009-07-24 12:46+0200\n"
-"Last-Translator: Pedro Gracia <pedro@flumotion.com>\n"
+"Last-Translator: Xavier Queralt <xqueralt@flumotion.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -108,12 +110,12 @@ msgstr "Sólo vídeo"
 #: ../data/glade/debug-marker.glade.h:1
 msgid ""
 "\n"
-"Please write the debug marker you want to write \n"
-"to your logs and select the debug level. Press Ok\n"
+"Please enter the debug marker you wish to write \n"
+"to your logs and select the debug level. Press OK\n"
 "when you are ready.\n"
 msgstr ""
 "\n"
-"Por favor, escriba la marca de depuración que desea \n"
+"Por favor, introduzca la marca de depuración que desea \n"
 "escribir a los logs y seleccione el nivel de depuración. \n"
 "Presione Ok cuando esté listo.\n"
 
@@ -158,20 +160,16 @@ msgid "F_ormat:"
 msgstr "F_ormato:"
 
 #: ../data/glade/encoding-wizard.glade.h:2
-msgid ""
-"Please select the format, audio and/or \n"
-"video codecs which will be used in your stream:"
-msgstr ""
-"Por favor seleccione el formato, o sea, los codecs de audio y video que "
-"serán usados en su flujo:"
+msgid "Please select the format and codecs to be used in your stream:"
+msgstr "Por favor, seleccione el formato y codecs que se usarán en su flujo:"
 
-#: ../data/glade/encoding-wizard.glade.h:4
+#: ../data/glade/encoding-wizard.glade.h:3
 #: ../data/glade/production-wizard.glade.h:5
 #: ../data/glade/select-producers-wizard.glade.h:5
 msgid "_Audio:"
 msgstr "_Audio:"
 
-#: ../data/glade/encoding-wizard.glade.h:5
+#: ../data/glade/encoding-wizard.glade.h:4
 #: ../data/glade/production-wizard.glade.h:6
 #: ../data/glade/select-producers-wizard.glade.h:6
 msgid "_Video:"
@@ -248,13 +246,13 @@ msgid "_Advanced settings"
 msgstr "Configuraciones _avanzadas"
 
 #: ../data/glade/httpstreamer-wizard.glade.h:8
-#: ../data/glade/ondemand-wizard.glade.h:9
+#: ../data/glade/ondemand-wizard.glade.h:8
 #: ../data/glade/shout2-wizard.glade.h:9
 msgid "_Mount point:"
 msgstr "_Punto de anclaje:"
 
 #: ../data/glade/httpstreamer-wizard.glade.h:9
-#: ../data/glade/ondemand-wizard.glade.h:10
+#: ../data/glade/ondemand-wizard.glade.h:9
 #: ../data/glade/open-connection.glade.h:2
 msgid "_Port:"
 msgstr "_Puerto:"
@@ -263,55 +261,47 @@ msgstr "_Puerto:"
 msgid "clients"
 msgstr "clientes"
 
-#: ../data/glade/httpstreamer-wizard.glade.h:11
-msgid "localhost.localdomain"
-msgstr "localhost.localdomain"
-
 #: ../data/glade/license-wizard.glade.h:1
 msgid "Specify _license:"
 msgstr "Especificar _ la licencia:"
 
 #: ../data/glade/ondemand-wizard.glade.h:1
-msgid "/tmp"
-msgstr "/tmp"
-
-#: ../data/glade/ondemand-wizard.glade.h:2
 msgid "<b>Log requests to a file (apache log):</b>"
 msgstr "<b>Registro de peticiones a un fichero (registro de Apache):</b>"
 
-#: ../data/glade/ondemand-wizard.glade.h:3
+#: ../data/glade/ondemand-wizard.glade.h:2
 msgid "<b>Server configuration:</b>"
 msgstr "<b>Configuración del servidor:</b>"
 
+#: ../data/glade/ondemand-wizard.glade.h:3
+msgid ""
+"The base path the streamer serves on. All URLs will be prefixed with this. "
+"Defaults to '/'."
+msgstr ""
+"El camino base donde el streamer servirá. Todas las URLs tendrán este "
+"prefijo.  Por defecto es '/'"
+
 #: ../data/glade/ondemand-wizard.glade.h:4
-msgid "Port the on demand server will listen to."
-msgstr "Puerto en el que escuchará el servidor bajo demanda."
+msgid ""
+"The directory from which files will be served. All files in this directory "
+"and its subdirectories will be accessible over HTTP."
+msgstr ""
+"El directorio que será exportado. Todos los ficheros y subdirectorios que "
+"contenga serán accesibles por http."
 
 #: ../data/glade/ondemand-wizard.glade.h:5
-msgid ""
-"The base path of the streamer, all urls will be prefixed with this. Defaults "
-"to '/'."
-msgstr ""
-"El \"path\" base del flujo, todas las URLs tendrán este prefijo. Por defecto "
-"es \"/\""
+msgid "The port on which the ondemand server will listen."
+msgstr "El puerto donde escuchará el servidor bajo demanda."
 
 #: ../data/glade/ondemand-wizard.glade.h:6
-msgid ""
-"This is the directory which will be exported. All files in this and its "
-"subdirectories will be accessible over http."
-msgstr ""
-"Este es el directorio que será exportado. Todos los ficheros que contenga y "
-"sus subdirectorios será accesibles por http."
-
-#: ../data/glade/ondemand-wizard.glade.h:7
 msgid "_Directory:"
 msgstr "_Directorio:"
 
-#: ../data/glade/ondemand-wizard.glade.h:8
+#: ../data/glade/ondemand-wizard.glade.h:7
 msgid "_File name:"
 msgstr "Nombre del _fichero:"
 
-#: ../data/glade/ondemand-wizard.glade.h:11
+#: ../data/glade/ondemand-wizard.glade.h:10
 msgid "_Select..."
 msgstr "_Seleccionar..."
 
@@ -325,11 +315,10 @@ msgstr "_Asegurar la conexión vía el SSL"
 
 #: ../data/glade/overlay-wizard.glade.h:1
 msgid ""
-"Enable this to show a couple of logotypes in the bottom left corner of the "
-"video output."
+"Enable this to show some logos in the bottom left corner of the video output."
 msgstr ""
 "Seleccione esto para mostrar algunos logotipos en la parte inferior "
-"izquierdade la salida de video."
+"izquierda del video resultante."
 
 #: ../data/glade/overlay-wizard.glade.h:2
 msgid "Show _logos in bottom left corner"
@@ -461,16 +450,16 @@ msgstr "_Ancho:"
 msgid ""
 "Welcome to the Flumotion assistant.\n"
 "\n"
-"The next steps will configure a Flumotion streaming server for simple "
+"The following steps will configure a Flumotion streaming server for simple "
 "scenarios such as <b>live</b> (from a webcam, a firewire camera or a TV "
 "card) or <b>on demand</b> (from a set of files or a directory).\n"
 "\n"
 "If in doubt just use the default options."
 msgstr ""
-"Bienvenido al asistente para la configuración de Flumotion.\n"
+"Bienvenido al asistente de configuración de Flumotion.\n"
 "\n"
 "En los siguientes pasos configurará un servidor de \"streaming\" Flumotion "
-"para alguno de los escenarios simples, como <b>directo</b> (desde una "
+"para alguno de los escenarios simples, como <b>en directo</b> (desde una "
 "\"webcam\", una cámara Firewire o una tarjeta de TV) o <b>bajo demanda</b> "
 "(desde un conjunto de ficheros o un directorio).\n"
 "\n"
@@ -508,15 +497,15 @@ msgid "Connect to _running manager..."
 msgstr "Conectar con con un \"manager\" en _funcionamiento"
 
 #: ../flumotion/admin/gtk/adminwindow.py:363
-msgid "Connect to an previously used connection"
-msgstr "Conectar a una conexión usada anteriormente"
+msgid "Connect to a previously used connection"
+msgstr "Abrir una conexión usada anteriormente"
 
 #: ../flumotion/admin/gtk/adminwindow.py:365
 msgid "_Import Configuration..."
 msgstr "_Importar la configuración...."
 
 #: ../flumotion/admin/gtk/adminwindow.py:366
-msgid "Import configuration from a file"
+msgid "Import a configuration from a file"
 msgstr "Importar la configuración desde un fichero"
 
 #: ../flumotion/admin/gtk/adminwindow.py:368
@@ -524,7 +513,7 @@ msgid "_Export Configuration..."
 msgstr "_Exportar la configuración..."
 
 #: ../flumotion/admin/gtk/adminwindow.py:369
-msgid "Export current configuration to a file"
+msgid "Export the current configuration to a file"
 msgstr "Exportar la configuración actual a un fichero"
 
 #: ../flumotion/admin/gtk/adminwindow.py:371
@@ -619,7 +608,7 @@ msgid "_Contents"
 msgstr "_Contenidos"
 
 #: ../flumotion/admin/gtk/adminwindow.py:410
-msgid "Open the flumotion manual"
+msgid "Open the Flumotion manual"
 msgstr "Arbir el manual de Flumotion"
 
 #: ../flumotion/admin/gtk/adminwindow.py:412
@@ -627,8 +616,8 @@ msgid "_About"
 msgstr "_Acerca de"
 
 #: ../flumotion/admin/gtk/adminwindow.py:413
-msgid "Displays an about dialog"
-msgstr "Mostrar un diálogo 'acerca de'"
+msgid "About this software"
+msgstr "Acerca de esta aplicación"
 
 #. Only in context menu
 #: ../flumotion/admin/gtk/adminwindow.py:417
@@ -784,8 +773,8 @@ msgstr "Reconectando..."
 
 #: ../flumotion/admin/gtk/adminwindow.py:1285
 #, python-format
-msgid "Lost connection to manager %s, reconnecting ..."
-msgstr "Conexión perdida con el manager %s, volviendo a conectar ..."
+msgid "Lost connection to manager %s. Reconnecting ..."
+msgstr "Se ha perdido la conexión con el manager %s. Volviendo a conectar ..."
 
 #: ../flumotion/admin/gtk/adminwindow.py:1339
 msgid "Import Configuration..."
@@ -796,8 +785,8 @@ msgid "Import"
 msgstr "Importar"
 
 #: ../flumotion/admin/gtk/adminwindow.py:1346
-msgid "Flumotion XML Configuration files"
-msgstr "Ficheros de configuración XML de Flumotion"
+msgid "Flumotion XML configuration files"
+msgstr "Ficheros XML de configuración de Flumotion"
 
 #: ../flumotion/admin/gtk/adminwindow.py:1350
 msgid "All files"
@@ -820,8 +809,9 @@ msgstr ""
 "¿Desea sobreescribirlo?"
 
 #: ../flumotion/admin/gtk/adminwindow.py:1456
-msgid "Cannot find a program to display the flumotion manual."
-msgstr "No puedo encontrar un programa para mostrar el manual de Flumotion."
+msgid "Cannot find a program to display the Flumotion manual."
+msgstr ""
+"No se ha encontrado ninguna aplicación para mostrar el manual de Flumotion."
 
 #: ../flumotion/admin/gtk/basesteps.py:32
 #: ../flumotion/admin/gtk/basesteps.py:40
@@ -1087,9 +1077,9 @@ msgid "Host Information"
 msgstr "Información del \"Host\""
 
 #: ../flumotion/admin/gtk/greeter.py:109
-msgid "Please enter the address where the manager is running."
+msgid "Please enter the address at which the manager is running."
 msgstr ""
-"Por favor, introduzca la dirección dónde el \"manager\" esté funcionando."
+"Por favor, introduzca la dirección dónde el \"manager\" está funcionando."
 
 #: ../flumotion/admin/gtk/greeter.py:137
 msgid "Authentication"
@@ -1824,7 +1814,7 @@ msgid "of"
 msgstr "de"
 
 #: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:351
-#: ../flumotion/worker/checks/check.py:261
+#: ../flumotion/worker/checks/check.py:312
 #, python-format
 msgid "Version %s of the '%s' GStreamer plug-in is too old.\n"
 msgstr ""
@@ -1834,7 +1824,7 @@ msgstr ""
 #: ../flumotion/component/feedcomponent010.py:395
 #: ../flumotion/component/muxers/checks.py:46
 #: ../flumotion/component/producers/gdp/gdp.py:42
-#: ../flumotion/worker/checks/check.py:265
+#: ../flumotion/worker/checks/check.py:316
 #: ../flumotion/worker/checks/encoder.py:47
 #: ../flumotion/worker/checks/encoder.py:69
 #, python-format
@@ -1854,8 +1844,8 @@ msgstr ""
 msgid "Learn how to increase the maximum number of clients."
 msgstr "Aprenda cómo incrementar el número máximo de clientes."
 
-#: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:804
-#: ../flumotion/component/misc/httpserver/httpserver.py:407
+#: ../flumotion/component/consumers/httpstreamer/httpstreamer.py:801
+#: ../flumotion/component/misc/httpserver/httpserver.py:405
 #: ../flumotion/component/misc/porter/porter.py:355
 #, python-format
 msgid "Network error: TCP port %d is not available."
@@ -2036,7 +2026,7 @@ msgstr "Codificador Mulaw"
 
 #: ../flumotion/component/encoders/smoke/smoke.py:45
 msgid ""
-"The 'smoke' encoder has a bug on versions previous to (0.10.11). It will not "
+"The 'smoke' encoder has a bug in versions previous to 0.10.11. It will not "
 "work unless it is updated."
 msgstr ""
 "El codificador \"smoke\" tiene un fallo en sus versiones anteriores a la "
@@ -2413,11 +2403,11 @@ msgstr "La versión %s del complemento del GStreamer '%s' tiene un error.\n"
 
 #: ../flumotion/component/muxers/checks.py:44
 msgid ""
-"The generated Ogg stream will not be fully compliant, and possibly not even "
+"The generated Ogg stream will not be fully compliant, and might not even "
 "play correctly.\n"
 msgstr ""
-"El flujo Ogg generado no será totalmente compatible y posiblemente ni "
-"siquiera pueda ser escuchado correctamente.\n"
+"El flujo Ogg generado no será totalmente compatible y, posiblemente, ni "
+"siquiera pueda ser reproducido correctamente.\n"
 
 #: ../flumotion/component/muxers/muxers.xml.h:1
 msgid "Multipart"
@@ -2636,23 +2626,22 @@ msgstr ""
 "La versión %d.%d.%d de la librería PyGTK contiene un \"memory leak\".\n"
 
 #: ../flumotion/component/producers/checks.py:66
-#: ../flumotion/component/producers/checks.py:88
 msgid ""
 "The Soundcard and Firewire sources may leak a lot of memory as a result, and "
-"need to be restarted frequently.\n"
+"would need to be restarted frequently.\n"
 msgstr ""
-"La tarjeta de sonido y las fuentes Firewire pueden ir ocupando mucha memoria "
-"y, como resultado de esto, necesitan ser reiniciadas frecuentemente.\n"
+"La tarjeta de sonido y las fuentes Firewire pueden perder mucha memoria y, "
+"como resultado de esto, necesitan ser reiniciadas frecuentemente.\n"
 
-#: ../flumotion/component/producers/checks.py:68
-#: ../flumotion/component/producers/checks.py:90
-#: ../flumotion/component/producers/checks.py:112
-#: ../flumotion/component/producers/checks.py:124
+#: ../flumotion/component/producers/checks.py:69
+#: ../flumotion/component/producers/checks.py:91
+#: ../flumotion/component/producers/checks.py:113
+#: ../flumotion/component/producers/checks.py:125
 #, python-format
 msgid "Please upgrade '%s' to version %s or later."
 msgstr "Por favor, actualize '%s' a la versión %s o superior."
 
-#: ../flumotion/component/producers/checks.py:84
+#: ../flumotion/component/producers/checks.py:85
 #, python-format
 msgid ""
 "Version %d.%d.%d of the gst-python library contains a large memory leak.\n"
@@ -2660,18 +2649,26 @@ msgstr ""
 "La versión %d.%d.%d. de la librería gst-python contiene un gran \"memory leak"
 "\".\n"
 
-#: ../flumotion/component/producers/checks.py:107
+#: ../flumotion/component/producers/checks.py:89
+msgid ""
+"The Soundcard and Firewire sources may leak a lot of memory as a result, and "
+"need to be restarted frequently.\n"
+msgstr ""
+"La tarjeta de sonido y las fuentes Firewire pueden ir ocupando mucha memoria "
+"y, como resultado de esto, necesitan ser reiniciadas frecuentemente.\n"
+
+#: ../flumotion/component/producers/checks.py:108
 #, python-format
 msgid "Version %d.%d.%d of the GStreamer library is too old.\n"
 msgstr "La versión %d.%d.%d de la libreríal GStreamer es demasiado antigüa.\n"
 
-#: ../flumotion/component/producers/checks.py:110
-#: ../flumotion/component/producers/checks.py:122
+#: ../flumotion/component/producers/checks.py:111
+#: ../flumotion/component/producers/checks.py:123
 #, python-format
 msgid "The '%s' component needs a newer version of '%s'.\n"
 msgstr "El componente '%s' necesita una nueva versión de '%s'.\n"
 
-#: ../flumotion/component/producers/checks.py:119
+#: ../flumotion/component/producers/checks.py:120
 #, python-format
 msgid "Version %d.%d.%d of the gst-python library is too old.\n"
 msgstr "La versión %d.%d.%d de la librería gst-python es demasiado antigüa.\n"
@@ -3018,9 +3015,10 @@ msgstr "Tarjeta de sonido"
 
 #: ../flumotion/component/producers/soundcard/wizard_gtk.py:119
 msgid ""
-"Looking for the sound devices present on the system.This can take a while..."
+"Looking for the sound devices present on the system. This can take a while..."
 msgstr ""
-"Buscando dispositivos de sonido en su sistema. Esto podría llevar un rato..."
+"Buscando dispositivos de sonido en su sistema. Esto podría llevar un "
+"tiempo..."
 
 #: ../flumotion/component/producers/soundcard/wizard_gtk.py:154
 msgid "Probing the sound card. This can take a while..."
@@ -3068,20 +3066,20 @@ msgid "The height in pixels."
 msgstr "Altura en píxeles."
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:5
+msgid "The test pattern to show (smpte/snow/black/...)."
+msgstr "Patrón de pruebas a mostrar (smpte/nieve/negro/...)."
+
+#: ../flumotion/component/producers/videotest/videotest.xml.h:6
 msgid "The video frame rate as numerator/denominator."
 msgstr "La tasa de fotogramas de video como numerador/denominador."
 
-#: ../flumotion/component/producers/videotest/videotest.xml.h:6
+#: ../flumotion/component/producers/videotest/videotest.xml.h:7
 msgid "The video pixel aspect ratio as numerator/denominator."
 msgstr "Ratio de aspecto del vídeo como numerador/denominador."
 
-#: ../flumotion/component/producers/videotest/videotest.xml.h:7
+#: ../flumotion/component/producers/videotest/videotest.xml.h:8
 msgid "The width in pixels."
 msgstr "Ancho en píxeles."
-
-#: ../flumotion/component/producers/videotest/videotest.xml.h:8
-msgid "Thhe test pattern to show (smpte/snow/black/...)."
-msgstr "Diseño de pruebas a mostrar (smpte/nieve/negro/...)."
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:9
 msgid "Video format"
@@ -3295,11 +3293,11 @@ msgstr "Sumario"
 #: ../flumotion/scenario/steps/httpstreamersteps.py:510
 #, python-format
 msgid ""
-"The mount point %s is already been used for worker %s and port %s. Correct "
-"it to be able to go forward."
+"The mount point %s is already being used for worker %s and port %s. Please "
+"correct this to be able to go forward."
 msgstr ""
-"El punto de montaje %s está ya siendo usado por el \"worker\" %s en el "
-"puerto %s. Corríjalo para poder continuar."
+"El punto de montaje %s está ocupado en el \"worker\" %s y puerto %s. "
+"Corríjalo para poder continuar."
 
 #: ../flumotion/scenario/steps/httpstreamersteps.py:524
 msgid ""
@@ -3513,12 +3511,13 @@ msgid "But does %s know what ?"
 msgstr "¿Pero %s sabe eso?"
 
 #: ../flumotion/ui/fileselector.py:89
-msgid "You don't have enough privileges to view thecontents of that directory"
+msgid ""
+"You don't have enough privileges to view the contents of that directory."
 msgstr "No tiene suficienes permisos para ver el contenido de ese directorio"
 
-#: ../flumotion/ui/fileselector.py:186
-msgid "Select a folder..."
-msgstr "Seleccione una carpeta..."
+#: ../flumotion/ui/fileselector.py:189
+msgid "Select ..."
+msgstr "Seleccionar..."
 
 #: ../flumotion/ui/wizard.py:747
 msgid "_Finish"
@@ -3526,7 +3525,7 @@ msgstr "_Finalizar"
 
 #: ../flumotion/worker/checks/audio.py:95
 msgid ""
-"There has been an error while fetching the OSS audio devicesthrough Hal.\n"
+"There has been an error while fetching the OSS audio devices through Hal.\n"
 "The listed devices have been guessed and may not work properly."
 msgstr ""
 "Ha habido un error mientras se accedía a los dispositivo de sonido OSS a "
@@ -3540,14 +3539,14 @@ msgstr "No se han podido probar los dispositivos."
 #: ../flumotion/worker/checks/audio.py:115
 msgid ""
 "Could not find any device in the system.\n"
-"Please, check whether the device is correctly plugged and/or the modules are "
-"correctly loaded."
+"Please check whether the device is correctly plugged in and whether the "
+"modules are correctly loaded."
 msgstr ""
-"No se ha podido encontrar ningún dispositivo en el sistema.\n"
-"Por favor, compruebe que el dispositivo esté correctamente enchufado y que "
-"los módulos (del kernel) hayan cargado correctamente."
+"No se ha podido encontrar ningún dispositivo de audio en el sistema.\n"
+"Por favor, compruebe que el dispositivo esté correctamente conectado y que "
+"los módulos (del kernel) estén cargados correctamente."
 
-#: ../flumotion/worker/checks/audio.py:180
+#: ../flumotion/worker/checks/audio.py:181
 #: ../flumotion/worker/checks/check.py:54
 #, python-format
 msgid ""
@@ -3594,22 +3593,22 @@ msgstr "No se ha podido probar el dispositivo '%s'."
 msgid "No device found on %s."
 msgstr "Dispositivo no encontrado en %s."
 
-#: ../flumotion/worker/checks/check.py:239
+#: ../flumotion/worker/checks/check.py:290
 #, python-format
 msgid "This host is missing the '%s' GStreamer plug-in.\n"
 msgstr "El \"host\" no tiene el \"plug-in\" de GStreamer '%s'.\n"
 
-#: ../flumotion/worker/checks/check.py:242
+#: ../flumotion/worker/checks/check.py:293
 #, python-format
 msgid "Please install '%s'.\n"
 msgstr "Por favor, instale '%s'.\n"
 
-#: ../flumotion/worker/checks/check.py:252
+#: ../flumotion/worker/checks/check.py:303
 #, python-format
 msgid "Your '%s' GStreamer plug-in is too old.\n"
 msgstr "La versión del componente '%s' de GStreamer es demasiado antigüa.\n"
 
-#: ../flumotion/worker/checks/check.py:255
+#: ../flumotion/worker/checks/check.py:306
 #, python-format
 msgid "Please upgrade '%s' to version %s or higher."
 msgstr "Por favor, actualize '%s' a la versión %s o superior."
@@ -3654,13 +3653,25 @@ msgstr ""
 #: ../flumotion/worker/checks/gst010.py:273
 msgid ""
 "Could not find any Firewire device on the system.\n"
-"Please, check whether the device is correctly plugged or the modules are "
-"correctly loaded."
+"Please check whether the device is correctly plugged in and whether the "
+"modules are correctly loaded."
 msgstr ""
 "No se ha podido encontrar ningún dispositivo Firewire en el sistema.\n"
-"Por favor, compruebe que el dispositivo esté correctamente enchufado y que "
-"los módulos (del kernel) hayan cargado corréctamente."
+"Por favor, compruebe que el dispositivo esté correctamente conectado y que "
+"los módulos (del kernel) estén cargados correctamente."
 
 #: ../flumotion/worker/job.py:334
 msgid "Check timed out."
 msgstr "Tiempo de comprobación excedido."
+
+#~ msgid "localhost.localdomain"
+#~ msgstr "localhost.localdomain"
+
+#~ msgid "/tmp"
+#~ msgstr "/tmp"
+
+#~ msgid "Displays an about dialog"
+#~ msgstr "Mostrar un diálogo 'acerca de'"
+
+#~ msgid "Select a folder..."
+#~ msgstr "Seleccione una carpeta..."
