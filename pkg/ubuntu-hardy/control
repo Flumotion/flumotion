@@ -1,7 +1,7 @@
 Source: flumotion
 Section: net
 Priority: optional
-Maintainer: Johan Dahlin <johan@flumotion.com>
+Maintainer: Arek Korbik <arek@flumotion.com>
 Build-Depends: cdbs,
                debhelper (>= 5.0.37.2),
                pkg-config,
