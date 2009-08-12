@@ -1,6 +1,11 @@
 2009-08-12  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	* po/fr.po:
+	last batch, there are still some flaky or non-translated strings though.
+
+2009-08-12  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	* po/fr.po:
 	going on with the french translations...
 
 2009-08-12  Jan Urbanski  <jurbanski@flumotion.com>

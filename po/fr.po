@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
 "POT-Creation-Date: 2009-08-12 12:10+0200\n"
-"PO-Revision-Date: 2009-08-12 18:18+0200\n"
+"PO-Revision-Date: 2009-08-12 19:05+0200\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -2238,7 +2238,7 @@ msgstr ""
 
 #: ../flumotion/component/feedcomponent.py:345
 msgid "GStreamer error: could not parse component pipeline."
-msgstr "Erreur GStreamer: impossible d'analyser le pipeline du component."
+msgstr "Erreur GStreamer: impossible d'analyser le pipeline du composant."
 
 #: ../flumotion/component/misc/httpserver/admin_gtk.py:146
 #: ../flumotion/component/misc/httpserver/admin_gtk.py:151
@@ -2359,7 +2359,7 @@ msgstr "Débit maximum :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:24
 msgid "Peak Rate:"
-msgstr "Taux maximum:"
+msgstr "Taux maximum :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:26
 msgid "Rate:"
@@ -2619,7 +2619,7 @@ msgstr "Carte TV"
 
 #: ../flumotion/component/producers/bttv/wizard_gtk.py:121
 msgid "Probing the TV card. This can take a while..."
-msgstr "Détection de la carte TV cette étape peut prendre du temps..."
+msgstr "Détection de la carte TV, cette étape peut prendre du temps..."
 
 #: ../flumotion/component/producers/checks.py:62
 #, python-format
@@ -2718,7 +2718,7 @@ msgstr "La largeur à atteindre avant de corriger."
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:9
 msgid "Whether to scale to a 1:1 pixel aspect ratio."
-msgstr "Si oui ou non on le ratio 1:1 de pixel doit être respecté."
+msgstr "Si oui ou non le ratio 1:1 de pixel doit être respecté."
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:1
 msgid "<b>Camera settings</b>"
@@ -2920,7 +2920,7 @@ msgstr ""
 msgid ""
 "Please upgrade '%s' to version %s or later if you require this functionality."
 msgstr ""
-"Veuillez mettre à jour '%s' vers la version %s (au moins) is vous avez "
+"Veuillez mettre à jour '%s' vers la version %s (au moins) si vous avez "
 "besoin de cette fonctionnalité."
 
 #: ../flumotion/component/producers/soundcard/soundcard.py:163
@@ -3088,20 +3088,23 @@ msgstr "La largeur en pixels."
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:9
 msgid "Video format"
-msgstr "Format video"
+msgstr "Format vidéo"
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:10
 msgid "Whether to overlay buffer timestamps."
-msgstr "Si il faut afficher les marqueurs de temps en surimpression."
+msgstr ""
+"Si oui ou non les marqueurs de temps doivent être affichés en surimpression."
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:11
 msgid ""
 "Whether to overlay system clock time.  Overrides overlay-timestamps if set."
 msgstr ""
+"Si oui ou non l'heure système doit être affichée en surimpression. (si oui, "
+"prévaut sur overlay-timestamps)"
 
 #: ../flumotion/component/producers/videotest/wizard_gtk.py:47
 msgid "Test Video Producer"
-msgstr "_Source vidéo:"
+msgstr "Source vidéo de test"
 
 #: ../flumotion/component/producers/webcam/webcam.xml.h:1
 msgid "Produces a raw video feed from a webcam."
@@ -3152,11 +3155,11 @@ msgstr "Webcam"
 
 #: ../flumotion/component/producers/webcam/wizard.glade.h:2
 msgid "Name:"
-msgstr "Nom:"
+msgstr "Nom :"
 
 #: ../flumotion/component/producers/webcam/wizard.glade.h:4
 msgid "_Size:"
-msgstr "_Vidéo:"
+msgstr "Taille :"
 
 #: ../flumotion/component/producers/webcam/wizard_gtk.py:57
 msgid "Webcam"
@@ -3164,7 +3167,7 @@ msgstr "Webcam"
 
 #: ../flumotion/component/producers/webcam/wizard_gtk.py:110
 msgid "Probing the webcam. This can take a while..."
-msgstr "Détéction de la webcam, cette étape peut prendre du temp..."
+msgstr "Test de la webcam, cette étape peut prendre du temps..."
 
 #: ../flumotion/extern/exceptiondialog.py:184
 msgid "A programming error occurred."
@@ -3180,7 +3183,7 @@ msgstr "Montrer l'information de débogage"
 
 #: ../flumotion/extern/pytrayicon/eggtrayicon.c:119
 msgid "Orientation"
-msgstr "Authentification"
+msgstr "Orientation"
 
 #: ../flumotion/extern/pytrayicon/eggtrayicon.c:120
 msgid "The orientation of the tray."
@@ -3223,7 +3226,7 @@ msgid ""
 msgstr ""
 "Ce composant est configuré pour Flumotion '%s' version %s, mais vous avez la "
 "version %s.\n"
-"Mettez à jour la configuration de ce composant.\n"
+"Mettez la configuration de ce composant à jour.\n"
 
 #: ../flumotion/manager/manager.py:473
 #, python-format
@@ -3236,7 +3239,7 @@ msgstr ""
 
 #: ../flumotion/manager/manager.py:547
 msgid "Invalid component configuration."
-msgstr "Charger Configuration..."
+msgstr "Configuration invalide du composant."
 
 #: ../flumotion/manager/manager.py:556
 #, python-format
@@ -3249,7 +3252,7 @@ msgstr "Erreur inconnue en chargeant la configuration."
 
 #: ../flumotion/manager/manager.py:1004
 msgid "The component could not be started."
-msgstr "Le composant n'a pas pu être démarré."
+msgstr "Le composant n'a pu être démarré."
 
 #: ../flumotion/scenario/steps/licensestep.py:36
 msgid "Content License"
@@ -3261,38 +3264,35 @@ msgstr "Licence"
 
 #: ../flumotion/scenario/steps/licensestep.py:58
 msgid "Creative Commons"
-msgstr ""
-"Creative·Commons\n"
-"GNU·FDL\n"
-"Commercial"
+msgstr "Creative·Commons"
 
 #: ../flumotion/scenario/steps/licensestep.py:59
 msgid "Commercial"
-msgstr "Commercial"
+msgstr "Commercialle"
 
 #: ../flumotion/scenario/steps/shout2steps.py:83
 msgid "Icecast Streamer (Audio and Video)"
-msgstr "Audio et Vidéo"
+msgstr "Streamer Icecast (audio et vidéo)"
 
 #: ../flumotion/scenario/steps/shout2steps.py:84
 msgid "Icecast audio/video"
-msgstr "Audio et Vidéo"
+msgstr "Icecast audio/vidéo"
 
 #: ../flumotion/scenario/steps/shout2steps.py:97
 msgid "Icecast Streamer (Audio Only)"
-msgstr "Audio seulement"
+msgstr "Streamer Icecast (audio seulement)"
 
 #: ../flumotion/scenario/steps/shout2steps.py:98
 msgid "Icecast Audio"
-msgstr "_Source vidéo:"
+msgstr "Icecast audio"
 
 #: ../flumotion/scenario/steps/shout2steps.py:111
 msgid "Icecast Streamer (Video Only)"
-msgstr "Vidéo seulement"
+msgstr "Streamer Icecast (vidéo seulement)"
 
 #: ../flumotion/scenario/steps/shout2steps.py:112
 msgid "Icecast Video"
-msgstr "_Source vidéo:"
+msgstr "Icecast vidéo"
 
 #: ../flumotion/scenario/steps/summarysteps.py:36
 #: ../flumotion/scenario/steps/summarysteps.py:37
@@ -3321,27 +3321,27 @@ msgstr ""
 
 #: ../flumotion/scenario/steps/httpstreamersteps.py:549
 msgid "HTTP Streamer (Audio and Video)"
-msgstr "Audio et Vidéo"
+msgstr "Streeamer HTTP (audio et vidéo)"
 
 #: ../flumotion/scenario/steps/httpstreamersteps.py:550
 msgid "HTTP Audio/Video"
-msgstr "Audio et Vidéo"
+msgstr "HTTP audio/video"
 
 #: ../flumotion/scenario/steps/httpstreamersteps.py:563
 msgid "HTTP Streamer (Audio Only)"
-msgstr "Audio seulement"
+msgstr "Streamer HTTP (audio seulement)"
 
 #: ../flumotion/scenario/steps/httpstreamersteps.py:564
 msgid "HTTP Audio"
-msgstr "_Audio:"
+msgstr "HTTP audio"
 
 #: ../flumotion/scenario/steps/httpstreamersteps.py:577
 msgid "HTTP Streamer (Video Only)"
-msgstr "Vidéo seulement"
+msgstr "Streamer HTTP (vidéo seulement)"
 
 #: ../flumotion/scenario/steps/httpstreamersteps.py:578
 msgid "HTTP Video"
-msgstr "_Vidéo:"
+msgstr "HTTP vidéo"
 
 #: ../flumotion/scenario/steps/ondemandstep.py:86
 #: ../flumotion/scenario/steps/ondemandstep.py:87
@@ -3355,7 +3355,7 @@ msgid ""
 "This module is part of the '%s'."
 msgstr ""
 "\n"
-"Ce module fait partie du '%s'."
+"Ce module fait partie de '%s'."
 
 #: ../flumotion/scenario/steps/ondemandstep.py:160
 #, python-format
@@ -3365,11 +3365,11 @@ msgstr ""
 
 #: ../flumotion/scenario/steps/productionsteps.py:142
 msgid "Select this if you want to stream video"
-msgstr "Si vous souhaitez diffuser de la vidéo"
+msgstr "Si vous souhaitez diffuser la vidéo"
 
 #: ../flumotion/scenario/steps/productionsteps.py:144
 msgid "Select this if you want to stream audio"
-msgstr "Si vous souhaitez diffuser de l'audio"
+msgstr "Si vous souhaitez diffuser l'audio"
 
 #: ../flumotion/scenario/steps/diskersteps.py:116
 msgid "kB"
@@ -3404,28 +3404,34 @@ msgid "week(s)"
 msgstr "semaine(s)"
 
 #: ../flumotion/scenario/steps/diskersteps.py:197
+#, fuzzy
 msgid "Disk (Audio and Video)"
-msgstr "Audio et Vidéo"
+msgstr "Disque (audio et vidéo)"
 
 #: ../flumotion/scenario/steps/diskersteps.py:198
+#, fuzzy
 msgid "Disk Audio/Video"
-msgstr "Audio et Vidéo"
+msgstr "Disque audio/vidéo"
 
 #: ../flumotion/scenario/steps/diskersteps.py:208
+#, fuzzy
 msgid "Disk (Audio Only)"
-msgstr "Audio seulement"
+msgstr "Disque (audio seulement)"
 
 #: ../flumotion/scenario/steps/diskersteps.py:209
+#, fuzzy
 msgid "Disk Audio"
-msgstr "Audio seulement"
+msgstr "Disque (audio seulement)"
 
 #: ../flumotion/scenario/steps/diskersteps.py:219
+#, fuzzy
 msgid "Disk (Video Only)"
-msgstr "Vidéo seulement"
+msgstr "Disque (vidéo seulement)"
 
 #: ../flumotion/scenario/steps/diskersteps.py:220
+#, fuzzy
 msgid "Disk Video"
-msgstr "Vidéo seulement"
+msgstr "Disque vidéo"
 
 #: ../flumotion/scenario/steps/conversionsteps.py:49
 msgid "Encoding"
@@ -3450,7 +3456,7 @@ msgstr "Créer un flux en direct."
 
 #: ../flumotion/scenario/live/wizard_gtk.py:45
 msgid "Stream live"
-msgstr "Diffusion sur _HTTP"
+msgstr "Diffusion en direct"
 
 #: ../flumotion/scenario/live/wizard_gtk.py:47
 msgid ""
@@ -3533,31 +3539,29 @@ msgstr ""
 
 #: ../flumotion/ui/fileselector.py:189
 msgid "Select ..."
-msgstr "_Selectionner"
+msgstr "Selectionner..."
 
 #: ../flumotion/ui/wizard.py:747
 msgid "_Finish"
 msgstr "_Finir"
 
 #: ../flumotion/worker/checks/audio.py:95
-#, fuzzy
 msgid ""
 "There has been an error while fetching the OSS audio devices through Hal.\n"
 "The listed devices have been guessed and may not work properly."
-msgstr "Une  "
+msgstr ""
 
 #: ../flumotion/worker/checks/audio.py:105
 msgid "Could not probe devices."
-msgstr "Impossible de sonder le périphérique '%s'"
+msgstr "Impossible de tester les périphériques."
 
 #: ../flumotion/worker/checks/audio.py:115
-#, fuzzy
 msgid ""
 "Could not find any device in the system.\n"
 "Please check whether the device is correctly plugged in and whether the "
 "modules are correctly loaded."
 msgstr ""
-"Impossible de trouver périphérique sur le systéme.\n"
+"Impossible de trouver un périphérique sur le systéme.\n"
 "Veuillez vérifier que le périphériques est correctement branché et/ou que "
 "les modules sont correctement chargés."
 
@@ -3568,7 +3572,7 @@ msgid ""
 "Could not open device '%s' for reading.  Check permissions on the device."
 msgstr ""
 "Impossible d'accéder en lecture au périphérique '%s'. Veuillez vérifier les "
-"droits d'accés au périphérique."
+"permissions de ce périphérique."
 
 #: ../flumotion/worker/checks/check.py:59
 #, python-format
@@ -3576,13 +3580,13 @@ msgid ""
 "Could not open device '%s' for writing.  Check permissions on the device."
 msgstr ""
 "Impossible d'accéder en lecture au périphérique '%s'. Veuillez vérifier les "
-"droits d'accés au périphérique."
+"permissions de ce périphérique."
 
 #: ../flumotion/worker/checks/check.py:64
 #, python-format
 msgid "Could not open device '%s'.  Check permissions on the device."
 msgstr ""
-"Impossible d'ouvrir le périphérique '%s'. Vérifiez les droits sur ce "
+"Impossible d'ouvrir le périphérique '%s'. Vérifiez les permissions de ce "
 "périphérique."
 
 #: ../flumotion/worker/checks/check.py:69
@@ -3593,21 +3597,21 @@ msgstr "Le périphérique '%s' est déjà utilisé."
 #: ../flumotion/worker/checks/check.py:72
 #, python-format
 msgid "Device '%s' did not accept the requested settings."
-msgstr "Le périphérique '%s' n'accepte pas les réglages demandés."
+msgstr "Le périphérique '%s' n'accepte pas les paramètres demandés."
 
 #: ../flumotion/worker/checks/check.py:78
 msgid "Internal unhandled GStreamer error."
-msgstr "Erreur interne à GStreamer"
+msgstr "Erreur non-gérée interne à GStreamer."
 
 #: ../flumotion/worker/checks/check.py:122
 #, python-format
 msgid "Could not probe device '%s'."
-msgstr "Impossible de sonder le périphérique '%s'"
+msgstr "Impossible de tester le périphérique '%s'."
 
 #: ../flumotion/worker/checks/check.py:143
 #, python-format
 msgid "No device found on %s."
-msgstr "Aucun périphérique détecté sur %s."
+msgstr "Aucun périphérique trouvé sur %s."
 
 #: ../flumotion/worker/checks/check.py:290
 #, python-format
@@ -3622,12 +3626,12 @@ msgstr "Veuillez installer '%s'.\n"
 #: ../flumotion/worker/checks/check.py:303
 #, python-format
 msgid "Your '%s' GStreamer plug-in is too old.\n"
-msgstr "Vote plug-in GStreamer '%s' est trop vieux.\n"
+msgstr "Votre plug-in GStreamer '%s' est trop vieux.\n"
 
 #: ../flumotion/worker/checks/check.py:306
 #, python-format
 msgid "Please upgrade '%s' to version %s or higher."
-msgstr "Veuillez mettre à jour '%s' vers la version %s."
+msgstr "Veuillez mettre à jour '%s' vers la version %s (au moins)."
 
 #: ../flumotion/worker/checks/encoder.py:45
 #: ../flumotion/worker/checks/encoder.py:67
@@ -3644,18 +3648,18 @@ msgstr ""
 
 #: ../flumotion/worker/checks/gst010.py:203
 msgid "No Firewire device found."
-msgstr "Aucun périphérique Firewire détécté."
+msgstr "Aucun périphérique Firewire trouvé."
 
 #: ../flumotion/worker/checks/gst010.py:206
 msgid ""
 "Could not open Firewire device for reading. Check permissions on the device."
 msgstr ""
 "Impossible d'accéder en lecture au périphérique '%s'. Veuillez vérifier les "
-"droits d'accés au périphérique."
+"permissions de ce périphérique."
 
 #: ../flumotion/worker/checks/gst010.py:214
 msgid "Could not probe Firewire device."
-msgstr "Impossible de sonder pour le périphérique Firewire."
+msgstr "Impossible de tester le périphérique Firewire."
 
 #: ../flumotion/worker/checks/gst010.py:246
 msgid ""
@@ -3666,13 +3670,12 @@ msgstr ""
 "gstreamer-plugins-good n'est peut-être pas correctement installé."
 
 #: ../flumotion/worker/checks/gst010.py:273
-#, fuzzy
 msgid ""
 "Could not find any Firewire device on the system.\n"
 "Please check whether the device is correctly plugged in and whether the "
 "modules are correctly loaded."
 msgstr ""
-"Impossible de trouver un périphérique FireWire sur le système.\n"
+"Impossible de trouver un périphérique Firewire sur le système.\n"
 "Veuillez vérifier que le périphériques est correctement branché et/ou que "
 "les modules sont correctement chargés."
 
