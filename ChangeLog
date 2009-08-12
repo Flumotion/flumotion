@@ -1,6 +1,11 @@
 2009-08-12  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* configure.ac:
+	0.5.4.2 prerelase
+
+2009-08-12  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* configure.ac:
 	Change the required version of Python to 2.4.0, which unbreaks the
 	Python version detection logic in the autotools setup.
 
