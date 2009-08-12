@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: flumotion 0.2.0\n"
 "Report-Msgid-Bugs-To: https://core.fluendo.com/trac/flumotion/\n"
 "POT-Creation-Date: 2009-08-12 12:10+0200\n"
-"PO-Revision-Date: 2009-08-12 16:32+0200\n"
+"PO-Revision-Date: 2009-08-12 18:18+0200\n"
 "Last-Translator: Edward Hervey <edward@fluendo.com>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -2125,7 +2125,7 @@ msgstr "Distance maximale entre les keyframes (en nombre d'images)."
 
 #: ../flumotion/component/encoders/theora/theora.xml.h:5
 msgid "The minimum distance between key frames (in frames)."
-msgstr "Distance minimale entre les images de référence (en nombre d'images)."
+msgstr "Distance minimale entre les keyframes (en nombre d'images)."
 
 #: ../flumotion/component/encoders/theora/theora.xml.h:6
 msgid "The noise sensitivity (defaults to 1)"
@@ -2151,8 +2151,8 @@ msgid ""
 "A shorter time between key frames reduces playback latency at the cost of a "
 "higher bit rate or lower quality."
 msgstr ""
-"Un temps plus court entre images de réference réduit la latence de lecture "
-"au prix d'un plus haut débit, ou d'une qualité moindre."
+"Un temps plus court entre keyframes réduit la latence de lecture au prix "
+"d'un plus haut débit, ou d'une qualité moindre."
 
 #: ../flumotion/component/encoders/theora/wizard.glade.h:4
 msgid "Advanced settings"
@@ -2160,7 +2160,7 @@ msgstr "Configuration avancée"
 
 #: ../flumotion/component/encoders/theora/wizard.glade.h:6
 msgid "Time between _key frames:"
-msgstr "Temps entre chaque image de référence _k : XXX"
+msgstr "Temps entre chaque _keyframe :"
 
 #: ../flumotion/component/encoders/theora/wizard.glade.h:7
 msgid "_Noise sensitivity:"
@@ -2168,11 +2168,11 @@ msgstr "Se_nsibilité au bruit :"
 
 #: ../flumotion/component/encoders/theora/wizard.glade.h:9
 msgid "_Sharpness:"
-msgstr "Nombre de _canaux:"
+msgstr "Dureté :"
 
 #: ../flumotion/component/encoders/theora/wizard_gtk.py:85
 msgid "Theora Encoder"
-msgstr "Recharger le _code"
+msgstr "Encodeur Theora"
 
 #: ../flumotion/component/encoders/vorbis/vorbis.xml.h:1
 msgid "An audio encoder that encodes to Vorbis."
@@ -2212,8 +2212,8 @@ msgstr "Erreur de programmation dans le composant."
 msgid ""
 "Your gst-plugins-base is too old, so feeder statistics will be unavailable."
 msgstr ""
-"Votre gst-plugins-base est trop vieux, les statistiques de feeders ne seront "
-"pas disponibles."
+"Votre gst-plugins-base est trop vieux, les statistiques des feeders ne "
+"seront pas disponibles."
 
 #: ../flumotion/component/feedcomponent010.py:677
 msgid "Internal Flumotion error."
@@ -2238,7 +2238,7 @@ msgstr ""
 
 #: ../flumotion/component/feedcomponent.py:345
 msgid "GStreamer error: could not parse component pipeline."
-msgstr "Erreur GStreamer: impossible d'analyser le tube du component."
+msgstr "Erreur GStreamer: impossible d'analyser le pipeline du component."
 
 #: ../flumotion/component/misc/httpserver/admin_gtk.py:146
 #: ../flumotion/component/misc/httpserver/admin_gtk.py:151
@@ -2307,7 +2307,7 @@ msgstr "Débit Moyen:"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:9
 msgid "Average File Read:"
-msgstr "Moyenne de fichier lu :"
+msgstr "Moyenne de fichiers lus :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:10
 msgid "Average Rate:"
@@ -2323,7 +2323,7 @@ msgstr "Nettoyages :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:14
 msgid "Current Bitrate:"
-msgstr "Courant:"
+msgstr "Débit courant:"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:16
 msgid "Efficiency:"
@@ -2331,7 +2331,7 @@ msgstr "Rendement :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:17
 msgid "Finished:"
-msgstr "Fini :"
+msgstr "Fini(s) :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:18
 msgid "From Temp:"
@@ -2339,11 +2339,11 @@ msgstr "De Temp :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:19
 msgid "Hits:"
-msgstr "_Hauteur"
+msgstr ""
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:20
 msgid "Last Cleanup:"
-msgstr "Dernier nettoyage"
+msgstr "Dernier nettoyage :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:21
 msgid "Misses:"
@@ -2355,19 +2355,19 @@ msgstr ""
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:23
 msgid "Peak Bitrate:"
-msgstr "Débit:"
+msgstr "Débit maximum :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:24
 msgid "Peak Rate:"
-msgstr "Maximum:"
+msgstr "Taux maximum:"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:26
 msgid "Rate:"
-msgstr "Motif:"
+msgstr "Taux :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:27
 msgid "Size:"
-msgstr "_Vidéo:"
+msgstr "Taille :"
 
 #: ../flumotion/component/misc/httpserver/httpserver.glade.h:31
 msgid "Usage:"
@@ -2431,7 +2431,7 @@ msgstr "Ogg"
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:1
 msgid "A HTML template to use to serve the cortado applet."
-msgstr "Un modèle HTML à utiliver pour l'applet cortado."
+msgstr "Un modèle HTML à utiliser pour l'applet cortado."
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:2
 msgid "Publish embedded Java player page"
@@ -2439,7 +2439,7 @@ msgstr "Publier la page contenant le lecteur Java"
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:3
 msgid "Serves the embedded Cortado Java player."
-msgstr "Déssert le lecteur Java Cortado."
+msgstr "Dessert le lecteur Java Cortado."
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:4
 msgid "The URL to the stream we are displaying."
@@ -2447,7 +2447,7 @@ msgstr "L'URL du flux que nous montrons."
 
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:5
 msgid "The base URL used to fetch the cortado applet code."
-msgstr "L'URL de base utilisé pour récupérer le code de l'applet cortado."
+msgstr "L'URL de base utilisée pour récupérer le code de l'applet cortado."
 
 #. FIXME: What is this? murrayc
 #: ../flumotion/component/plugs/cortado/cortado.xml.h:7
@@ -2489,11 +2489,11 @@ msgstr "Test audio"
 
 #: ../flumotion/component/producers/audiotest/audiotest.glade.h:2
 msgid "_Frequency:"
-msgstr "F_réquence:"
+msgstr "_Fréquence :"
 
 #: ../flumotion/component/producers/audiotest/audiotest.glade.h:3
 msgid "_Wave form:"
-msgstr "_W Forme de l'onde :"
+msgstr "Forme de l'onde :"
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:1
 msgid "Produces an example audio signal without using a device."
@@ -2501,7 +2501,7 @@ msgstr "Produit un signal audio d'exemple sans utiliser de périphérique."
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:2
 msgid "Test audio producer"
-msgstr "_Source vidéo:"
+msgstr "Source audio de test"
 
 #: ../flumotion/component/producers/audiotest/audiotest.xml.h:3
 msgid "The Sample rate (in Hz).  Defaults to 44100."
@@ -2532,7 +2532,7 @@ msgstr "Hz"
 
 #: ../flumotion/component/producers/audiotest/wizard.glade.h:3
 msgid "_Sample rate:"
-msgstr "_Taux d'échantillonage:"
+msgstr "_Taux d'échantillonage :"
 
 #: ../flumotion/component/producers/audiotest/wizard.glade.h:4
 msgid "_Volume:"
@@ -2540,11 +2540,11 @@ msgstr "_Volume:"
 
 #: ../flumotion/component/producers/audiotest/wizard_gtk.py:46
 msgid "Test Audio Producer"
-msgstr "_Source vidéo:"
+msgstr "Source audio de test"
 
 #: ../flumotion/component/producers/bttv/bttv.xml.h:1
 msgid "A producer that captures a raw video feed from a TV card."
-msgstr "Un producteur qui capture le flux video brupt d'une carte TV."
+msgstr "Un producteur qui capture le flux video brut d'une carte TV."
 
 #: ../flumotion/component/producers/bttv/bttv.xml.h:2
 msgid "TV card"
@@ -2597,7 +2597,7 @@ msgstr "La largeur de la vidéo produite."
 #: ../flumotion/component/producers/videotest/wizard.glade.h:1
 #: ../flumotion/component/producers/webcam/wizard.glade.h:1
 msgid "F_rame Rate:"
-msgstr "F_ramerate:"
+msgstr "F_ramerate :"
 
 #: ../flumotion/component/producers/bttv/wizard.glade.h:2
 msgid "TV _norm:"
@@ -2605,13 +2605,13 @@ msgstr "_Norme TV:"
 
 #: ../flumotion/component/producers/bttv/wizard.glade.h:3
 msgid "Video _source:"
-msgstr "_Source vidéo:"
+msgstr "_Source vidéo :"
 
 #: ../flumotion/component/producers/bttv/wizard.glade.h:4
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:5
 #: ../flumotion/component/producers/webcam/wizard.glade.h:3
 msgid "_Device:"
-msgstr "_Périphérique:"
+msgstr "_Périphérique :"
 
 #: ../flumotion/component/producers/bttv/wizard_gtk.py:61
 msgid "TV Card"
@@ -2619,7 +2619,7 @@ msgstr "Carte TV"
 
 #: ../flumotion/component/producers/bttv/wizard_gtk.py:121
 msgid "Probing the TV card. This can take a while..."
-msgstr "Détéction de la webcam, cette étape peut prendre du temp..."
+msgstr "Détection de la carte TV cette étape peut prendre du temps..."
 
 #: ../flumotion/component/producers/checks.py:62
 #, python-format
@@ -2628,13 +2628,12 @@ msgstr ""
 "La version %d.%d.%d de la bibliothèque PyGTK contient une fuite de mémoire.\n"
 
 #: ../flumotion/component/producers/checks.py:66
-#, fuzzy
 msgid ""
 "The Soundcard and Firewire sources may leak a lot of memory as a result, and "
 "would need to be restarted frequently.\n"
 msgstr ""
-"Les cartes son et les sources Firewire peuvent souffrir de fuite de mémoire, "
-"et nécessite d'être redémarrées fréquemment.\n"
+"Les cartes son et les sources Firewire peuvent souffrir de fuites de "
+"mémoire, et nécessitent d'être redémarrées fréquemment.\n"
 
 #: ../flumotion/component/producers/checks.py:69
 #: ../flumotion/component/producers/checks.py:91
@@ -2642,7 +2641,7 @@ msgstr ""
 #: ../flumotion/component/producers/checks.py:125
 #, python-format
 msgid "Please upgrade '%s' to version %s or later."
-msgstr "Veuillez mettre à jour '%s' vers la version %s."
+msgstr "Veuillez mettre à jour '%s' vers la version %s (au moins)."
 
 #: ../flumotion/component/producers/checks.py:85
 #, python-format
@@ -2657,8 +2656,8 @@ msgid ""
 "The Soundcard and Firewire sources may leak a lot of memory as a result, and "
 "need to be restarted frequently.\n"
 msgstr ""
-"Les cartes son et les sources Firewire peuvent souffrir de fuite de mémoire, "
-"et nécessite d'être redémarrées fréquemment.\n"
+"Les cartes son et les sources Firewire peuvent souffrir de fuites de "
+"mémoire, et nécessitent d'être redémarrées fréquemment.\n"
 
 #: ../flumotion/component/producers/checks.py:108
 #, python-format
@@ -2686,15 +2685,15 @@ msgstr "La camera à été déconnecté."
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:1
 msgid "Firewire audio"
-msgstr "Aucun périphérique Firewire détécté."
+msgstr "Firewire audio"
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:2
 msgid "Firewire video"
-msgstr "Aucun périphérique Firewire détécté."
+msgstr "Firewire vidéo"
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:3
 msgid "Produces feeds from a Firewire/DV device."
-msgstr "Impossible de sonder pour le périphérique Firewire."
+msgstr "Produit des flux depuis un périphériques Firewire/DV."
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:4
 msgid "The GUID of the device (a hexadecimal such as 0xhhhhhhhhhhhhhhhh)."
@@ -2719,7 +2718,7 @@ msgstr "La largeur à atteindre avant de corriger."
 
 #: ../flumotion/component/producers/firewire/firewire.xml.h:9
 msgid "Whether to scale to a 1:1 pixel aspect ratio."
-msgstr "Si oui ou non on doit respecter le ratio 1:1 de pixel."
+msgstr "Si oui ou non on le ratio 1:1 de pixel doit être respecté."
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:1
 msgid "<b>Camera settings</b>"
@@ -2727,7 +2726,7 @@ msgstr "<b>Réglages de Caméra</b>"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:2
 msgid "<b>Device:</b>"
-msgstr "<b>Serveur</b>"
+msgstr "<b>Périphérique :</b>"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:3
 msgid "<b>Output format</b>"
@@ -2735,7 +2734,7 @@ msgstr "<b>Format de sortie</b>"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:4
 msgid "<b>Scaling</b>"
-msgstr "<b>Retaillage</b>"
+msgstr "<b>Mise à l'échelle</b>"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:5
 msgid "<b>Width correction</b>"
@@ -2747,15 +2746,15 @@ msgstr "Convertir en pixels _carrés"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:8
 msgid "PAL, 4:3 (59/54 pixel aspect ratio)"
-msgstr "PAL,·4:3·(rapport d'aspect de pixel 59/54)"
+msgstr "PAL,·4:3·(ratio de pixel 59/54)"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:9
 msgid "Recommended if you are outputting to a computer screen"
-msgstr "Recommandé pour visualisation sur moniteur d'ordinateur"
+msgstr "Recommandé pour la visualisation sur moniteur d'ordinateur"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:10
 msgid "Scaled _height:"
-msgstr "Ratio de hauteur:"
+msgstr "_Hauteur mise à l'échelle :"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:11
 msgid "_No width correction"
@@ -2767,7 +2766,7 @@ msgstr "C_omplêter jusqu'à un multiple de 8 pixels"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:13
 msgid "_Stretch to multiple of 8 pixels"
-msgstr "Et_irer a un multiple de 8 pixels"
+msgstr "Et_irer à un multiple de 8 pixels"
 
 #: ../flumotion/component/producers/firewire/wizard.glade.h:14
 #: ../flumotion/component/producers/looper/wizard.glade.h:6
@@ -2782,16 +2781,16 @@ msgstr "aucun"
 #: ../flumotion/component/producers/firewire/wizard_gtk.py:122
 #, python-format
 msgid "%s, %s (%d/%d pixel aspect ratio)"
-msgstr "%s,·%s·(rapport d'aspect de pixel %d/%d)"
+msgstr "%s,·%s·(ratio de pixel %d/%d)"
 
 #: ../flumotion/component/producers/firewire/wizard_gtk.py:143
 #, python-format
 msgid "%dx%d, %d/%d pixel aspect ratio"
-msgstr "%dx%d,·rapport de pixel de %d/%d"
+msgstr "%dx%d,·ratio de pixel de %d/%d"
 
 #: ../flumotion/component/producers/firewire/wizard_gtk.py:180
 msgid "Checking for Firewire devices..."
-msgstr "Détection du périphérique Firewire..."
+msgstr "Détection de périphériques Firewire..."
 
 #: ../flumotion/component/producers/firewire/wizard_gtk.py:204
 msgid "Checking for Firewire device..."
@@ -2799,19 +2798,19 @@ msgstr "Détection du périphérique Firewire..."
 
 #: ../flumotion/component/producers/firewire/wizard_gtk.py:260
 msgid "Firewire Video"
-msgstr "Aucun périphérique Firewire détécté."
+msgstr "Firewire vidéo"
 
 #: ../flumotion/component/producers/firewire/wizard_gtk.py:278
 msgid "Firewire Audio"
-msgstr "Aucun périphérique Firewire détécté."
+msgstr "Firewire vidéo"
 
 #: ../flumotion/component/producers/gdp/gdp.py:41
 msgid "The GDP producer cannot function with this bug.\n"
-msgstr "Le producteur GDP ne peut fonction avec ce bug.\n"
+msgstr "Le producteur GDP ne peut fonctionner avec ce bug.\n"
 
 #: ../flumotion/component/producers/looper/admin_gtk.py:129
 msgid "Looper"
-msgstr "Boucleur"
+msgstr "Looper"
 
 #: ../flumotion/component/producers/looper/flufileinfo.glade.h:1
 msgid "<b>File Information</b>"
@@ -2819,11 +2818,11 @@ msgstr "<b>Information sur le fichier</b>"
 
 #: ../flumotion/component/producers/looper/flufileinfo.glade.h:2
 msgid "<i>No file given yet !</i>"
-msgstr "<i> Pas de fichier spécifié pour le moment </i>"
+msgstr "<i> Pas de fichier spécifié pour le moment!</i>"
 
 #: ../flumotion/component/producers/looper/flufileinfo.glade.h:3
 msgid "Audio:"
-msgstr "Audio:"
+msgstr "Audio :"
 
 #: ../flumotion/component/producers/looper/flufileinfo.glade.h:4
 msgid "Duration:"
@@ -2835,15 +2834,15 @@ msgstr "Fichier :"
 
 #: ../flumotion/component/producers/looper/flufileinfo.glade.h:6
 msgid "Video:"
-msgstr "Vidéo:"
+msgstr "Vidéo :"
 
 #: ../flumotion/component/producers/looper/looper.glade.h:1
 msgid "Current position:"
-msgstr "Courant:"
+msgstr "Position courante :"
 
 #: ../flumotion/component/producers/looper/looper.glade.h:2
 msgid "Number of loops:"
-msgstr "Nom:"
+msgstr "Nombre de répétitions :"
 
 #: ../flumotion/component/producers/looper/looper.glade.h:3
 msgid "Restart"
@@ -2856,7 +2855,7 @@ msgstr "Redémarrer la boucle :"
 #: ../flumotion/component/producers/looper/looper.py:141
 #, python-format
 msgid "Could not open file '%s' for reading."
-msgstr "Impossible de sonder le périphérique '%s'"
+msgstr "Impossible d'ouvrir le fichier '%s' en lecture."
 
 #: ../flumotion/component/producers/looper/wizard.glade.h:1
 msgid "..."
@@ -2864,11 +2863,11 @@ msgstr "..."
 
 #: ../flumotion/component/producers/looper/wizard.glade.h:2
 msgid "Frame Rate:"
-msgstr "F_ramerate:"
+msgstr "F_ramerate :"
 
 #: ../flumotion/component/producers/looper/wizard.glade.h:3
 msgid "Height:"
-msgstr "_Hauteur"
+msgstr "_Hauteur :"
 
 #: ../flumotion/component/producers/looper/wizard.glade.h:4
 msgid "Location:"
@@ -2876,7 +2875,7 @@ msgstr "Position :"
 
 #: ../flumotion/component/producers/looper/wizard.glade.h:5
 msgid "Width:"
-msgstr "_Largeur"
+msgstr "Largeur :"
 
 #: ../flumotion/component/producers/looper/wizard.glade.h:7
 #: ../flumotion/component/producers/videotest/wizard.glade.h:6
@@ -2887,7 +2886,7 @@ msgstr "pixels"
 #, python-format
 msgid "'%s' is not a valid file, or is not readable on worker '%s'."
 msgstr ""
-"Le répertoire '%s' n'existe pas, ou n'est pas lisible par le worker '%s'."
+"'%s' n'est pas un fichier valide, ou n'est pas lisible par le worker '%s'."
 
 #: ../flumotion/component/producers/looper/wizard_gtk.py:178
 msgid "Loop Video"
@@ -2900,7 +2899,7 @@ msgstr "Passer l'audio en boucle"
 #: ../flumotion/component/producers/playlist/playlist.py:452
 #, python-format
 msgid "Failed to parse a playlist from file %s: %s"
-msgstr "Impossible d'analyser la playlist du fichier '%s': %s"
+msgstr "Impossible d'analyser la liste de lecture du fichier '%s' : %s"
 
 #: ../flumotion/component/producers/playlist/playlist.py:461
 #, python-format
@@ -2920,14 +2919,16 @@ msgstr ""
 #, python-format
 msgid ""
 "Please upgrade '%s' to version %s or later if you require this functionality."
-msgstr "Veuillez mettre à jour '%s' vers la version %s."
+msgstr ""
+"Veuillez mettre à jour '%s' vers la version %s (au moins) is vous avez "
+"besoin de cette fonctionnalité."
 
 #: ../flumotion/component/producers/soundcard/soundcard.py:163
 #, python-format
 msgid ""
 "Could not open sound device '%s'.  Please check permissions on the device."
 msgstr ""
-"Impossible d'ouvrir le périphérique '%s'. Vérifiez les droits sur ce "
+"Impossible d'ouvrir le périphérique de son '%s'. Vérifiez les droits sur ce "
 "périphérique."
 
 #: ../flumotion/component/producers/soundcard/soundcard.py:169
@@ -2941,7 +2942,7 @@ msgstr ""
 
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:1
 msgid "Captures a raw audio feed from a soundcard."
-msgstr "Capture un flux audio brut depuis une carte son"
+msgstr "Capture un flux audio brut depuis une carte son."
 
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:2
 msgid "Sound card"
@@ -2953,7 +2954,7 @@ msgstr ""
 
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:4
 msgid "The Number of channels to capture (default 2)."
-msgstr "Le nombre de canaux à capturer (d'efaut 2)."
+msgstr "Le nombre de canaux à capturer (défaut 2)."
 
 #: ../flumotion/component/producers/soundcard/soundcard.xml.h:5
 msgid "The Sample rate to capture at (in Hz. default: 44100)."
@@ -2977,27 +2978,27 @@ msgstr ""
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:1
 msgid "Bi_t depth:"
-msgstr "Profon_deur d'échantillonage:"
+msgstr "Profondeur d'échan_tillonage :"
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:2
 msgid "Sample _rate:"
-msgstr "_Taux d'échantillonage:"
+msgstr "_Taux d'échantillonage :"
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:3
 msgid "Sound _system:"
-msgstr "_Système sonore:"
+msgstr "_Système sonore :"
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:4
 msgid "_Channels:"
-msgstr "Nombre de _canaux:"
+msgstr "_Canaux :"
 
 #: ../flumotion/component/producers/soundcard/wizard.glade.h:6
 msgid "_Input:"
-msgstr "_Entrée:"
+msgstr "_Entrée :"
 
 #: ../flumotion/component/producers/soundcard/wizard_gtk.py:38
 msgid "Mono"
-msgstr "Humeur"
+msgstr "Mono"
 
 #: ../flumotion/component/producers/soundcard/wizard_gtk.py:39
 msgid "Stereo"
@@ -3017,14 +3018,15 @@ msgid "Sound Card"
 msgstr "Carte Son"
 
 #: ../flumotion/component/producers/soundcard/wizard_gtk.py:119
-#, fuzzy
 msgid ""
 "Looking for the sound devices present on the system. This can take a while..."
-msgstr "Détéction de la webcam, cette étape peut prendre du temp..."
+msgstr ""
+"Détéction de périphériques de son présent sur le système. Cela peut prendre "
+"un moment..."
 
 #: ../flumotion/component/producers/soundcard/wizard_gtk.py:154
 msgid "Probing the sound card. This can take a while..."
-msgstr "Détéction de la webcam, cette étape peut prendre du temp..."
+msgstr "Test de la carte son. Cela peut prendre un moment..."
 
 #: ../flumotion/component/producers/soundcard/wizard_gtk.py:187
 #, python-format
@@ -3044,11 +3046,11 @@ msgstr "Aléatoire (Neige de télévision)"
 #: ../flumotion/component/producers/videotest/admin_gtk.py:38
 #: ../flumotion/component/producers/videotest/wizard_gtk.py:65
 msgid "Totally black"
-msgstr "Noir"
+msgstr "Totalement noir"
 
 #: ../flumotion/component/producers/videotest/admin_gtk.py:47
 msgid "Pattern:"
-msgstr "Motif:"
+msgstr "Motif :"
 
 #. FIXME: have constructor take self instead ?
 #: ../flumotion/component/producers/videotest/admin_gtk.py:94
@@ -3061,7 +3063,7 @@ msgstr "Produit un signal vidéo d'exemple sans utiliser de périphérique."
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:2
 msgid "Test video producer"
-msgstr "_Source vidéo:"
+msgstr "Source vidéo de test"
 
 #: ../flumotion/component/producers/videotest/videotest.xml.h:4
 msgid "The height in pixels."
