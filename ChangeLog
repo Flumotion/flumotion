@@ -1,3 +1,11 @@
+2009-08-12  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* data/make-dummy-cert:
+	Remove bashism in the usage of the trap shell builtin.
+	It made make-dummy-cert fail on systems that use a different shell than
+	bash as their system shell, e.g. recent Ubuntus and Debians that use
+	dash as the system shell.
+
 2009-08-12  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	* po/fr.po:
