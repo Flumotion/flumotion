@@ -63,7 +63,7 @@ AS_LIBTOOL_TAGS([])
 AC_PROG_LIBTOOL
 
 dnl check for python
-AS_PATH_PYTHON(2.3)
+AS_PATH_PYTHON(2.4)
 
 AM_CHECK_PYTHON_HEADERS(HAVE_PYTHON_H=yes, [
   AC_MSG_ERROR([You need to install the Python development packages.])

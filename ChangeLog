@@ -1,3 +1,10 @@
+2009-08-12  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* README:
+	* configure.ac:
+	* flumotion.spec.in:
+	Bump the required version of Python to 2.4.
+
 2009-08-11  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	* po/fr.po:
