@@ -1,3 +1,11 @@
+2009-08-14  Jan Urbanski  <jurbanski@flumotion.com>
+
+	patch by: Xavier Queralt  <xqueralt@flumotion.com>
+
+	* po/POTFILES.in:
+	Update with new files containing strings for translation.
+	Sort the entries.
+
 2009-08-12  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	* po/fr.po:
