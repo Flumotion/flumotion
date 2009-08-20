@@ -1,3 +1,9 @@
+2009-08-20  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/converters/overlay/overlay.py:
+	Makes overlay work for > 0.10.23 gst-plugins-base.
+	Fixes #1340
+
 2009-08-20  Alvin Delagon  <adelagon@flumotion.com>
 
 	reviewed by: Jan Urbanski

@@ -80,7 +80,8 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         pipeline = (
             '%s ! alphacolor ! '
             'videomixer name=mix ! @feeder:default@ '
-            '@eater:default@ ! ffmpegcolorspace ! mix.' % source_element)
+            '@eater:default@ ! ffmpegcolorspace ! '
+            'video/x-raw-yuv,format=(fourcc)AYUV ! mix.' % source_element)
 
         return pipeline
 
