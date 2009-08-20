@@ -318,7 +318,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
         self.info("Changing filename to %s", self.location)
         try:
-            self.file = open(self.location, 'a')
+            self.file = open(self.location, 'wb')
         except IOError, e:
             self.warning("Failed to open output file %s: %s",
                        self.location, log.getExceptionMessage(e))

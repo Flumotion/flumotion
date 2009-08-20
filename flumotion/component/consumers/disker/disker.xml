@@ -39,7 +39,7 @@
         <property name="ical-schedule" type="string" required="no"
                   _description="If set, the given iCalendar schedule will be used to decide when to record.  Every event defined indicates a recording, and the event description will be used as the filename template. "/>
         <property name="filename" type="string" required="no" 
-                  _description="If set, the given template will be used to decide filenames for recordings.  The template will be expanded according to strftime(3)." />
+                  _description="If set, the given template will be used to decide filenames for recordings.  The template will be expanded according to strftime(3). If the file exists, it will be overwritten." />
         <property name="react-to-stream-markers" type="bool" required="no"
                   _description="Whether to start/stop the disker when stream marker events are received." />
         <property name="stream-marker-filename-prefix" type="string"
