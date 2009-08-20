@@ -2,6 +2,14 @@
 
 	reviewed by: Jan Urbanski
 
+	* flumotion/component/muxers/checks.py:
+	* flumotion/component/muxers/ogg.py:
+	Add warnings about the oggmuxer bug in gst-plugins base 0.10.24
+
+2009-08-20  Alvin Delagon  <adelagon@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
 	* flumotion/component/consumers/disker/disker.py:
 	* flumotion/component/consumers/disker/disker.xml:
 	Have the disker overwrite the file if the file exists. Fixes #1339.

@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import gst
+from twisted.internet import defer
 
 from flumotion.component import feedcomponent
 
@@ -32,13 +33,16 @@ class Ogg(feedcomponent.MultiInputParseLaunchComponent):
     def do_check(self):
         self.debug('running Ogg check')
         import checks
-        d = checks.checkOgg()
-        d.addCallback(self._checkCallback)
-        return d
+        d1 = checks.checkOgg()
+        d2 = checks.checkTicket1344()
+        dl = defer.DeferredList([d1, d2])
+        dl.addCallback(self._checkCallback)
+        return dl
 
-    def _checkCallback(self, result):
-        for m in result.messages:
-            self.addMessage(m)
+    def _checkCallback(self, results):
+        for (state, result) in results:
+            for m in result.messages:
+                self.addMessage(m)
 
     def get_muxer_string(self, properties):
         maxDelay = 500 * 1000 * 1000

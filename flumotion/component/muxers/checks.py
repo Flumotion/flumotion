@@ -49,3 +49,23 @@ def checkOgg():
 
     result.succeed(None)
     return defer.succeed(result)
+
+
+def checkTicket1344():
+    """
+    Check if the version of oggmux is the one that can create borked ogg files.
+    """
+    result = messages.Result()
+    if gstreamer.get_plugin_version('ogg') == (0, 10, 24, 0):
+        m = messages.Warning(T_(
+            N_("Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
+              '0.10.24', 'gst-plugins-base'),
+            mid='oggmux-check')
+        m.add(T_(N_("It is a regression introduced in 0.10.24 and will be "
+             "fixed in 0.10.25.\n")))
+        m.add(T_(N_("Please use %s version %s instead."), 'gst-plugins-base',
+             '0.10.23'))
+        result.add(m)
+
+    result.succeed(None)
+    return defer.succeed(result)
