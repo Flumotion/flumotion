@@ -1,6 +1,11 @@
 2009-08-21  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* configure.ac:
+	Start the new development series.
+
+2009-08-21  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* configure.ac:
 	Back to dev.
 
 === release 0.6.0 ===
