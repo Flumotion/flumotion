@@ -1,5 +1,89 @@
-This is Flumotion 0.5.4 "EAT"
+This is Flumotion 0.6.0 "Can Punyetes"
         
+Features since 0.5.4:
+
+  * Added Python 2.6 compatibility. Dropped Python 2.3 compatibility. You
+    can see we are going in the right direction.
+
+  * The icecast producer component will now automatically retry
+    connecting to the icecast server in case of connection loss.
+
+  * The playlist producer component got a shiny new user interface
+    visible in the GTK administration tool.
+
+  * A new plug for the HTTP server component has been added that makes it
+    possible to configure the bitrate control plug on a file by file
+    basis. This can be used to implement per file bitrate control.
+
+  * The porter now injects a HTTP GET parameter named FLUREQUID for each
+    connection it passes to the slaved component. The parameter is unique
+    for each connection the porter handles, so you can use it to track the
+    lifecycle of a request across various components.
+
+  * Flumotion jobs can now be automatically run under a profiler if the
+    environment in which the worker is started includes a FLU_PROFILE or
+    FLU_BUILTIN_PROFILE variable. The former uses a statistical profiler
+    from http://wingolog.org/pub/statprof.py, the latter uses the builtin
+    Python profiler.
+
+  * Flumotion HTTP server component can now perform remote seeking with
+    MP4 files, similar to Apache with mod_h264_streaming. When handling
+    requests for MP4 files that include a HTTP GET parameter named start it
+    will serve the file from a time offset specified by that
+    parameter. This protocol is supported by popular open-source Flash
+    players. The feature requires a supporting Python library from
+    http://github.com/arkadini/mp4seek
+
+  * The assistant now offers the possibility to choose static OGG files as
+    video or audio sources and creates flows with the looper component if
+    you choose it.
+
+Bugs fixed since 0.5.4:
+
+  * 114 : When unable to write/read from a device the GUI should tell you how to fix it
+  * 197 : Sound card wizard page does not query hardware for capabilities
+  * 245 : lacking documentation for distributed use
+  * 294 : overlay is sad when my /tmp is full, but somehow stuff still works.  amazing.
+  * 564 : should not be possible to start a component from the admin until its worker is logged in
+  * 804 : wizard should allow user to choose from sound cards, not hw:N devices
+  * 879 : Hostname column in the recent connetions dialog is too wide
+  * 894 : tracebacks in the admin due to wizard step programmers mistakes don't show up as an error message in the wizard
+  * 937 : when dvb-producer starts but cannot lock to a signal, it times out, then goes sad reopening the device
+  * 951 : streamer shouldn't report an error twice if a port is already used
+  * 952 : Probe ALSA devices using hal
+  * 955 : NoProjectError should have more info about the failure to load a project
+  * 965 : first-run option should generate its own default.pem file and not use the installed one
+  * 1085 : no xsl to upgrade configs to 0.6
+  * 1141 : Multi-selection stop traceback
+  * 1159 : Component UI is deselected when a new component is loaded
+  * 1163 : connection errors should be shown in recoverable error dialogs, and not exit the admin client
+  * 1167 : porter doesn't handle runtimeexceptions when passing fd's
+  * 1175 : properties are not documented
+  * 1182 : eaters cannot be named other than default for some reason
+  * 1214 : flumotion-worker crashes when no port and transport are specified in the configuration file
+  * 1238 : Improve local cache provider plug
+  * 1243 : it's possible to request the UIState of a component that's being removed
+  * 1252 : The dialog that appears when the connection is lost behaves wrong
+  * 1263 : ihooks.py:44 ImportError: could not import gobject (error was: 'import_module() takes at most 5 arguments (6 given)')
+  * 1264 : file-server leaking keycards when client disconnects before keycard returned from the bouncer
+  * 1275 : overlay is broken in recent gst-plugins-good packages
+  * 1276 : flumotion-admin takes 100% of cpu and doesn't show the flow when it has a lot of components
+  * 1277 : components that are already eating one from another should ignore eatFrom calls if the feed specified is the same as the current one
+  * 1278 : flumotion should drop all newsegment events after the first one
+  * 1280 : http-server is not checking if a byte range request with end range is bigger than the filesize
+  * 1282 : flumotion 0.5.4 fails on ubuntu 9.04
+  * 1296 : HTTPAuthentication: log the code returned to the client
+  * 1302 : Add metadata plug interface to ondemand http-server component
+  * 1303 : include reference to flvlib in the ondemand docs
+  * 1306 : pep8.py broken due to tokenizer module changes in python2.6
+  * 1311 : memory leaking, still
+  * 1312 : feedersnode.py:238 TypeError: iter must be a GtkTreeIter
+  * 1313 : [playlist-producer] p-p fails messily when gnonlin and/or python-iCalendar are not installed
+  * 1315 : when flumotion-admin connects to a manager, and gets refused because of wrong user/pass, in the background it keeps trying to connect there
+  * 1339 : [disker] the disker opens the files in append mode, even if it looks like it should open then it write mode
+  * 1340 : [overlay] does not work with recent gstreamer
+  * 1344 : flumotion creates borked ogg files with git gst as of Aug 20 2009
+
 Features since 0.5.3:
     
   * You can now configure your ondemand flows to force displaying

@@ -289,4 +289,14 @@ it.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.5.4.tar.bz2" />
   </Version>
  </release>
+
+ <release>
+  <Version>
+   <revision>0.6.0</revision>
+   <branch>0.6</branch>
+   <name>Can Punyetes</name>
+   <created>2009-08-21</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.6.0.tar.bz2" />
+  </Version>
+ </release>
 </Project>

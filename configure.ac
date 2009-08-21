@@ -1,9 +1,9 @@
 -*- mode: m4 -*-
 
 m4_define([flu_major_version], [0])
-m4_define([flu_minor_version], [5])
-m4_define([flu_micro_version], [4])
-m4_define([flu_extra_version], [2])
+m4_define([flu_minor_version], [6])
+m4_define([flu_micro_version], [0])
+m4_define([flu_extra_version], [0])
 m4_define([flu_version], [flu_major_version.flu_minor_version.flu_micro_version])
 
 AC_INIT(flumotion, [flu_version])
