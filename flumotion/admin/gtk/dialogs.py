@@ -179,6 +179,7 @@ class AboutDialog(gtk.Dialog):
             '© 2004, 2005, 2006, 2007, 2008 Fluendo S.L.')
         authors = (
                    'Johan Dahlin',
+                   'Alvin Delagon',
                    'Pedro Gracia Fajardo',
                    'Arek Korbik',
                    'Julien Le Goff',
@@ -187,6 +188,7 @@ class AboutDialog(gtk.Dialog):
                    'Zaheer Abbas Merali',
                    'Sébastien Merle',
                    'Xavier Queralt Mateu',
+                   'Josep Joan "Pepe" Ribas',
                    'Mike Smith',
                    'Wim Taymans',
                    'Jan Urbański',
