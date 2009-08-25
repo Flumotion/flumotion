@@ -78,6 +78,7 @@ deleted.
 
 import os
 import signal
+import tempfile
 
 from twisted.python import failure
 from twisted.internet import reactor, protocol, defer
@@ -404,7 +405,8 @@ class Plan:
         self.name = testName
         self.testCaseName = testCase.__class__.__name__
         self.processes = {}
-        self.outputDir = self._makeOutputDir(os.getcwd())
+        self.testDir = self._makeTestDir()
+        self.outputDir = self._makeOutputDir(self.testDir)
 
         # put your boots on monterey jacks, cause this gravy just made a
         # virtual machine whose instructions are python methods
@@ -412,12 +414,11 @@ class Plan:
         self.ops = []
         self.timeout = 20
 
+    def _makeTestDir(self):
+        testDir = tempfile.mkdtemp(prefix="test_integration")
+        return testDir
+
     def _makeOutputDir(self, testDir):
-        # ensure that testDir exists
-        try:
-            os.mkdir(testDir)
-        except OSError:
-            pass
         tail = '%s-%s' % (self.testCaseName, self.name)
         outputDir = os.path.join(testDir, tail)
         os.mkdir(outputDir)
@@ -430,6 +431,8 @@ class Plan:
             for name in dirs:
                 os.rmdir(os.path.join(root, name))
         os.rmdir(self.outputDir)
+        os.rmdir(self.testDir)
+        self.testDir = None
         self.outputDir = None
 
     def _allocProcess(self, args):
