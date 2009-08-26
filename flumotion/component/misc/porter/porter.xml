@@ -26,6 +26,8 @@
                   _description="The network port for the porter to report (useful when using iptables to redirect incoming 80 to 8800)." />
         <property name="interface" type="string"
                   _description="The IP address or hostname associated with the interface we want to listen on." />
+        <property name="external-interface" type="string"
+                  _description="The IP address or hostname associated with the interface we are reachable on." />
         <property name="protocol" type="string"
                   _description="The porter protocol to use (defaults to flumotion.component.misc.porter.porter.HTTPPorterProtocol')." />
       </properties>

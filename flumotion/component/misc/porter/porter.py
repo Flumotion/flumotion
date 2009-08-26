@@ -109,11 +109,11 @@ class PorterMedium(component.BaseComponentMedium):
         """
         Return the location, login username/password, and listening port
         and interface for the porter as a tuple (path, username,
-        password, port, interface).
+        password, port, interface, external-interface).
         """
         return (self.comp._socketPath, self.comp._username,
                 self.comp._password, self.comp._iptablesPort,
-                self.comp._interface)
+                self.comp._interface, self.comp._external_interface)
 
 
 class Porter(component.BaseComponent, log.Loggable):
@@ -142,6 +142,7 @@ class Porter(component.BaseComponent, log.Loggable):
         self._porterProtocol = None
 
         self._interface = ''
+        self._external_interface = props.get('external-interface', '')
 
     def registerPath(self, path, avatar):
         """
@@ -290,6 +291,7 @@ class Porter(component.BaseComponent, log.Loggable):
         self._porterProtocol = props.get('protocol',
             'flumotion.component.misc.porter.porter.HTTPPorterProtocol')
         self._interface = props.get('interface', '')
+        self._external_interface = props.get('external-interface', '')
 
     def do_stop(self):
         d = None
