@@ -1,3 +1,11 @@
+2009-08-26  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	reviewed by: xmartinez/jan 
+
+	* flumotion/component/misc/httpserver/httpfile.py:
+	avoid leaking of sockets in CLOSE_WAIT state
+	solves #1327
+
 2009-08-26  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	patch by: Jan Urbanski

@@ -621,9 +621,11 @@ class FileTransfer(log.Loggable):
         self.consumer.write(data)
 
     def _terminate(self):
-        self.provider.close()
-        self.provider = None
-        self.consumer.unregisterProducer()
-        self.consumer.finish()
-        self.consumer = None
-        self._finished = True
+        try:
+            self.provider.close()
+        finally:
+            self.provider = None
+            self.consumer.unregisterProducer()
+            self.consumer.finish()
+            self.consumer = None
+            self._finished = True
