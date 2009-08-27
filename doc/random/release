@@ -16,6 +16,9 @@
 * copy the generated text version to the RELEASE file
 * Edit NEWS and add the tickets fixed for this milestone, as well as the
   new features
+  (if this is a new major/minor stable series, list features for the whole
+   development cycle, not since last dev release, as users are typically
+   upgrading from the previous stable series)
 * bump nano in configure.ac to 0
 * update doap file, adding new release
 * edit ChangeLog and add === release 0.1.2 ===
