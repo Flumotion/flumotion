@@ -1,3 +1,8 @@
+2009-08-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/porter/porter.py:
+	Fix initialisation of porter.
+
 2009-08-26  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	reviewed by: xmartinez/jan 

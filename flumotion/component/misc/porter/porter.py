@@ -142,7 +142,7 @@ class Porter(component.BaseComponent, log.Loggable):
         self._porterProtocol = None
 
         self._interface = ''
-        self._external_interface = props.get('external-interface', '')
+        self._external_interface = ''
 
     def registerPath(self, path, avatar):
         """
