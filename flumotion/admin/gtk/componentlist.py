@@ -159,16 +159,18 @@ class ComponentList(log.Loggable, gobject.GObject):
 
     def getSelectedStates(self):
         """
-        Get the states of the currently selected component, or None.
+        Get the states of the currently selected components, or None.
 
-        @rtype: L{flumotion.common.component.AdminComponentState}
+        @rtype: list of L{flumotion.common.component.AdminComponentState}
         """
         return self._getSelected(COL_STATE)
 
     def getComponentNames(self):
-        """Fetches a list of all component names
+        """
+        Fetches a list of all component names.
+
         @returns: component names
-        @rtype: list of strings
+        @rtype:   list of strings
         """
         names = []
         for row in self._model:
@@ -176,9 +178,11 @@ class ComponentList(log.Loggable, gobject.GObject):
         return names
 
     def getComponentStates(self):
-        """Fetches a list of all component states
+        """
+        Fetches a list of all component states
+
         @returns: component states
-        @rtype: list of L{AdminComponentState}
+        @rtype:   list of L{AdminComponentState}
         """
         names = []
         for row in self._model:
@@ -204,7 +208,7 @@ class ComponentList(log.Loggable, gobject.GObject):
 
     def canStop(self):
         """
-        Get whether the selected components can be stoped.
+        Get whether the selected components can be stopped.
 
         @rtype: bool
         """
