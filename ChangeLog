@@ -1,5 +1,15 @@
 2009-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/componentlist.py:
+	  Allow deletion of sleeping components with no worker logged in.
+	  canStart == (canDelete && workers logged in).
+	  Fixes #1348.
+
+2009-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/admin/gtk/componentlist.py:
 	  Fix/normalize docstrings.
 

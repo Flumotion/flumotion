@@ -889,11 +889,12 @@ class AdminWindow(Loggable, GladeDelegate):
     def _updateComponentActions(self):
         canStart = self._componentList.canStart()
         canStop = self._componentList.canStop()
-        canDelete = bool(self._currentComponentStates and canStart)
+        canDelete = self._componentList.canDelete()
         self._startComponentAction.set_sensitive(canStart)
         self._stopComponentAction.set_sensitive(canStop)
         self._deleteComponentAction.set_sensitive(canDelete)
-        self.debug('can start %r, can stop %r' % (canStart, canStop))
+        self.debug('can start %r, can stop %r, can delete %r' % (
+            canStart, canStop, canDelete))
         canStartAll = self._componentList.get_property('can-start-any')
         canStopAll = self._componentList.get_property('can-stop-any')
 

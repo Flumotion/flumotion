@@ -192,6 +192,26 @@ class ComponentList(log.Loggable, gobject.GObject):
             names.append(row[COL_STATE])
         return names
 
+    def canDelete(self):
+        """
+        Get whether the selected components can be deleted.
+
+        Returns True if all components are sleeping.
+
+        Also returns False if no components are selected.
+
+        @rtype: bool
+        """
+        states = self.getSelectedStates()
+        if not states:
+            return False
+        canDelete = True
+        for state in states:
+            moodname = moods.get(state.get('mood')).name
+            workerName = state.get('workerRequested')
+            canDelete = canDelete and moodname == 'sleeping'
+        return canDelete
+
     def canStart(self):
         """
         Get whether the selected components can be started.
@@ -203,15 +223,16 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         @rtype: bool
         """
-        states = self.getSelectedStates()
-        if not states:
+        # additionally to canDelete, the worker needs to be logged intoo
+        if not self.canDelete():
             return False
+
         canStart = True
+        states = self.getSelectedStates()
         for state in states:
-            moodname = moods.get(state.get('mood')).name
             workerName = state.get('workerRequested')
-            canStart = (canStart and moodname == 'sleeping' and
-                        workerName in self._workers)
+            canStart = canStart and workerName in self._workers
+
         return canStart
 
     def canStop(self):
