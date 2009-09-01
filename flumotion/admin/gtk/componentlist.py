@@ -151,17 +151,20 @@ class ComponentList(log.Loggable, gobject.GObject):
 
     def getSelectedNames(self):
         """
-        Get the names of the currently selected component, or None.
+        Get the names of the currently selected components, or None if none
+        are selected.
 
-        @rtype: string
+        @rtype: list of str or None
         """
         return self._getSelected(COL_NAME)
 
     def getSelectedStates(self):
         """
-        Get the states of the currently selected components, or None.
+        Get the states of the currently selected components, or None if none
+        are selected.
 
         @rtype: list of L{flumotion.common.component.AdminComponentState}
+                or None
         """
         return self._getSelected(COL_STATE)
 
@@ -170,7 +173,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         Fetches a list of all component names.
 
         @returns: component names
-        @rtype:   list of strings
+        @rtype:   list of str
         """
         names = []
         for row in self._model:
@@ -193,6 +196,11 @@ class ComponentList(log.Loggable, gobject.GObject):
         """
         Get whether the selected components can be started.
 
+        Returns True if all components are sleeping and their worked has
+        logged in.
+
+        Also returns False if no components are selected.
+
         @rtype: bool
         """
         states = self.getSelectedStates()
@@ -209,6 +217,10 @@ class ComponentList(log.Loggable, gobject.GObject):
     def canStop(self):
         """
         Get whether the selected components can be stopped.
+
+        Returns True if none of the components are sleeping.
+
+        Also returns False if no components are selected.
 
         @rtype: bool
         """
@@ -383,6 +395,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         self._updateStartStop()
 
     def _getSelected(self, col_name):
+        # returns None if no components are selected, a list otherwise
         selection = self._view.get_selection()
         if not selection:
             return None
