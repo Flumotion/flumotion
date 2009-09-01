@@ -1,5 +1,10 @@
 2009-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/admin/gtk/componentlist.py:
+	  Remove unused variable. Thanks to Arek for spotting.
+
+2009-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	reviewed by: Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/gtk/adminwindow.py:

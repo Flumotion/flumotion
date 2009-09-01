@@ -208,7 +208,6 @@ class ComponentList(log.Loggable, gobject.GObject):
         canDelete = True
         for state in states:
             moodname = moods.get(state.get('mood')).name
-            workerName = state.get('workerRequested')
             canDelete = canDelete and moodname == 'sleeping'
         return canDelete
 
