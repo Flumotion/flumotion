@@ -1,0 +1,56 @@
+Things to do before the release
+===============================
+
+2 months before the release
+---------------------------
+ * review dependencies, make sure configure.ac, the .spec and debian/control files in sync
+ * think about bumping dependencies if necessary
+ * if you bump dependencies, remove the warnings and workarounds for older versions to decruftify the code
+
+1 month before the release
+--------------------------
+ * check if you have all the hardware to test
+ * if there's hardware missing, see about getting it
+ * look for new features, add flowtests for them if necessary
+ * start writing a test plan
+
+2 weeks before the release
+--------------------------
+ * warn about the upcoming code freeze (mailing list and personally)
+ * ask translators for translation updates
+
+11 days before the release
+--------------------------
+ * finish up the test plan
+ * make a list of things you will test on: distros and hardware
+ * distribute flowtests among developers
+ * distribute other test tasks
+ * start thinking on a release name
+ * verify that you have all new features listed, see if any have been added recently
+ * recheck if the hardware is available, make sure people know you will need it
+
+8 days before the release
+--------------------------
+ * start the freeze (mailing list and personally)
+ * start flowtesting
+ * execute the rest of the tests
+ * start looking at milestone bugs
+
+3 days before the release
+-------------------------
+ * commit new warnings about broken components
+ * verify that you have no open bugs with the release milestone
+ * (optional) wrap up prerelase packages
+ * (optional) build PPA packages for the prerelase
+ * (optional) build other packages, like RPMs or Debian .debs
+
+1 day before the release
+------------------------
+ * write the release notes, new features summary, known issues
+ * ask someone to review your English
+
+RELEASE
+
+1 day after the release
+-----------------------
+ * poke people responsible for distros interaction to push the new release into the distro
