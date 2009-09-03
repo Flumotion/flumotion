@@ -268,7 +268,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.info('No events in progress')
                 self._recordAtStart = False
             self._updateNextPoints()
-        except ValueError, e:
+        except (ValueError, IndexError, KeyError), e:
             m = messages.Warning(T_(N_(
                 "Error parsing ical file %s, so not scheduling any"
                 " events." % icalFile)),

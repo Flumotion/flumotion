@@ -1,3 +1,12 @@
+2009-09-03  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	reviewed by: Arek
+
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/component/consumers/disker/disker.py:
+	Catch more (possible) exceptions from the icalendar module
+	Fixes #1267
+
 2009-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/admin/gtk/componentlist.py:

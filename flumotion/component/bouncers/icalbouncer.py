@@ -80,7 +80,7 @@ class IcalBouncer(bouncer.Bouncer):
 
         try:
             self.iCalScheduler = scheduler.ICalScheduler(handle)
-        except ValueError, e:
+        except (ValueError, IndexError, KeyError), e:
             m = messages.Error(T_(N_(
                 "Error parsing ical file '%s'."), self._icsfile),
                                debug=log.getExceptionMessage(e),
