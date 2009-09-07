@@ -1,5 +1,14 @@
 2009-09-07  Jan Urbanski  <jurbanski@flumotion.com>
 
+	patch by: Xavier Queralt  <xqueralt@flumotion.com>
+
+	* doc/man/flumotion-admin.1:
+	* doc/man/flumotion-manager.1:
+	* doc/man/flumotion-worker.1:
+	Document missing command line options in manpages. Closes #1354.
+
+2009-09-07  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/consumers/disker/disker.py:
 	Prevent the disker from starting if the ical-schedule property is set
 	and one of the required modules is missing.

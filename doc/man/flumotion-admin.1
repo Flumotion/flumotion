@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii flumotion-admin.1
 .\"
-.TH flumotion-admin 1 "2005 July 13" "Fluendo" "Flumotion"
+.TH flumotion-admin 1 "2009 September 4" "Fluendo" "Flumotion"
 
 .SH NAME
 flumotion-admin \- streaming media server administration GUI
@@ -9,11 +9,18 @@ flumotion-admin \- streaming media server administration GUI
 .SH SYNOPSIS
 .B flumotion-admin
 [
-.B -
+.B -h
 ]
 [
 .B --debug
 .I debug configuration
+]
+[
+.B -m
+.I manager
+]
+[
+.B --no-ssl
 ]
 
 .SH DESCRIPTION
@@ -49,6 +56,10 @@ Set the debug configuration to the specified
 string. See the
 .I Debugging
 section for details of this.
+.IP "-mMANAGER, --manager=MANAGER"
+Set the manager connection string in the form [username[:password]@]host:port
+.IP "--no-ssl"
+Disable encryption when connecting to the manager.
 
 .SH DEBUGGING
 

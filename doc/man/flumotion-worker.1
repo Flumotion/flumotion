@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii flumotion-worker.1
 .\"
-.TH flumotion-worker 1 "2005 July 13" "Fluendo" "Flumotion"
+.TH flumotion-worker 1 "2009 September 4" "Fluendo" "Flumotion"
 
 .SH NAME
 flumotion-worker \- streaming media server worker
@@ -14,6 +14,14 @@ flumotion-worker \- streaming media server worker
 [
 .B --debug
 .I debug configuration
+]
+[
+.B -L
+.I logdir
+]
+[
+.B -R
+.I rundir
 ]
 [
 .B -H
@@ -33,6 +41,16 @@ flumotion-worker \- streaming media server worker
 ]
 [
 .B -D
+]
+[
+.B --daemonize-to=
+.I directory
+]
+[
+.B -F
+.I ports
+|
+.B --random-feederports
 ]
 .B -u username
 .B -p password
@@ -62,6 +80,10 @@ Set the debug configuration to the specified
 string. See the
 .I Debugging
 section for details of this.
+.IP "-L LOGDIR, --logdir=LOGDIR"
+Specify the directory for logging output from the worker.
+.IP "-R RUNDIR, --rundir=RUNDIR"
+Specify the directory for runtime files created by the worker.
 .IP "-HHOST, --host=HOST"
 Specify the hostname on which the manager is running.
 .IP "-PPORT, --port=PORT"
@@ -84,6 +106,8 @@ seperate systems (perhaps one doing encoding, behind a firewall, and a second
 doing the streaming outside the firewall), they must be able to communicate
 using this port range, so you'll have to open these ports in your firewall. It
 is recommended that you have a range of 20 ports.
+.IP "--random-feederports"
+Use random available feeder ports.
 
 .SH DEBUGGING
 

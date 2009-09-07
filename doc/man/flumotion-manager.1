@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii flumotion-manager.1
 .\"
-.TH flumotion-manager 1 "2005 July 13" "Fluendo" "Flumotion"
+.TH flumotion-manager 1 "2009 September 4" "Fluendo" "Flumotion"
 
 .SH NAME
 flumotion-manager \- streaming media server central management
@@ -14,6 +14,14 @@ flumotion-manager \- streaming media server central management
 [
 .B --debug
 .I debug configuration
+]
+[
+.B -L
+.I logdir
+]
+[
+.B -R
+.I rundir
 ]
 [
 .B -H
@@ -36,7 +44,14 @@ flumotion-manager \- streaming media server central management
 .I name
 ]
 [
+.B -s
+.I servicename
+]
+[
 .B -D
+]
+[
+.B --daemonize-to=directory
 ]
 .I manager.xml [flow1.xml flow2.xml ...]
 
@@ -77,6 +92,10 @@ Set the debug configuration to the specified
 string. See the
 .I Debugging
 section for details of this.
+.IP "-L LOGDIR, --logdir=LOGDIR"
+Specify the directory for logging output from the manager.
+.IP "-R RUNDIR, --rundir=RUNDIR"
+Specify the directory for runtime files created by the manager.
 .IP "-HHOST, --hostname=HOST"
 Specify the interface to bind to, either as a hostname or a numeric address.
 Usually, unless you have multiple network connections, you won't want to set
@@ -90,8 +109,12 @@ Set the transport protocol to use, either 'tcp' or 'ssl'. Default is 'ssl'.
 Specify the PEM certificate file to use. This is required if you use SSL.
 .IP "-nNAME, --name=NAME"
 Set the manager name.
+.IP "-sSERVICENAME, --service-name=SERVICENAME"
+Set the name used for naming log and pid files when running as a daemon.
 .IP "-D, --daemonize"
 Run in the background as a daemon.
+.IP "--daemonize-to=DAEMONIZETO"
+Specify what directory to run from when daemonizing.
 
 .SH DEBUGGING
 
