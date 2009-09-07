@@ -1,3 +1,10 @@
+2009-09-07  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* data/make-dummy-cert:
+	Remove bashism from make-dummy-cert (possibly it was just a typo). We
+	don't translate the usage message for that script anyway.
+	See Debian bug #530971.
+
 2009-09-07  Julien Le Goff  <jlegoff@flumotion.com>
 
 	reviewed by: Jan

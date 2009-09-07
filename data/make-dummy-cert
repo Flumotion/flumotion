@@ -12,7 +12,7 @@ answers() {
 }
 
 if [ $# -eq 0 ] ; then
-	echo $"Usage: `basename $0` filename [...]"
+	echo "Usage: `basename $0` filename [...]"
 	exit 0
 fi
 
