@@ -170,6 +170,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if self._can_schedule and icalfn:
             self.scheduleRecordings(open(icalfn, 'r'))
         elif icalfn:
+            # ical schedule is set, but self._can_schedule is False
 
             def missingModule(moduleName):
                 m = messages.Error(T_(N_(
@@ -184,6 +185,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 missingModule('icalendar')
             if not eventcalendar.HAS_DATEUTIL:
                 missingModule('dateutil')
+            # self._can_schedule is False, so one of the above surely happened
+            raise errors.ComponentSetupHandledError()
 
         sink = self.get_element('fdsink')
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)

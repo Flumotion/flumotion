@@ -1,5 +1,15 @@
 2009-09-07  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/consumers/disker/disker.py:
+	Prevent the disker from starting if the ical-schedule property is set
+	and one of the required modules is missing.
+	Original coding forgot to raise an exception after adding an Error
+	message to the component state, which resulted in a sad disker, but one
+	that was still disking.
+	Fixes #809.
+
+2009-09-07  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* data/make-dummy-cert:
 	Remove bashism from make-dummy-cert (possibly it was just a typo). We
 	don't translate the usage message for that script anyway.
