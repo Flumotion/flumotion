@@ -388,7 +388,8 @@ class GstInfo:
             queue ! decodebin name=dbin t. ! \
             queue ! filesink location=%s' % (factory, tmpfile)
 
-        self.options = options
+        if options.timeout:
+            gobject.timeout_add(int(options.timeout) * 1000, self.timedOut)
         self.mainloop = gobject.MainLoop()
         self.pipeline = gst.parse_launch(PIPELINE)
         self.input = self.pipeline.get_by_name('input')
@@ -521,3 +522,7 @@ class GstInfo:
             self.error = message.parse_error()
             self.mainloop.quit()
         return True
+
+    def timedOut(self):
+        """End of time to do the check"""
+        self.mainloop.quit()
