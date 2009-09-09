@@ -1,5 +1,10 @@
 2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/admin/gtk/dialogs.py:
+	Update the list of authors.
+
+2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/muxers/multipart.py:
 	Add warnings about multipart deficiency in gst-plugins-good up to
 	0.10.17.
