@@ -23,11 +23,19 @@
 * update doap file, adding new release
 * edit ChangeLog and add === release 0.1.2 ===
 * commit to SVN
-* make release
 * create release tag:
   svn cp https://svn.fluendo.com/svn/flumotion/trunk https://svn.fluendo.com/svn/flumotion/tags/flumotion-0.1.2
+* do a fresh checkout of the just created release tag:
+  svn co https://svn.fluendo.com/svn/flumotion/tags/flumotion-0.1.2
+* enter that checkout
+* make release
 * copy release tarball and md5 to flumotion.net/data/src/flumotion, and upload
   using bin/data-put
+* build documentation from flumotion-doc and upload it (remember to svn up flumotion-doc first!)
+  svn up
+  ../flumotion-0.2.1/env ./autogen
+  ../flumotion-0.2.1/env make
+  ../flumotion-0.2.1/env make pdf
 * fix up ticket list to do and milestone (trac)
 * add news entry on site (edit flumotion.net/src/htdocs/news/news.xml, then commit)
 * send out mail, see https://apestaart.org/thomas/trac/browser/src/moap/trunk/README. Example: moap doap -f ~/svn/flumotion-0.4.x/flumotion.doap -v 0.3.2 mail -f msmith@fluendo.com flumotion-devel@lists.fluendo.com theora@xiph.org

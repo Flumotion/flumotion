@@ -1,5 +1,10 @@
 2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* doc/random/release:
+	Refine the release process.
+
+2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion.doap:
 	Update for 0.6.1 release.
 
