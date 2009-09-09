@@ -1,5 +1,15 @@
 2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* Makefile.am:
+	* common/common.mk:
+	Also build .gz packages, some Debian packaging tools only
+	understand that format.
+
+	* doc/random/release:
+	Mention uploading both .bz2 and .gz.
+
+2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* doc/random/release:
 	Refine the release process.
 

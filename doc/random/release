@@ -29,7 +29,7 @@
   svn co https://svn.fluendo.com/svn/flumotion/tags/flumotion-0.1.2
 * enter that checkout
 * make release
-* copy release tarball and md5 to flumotion.net/data/src/flumotion, and upload
+* copy release tarball (.bz2 and .gz) and md5 to flumotion.net/data/src/flumotion, and upload
   using bin/data-put
 * build documentation from flumotion-doc and upload it (remember to svn up flumotion-doc first!)
   svn up
