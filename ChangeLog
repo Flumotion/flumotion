@@ -1,5 +1,12 @@
 2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/encoders/mulaw/mulaw.py:
+	Force mulaw to be 8000 Hz mono.
+	We only support mulaw in multipart and RFC2046 mandates the audio/basic
+	content-type of multipart to be 8000 Hz single channel.
+
+2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/encoders/dirac/dirac.py:
 	Add warnings about a bug that existed in schroenc before it was moved
 	to gst-plugins-bad and released in 0.10.14.

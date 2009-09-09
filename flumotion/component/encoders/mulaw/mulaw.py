@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+from flumotion.common import gstreamer
 from flumotion.component import feedcomponent
 
 __version__ = "$Rev$"
@@ -27,4 +28,10 @@ __version__ = "$Rev$"
 class Mulaw(feedcomponent.ParseLaunchComponent):
 
     def get_pipeline_string(self, properties):
-        return 'mulawenc name=encoder'
+        resampler = 'audioresample'
+        if gstreamer.element_factory_exists('legacyresample'):
+            resampler = 'legacyresample'
+        # we only support mulaw in multipart, and multipart mandates
+        # the audio/basic content-type to be 8000 Hz mono, c.f. RFC2046
+        return ('%s ! audioconvert ! audio/x-raw-int,rate=8000,channels=1 '
+                '! mulawenc name=encoder' % resampler)
