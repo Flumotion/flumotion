@@ -1,3 +1,13 @@
+2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/encoders/dirac/dirac.py:
+	Add warnings about a bug that existed in schroenc before it was moved
+	to gst-plugins-bad and released in 0.10.14.
+
+	* flumotion/component/muxers/checks.py:
+	Add warnings about the gdppay bug in gst-plugins-base 0.10.24.
+	Closes #1341.
+
 2009-09-07  Jan Urbanski  <jurbanski@flumotion.com>
 
 	patch by: Xavier Queralt  <xqueralt@flumotion.com>
