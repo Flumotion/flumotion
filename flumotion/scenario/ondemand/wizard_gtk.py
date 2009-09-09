@@ -47,8 +47,36 @@ class OndemandAssistantPlugin(object):
     def save(self, wizard, saver):
         ondemandStep = wizard.getStep('Demand')
         consumer = ondemandStep.getServerConsumer()
+        httpPorters = wizard.getHTTPPorters()
+        porter = self._obtainPorter(httpPorters, consumer.getPorter())
+        if porter not in httpPorters:
+            saver.addPorter(porter, 'http')
+            httpPorters.append(porter)
+        consumer.setPorter(porter)
         saver.addServerConsumer(consumer, 'ondemand')
         self._consumer = consumer
 
     def getSelectComponentName(self):
         return self._consumer.name
+
+    def _obtainPorter(self, actualPorters, consumerPorter):
+        """
+        Looks if the consumerPorter has been already created and is inside
+        the actualPorters list. If it is so, we return the existent porter,
+        otherwise we return the consumerPorter.
+
+        @param actualPorters : list of already exsisting porters.
+        @type  actualPorters : list of L{flumotion.assistant.models.Porter}
+        @param consumerPorter: porter model created by the consumer.
+        @type  consumerPorter: L{flumotion.assistant.models.Porter}
+
+        @rtype : L{flumotion.assistant.models.Porter}
+        """
+        for porter in actualPorters:
+            p1 = porter.getProperties()
+            p2 = consumerPorter.getProperties()
+
+            if p1.port == p2.port and porter.worker == consumerPorter.worker:
+                return porter
+
+        return consumerPorter

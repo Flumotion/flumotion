@@ -28,11 +28,12 @@ from os.path import dirname, basename
 import gobject
 import gtk
 
-from flumotion.admin.assistant.models import HTTPServer, Plug
+from flumotion.admin.assistant.models import HTTPServer, Plug, Porter
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.common import messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.ui.fileselector import FileSelectorDialog
+from flumotion.configure import configure
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -61,8 +62,11 @@ class OnDemand(HTTPServer):
 
     def __init__(self, worker=None):
         super(OnDemand, self).__init__(worker, mountPoint='/')
+        self.properties.port = configure.defaultHTTPStreamPort
+        self.setPorter(
+            Porter(worker=None, port=self.properties.port))
+
         self.properties.path = '/tmp'
-        self.properties.port = 8800
 
         self.add_logger = False
         self.logfile = '/tmp/access.log'
@@ -75,7 +79,26 @@ class OnDemand(HTTPServer):
         if self.add_logger:
             self.addPlug(LoggerPlug(self.logfile))
 
+        porter = self.getPorter()
+
+        properties.porter_socket_path = porter.getSocketPath()
+        properties.porter_username = porter.getUsername()
+        properties.porter_password = porter.getPassword()
+        properties.type = 'slave'
+        # FIXME: Try to maintain the port empty when we are slave. Needed
+        # for now as the adminwindow tab shows the URL based on this property.
+        properties.port = (self.properties.port or
+                           self.getPorter().getProperties().port)
         return properties
+
+    def setPorter(self, porter):
+        self._porter = porter
+
+    def getPorter(self):
+        self._porter.worker = self.worker
+        if self.properties.port:
+            self._porter.properties.port = self.properties.port
+        return self._porter
 
 
 class OnDemandStep(WorkerWizardStep):
