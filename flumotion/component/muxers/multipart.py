@@ -19,14 +19,27 @@
 
 # Headers in this file shall remain intact.
 
-import gst
-
+from flumotion.common import gstreamer, messages
+from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 
 __version__ = "$Rev$"
+T_ = gettexter()
 
 
 class Multipart(feedcomponent.MultiInputParseLaunchComponent):
+
+    def do_check(self):
+        if gstreamer.get_plugin_version('multipart') <= (0, 10, 16, 0):
+            m = messages.Warning(
+                T_(N_("Versions up to and including %s of the '%s' "
+                      "GStreamer plug-in are not suitable for streaming.\n"),
+                   '0.10.16', 'multipart'))
+            m.add(T_(N_("The stream served by the streamer component "
+                        "will probably be unplayable.\n")))
+            m.add(T_(N_("The issue will be addressed in version %s of '%s'."),
+                     '0.10.17', 'gst-plugins-good'))
+            self.addMessage(m)
 
     def get_muxer_string(self, properties):
         return 'multipartmux name=muxer'
