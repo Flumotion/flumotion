@@ -299,4 +299,14 @@ it.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.6.0.tar.bz2" />
   </Version>
  </release>
+
+ <release>
+  <Version>
+   <revision>0.6.1</revision>
+   <branch>0.6</branch>
+   <name>El Ag&#0252;elo</name>
+   <created>2009-09-09</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.6.1.tar.bz2" />
+  </Version>
+ </release>
 </Project>
