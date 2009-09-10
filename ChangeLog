@@ -1,5 +1,22 @@
 2009-09-10  Xavier Queralt  <xqueralt@flumotion.com>
 
+	reviewed by: jurbanski
+
+	* data/glade/ondemand-wizard.glade:
+	Add the plug area into the ondemand step and remove the static UI for
+	the plugs used
+	* flumotion/admin/assistant/interfaces.py:
+	* flumotion/admin/assistant/models.py:
+	Allow deleting a plug from a component
+	* flumotion/common/registry.py:
+	Add a new wizard plug type to be used by the httpserver plugs
+	* flumotion/scenario/steps/ondemandstep.py:
+	Get rid of the code that adds and treats the plugs. Do it dynamically
+	using a PlugArea
+	See #1337
+
+2009-09-10  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/component/plugs/adminaction.py:
 	* flumotion/component/plugs/request.py:
 	Fix a typo. Use errors.PropertyError instead of errors.PropertiesError
@@ -27,7 +44,7 @@
 	* flumotion/ui/plugarea.py (added):
 	Move PlugArea from inside the httpstreamersteps module to its own. So it
 	can be used by other steps and generalized.
-	Helps #1337
+	See #1337
 
 2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
 

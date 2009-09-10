@@ -25,6 +25,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
+            <property name="position">0</property>
           </packing>
         </child>
         <child>
@@ -34,16 +35,10 @@
             <child>
               <widget class="GtkTable" id="table4">
                 <property name="visible">True</property>
-                <property name="n_rows">3</property>
+                <property name="n_rows">4</property>
                 <property name="n_columns">3</property>
                 <property name="column_spacing">6</property>
                 <property name="row_spacing">6</property>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
                 <child>
                   <widget class="GtkHBox" id="hbox1">
                     <property name="visible">True</property>
@@ -58,6 +53,7 @@
                       </widget>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -110,7 +106,6 @@
                     <property name="can_focus">True</property>
                     <property name="label" translatable="yes">_Select...</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_select_directory__clicked"/>
                   </widget>
                   <packing>
@@ -173,86 +168,9 @@
           </packing>
         </child>
         <child>
-          <widget class="GtkCheckButton" id="add_logger">
+          <widget class="Custom" id="plugarea">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="response_id">0</property>
-            <property name="draw_indicator">True</property>
-            <signal name="toggled" handler="on_add_logger__toggled"/>
-            <child>
-              <widget class="GtkLabel" id="label2">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">&lt;b&gt;Log requests to a file (apache log):&lt;/b&gt;</property>
-                <property name="use_markup">True</property>
-              </widget>
-            </child>
-          </widget>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkAlignment" id="logging_alignment">
-            <property name="visible">True</property>
-            <property name="left_padding">12</property>
-            <child>
-              <widget class="GtkTable" id="table2">
-                <property name="visible">True</property>
-                <property name="n_columns">3</property>
-                <property name="column_spacing">6</property>
-                <property name="row_spacing">6</property>
-                <child>
-                  <widget class="GtkButton" id="select_logfile">
-                    <property name="visible">True</property>
-                    <property name="sensitive">False</property>
-                    <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">_Select...</property>
-                    <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
-                    <signal name="clicked" handler="on_select_logfile__activate"/>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">3</property>
-                    <property name="x_options"></property>
-                    <property name="y_options"></property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkEntry" id="logfile">
-                    <property name="width_request">100</property>
-                    <property name="visible">True</property>
-                    <property name="sensitive">False</property>
-                    <property name="can_focus">True</property>
-                    <property name="has_tooltip">True</property>
-                    <property name="tooltip_text">File in the worker where the logs will be saved.</property>
-                    <property name="invisible_char">*</property>
-                    <property name="text">/tmp/access.log</property>
-                    <signal name="changed" handler="on_logfile__changed"/>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="y_options"></property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label3">
-                    <property name="visible">True</property>
-                    <property name="xalign">0</property>
-                    <property name="label" translatable="yes">_File name:</property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">path</property>
-                  </widget>
-                  <packing>
-                    <property name="x_options">GTK_FILL</property>
-                    <property name="y_options"></property>
-                  </packing>
-                </child>
-              </widget>
-            </child>
+            <property name="creation_function">flumotion.ui.plugarea.WizardPlugArea</property>
           </widget>
           <packing>
             <property name="expand">False</property>

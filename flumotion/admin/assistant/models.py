@@ -157,6 +157,9 @@ class Component(object, log.Loggable):
         """
         self.plugs.append(plug)
 
+    def delPlug(self, plug):
+        plug in self.plugs and self.plugs.remove(plug)
+
     def link(self, component):
         """Link two components together
         @param component: component to link with

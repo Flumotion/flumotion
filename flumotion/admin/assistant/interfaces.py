@@ -82,7 +82,7 @@ class IHTTPConsumerPlugin(Interface):
     under the entry type "wizard".
     """
 
-    def __call__(assistant, wizard, model):
+    def __call__(assistant, model):
         """Creates http consumer plugins
         @param assistant: the assistant
         @type assistant: L{ConfigurationAssistant}
@@ -115,6 +115,38 @@ class IHTTPConsumerPluginLine(Interface):
         @type video_producer: L{VideoProducer} subclass
         @returns: consumer
         @rtype: a L{HTTPServer} subclass
+        """
+
+
+class IHTTPServerPlugin(Interface):
+    """A http server plugin allows to extend a HTTP server.
+    The main purpose of the plugin is to get a wizard plug line that can be
+    added into a plug area. The plugline should add/delete the plug from the
+    http server model when activated/deactivated.
+    This entry point should be defined in the xml for the plug
+    under the entry type "wizard".
+    """
+
+    def __call__(assistant, component):
+        """Creates http server plugins
+        @param assistant: the assistant
+        @type assistant: L{ConfigurationAssistant}
+        @param component: the component that will receive the plug
+        @type assistant: L{f.a.a.m.Component}
+        """
+
+    def workerChanged(worker):
+        """Called when the worker for the step changed.
+        @param worker: the worker
+        @type worker: str
+        """
+
+    def getPlugWizard(description):
+        """Creates a plugin line for the consumer
+        @param description: The text to appear in the line
+        @type description: str
+        @returns: wizard plugin line
+        @rtype: a L{WizardPlugLine}
         """
 
 

@@ -53,6 +53,7 @@ _VALID_WIZARD_COMPONENT_TYPES = [
 
 _VALID_WIZARD_PLUG_TYPES = [
     'http-consumer',
+    'httpserver-plug',
     ]
 
 
