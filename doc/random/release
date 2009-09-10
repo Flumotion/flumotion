@@ -1,16 +1,18 @@
+* Pick a new version number and set it for the rest of the commands:
+  export VERSION=0.6.2
 * Choose release name:
   - a bar for micro version
   - a restaurant for minor version
-* add a revision to the .doap file
+* add a revision to the .doap file for the next version
 * Check for milestone bugs
   example:
-  https://core.fluendo.com/flumotion/trac/report/16?format=tab&MILESTONE=0.1.2
+  https://core.fluendo.com/flumotion/trac/report/16?format=tab&MILESTONE=$VERSION
 * create the release notes in the flumotion.net modules:
   - in src/htdocs/releases/flumotion, create a new file
   - add it to Makefile.am
   - update list of features by going through the ChangeLog
   - update list of bugs fixed by pasting in the output of:
-    moap doap bug query -f "<bug><id>%(id)s</id><summary>%(summary)s</summary></bug>" milestone=0.2.0
+    moap doap bug query -f "<bug><id>%(id)s</id><summary>%(summary)s</summary></bug>" milestone=$VERSION
 
   - update list of contributors
 * copy the generated text version to the RELEASE file
@@ -21,22 +23,27 @@
    upgrading from the previous stable series)
 * bump nano in configure.ac to 0
 * update doap file, adding new release
-* edit ChangeLog and add === release 0.1.2 ===
+* edit ChangeLog and add === release $VERSION ===
 * commit to SVN
 * create release tag:
-  svn cp https://svn.fluendo.com/svn/flumotion/trunk https://svn.fluendo.com/svn/flumotion/tags/flumotion-0.1.2
+  svn cp https://svn.fluendo.com/svn/flumotion/trunk https://svn.fluendo.com/svn/flumotion/tags/flumotion-$VERSION
 * do a fresh checkout of the just created release tag:
-  svn co https://svn.fluendo.com/svn/flumotion/tags/flumotion-0.1.2
+  svn co https://svn.fluendo.com/svn/flumotion/tags/flumotion-$VERSION
 * enter that checkout
 * make release
 * copy release tarball (.bz2 and .gz) and md5 to flumotion.net/data/src/flumotion, and upload
   using bin/data-put
 * build documentation from flumotion-doc and upload it (remember to svn up flumotion-doc first!)
   svn up
-  ../flumotion-0.2.1/env ./autogen
-  ../flumotion-0.2.1/env make
-  ../flumotion-0.2.1/env make pdf
+  ../flumotion-$VERSION/env ./autogen
+  ../flumotion-$VERSION/env make
+  ../flumotion-$VERSION/env make pdf
 * fix up ticket list to do and milestone (trac)
 * add news entry on site (edit flumotion.net/src/htdocs/news/news.xml, then commit)
-* send out mail, see https://apestaart.org/thomas/trac/browser/src/moap/trunk/README. Example: moap doap -f ~/svn/flumotion-0.4.x/flumotion.doap -v 0.3.2 mail -f msmith@fluendo.com flumotion-devel@lists.fluendo.com theora@xiph.org
+* send out release announcement mail;
+  see https://apestaart.org/thomas/trac/browser/src/moap/trunk/README.
+  Example: from the tag, do 
+    moap doap -v $VERSION mail -f msmith@fluendo.com flumotion-devel@lists.fluendo.com theora@xiph.org
+* submit release to freshmeat:
+  moap doap -v $VERSION freshmeat
 * bump nano in configure.ac to 1 to go back to development
