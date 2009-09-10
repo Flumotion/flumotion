@@ -1,3 +1,10 @@
+2009-09-10  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/component/plugs/adminaction.py:
+	* flumotion/component/plugs/request.py:
+	Fix a typo. Use errors.PropertyError instead of errors.PropertiesError
+	that doesn't exist.
+
 2009-09-10  Alvin Delagon  <adelagon@flumotion.com>
 
 	reviewed by: Jan Urbanski

@@ -74,7 +74,7 @@ class RequestLoggerFilePlug(RequestLoggerPlug):
         try:
             self.file = open(self.filename, 'a')
         except IOError, data:
-            raise errors.PropertiesError('could not open log file %s '
+            raise errors.PropertyError('could not open log file %s '
                                          'for writing (%s)'
                                          % (self.filename, data[1]))
 
