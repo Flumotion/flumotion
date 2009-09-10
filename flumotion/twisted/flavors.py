@@ -76,6 +76,31 @@ class IStateListener(Interface):
         """
 
 
+class IStateCacheableListener(Interface):
+    """
+    I am an interface for objects that want to listen to changes on
+    cacheable states
+    """
+
+    def observerAppend(self, observer, num):
+        """
+        @type observer: L{twisted.spread.flavors.RemoteCacheObserver}
+        @param observer: reference to the peer's L{RemoteCache}
+                         that was added
+        @type num: int
+        @param num: number of observers present
+        """
+
+    def observerRemove(self, observer, num):
+        """
+        @type observer: L{twisted.spread.flavors.RemoteCacheObserver}
+        @param observer: reference to the peer's L{RemoteCache}
+                         that was removed
+        @type num: int
+        @param num: number of observers remaining
+        """
+
+
 class StateCacheable(pb.Cacheable):
     """
     I am a cacheable state object.
@@ -86,6 +111,7 @@ class StateCacheable(pb.Cacheable):
 
     def __init__(self):
         self._observers = []
+        self._hooks = []
         self._dict = {}
 
     # our methods
@@ -217,10 +243,41 @@ class StateCacheable(pb.Cacheable):
 
     def getStateToCacheAndObserveFor(self, perspective, observer):
         self._observers.append(observer)
+        for hook in self._hooks:
+            hook.observerAppend(observer, len(self._observers))
         return self._dict
 
     def stoppedObserving(self, perspective, observer):
         self._observers.remove(observer)
+        for hook in self._hooks:
+            hook.observerRemove(observer, len(self._observers))
+
+    def addHook(self, hook):
+        """
+        A helper function that adds an object that would like to get
+        informed by StateCacheable when observers has been added or
+        removed.
+
+        @param hook: an object who would like to receive state events
+        @type hook:  object that implements
+                     L{flumotion.twisted.flavors.IStateCacheableListener}
+        """
+        if hook in self._hooks:
+            raise ValueError(
+                "%r is already a hook of %r" % (hook, self))
+        self._hooks.append(hook)
+
+    def removeHook(self, hook):
+        """
+        Remove the object that listens to StateCacheable observer events
+
+        @param hook: the object who would like to unsubscribe to state
+                     events
+        @type hook: object that implements
+                    L{flumotion.twisted.flavors.IStateCacheableListener}
+        """
+        self._hooks.remove(hook)
+
 
 # At some point, a StateRemoteCache will become invalid. The normal way
 # would be losing the connection to the RemoteCacheable, although
