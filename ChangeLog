@@ -2,6 +2,18 @@
 
 	reviewed by: jurbanski
 
+	* flumotion/component/plugs/Makefile.am:
+	* flumotion/component/plugs/plugs.xml:
+	Add wizard entries for requestlogger and forcedownload plugs
+	* flumotion/component/plugs/wizard.glade (added):
+	* flumotion/component/plugs/wizard_gtk.py (added):
+	Add an UI for two http-server plugs.
+	Closes #1337
+
+2009-09-10  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: jurbanski
+
 	* data/glade/ondemand-wizard.glade:
 	Add the plug area into the ondemand step and remove the static UI for
 	the plugs used

@@ -11,7 +11,9 @@ component_PYTHON = \
 	request.py \
 	requestmodifier.py \
 	rrd.py \
-	streamdata.py
+	streamdata.py \
+        wizard.glade \
+        wizard_gtk.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/plugs
 component_DATA = plugs.xml

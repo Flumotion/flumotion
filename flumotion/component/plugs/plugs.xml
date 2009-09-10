@@ -3,8 +3,17 @@
     <plug socket="flumotion.component.plugs.request.RequestLoggerPlug"
           type="requestlogger-file"
           _description="Logs all stream requests to a W3C-compatible log file.">
-      <entry location="flumotion/component/plugs/request.py"
-             function="RequestLoggerFilePlug" />
+      <entries>
+        <entry type="default"
+               location="flumotion/component/plugs/request.py"
+               function="RequestLoggerFilePlug" />
+        <entry type="wizard"
+               location="flumotion/component/plugs/wizard_gtk.py"
+               function="RequestLoggerPlugWizardPlugin" />
+      </entries>
+
+      <wizard _description="Log all stream requests to a file."
+              type="httpserver-plug"/>
 
       <properties>
         <property name="logfile" type="string" required="true"
@@ -94,8 +103,16 @@
     <plug socket="flumotion.component.plugs.requestmodifier.RequestModifierPlug"
           type="requestmodifier-forcedownload"
           _description="Force browsers to ask for download by injecting an HTTP header">
-      <entry location="flumotion/component/plugs/requestmodifier.py"
-             function="RequestModifierForceDownloadPlug" />
+      <entries>
+        <entry type="default"
+               location="flumotion/component/plugs/requestmodifier.py"
+               function="RequestModifierForceDownloadPlug" />
+        <entry type="wizard"
+               location="flumotion/component/plugs/wizard_gtk.py"
+               function="RequestModifierForceDownloadPlugWizardPlugin" />
+      </entries>
+
+      <wizard _description="Force browsers to ask for download." type="httpserver-plug"/>
 
       <properties>
         <property name="argument-name" type="string" required="true"
@@ -126,6 +143,8 @@
       <directories>
         <directory name="flumotion/component/plugs">
           <filename location="request.py" />
+          <filename location="wizard_gtk.py" />
+          <filename location="wizard.glade" />
         </directory>
       </directories>
     </bundle>
