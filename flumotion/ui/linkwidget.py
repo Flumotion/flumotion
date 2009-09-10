@@ -114,7 +114,7 @@ if hasattr(gtk, 'LinkButton'):
     class LinkWidget(gtk.LinkButton):
 
         def __init__(self, uri):
-            gtk.LinkButton.__init__(self, uri)
+            gtk.LinkButton.__init__(self, uri, label=uri)
             self.set_property('can-focus', False)
             self._callback = None
             gtk.link_button_set_uri_hook(self.on_link_button_clicked)

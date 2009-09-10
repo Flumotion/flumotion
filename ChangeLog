@@ -1,5 +1,12 @@
 2009-09-10  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/ui/linkwidget.py:
+	Set the label of LinkButton.
+	Actually, as stated in the documentation setting only the uri should
+	be enough but, surprinsingly, this doesn't work with pygtk >=2.16
+
+2009-09-10  Xavier Queralt  <xqueralt@flumotion.com>
+
 	reviewed by: jurbanski
 
 	* flumotion/component/plugs/Makefile.am:
