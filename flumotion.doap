@@ -1,6 +1,7 @@
 <Project
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns="http://usefulinc.com/ns/doap#"
   xmlns:foaf="http://xmlns.com/foaf/0.1/"
   xmlns:admin="http://webns.net/mvcb/">
@@ -307,6 +308,14 @@ it.
    <name>El Ag&#0252;elo</name>
    <created>2009-09-09</created>
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.6.1.tar.bz2" />
+   <dc:description>
+This is a brown paper bag release.  It turned out that the contents of 0.6.0
+tarballs did not match the release tag and some last bugfixes made before the
+0.6.0 release did not make it to those tarballs.
+This release also fixes some GStreamer issues, bringing back Dirac in Ogg and
+mu-law audio in multipart.
+   </dc:description>
+
   </Version>
  </release>
 </Project>
