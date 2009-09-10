@@ -24,9 +24,10 @@
 
 from zope.interface import implements
 
-from flumotion.admin.assistant.interfaces import IHTTPConsumerPlugin
+from flumotion.admin.assistant.interfaces import IHTTPConsumerPlugin, \
+        IHTTPConsumerPluginLine
 from flumotion.admin.assistant.models import HTTPServer, HTTPPlug
-from flumotion.common.fraction import fractionAsFloat, fractionFromValue
+from flumotion.ui.plugarea import WizardPlugLine
 
 __version__ = "$Rev$"
 
@@ -126,6 +127,23 @@ class CortadoHTTPServer(HTTPServer):
         return properties
 
 
+class CortadoPlugLine(WizardPlugLine):
+    implements(IHTTPConsumerPluginLine)
+    gladeFile = ''
+
+    def __init__(self, wizard, description):
+        WizardPlugLine.__init__(self, wizard, None, description)
+        self.setActive(True)
+
+    def plugActiveChanged(self, active):
+        pass
+
+    def getConsumer(self, streamer, audioProducer, videoProducer):
+        mountPoint = slashjoin(streamer.properties.mount_point, "cortado/")
+        return CortadoHTTPServer(streamer, audioProducer,
+                                 videoProducer, mountPoint)
+
+
 class CortadoWizardPlugin(object):
     implements(IHTTPConsumerPlugin)
 
@@ -142,9 +160,5 @@ class CortadoWizardPlugin(object):
         d.addCallback(check)
         return d
 
-    def getConsumer(self, streamer, audioProducer, videoProducer):
-        mountPoint = slashjoin(streamer.properties.mount_point,
-                               "cortado/")
-        return CortadoHTTPServer(streamer, audioProducer,
-                                 videoProducer,
-                                 mountPoint)
+    def getPlugWizard(self, description):
+        return CortadoPlugLine(self.wizard, description)

@@ -38,16 +38,11 @@ On the http-server the applet will be provided with help of a plug.
 import gettext
 import re
 
-import gobject
-from kiwi.utils import gsignal
-import gtk
-from twisted.internet import defer
-
 from flumotion.admin.assistant.models import Consumer, Porter
 from flumotion.admin.gtk.basesteps import ConsumerStep
 from flumotion.configure import configure
 from flumotion.common import errors, log, messages
-from flumotion.common.i18n import N_, gettexter, ngettext
+from flumotion.common.i18n import N_, gettexter
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -72,8 +67,6 @@ class HTTPStreamer(Consumer):
 
         self.setPorter(
             Porter(worker=None, port=configure.defaultHTTPStreamPort))
-
-        self.has_plugins = False
 
         self.has_client_limit = False
         self.client_limit = 1000
@@ -152,106 +145,6 @@ class HTTPStreamer(Consumer):
         return properties
 
 
-class PlugPluginLine(gtk.VBox):
-    """I am a line in the plug plugin area representing a single plugin.
-    Rendered, I am visible as a checkbutton containing a label with the
-    description of the plugin.
-    Signals::
-      - enable-changed: emitted when I am enabled/disabled
-    @ivar plugin: plugin instance
-    """
-    gsignal('enable-changed')
-
-    def __init__(self, plugin, description):
-        """
-        @param plugin: plugin instance
-        @param description: description of the plugin
-        """
-        gtk.VBox.__init__(self)
-        self.plugin = plugin
-        self.checkbutton = gtk.CheckButton(description)
-        self.checkbutton.connect('toggled',
-                                 self._on_checkbutton__toggled)
-        self.checkbutton.set_active(True)
-        self.pack_start(self.checkbutton)
-        self.checkbutton.show()
-
-    def isEnabled(self):
-        """Find out if the plugin is going to be enabled or not
-        @returns: enabled
-        @rtype: bool
-        """
-        return self.checkbutton.get_active()
-
-    def _on_checkbutton__toggled(self, checkbutton):
-        self.emit('enable-changed')
-gobject.type_register(PlugPluginLine)
-
-
-class PlugPluginArea(gtk.VBox):
-    """I am plugin area representing all available plugins. I keep track
-    of the plugins and their internal state. You can ask me to add new plugins
-    or get the internal models of the plugins.
-    """
-
-    def __init__(self, streamer=None):
-        self.streamer = streamer
-        gtk.VBox.__init__(self, spacing=6)
-        self._lines = []
-
-    # Public
-
-    def setStreamer(self, streamer):
-        """
-        Stablishes the streamer's model the plug is related to.
-        """
-        self.streamer = streamer
-
-    def addPlug(self, plugin, description):
-        """Add a plug, eg a checkbutton with a description such as
-        'Cortado Java applet'.
-        @param plugin: plugin instance
-        @param description: label description
-        """
-        line = PlugPluginLine(plugin, description)
-        line.connect('enable-changed', self._on_plugline__enable_changed)
-        self._lines.append(line)
-        self.pack_start(line, False, False)
-        line.show()
-        self._updateStreamer()
-
-    def getServerConsumers(self, audio_producer, video_producer):
-        """Fetch a list of server consumers which are going to be used by all
-        available plugins.
-        @returns: consumers
-        @rtype: a sequence of L{HTTPServer} subclasses
-        """
-        for plugin in self._getEnabledPlugins():
-            yield plugin.getConsumer(self.streamer, audio_producer,
-                                     video_producer)
-
-    # Private
-
-    def _hasEnabledPlugins(self):
-        for line in self._lines:
-            if line.isEnabled():
-                return True
-        return False
-
-    def _getEnabledPlugins(self):
-        for line in self._lines:
-            if line.isEnabled():
-                yield line.plugin
-
-    def _updateStreamer(self):
-        self.streamer.has_plugins = self._hasEnabledPlugins()
-
-    # Callbacks
-
-    def _on_plugline__enable_changed(self, line):
-        self._updateStreamer()
-
-
 class HTTPSpecificStep(ConsumerStep):
     """I am a step of the configuration wizard which allows you
     to configure a stream to be served over HTTP.
@@ -282,9 +175,10 @@ class HTTPSpecificStep(ConsumerStep):
         return self.model
 
     def getServerConsumers(self):
-        return self.plugarea.getServerConsumers(
-            self.wizard.getScenario().getAudioProducer(self.wizard),
-            self.wizard.getScenario().getVideoProducer(self.wizard))
+        for line in self.plugarea.getEnabledLines():
+            yield line.getConsumer(self.model,
+                self.wizard.getScenario().getAudioProducer(self.wizard),
+                self.wizard.getScenario().getVideoProducer(self.wizard))
 
     # WizardStep
 
@@ -311,8 +205,6 @@ class HTTPSpecificStep(ConsumerStep):
         self.client_limit.set_sensitive(self.model.has_client_limit)
         self.bandwidth_limit.set_sensitive(self.model.has_bandwidth_limit)
         self.hostname.set_sensitive(self.model.set_hostname)
-
-        self.plugarea.setStreamer(self.model)
 
         self.port.connect('changed', self.on_port_changed)
         self.mount_point.connect('changed', self.on_mount_point_changed)
@@ -364,6 +256,8 @@ class HTTPSpecificStep(ConsumerStep):
         if not canPopulate:
             return
 
+        self.plugarea.clean()
+
         def gotEntries(entries):
             log.debug('httpwizard', 'got %r' % (entries, ))
             for entry in entries:
@@ -378,11 +272,12 @@ class HTTPSpecificStep(ConsumerStep):
 
                         def cb(found, plugin, entry):
                             if found:
-                                self._addPlug(
-                                    plugin, N_(entry.description))
+                                self._addPlug(plugin.getPlugWizard(
+                                    N_(entry.description)))
                         d.addCallback(cb, plugin, entry)
                     else:
-                        self._addPlug(plugin, N_(entry.description))
+                        self._addPlug(plugin.getPlugWizard(
+                            N_(entry.description)))
                 d = self.wizard.getWizardPlugEntry(entry.componentType)
                 d.addCallback(response, entry)
 
@@ -418,8 +313,8 @@ class HTTPSpecificStep(ConsumerStep):
 
         return True
 
-    def _addPlug(self, plugin, description):
-        self.plugarea.addPlug(plugin, description)
+    def _addPlug(self, plugin):
+        self.plugarea.addLine(plugin)
 
     def _runChecks(self):
         self.wizard.waitForTask('http streamer check')

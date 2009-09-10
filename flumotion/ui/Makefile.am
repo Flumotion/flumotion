@@ -10,6 +10,7 @@ flumotion_PYTHON = 	\
 	glade.py 	\
 	kiwipatches.py 	\
 	linkwidget.py 	\
+        plugarea.py     \
 	icons.py 	\
 	simplewizard.py \
 	trayicon.py 	\

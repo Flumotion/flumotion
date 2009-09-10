@@ -1,3 +1,18 @@
+2009-09-10  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: jurbanski
+
+	* data/glade/httpstreamer-wizard.glade:
+	* flumotion/admin/assistant/interfaces.py:
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	Adapt cortado plug to the new plugarea
+	* flumotion/scenario/steps/httpstreamersteps.py:
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/plugarea.py (added):
+	Move PlugArea from inside the httpstreamersteps module to its own. So it
+	can be used by other steps and generalized.
+	Helps #1337
+
 2009-09-09  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* Makefile.am:

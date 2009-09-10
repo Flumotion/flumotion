@@ -82,7 +82,7 @@ class IHTTPConsumerPlugin(Interface):
     under the entry type "wizard".
     """
 
-    def __call__(assistant):
+    def __call__(assistant, wizard, model):
         """Creates http consumer plugins
         @param assistant: the assistant
         @type assistant: L{ConfigurationAssistant}
@@ -94,8 +94,19 @@ class IHTTPConsumerPlugin(Interface):
         @type worker: L{WorkerComponentUIState}
         """
 
+    def getPlugWizard(description):
+        """Creates a plugin line for the consumer
+        @param description: The text to appear in the line
+        @type description: str
+        @returns: wizard plugin line
+        @rtype: a L{WizardPlugLine}
+        """
+
+
+class IHTTPConsumerPluginLine(Interface):
+
     def getConsumer(streamer, audio_producer, video_producer):
-        """Asks the plugin for a consumer model
+        """Asks the plugin line for a consumer model
         @param streamer: the http streamer
         @type streamer: L{HTTPStreamer} subclass
         @param audio_producer: audio producer for this stream

@@ -63,7 +63,7 @@
         <child>
           <widget class="Custom" id="plugarea">
             <property name="visible">True</property>
-            <property name="creation_function">flumotion.scenario.steps.httpstreamersteps.PlugPluginArea</property>
+            <property name="creation_function">flumotion.ui.plugarea.WizardPlugArea</property>
           </widget>
           <packing>
             <property name="expand">False</property>
