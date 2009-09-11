@@ -17,3 +17,14 @@ Alternatively, you can embed only the log.py file with proper svn:externals.
 
 If you are worried about stability, check out a specific revision by
 putting -r (revision number) in between log and https
+
+BUGS
+----
+
+The logging strings should be strings, not unicode.
+
+log.getExceptionMessage() is not always able to extract the stack properly;
+there doesn't seem to be a good way to do so.
+Instead, it will take the stack from the last raise context, so call
+this function before passing the exception down somewhere else where it
+could hit another raise first.
