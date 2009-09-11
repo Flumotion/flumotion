@@ -1,3 +1,15 @@
+2009-09-11  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* common/as-version.m4:
+	  Update to newer version so we can remove m4 ugliness from
+	  configure.ac
+	  This will probably need following up in the other modules too.
+	* configure.ac:
+	  Remove m4 ugliness.
+	  Add bug location.
+	* flumotion.spec.in:
+	  Use new release tag variable.
+
 2009-09-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/porter/porter.py:

@@ -1,20 +1,19 @@
 -*- mode: m4 -*-
 
-m4_define([flu_major_version], [0])
-m4_define([flu_minor_version], [7])
-m4_define([flu_micro_version], [0])
-m4_define([flu_extra_version], [1])
-m4_define([flu_version], [flu_major_version.flu_minor_version.flu_micro_version])
+dnl initialize autoconf
+dnl when going to/from release please remove/add the nano (fourth number)
+dnl releases only do Wall, cvs and prerelease does Werror too
+AC_INIT(flumotion, 0.7.0.1,
+   http://https://code.fluendo.com/flumotion/trac/newticket?component=flumotion,
+   flumotion)
 
-AC_INIT(flumotion, [flu_version])
+dnl initialize automake
 AM_INIT_AUTOMAKE([-Wno-portability])
 
-AS_VERSION(flumotion, FLUMOTION,
-           flu_major_version,
-           flu_minor_version,
-           flu_micro_version,
-           flu_extra_version)
-AC_SUBST(RELEASE, $FLUMOTION_RELEASE)
+dnl define PACKAGE_VERSION_* variables
+AS_VERSION
+
+AS_NANO
 
 AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
@@ -29,6 +28,9 @@ GST_010_SUPPORTED=true
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common")
+
+dnl for rerunning libtoolize
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl set up gettext
 dnl the version check needs to stay here because autopoint greps for it
