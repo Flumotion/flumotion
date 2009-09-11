@@ -1,3 +1,10 @@
+2009-09-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/porter/porter.py:
+	If config has no external-interface property set, set it to
+	same as interface property. This makes any calls to getPorterDetails
+	return something meaningful and correct for external-interface.
+
 2009-09-10  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/ui/linkwidget.py:

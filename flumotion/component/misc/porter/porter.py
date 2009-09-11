@@ -291,7 +291,10 @@ class Porter(component.BaseComponent, log.Loggable):
         self._porterProtocol = props.get('protocol',
             'flumotion.component.misc.porter.porter.HTTPPorterProtocol')
         self._interface = props.get('interface', '')
-        self._external_interface = props.get('external-interface', '')
+        # if a config has no external-interface set, set it to the same as
+        # interface
+        self._external_interface = props.get('external-interface',
+            self._interface)
 
     def do_stop(self):
         d = None
