@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?> <!--*- mode: nxml -*-->
+
+<!-- stable Flumotion only -->
+
+<!DOCTYPE moduleset SYSTEM "moduleset.dtd">
+<?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
+
+<moduleset>
+
+  <!-- repositories -->
+  <repository type="svn" name="code.fluendo.com-flumotion" default="yes"
+              href="https://code.fluendo.com/flumotion/svn/"
+              password="" />
+
+  <autotools id="flumotion">
+    <branch repo="code.fluendo.com-flumotion"
+            module="flumotion" revision="../tags/flumotion-0.6.1" />
+  </autotools>
+
+</moduleset>
