@@ -46,4 +46,5 @@
     moap doap -v $VERSION mail -f msmith@fluendo.com flumotion-devel@lists.fluendo.com theora@xiph.org
 * submit release to freshmeat:
   moap doap -v $VERSION freshmeat
+* update the jhbuild modules in misc/flu.*.modules to point at the latest release tag
 * bump nano in configure.ac to 1 to go back to development
