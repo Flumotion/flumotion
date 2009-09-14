@@ -1,3 +1,8 @@
+2009-09-14  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	* doc/man/flumotion-worker.1:
+	Corrects the syntax for -FPORTS
+
 2009-09-11  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* common/as-version.m4:
