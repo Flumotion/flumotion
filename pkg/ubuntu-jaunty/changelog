@@ -1,3 +1,9 @@
+flumotion (0.7.0.1-1flu1~jaunty1) jaunty; urgency=low
+
+  * New version
+
+ -- Arek Korbik <arkadini@gmail.com>  Tue, 15 Sep 2009 12:52:46 +0200
+
 flumotion (0.5.4.2-1flu1~jaunty1) jaunty; urgency=low
 
   * Update to 0.5.4.2 pre-release
