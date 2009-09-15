@@ -9,7 +9,7 @@ component_PYTHON = \
 	admin_gtk.py \
 	admin_text.py
 
-component_DATA = disker.xml disker.glade
+component_DATA = disker.xml disker.glade status.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo

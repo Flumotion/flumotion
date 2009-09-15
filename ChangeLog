@@ -1,5 +1,10 @@
 2009-09-16  Alvin Delagon  <adelagon@flumotion.com>
 
+	* flumotion/component/consumers/disker/Makefile.am:
+	Adding status.glade to Makefile.am.
+
+2009-09-16  Alvin Delagon  <adelagon@flumotion.com>
+
 	reviewed by: Arek Korbik/Jan Urbanski
 
 	* flumotion/component/consumers/disker/admin_gtk.py:
