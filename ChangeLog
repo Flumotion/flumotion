@@ -1,3 +1,15 @@
+2009-09-16  Alvin Delagon  <adelagon@flumotion.com>
+
+	reviewed by: Arek Korbik/Jan Urbanski
+
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/disker/disker.xml:
+	* flumotion/component/consumers/disker/status.glade:
+	* flumotion/component/consumers/disker/status.glade (added):
+	Show more information on the disker admin.
+	Closes #1191.
+
 2009-09-14  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	* doc/man/flumotion-worker.1:

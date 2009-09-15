@@ -71,6 +71,7 @@
             <directory name="flumotion/component/consumers/disker">
                 <filename location="admin_gtk.py"/>
                 <filename location="disker.glade"/>
+                <filename location="status.glade"/>
             </directory>
         </directories>
     </bundle>

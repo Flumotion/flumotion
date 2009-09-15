@@ -21,6 +21,7 @@
 
 import os
 import gettext
+import time
 
 import gtk
 
@@ -35,6 +36,13 @@ _ = gettext.gettext
 
 __version__ = "$Rev$"
 
+(
+    COLUMN_TSTAMP,
+    COLUMN_FILENAME,
+    COLUMN_CREATED,
+    COLUMN_SIZE,
+    COLUMN_LOCATION,
+) = range(5)
 
 from kiwi.ui import objectlist
 
@@ -200,11 +208,111 @@ class FilenameNode(BaseAdminGtkNode):
         return None
 
 
+class StatusNode(BaseAdminGtkNode):
+    gladeFile = os.path.join('flumotion', 'component', 'consumers',
+                             'disker', 'status.glade')
+
+    _iters = {}
+
+    def haveWidgetTree(self):
+
+        def cb_getUIState(state):
+            values = state.get('filelist')
+            self.store.clear()
+            for item in values:
+                self._append(item)
+            if self.rotateTypeLabel:
+                self.rotateTypeLabel.set_text("Rotation: %s" % \
+                                              state.get('rotate-type'))
+            self._setCurrentLabel(state)
+            self._setDiskLabel(state)
+
+        self.widget = self.wtree.get_widget('status-widget')
+        self.diskFreeLabel = self.wtree.get_widget('label-free')
+        self.rotateTypeLabel = self.wtree.get_widget('label-rotation')
+        self.currentFilenameLabel = self.wtree.get_widget('label-current')
+        self._buildFilelist()
+        d = self.callRemote("getUIState")
+        d.addCallback(cb_getUIState)
+
+    def _buildFilelist(self):
+
+        def getGtkColumn(title, text, visible=True, clickable=True):
+            col = gtk.TreeViewColumn(title,
+                                     gtk.CellRendererText(),
+                                     text=text)
+            col.set_property('visible', visible)
+            col.set_property('clickable', clickable)
+            col.set_sort_column_id(text)
+            return col
+
+        self.store = gtk.ListStore(str, str, str, str, str)
+        # Sort by time created (default)
+        self.store.set_sort_column_id(0, gtk.SORT_DESCENDING)
+        self.tree = self.wtree.get_widget('treeview-filelist')
+        self.tree.append_column(getGtkColumn('tstamp',
+                                             COLUMN_TSTAMP,
+                                             visible=False,
+                                             clickable=False))
+        self.tree.append_column(getGtkColumn('Filename',
+                                             COLUMN_FILENAME))
+        self.tree.append_column(getGtkColumn('Time created',
+                                             COLUMN_CREATED))
+        self.tree.append_column(getGtkColumn('Size in bytes',
+                                             COLUMN_SIZE))
+        self.tree.append_column(getGtkColumn('Location',
+                                             COLUMN_LOCATION))
+        self.tree.set_rules_hint(True)
+        self.tree.set_model(self.store)
+
+    def _append(self, item):
+        created = format.formatTimeStamp(time.localtime(item[0]))
+        self._iters[item[0]] = self.store.append([str(item[0]),
+                                                  os.path.basename(
+                                                      str(item[1])),
+                                                  created,
+                                                  str(item[2]),
+                                                  str(item[1])])
+
+    def _setDiskLabel(self, state):
+        if self.diskFreeLabel:
+            df = state.get('disk-free')
+            if df != None:
+                self.diskFreeLabel.set_text(
+                    "Available Disk Space: %s" % df)
+
+    def _setCurrentLabel(self, state):
+        if self.currentFilenameLabel:
+            self.currentFilenameLabel.set_text("Current filename: %s" % \
+                                               state.get("filename"))
+
+    def stateSet(self, state, key, value):
+        if key == "disk-free":
+            self._setDiskLabel(state)
+        if key == "filename":
+            self._setCurrentLabel(state)
+
+    def stateAppend(self, state, key, value):
+        if key == 'filelist':
+            self._append(value)
+
+    def stateRemove(self, state, key, value):
+        if key == 'filelist':
+            iter = self._iters[value[0]]
+            if iter:
+                self.store.remove(iter)
+                self._iters.pop(value[0])
+
+
 class DiskerAdminGtk(BaseAdminGtk):
 
     def setup(self):
         filename = FilenameNode(self.state, self.admin, _("Filename"))
         self.nodes['Filename'] = filename
+
+        status = StatusNode(self.state, self.admin, title=_("Status"))
+        self.nodes['status'] = status
+
         return BaseAdminGtk.setup(self)
 
 GUIClass = DiskerAdminGtk

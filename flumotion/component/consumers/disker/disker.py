@@ -28,20 +28,28 @@ import gobject
 import gst
 
 from twisted.internet import reactor
+from zope.interface import implements
 
 from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer, pygobject, messages, errors
 from flumotion.common import documentation, format
-from flumotion.common import eventcalendar
+from flumotion.common import eventcalendar, poller
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.mimetypes import mimeTypeToExtention
 from flumotion.common.pygobject import gsignal
+from flumotion.twisted.flavors import IStateCacheableListener
 # proxy import
 from flumotion.component.component import moods
 
 __all__ = ['Disker']
 __version__ = "$Rev$"
 T_ = gettexter()
+
+# Disk Usage polling frequency
+DISKPOLL_FREQ = 60
+
+# Maximum number of information to store in the filelist
+FILELIST_SIZE = 100
 
 """
 Disker has a property 'ical-schedule'. This allows an ical file to be
@@ -97,12 +105,16 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     directory = None
     location = None
     caps = None
+    last_tstamp = None
 
     _startFilenameTemplate = None # template to use when starting off recording
     _startTimeTuple = None        # time tuple of event when starting
     _rotateTimeDelayedCall = None
+    _pollDiskDC = None            # _pollDisk delayed calls
     _symlinkToLastRecording = None
     _symlinkToCurrentRecording = None
+
+    implements(IStateCacheableListener)
 
     ### BaseComponent methods
 
@@ -113,8 +125,41 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.uiState.addKey('recording', False)
         self.uiState.addKey('can-schedule', self._can_schedule)
         self.uiState.addKey('has-schedule', False)
+        self.uiState.addKey('rotate-type', None)
+        self.uiState.addKey('disk-free', None)
         # list of (dt (in UTC, without tzinfo), which, content)
         self.uiState.addListKey('next-points')
+        self.uiState.addListKey('filelist')
+        # listen to uiState observer events
+        self.uiState.addHook(self)
+
+        self._diskPoller = poller.Poller(self._pollDisk,
+                                         DISKPOLL_FREQ,
+                                         start=False)
+
+    ### IStateCacheableListener interface
+
+    def observerAppend(self, observer, num):
+        # PB may not have finished setting up its state and doing a
+        # remoteCall immediately here may cause some problems to the other
+        # side. For us to send the initial disk usage value with no
+        # noticeable delay, we will do it in a callLater with a timeout
+        # value of 0
+        self.debug("observer has started watching us, starting disk polling")
+        if not self._diskPoller.running and not self._pollDiskDC:
+            self._pollDiskDC = reactor.callLater(0,
+                                                 self._diskPoller.start,
+                                                 immediately=True)
+
+    def observerRemove(self, observer, num):
+        if num == 0:
+            # cancel delayed _pollDisk calls if there's any
+            if self._pollDiskDC:
+                self._pollDiskDC.cancel()
+                self._pollDiskDC = None
+
+            self.debug("no more observers left, shutting down disk polling")
+            self._diskPoller.stop()
 
     ### ParseLaunchComponent methods
 
@@ -150,8 +195,16 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # now act on the properties
         if rotateType == 'size':
             self.setSizeRotate(properties['size'])
+            self.uiState.set('rotate-type',
+                             'every %sB' % \
+                             format.formatStorage(properties['size']))
         elif rotateType == 'time':
             self.setTimeRotate(properties['time'])
+            self.uiState.set('rotate-type',
+                             'every %s' % \
+                             format.formatTime(properties['time']))
+        else:
+            self.uiState.set('rotate-type', 'disabled')
         # FIXME: should add a way of saying "do first cycle at this time"
 
         return self.pipe_template
@@ -201,6 +254,26 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             sink.get_pad('sink').add_event_probe(self._markers_event_probe)
 
     ### our methods
+
+    def _pollDisk(self):
+        # Figure out the remaining disk space where the disker is saving
+        # files to
+        self._pollDiskDC = None
+        s = None
+        try:
+            s = os.statvfs(self.directory)
+        except Exception, e:
+            self.debug('failed to figure out disk space: %s',
+                       log.getExceptionMessage(e))
+
+        if not s:
+            free = None
+        else:
+            free = format.formatStorage(s.f_frsize * s.f_bavail)
+
+        if self.uiState.get('disk-free') != free:
+            self.debug("disk usage changed, reporting to observers")
+            self.uiState.set('disk-free', free)
 
     def setTimeRotate(self, time):
         """
@@ -332,6 +405,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             return
         self._recordingStarted(self.file, self.location)
         sink.emit('add', self.file.fileno())
+        self.last_tstamp = time.time()
         self.uiState.set('filename', self.location)
         self.uiState.set('recording', True)
 
@@ -375,6 +449,21 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self.file = None
             self.uiState.set('filename', None)
             self.uiState.set('recording', False)
+            try:
+                size = format.formatStorage(os.stat(self.location).st_size)
+            except EnvironmentError, e:
+                # catch File not found, permission denied, disk problems
+                size = "unknown"
+
+            # Limit number of entries on filelist, remove the oldest entry
+            fl = self.uiState.get('filelist', otherwise=[])
+            if FILELIST_SIZE == len(fl):
+                self.uiState.remove('filelist', fl[0])
+
+            self.uiState.append('filelist', (self.last_tstamp,
+                                             self.location,
+                                             size))
+
             if self._symlinkToLastRecording:
                 self._updateSymlink(self.location,
                                     self._symlinkToLastRecording)
@@ -514,3 +603,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                              '%r <-- %r; %r' %
                              (self._markerPrefix, data, err))
         self.changeFilename(tmpl)
+
+    def do_stop(self):
+        if self._pollDiskDC:
+            self._pollDiskDC.cancel()
+            self._pollDiskDC = None
+        self._diskPoller.stop()
