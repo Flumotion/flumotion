@@ -37,7 +37,7 @@ from kiwi.utils import gsignal
 from zope.interface import implements
 
 from flumotion.admin.gtk.dialogs import ErrorDialog
-from flumotion.common.errors import AccessDeniedError
+from flumotion.common.errors import AccessDeniedError, NotDirectoryError
 from flumotion.common.interfaces import IDirectory, IFile
 from flumotion.common.vfs import listDirectory, registerVFSJelly
 
@@ -122,11 +122,18 @@ class FileSelector(ObjectList):
     def _listingDoneCallback(self, vfsFile, path):
         d = vfsFile.getFiles()
         d.addCallback(self._gotFilesCallback, path)
+        d.addErrback(self._notDirectoryErrback, vfsFile.getPath())
         d.addErrback(self._accessDeniedErrback, vfsFile.getPath())
 
     def _accessDeniedErrback(self, failure, path):
         failure.trap(AccessDeniedError)
         self.showErrorMessage(failure, self._parent)
+
+    def _notDirectoryErrback(self, failure, path):
+        failure.trap(NotDirectoryError)
+        dialog = ErrorDialog(_("File is not a directory."),
+                               self._parent, close_on_response=True)
+        dialog.show()
 
     def _gotFilesCallback(self, vfsFiles, path):
         vfsFiles.sort(cmp=lambda a, b: cmp(a.filename, b.filename))
@@ -159,6 +166,7 @@ class FileSelector(ObjectList):
             self._workerName,
             'listDirectory', path)
         d.addCallback(self._listingDoneCallback, path)
+        d.addErrback(self._notDirectoryErrback, path)
         d.addErrback(self._accessDeniedErrback, path)
         return d
 

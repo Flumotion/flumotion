@@ -55,6 +55,7 @@ class OnDemand(HTTPServer):
 
         self.properties.path = '/tmp'
 
+        self.properties.allow_browsing = True
         self.add_logger = False
         self.logfile = '/tmp/access.log'
 

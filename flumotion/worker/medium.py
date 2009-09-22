@@ -287,7 +287,13 @@ class WorkerMedium(medium.PingingMedium):
         return debug.getVersions()
 
     def remote_listDirectory(self, directoryName):
-        """List the directory called path
+        """List the directory called path.
+
+        Raises L{flumotion.common.errors.NotDirectoryError} if directoryName is
+        not a directory.
+
+        @param directoryName: the name of the directory to list
+        @type directoryName: string
         @returns: the directory
         @rtype: deferred that will fire an object implementing L{IDirectory}
         """

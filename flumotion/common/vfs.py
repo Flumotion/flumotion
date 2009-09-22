@@ -26,7 +26,7 @@ and their metadata.
 It's designed to be used over twisted.spread and is thus using deferreds.
 """
 
-from twisted.internet.defer import succeed
+from twisted.internet.defer import succeed, fail
 
 from flumotion.common import log
 
@@ -35,6 +35,11 @@ _backends = []
 
 def listDirectory(path):
     """List the directory called path
+    Raises L{flumotion.common.errors.NotDirectoryError} if directoryName is
+    not a directory.
+
+    @param path: the name of the directory to list
+    @type path: string
     @returns: the directory
     @rtype: deferred that will fire an object implementing L{IDirectory}
     """
@@ -46,9 +51,12 @@ def listDirectory(path):
             "there are no vfs backends available")
     backend = _backends[0]
     log.info('vfs', 'listing directory %s using %r' % (path, backend))
-    directory = backend(path)
-    directory.cacheFiles()
-    return succeed(directory)
+    try:
+        directory = backend(path)
+        directory.cacheFiles()
+        return succeed(directory)
+    except Exception, e:
+        return fail(e)
 
 
 def _registerBackends():

@@ -108,6 +108,9 @@
         <property name="ip-filter" type="string" multiple="yes"
                   _description="The IP network-address/prefix-length to filter out of logs." />
 
+	<property name="allow-browsing" type="bool"
+		 _description="Whether to allow browsing files (default False)." />
+
         <!-- If type is 'master' (default) -->
         <property name="port" type="int"
                   _description="The port to listen on (if type is 'master')." />

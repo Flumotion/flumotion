@@ -31,7 +31,7 @@ from twisted.spread.jelly import setUnjellyableForClass
 from zope.interface import implements
 
 from flumotion.common import log
-from flumotion.common.errors import AccessDeniedError
+from flumotion.common.errors import AccessDeniedError, NotDirectoryError
 from flumotion.common.interfaces import IDirectory, IFile
 
 # gio is only imported inside nested scopes so that
@@ -74,6 +74,8 @@ class GIODirectory(Copyable, RemoteCopy):
         import gio
         if not os.path.exists(path):
             self.path = '/'
+        elif not os.path.isdir(path):
+            raise NotDirectoryError()
         else:
             self.path = os.path.abspath(path)
 

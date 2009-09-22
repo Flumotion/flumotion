@@ -1,3 +1,28 @@
+2009-09-22  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Arek Korbik/Xavi Martinez
+
+	* flumotion/common/errors.py:
+	* flumotion/common/vfs.py:
+	Improve exception handling.
+	* flumotion/common/vfsgio.py:
+	* flumotion/common/vfsgnome.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	Add Ondemand browser tab to admin.
+	* flumotion/component/misc/httpserver/httpserver.glade:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	Add allow-browsing property.
+	* flumotion/scenario/steps/ondemandstep.py:
+	* flumotion/ui/Makefile.am:
+	* flumotion/ui/fileselector.py:
+	Improve exception handling.
+	* flumotion/ui/ondemandbrowser.py (added):
+	New Ondemand browser widget.
+	* flumotion/worker/medium.py:
+	Improve docstring for remote_ListDirectory.
+	Closes #1108.
+
 2009-09-16  Alvin Delagon  <adelagon@flumotion.com>
 
 	* flumotion/component/consumers/disker/Makefile.am:

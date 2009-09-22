@@ -12,6 +12,7 @@ flumotion_PYTHON = 	\
 	linkwidget.py 	\
         plugarea.py     \
 	icons.py 	\
+	ondemandbrowser.py	\
 	simplewizard.py \
 	trayicon.py 	\
 	wizard.py

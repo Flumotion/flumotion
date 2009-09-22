@@ -30,7 +30,7 @@ from twisted.spread.jelly import setUnjellyableForClass
 from zope.interface import implements
 
 from flumotion.common import log
-from flumotion.common.errors import AccessDeniedError
+from flumotion.common.errors import AccessDeniedError, NotDirectoryError
 from flumotion.common.interfaces import IDirectory, IFile
 
 # gnomevfs is only imported inside nested scopes so that
@@ -66,6 +66,8 @@ class GnomeVFSDirectory(Copyable, RemoteCopy):
         import gnomevfs
         if not os.path.exists(path):
             self.path = '/'
+        if not os.path.isdir(path):
+            raise NotDirectoryError()
         else:
             self.path = os.path.abspath(path)
 

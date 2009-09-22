@@ -223,6 +223,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.httpauth = None
         self._startTime = time.time()
         self._uptimeCallId = None
+        self._allowBrowsing = False
 
         self._description = 'On-Demand Flumotion Stream'
 
@@ -248,6 +249,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self.uiState.addKey('stream-url', None)
         self.uiState.addKey('server-uptime', 0)
         self.uiState.addKey('file-provider', None)
+        self.uiState.addKey('allow-browsing', False)
         self.uiState.addDictKey('request-statistics')
         self.uiState.addDictKey('provider-statistics')
 
@@ -294,6 +296,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
         self.type = props.get('type', 'master')
         self.port = props.get('port', 8801)
+        self._allowBrowsing = props.get('allow-browsing', False)
         if self.type == 'slave':
             # already checked for these in do_check
             self._porterPath = props['porter-socket-path']
@@ -346,6 +349,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
         # Update uiState
         self.uiState.set('stream-url', self.getUrl())
+        self.uiState.set('allow-browsing', self._allowBrowsing)
 
     def do_setup(self):
         self.have_properties(self.config['properties'])

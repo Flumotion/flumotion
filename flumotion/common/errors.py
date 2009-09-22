@@ -357,3 +357,7 @@ class MissingElementError(GStreamerError):
 
 class AccessDeniedError(Exception):
     "Access is denied to this object, usually a file or directory"
+
+
+class NotDirectoryError(Exception):
+    "Access to an object that is not a directory"

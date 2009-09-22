@@ -23,12 +23,14 @@ import time
 import gettext
 import os
 import webbrowser
+import gtk
 
 from flumotion.common.i18n import N_
 from flumotion.common.format import formatTime, formatStorage, formatTimeStamp
 from flumotion.component.base.admin_gtk import BaseAdminGtk
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.ui.linkwidget import LinkWidget
+from flumotion.ui.ondemandbrowser import OnDemandBrowser
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -274,12 +276,61 @@ def _formatPercent(value):
     return "%.2f %%" % (value * 100.0)
 
 
+class BrowserAdminGtkNode(BaseAdminGtkNode):
+    gladeFile = os.path.join('flumotion', 'component', 'misc',
+                             'httpserver', 'httpserver.glade')
+
+    def __init__(self, state, admin, title=None):
+        BaseAdminGtkNode.__init__(self, state, admin, title)
+        self.browser = self._create_browser()
+
+    def haveWidgetTree(self):
+        self.widget = self.wtree.get_widget('browser_vbox')
+        self.widget.connect('realize', self._on_realize)
+        self.widget.pack_start(self.browser)
+        self.browser.show()
+        self.widget.show_all()
+        return self.widget
+
+    def setUIState(self, state):
+        BaseAdminGtkNode.setUIState(self, state)
+        if state.hasKey('allow-browsing') and state.get('allow-browsing'):
+            self.browser.setBaseUri(state.get('stream-url'))
+        else:
+            self.browser.hide_all()
+            warning = gtk.Label()
+            warning.set_markup(_('Browsing files is not allowed.'))
+            warning.show()
+            self.widget.pack_start(warning)
+
+    def _create_browser(self):
+        browser = OnDemandBrowser(self.widget, self.admin)
+        worker_name = self.state.get('workerRequested')
+        browser.setWorkerName(worker_name)
+        browser.connect('selected', self._on_file_selector__selected)
+        return browser
+
+    def _configure_browser(self):
+        path = self.state.get('config').get('properties').get('path')
+        self.browser.setRoot(path)
+
+    def _on_realize(self, widget):
+        self._configure_browser()
+
+    def _on_file_selector__selected(self, browser, vfsFile):
+        webbrowser.open_new(vfsFile.filename)
+
+
 class HTTPFileAdminGtk(BaseAdminGtk):
 
     def setup(self):
         statistics = ServerStatsAdminGtkNode(self.state, self.admin,
                                              _("Statistics"))
+
+        browser = BrowserAdminGtkNode(self.state, self.admin,
+                                             _("Browser"))
         self.nodes['Statistics'] = statistics
+        self.nodes['Browser'] = browser
         #FIXME: We need to figure out how to create or delete
         #       a nodes after receiving the UI State,
         #       so we do not have a cache tab when not using a caching plug.
