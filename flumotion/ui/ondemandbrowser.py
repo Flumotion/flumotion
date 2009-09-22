@@ -30,7 +30,12 @@ import gtk
 import urlparse
 import os
 
-from kiwi.ui.widgets.contextmenu import ContextMenu, ContextMenuItem
+try:
+    from kiwi.ui.widgets import contextmenu
+except:
+    # kiwi < 1.9.22
+    contextmenu = None
+
 from flumotion.ui.fileselector import FileSelector
 from flumotion.common.interfaces import IDirectory
 
@@ -55,8 +60,9 @@ class OnDemandBrowser(FileSelector):
         FileSelector.__init__(self, parent, adminModel)
         self._base_uri = None
         self._root = None
-        self._popupmenu = self._create_popup_menu()
-        self.set_context_menu(self._popupmenu)
+        if contextmenu:
+            self._popupmenu = self._create_popup_menu()
+            self.set_context_menu(self._popupmenu)
 
     def setBaseUri(self, base_uri):
         self._base_uri = base_uri
@@ -66,12 +72,12 @@ class OnDemandBrowser(FileSelector):
         self.setDirectory(self._root)
 
     def _create_popup_menu(self):
-        popupmenu = ContextMenu()
-        item = ContextMenuItem('_Open Link', gtk.STOCK_JUMP_TO)
+        popupmenu = contextmenu.ContextMenu()
+        item = contextmenu.ContextMenuItem('_Open Link', gtk.STOCK_JUMP_TO)
         item.connect('activate', self._on_open_link_activate)
         popupmenu.add(item)
         popupmenu.append_separator()
-        item = ContextMenuItem('_Copy Link', gtk.STOCK_COPY)
+        item = contextmenu.ContextMenuItem('_Copy Link', gtk.STOCK_COPY)
         item.connect('activate', self._on_copy_link_activate)
         popupmenu.add(item)
         popupmenu.show_all()

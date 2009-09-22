@@ -1,5 +1,10 @@
 2009-09-22  Josep Joan Ribas  <jribas@flumotion.com>
 
+	* flumotion/ui/ondemandbrowser.py:
+	Context menu not shown if kiwi version < 1.9.22
+
+2009-09-22  Josep Joan Ribas  <jribas@flumotion.com>
+
 	reviewed by: Arek Korbik/Xavi Martinez
 
 	* flumotion/common/errors.py:
