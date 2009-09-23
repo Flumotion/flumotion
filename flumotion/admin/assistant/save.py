@@ -126,6 +126,16 @@ class AssistantSaver(object):
         self._muxerType = muxerType
         self._muxerWorker = muxerWorker
 
+    def addMuxer(self, muxerType, muxer):
+        """Adds an existing muxer to the flow. This way it will be reused and
+        the saver won't create a new one. Used when adding a new streamer.
+        @param muxerType: type of the muxer, one of audio/video/audio-video
+        @type muxerType: str
+        @param muxer: a muxer model
+        @type muxer: L{Muxer}
+        """
+        self._muxers[muxerType] = muxer
+
     def addServerConsumer(self, server, consumerType):
         """Add a server consumer. Currently limited a to http-server
         server consumers
@@ -327,7 +337,7 @@ class AssistantSaver(object):
             if muxer.feeders:
                 self._flowComponents.append(muxer)
                 for component in components:
-                    component.link(muxer)
+                    component and component.link(muxer)
 
     def _resolveNameConflicts(self):
         for component in self._getAllComponents():

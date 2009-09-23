@@ -26,11 +26,12 @@ from zope.interface import implements
 
 from flumotion.admin.assistant.interfaces import IScenarioAssistantPlugin
 from flumotion.admin.gtk.basesteps import ConsumerStep
-from flumotion.scenario.steps.productionsteps import SelectProducersStep
+from flumotion.scenario.steps.productionsteps import SelectProducersStep, \
+        LiveProductionStep
 from flumotion.scenario.steps.consumptionsteps import ConsumptionStep
-from flumotion.scenario.steps.conversionsteps import ConversionStep
+from flumotion.scenario.steps.conversionsteps import ConversionStep, \
+        SelectFormatStep
 from flumotion.scenario.steps.licensestep import LicenseStep
-from flumotion.scenario.steps.productionsteps import LiveProductionStep
 from flumotion.scenario.steps.summarysteps import LiveSummaryStep
 
 _ = gettext.gettext
@@ -53,7 +54,7 @@ class LiveAssistantPlugin(object):
         self._mode = 'normal'
         self._videoEncoder = None
         self._audioEncoder = None
-        self._muxerEntry = None
+        self._muxer = None
 
     # IScenarioAssistantPlugin
 
@@ -63,9 +64,13 @@ class LiveAssistantPlugin(object):
         elif self._mode == 'addformat':
             self._selectProducerStep = SelectProducersStep(wizard)
             wizard.addStepSection(self._selectProducerStep)
+        elif self._mode == 'addstreamer':
+            self._selectFormatStep = SelectFormatStep(wizard)
+            wizard.addStepSection(self._selectFormatStep)
 
-        wizard.addStepSection(ConversionStep)
-        wizard.addStepSection(ConsumptionStep)
+        if self._mode != 'addstreamer':
+            wizard.addStepSection(ConversionStep)
+            wizard.addStepSection(ConsumptionStep)
 
         if self._mode == 'normal':
             wizard.addStepSection(LicenseStep)
@@ -87,9 +92,10 @@ class LiveAssistantPlugin(object):
         encodingStep = wizard.getStep('Encoding')
         saver.setAudioEncoder(self.getAudioEncoder())
         saver.setVideoEncoder(self.getVideoEncoder())
-        saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
-
-        consumptionStep = wizard.getStep('Consumption')
+        if self._muxer:
+            saver.addMuxer(self._muxer.type, self._muxer)
+        else:
+            saver.setMuxer(encodingStep.getMuxerType(), encodingStep.worker)
 
         httpPorters = wizard.getHTTPPorters()
         steps = list(self._getConsumptionSteps(wizard))
@@ -119,7 +125,7 @@ class LiveAssistantPlugin(object):
         return self._defaultConsumer.name
 
     def setMode(self, mode):
-        if not mode in ['normal', 'addformat']:
+        if not mode in ['normal', 'addformat', 'addstreamer']:
             raise ValueError()
 
         self._mode = mode
@@ -145,6 +151,9 @@ class LiveAssistantPlugin(object):
         @returns: producer or None
         @rtype: L{flumotion.admin.assistant.models.AudioProducer}
         """
+        if not wizard.hasStep('Production'):
+            return None
+
         productionStep = wizard.getStep('Production')
         return productionStep.getAudioProducer()
 
@@ -153,6 +162,9 @@ class LiveAssistantPlugin(object):
         @returns: producer or None
         @rtype: L{flumotion.admin.assistant.models.VideoProducer}
         """
+        if not wizard.hasStep('Production'):
+            return None
+
         productionStep = wizard.getStep('Production')
         return productionStep.getVideoProducer()
 
@@ -184,23 +196,17 @@ class LiveAssistantPlugin(object):
         """
         self._audioEncoder = audioEncoder
 
-    def setMuxerEntry(self, muxerEntry):
-        """Select a muxer entry
-        @param audioEncoder: muxer entry
-        """
-        self._muxerEntry = muxerEntry
-
-    def getMuxerEntry(self):
-        """Returns the muxer entry
-        @returns: the muxer entry
-        """
-        return self._muxerEntry
+    def setExistingMuxer(self, muxer):
+        self._muxer = muxer
 
     def setAudioProducers(self, audioProducers):
         self._selectProducerStep.setAudioProducers(audioProducers)
 
     def setVideoProducers(self, videoProducers):
         self._selectProducerStep.setVideoProducers(videoProducers)
+
+    def setMuxers(self, muxers):
+        self._selectFormatStep.setMuxers(muxers)
 
     # Private
 

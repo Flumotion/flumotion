@@ -557,6 +557,9 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
 
         self._currentSection += 1
         nextStepClass = self._sections2[self._currentSection]
+        if isinstance(nextStepClass, WizardStep):
+            return nextStepClass
+
         return nextStepClass(self._wizard)
 
     # Callbacks

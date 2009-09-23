@@ -479,3 +479,21 @@ class HTTPVideoStep(HTTPSpecificStep):
 
     def getConsumerType(self):
         return 'video'
+
+
+class HTTPGenericStep(HTTPSpecificStep):
+    name = 'HTTPStreamerGeneric'
+    title = _('HTTP Streamer (Generic)')
+    sidebarName = _('HTTP Generic')
+    docSection = 'help-configuration-assistant-http-streaming-generic'
+    docAnchor = ''
+    docVersion = 'local'
+
+    def __init__(self, wizard, type):
+        self._consumertype = type
+        HTTPSpecificStep.__init__(self, wizard)
+
+    # ConsumerStep
+
+    def getConsumerType(self):
+        return self._consumertype

@@ -20,11 +20,14 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import re
 
 from flumotion.admin.assistant.models import AudioEncoder, VideoEncoder, Muxer
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
+from flumotion.ui.wizard import WizardStep
 from flumotion.common import errors, messages
 from flumotion.common.i18n import N_, gettexter
+from flumotion.scenario.steps.summarysteps import LiveSummaryStep
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -66,7 +69,7 @@ class ConversionStep(WorkerWizardStep):
         @returns: the muxer
         @rtype: string
         """
-        entry = self.wizard.getScenario().getMuxerEntry()
+        entry = self.muxer.get_selected()
         return entry.componentType
 
     def getMuxerFormat(self):
@@ -74,7 +77,7 @@ class ConversionStep(WorkerWizardStep):
         @returns: the muxer formats
         @rtype: string
         """
-        entry = self.wizard.getScenario().getMuxerEntry()
+        entry = self.muxer.get_selected()
         return entry.getProvidedMediaTypes()[0]
 
     def getAudioFormat(self):
@@ -98,8 +101,7 @@ class ConversionStep(WorkerWizardStep):
     # WizardStep
 
     def activated(self):
-        data = [('muxer', self.muxer, None,
-                 self.wizard.getScenario().getMuxerEntry())]
+        data = [('muxer', self.muxer, None, None)]
 
         audioProducer = self.wizard.getScenario().getAudioProducer(self.wizard)
         if audioProducer:
@@ -252,7 +254,6 @@ class ConversionStep(WorkerWizardStep):
         # '...' used while waiting for the query to be done
         if muxerEntry is None:
             return
-        self.wizard.getScenario().setMuxerEntry(muxerEntry)
 
         provides = map(lambda f: f.find(':') > 0 and f.split(':', 1)[1] or f,
                         muxerEntry.getAcceptedMediaTypes())
@@ -267,3 +268,119 @@ class ConversionStep(WorkerWizardStep):
 
     def on_muxer__changed(self, combo):
         self._muxerChanged()
+
+
+class SelectFormatStep(WizardStep):
+    name = 'Encoding'
+    title = _('Select Format')
+    section = _('Format')
+    gladeFile = 'encoding-wizard.glade'
+    docSection = 'help-configuration-assistant-encoders'
+    docAnchor = ''
+    docVersion = 'local'
+    # Public API
+
+    def setMuxers(self, muxers):
+        self._muxers = [muxer for muxer in muxers]
+
+    def getMuxerFormat(self):
+        """Returns the format of the muxer, such as "ogg".
+        @returns: the muxer formats
+        @rtype: string
+        """
+        muxer = self.muxer.get_selected()
+        if not muxer:
+            return
+
+        entry = self._entries[muxer.componentType]
+        return entry.getProvidedMediaTypes()[0]
+
+    def getMuxerType(self):
+        """Returns the component-type, such as "ogg-muxer"
+        of the currently selected muxer.
+        @returns: the muxer
+        @rtype: string
+        """
+        muxer = self.muxer.get_selected()
+        if not muxer:
+            return
+
+        entry = self._entries[muxer.componentType]
+        return entry.componentType
+
+    def getAudioFormat(self):
+        """Returns the format of the audio encoder, such as "vorbis"
+        @returns: the audio format
+        @rtype: string
+        """
+        return None
+
+    def getVideoFormat(self):
+        """Returns the format of the video encoder, such as "theora"
+        @returns: the video format
+        @rtype: string
+        """
+        return None
+
+    # WizardStep
+
+    def activated(self):
+        self.audio.hide()
+        self.label_audio.hide()
+        self.wizard.getScenario().setAudioEncoder(None)
+        self.video.hide()
+        self.label_video.hide()
+        self.wizard.getScenario().setVideoEncoder(None)
+
+        self._populateCombo()
+
+    def _populateCombo(self):
+        self.debug("populating muxer combo")
+        self.wizard.waitForTask('get entries')
+        d = self.wizard.getWizardEntries(wizardTypes=['muxer'])
+        d.addCallback(self._addEntries)
+        self.muxer.prefill([('...', None)])
+        d.addCallback(lambda x: self.wizard.taskFinished() and
+                      self.muxer.set_sensitive(True))
+
+    def _addEntries(self, entries):
+        data = []
+        self._entries = \
+                dict([(entry.componentType, entry) for entry in entries])
+        for muxer in self._muxers:
+            pattern = re.compile('^muxer-(.*?)\d*$')
+            match = pattern.search(muxer.name)
+            muxer.type = match.group(1)
+
+            desc = '%s (%s)' % (N_(muxer.description), muxer.name)
+            data.append((desc, muxer))
+
+        self.muxer.prefill(data)
+
+    def getNext(self):
+        # Return audio/video/audio-video http streamer page
+        from flumotion.scenario.steps.httpstreamersteps import HTTPBothStep, \
+                HTTPAudioStep, HTTPVideoStep, HTTPGenericStep
+        self.wizard.cleanFutureSteps()
+        muxer = self.muxer.get_selected()
+
+        if muxer.type == 'audio-video':
+            self.wizard.addStepSection(HTTPBothStep(self.wizard))
+        elif muxer.type == 'video':
+            self.wizard.addStepSection(HTTPVideoStep(self.wizard))
+        elif muxer.type == 'audio':
+            self.wizard.addStepSection(HTTPAudioStep(self.wizard))
+        else:
+            self.wizard.addStepSection(HTTPGenericStep(self.wizard,
+                                                       muxer.type))
+
+        self.wizard.addStepSection(LiveSummaryStep)
+
+    # Callbacks
+
+    def on_muxer__changed(self, combo):
+        muxer = combo.get_selected()
+        if not muxer:
+            return
+
+        self.wizard.getScenario().setExistingMuxer(muxer)

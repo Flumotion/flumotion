@@ -101,4 +101,6 @@ class ConsumerStep(WorkerWizardStep):
     # WizardStep
 
     def getNext(self):
+        if not self.wizard.hasStep('Consumption'):
+            return None
         return self.wizard.getStep('Consumption').getNext(self)

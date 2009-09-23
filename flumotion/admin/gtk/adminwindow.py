@@ -76,7 +76,7 @@ from zope.interface import implements
 
 from flumotion.admin.admin import AdminModel
 from flumotion.admin.assistant.models import AudioProducer, Porter, \
-     VideoProducer
+     VideoProducer, Muxer
 from flumotion.admin.connections import getRecentConnections, \
      hasRecentConnections
 from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
@@ -127,6 +127,7 @@ MAIN_UI = """
       <menuitem action="ClearAll"/>
       <separator name="sep-manage2"/>
       <menuitem action="AddFormat"/>
+      <menuitem action="AddStreamer"/>
       <separator name="sep-manage3"/>
       <menuitem action="RunConfigurationAssistant"/>
     </menu>
@@ -396,6 +397,10 @@ class AdminWindow(Loggable, GladeDelegate):
              None,
              _('Add a new format to the current stream'),
              self._manage_add_format_cb),
+             ('AddStreamer', gtk.STOCK_ADD, _('Add new _streamer...'),
+             None,
+             _('Add a new streamer to the flow'),
+             self._manage_add_streamer_cb),
             ('RunConfigurationAssistant', 'flumotion.admin.gtk',
              _('Run _Assistant'), None,
              _('Run the configuration assistant'),
@@ -477,6 +482,8 @@ class AdminWindow(Loggable, GladeDelegate):
         assert self._clearAllAction
         self._addFormatAction = group.get_action("AddFormat")
         self._addFormatAction.set_sensitive(False)
+        self._addStreamerAction = group.get_action("AddStreamer")
+        self._addStreamerAction.set_sensitive(False)
         self._runConfigurationAssistantAction = (
             group.get_action("RunConfigurationAssistant"))
         self._runConfigurationAssistantAction.set_sensitive(False)
@@ -744,7 +751,7 @@ class AdminWindow(Loggable, GladeDelegate):
                 component.properties[key] = value
             yield component
 
-    def _runAddNewFormatAssistant(self):
+    def _runAddNew(self, addition):
         if not self._adminModel.isConnected():
             self._error(
                _('Cannot run assistant without being connected to a manager'))
@@ -760,19 +767,25 @@ class AdminWindow(Loggable, GladeDelegate):
             for entry in entries:
                 entryDict.setdefault(entry.type, []).append(entry)
 
-            audioProducers = self._createComponentsByAssistantType(
+            if addition == 'format':
+                audioProducers = self._createComponentsByAssistantType(
                     AudioProducer, entryDict['audio-producer'], )
-            videoProducers = self._createComponentsByAssistantType(
+                videoProducers = self._createComponentsByAssistantType(
                     VideoProducer, entryDict['video-producer'])
-            scenario = configurationAssistant.getScenario()
-            scenario.setAudioProducers(audioProducers)
-            scenario.setVideoProducers(videoProducers)
+                scenario = configurationAssistant.getScenario()
+                scenario.setAudioProducers(audioProducers)
+                scenario.setVideoProducers(videoProducers)
+            elif addition == 'streamer':
+                muxers = self._createComponentsByAssistantType(
+                    Muxer, entryDict['muxer'], )
+                scenario = configurationAssistant.getScenario()
+                scenario.setMuxers(muxers)
 
             self._runAssistant(configurationAssistant)
 
         def gotBundledFunction(function):
             scenario = function()
-            scenario.setMode('addformat')
+            scenario.setMode('add%s' % addition)
             scenario.addSteps(configurationAssistant)
             configurationAssistant.setScenario(scenario)
             httpPorters = self._getHTTPPorters()
@@ -780,8 +793,12 @@ class AdminWindow(Loggable, GladeDelegate):
             if httpPorters:
                 configurationAssistant.setHTTPPorters(httpPorters)
 
-            return self._adminModel.getWizardEntries(
-                wizardTypes=['audio-producer', 'video-producer'])
+            if addition == 'format':
+                return self._adminModel.getWizardEntries(
+                    wizardTypes=['audio-producer', 'video-producer'])
+            elif addition == 'streamer':
+                return self._adminModel.getWizardEntries(
+                    wizardTypes=['muxer'])
 
         d = self._adminModel.getBundledFunction(
             'flumotion.scenario.live.wizard_gtk',
@@ -864,6 +881,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._adminModel = None
 
         self._addFormatAction.set_sensitive(False)
+        self._addStreamerAction.set_sensitive(False)
         self._runConfigurationAssistantAction.set_sensitive(False)
 
     def _updateUIStatus(self, connected):
@@ -907,6 +925,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         hasProducer = self._hasProducerComponent()
         self._addFormatAction.set_sensitive(hasProducer)
+        self._addStreamerAction.set_sensitive(hasProducer)
 
     def _updateComponents(self):
         self._componentList.clearAndRebuild(self._componentStates,
@@ -1563,7 +1582,10 @@ You can do remote component calls using:
         self._clearAllComponents()
 
     def _manage_add_format_cb(self, action):
-        self._runAddNewFormatAssistant()
+        self._runAddNew('format')
+
+    def _manage_add_streamer_cb(self, action):
+        self._runAddNew('streamer')
 
     def _manage_run_assistant_cb(self, action):
         self._runConfigurationAssistant()
