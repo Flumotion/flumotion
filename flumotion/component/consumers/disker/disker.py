@@ -130,14 +130,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # list of (dt (in UTC, without tzinfo), which, content)
         self.uiState.addListKey('next-points')
         self.uiState.addListKey('filelist')
-        # listen to uiState observer events
-        self.uiState.addHook(self)
 
         self._diskPoller = poller.Poller(self._pollDisk,
                                          DISKPOLL_FREQ,
                                          start=False)
 
-    ### IStateCacheableListener interface
+    ### uiState observer triggers
 
     def observerAppend(self, observer, num):
         # PB may not have finished setting up its state and doing a
@@ -150,6 +148,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self._pollDiskDC = reactor.callLater(0,
                                                  self._diskPoller.start,
                                                  immediately=True)
+        # Start the BaseComponent pollers
+        feedcomponent.ParseLaunchComponent.observerAppend(self, observer, num)
 
     def observerRemove(self, observer, num):
         if num == 0:
@@ -160,6 +160,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
             self.debug("no more observers left, shutting down disk polling")
             self._diskPoller.stop()
+        # Stop the BaseComponent pollers
+        feedcomponent.ParseLaunchComponent.observerRemove(self, observer, num)
 
     ### ParseLaunchComponent methods
 

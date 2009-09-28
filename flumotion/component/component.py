@@ -41,6 +41,7 @@ from flumotion.common.planet import moods
 from flumotion.common.poller import Poller
 from flumotion.twisted import credentials
 from flumotion.twisted import pb as fpb
+from flumotion.twisted.flavors import IStateCacheableListener
 
 
 __version__ = "$Rev$"
@@ -315,6 +316,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
     logCategory = 'basecomp'
     componentMediumClass = BaseComponentMedium
 
+    implements(IStateCacheableListener)
+
     def __init__(self, config, haveError=None):
         """
         Subclasses should not override __init__ at all.
@@ -358,6 +361,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.addKey('start-time')
         self.uiState.addKey('current-time')
         self.uiState.addKey('virtual-size')
+        self.uiState.addHook(self)
 
         self.plugs = {}
 
@@ -366,10 +370,60 @@ class BaseComponent(common.InitMixin, log.Loggable):
         # Start the cpu-usage updating.
         self._lastTime = time.time()
         self._lastClock = time.clock()
-        self._cpuPoller = Poller(self._pollCPU, 5)
-        self._memoryPoller = Poller(self._pollMemory, 60)
-
+        self._cpuPoller = Poller(self._pollCPU, 5, start=False)
+        self._memoryPoller = Poller(self._pollMemory, 60, start=False)
+        self._cpuPollerDC = None
+        self._memoryPollerDC = None
         self._shutdownHook = None
+
+    ### IStateCacheable Interface
+
+    def observerAppend(self, observer, num):
+        """
+        Triggered when a uiState observer was added.
+
+        Default implementation is to start the memory and cpu pollers.
+
+        Note:
+        Subclasses can override me but should chain me up to start these
+        pollers
+        """
+        self.debug("observer has started watching us, starting pollers")
+        if not self._cpuPoller.running and not self._cpuPollerDC:
+            self._cpuPollerDC = reactor.callLater(0,
+                                                  self._cpuPoller.start,
+                                                  immediately=True)
+        if not self._memoryPoller.running and not self._memoryPollerDC:
+            self._memoryPollerDC = reactor.callLater(0,
+                                                     self._memoryPoller.start,
+                                                     immediately=True)
+
+    def observerRemove(self, observer, num):
+        """
+        Triggered when a uiState observer has left.
+
+        Default implementation is to stop the memory and cpu pollers
+        when the total number of observers denoted by the 'num'
+        argument becomes zero.
+
+        Note:
+        Subclasses can override me but should chain me up to stop these
+        pollers
+        """
+        if num == 0:
+            self.debug("no more observers left, shutting down pollers")
+            # Cancel any pending callLaters
+            if self._cpuPollerDC:
+                self._cpuPollerDC.cancel()
+                self._cpuPollerDC = None
+            if self._memoryPollerDC:
+                self._memoryPollerDC.cancel()
+                self._memoryPollerDC = None
+
+            if self._cpuPoller:
+                self._cpuPoller.stop()
+            if self._memoryPoller:
+                self._memoryPoller.stop()
 
     def do_check(self):
         """
@@ -467,6 +521,14 @@ class BaseComponent(common.InitMixin, log.Loggable):
         for message in self.state.get('messages'):
             # FIXME: not necessary
             self.state.remove('messages', message)
+
+        # Cancel any pending callLaters
+        if self._cpuPollerDC:
+            self._cpuPollerDC.cancel()
+            self._cpuPollerDC = None
+        if self._memoryPollerDC:
+            self._memoryPollerDC.cancel()
+            self._memoryPollerDC = None
 
         if self._cpuPoller:
             self._cpuPoller.stop()
@@ -667,6 +729,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
                        % (methodName, args, kwargs))
 
     def _pollCPU(self):
+        self._cpuPollerDC = None
         # update CPU time stats
         nowTime = time.time()
         nowClock = time.clock()
@@ -683,6 +746,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.set('current-time', nowTime)
 
     def _pollMemory(self):
+        self._memoryPollerDC = None
         # Figure out our virtual memory size and report that.
         # I don't know a nicer way to find vsize than groping /proc/
         handle = open('/proc/%d/stat' % os.getpid())

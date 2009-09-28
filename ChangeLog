@@ -1,3 +1,12 @@
+2009-09-28  Alvin Delagon  <adelagon@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/disker/disker.py:
+	Stop the CPU and Memory pollers when there is no uiState observers.
+	Closes #1363.
+
 2009-09-22  Xavier Queralt  <xqueralt@flumotion.com>
 
 	reviewed by: jribas
