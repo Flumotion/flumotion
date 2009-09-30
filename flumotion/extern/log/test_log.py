@@ -183,6 +183,7 @@ class TestOwnLogHandler(unittest.TestCase):
     def setUp(self):
         self.category = self.level = self.message = None
         self.tester = LogFunctionTester()
+        log.reset()
 
     def handler(self, level, object, category, file, line, message):
         self.level = level
@@ -206,6 +207,9 @@ class TestOwnLogHandler(unittest.TestCase):
 
 
 class TestGetExceptionMessage(unittest.TestCase):
+
+    def setUp(self):
+        log.reset()
 
     def func3(self):
         self.func2()
@@ -318,6 +322,40 @@ class TestLogNames(unittest.TestCase):
         self.assertEquals('INFO', log.getLevelName(3))
         self.assertEquals('DEBUG', log.getLevelName(4))
         self.assertEquals('LOG', log.getLevelName(5))
+
+
+class TestLogUnicode(unittest.TestCase):
+
+    def setUp(self):
+        self.tester = LogTester()
+        # add stderrHandler to fully test unicode handling
+        log.addLogHandler(log.stderrHandler)
+
+    def testUnicode(self):
+        # Test with a unicode input
+        self.tester.log(u'\xf3')
+
+    def testUnicodeWithArgs(self):
+        self.tester.log('abc: %s', u'\xf3')
+
+    def testNonASCIIByteString(self):
+        # Test with a non-ASCII bytestring
+        self.tester.log('\xc3\xa4')
+
+    def testNonASCIIByteStringWithArgs(self):
+        self.tester.log('abc: %s', '\xc3\xa4')
+
+    def testNonASCIIByteStringPlusUnicode(self):
+        # This should fail since were trying to combine
+        # a non-ascii string with a unicode string
+        self.assertRaises(UnicodeDecodeError,
+                          self.tester.log,
+                          'abc\xf3n%s:',
+                          u'a')
+
+    def testASCIIFormatUnicodeArgs(self):
+        self.tester.log('abc: %s', u'\xc3\xa4')
+
 
 if __name__ == '__main__':
     unittest.main()

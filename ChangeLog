@@ -1,3 +1,12 @@
+2009-09-30  Alvin Delagon  <adelagon@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali
+
+	* flumotion/extern/log/log.py:
+	* flumotion/extern/log/test_log.py:
+	Add support for non-ascii characters in the log system
+	Fixes #1283.
+
 2009-09-28  Alvin Delagon  <adelagon@flumotion.com>
 
 	reviewed by: Jan Urbanski

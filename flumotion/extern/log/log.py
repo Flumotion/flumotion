@@ -416,6 +416,11 @@ def stderrHandler(level, object, category, file, line, message):
 
     where = "(%s:%d)" % (file, line)
 
+    try:
+        message = message.encode('utf-8')
+    except UnicodeDecodeError:
+        pass
+
     # level   pid     object   cat      time
     # 5 + 1 + 7 + 1 + 32 + 1 + 17 + 1 + 15 == 80
     safeprintf(sys.stderr, '%s [%5d] %-32s %-17s %-15s ',
