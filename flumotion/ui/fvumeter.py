@@ -65,6 +65,7 @@ class FVUMeter(gtk.DrawingArea):
                           0,
                           -1.0,
                           gobject.PARAM_READWRITE)}
+    black_gc = None
     green_gc = None
     orange_gc = None
     red_gc = None
@@ -150,10 +151,12 @@ class FVUMeter(gtk.DrawingArea):
             event_mask=self.get_events() | gdk.EXPOSURE_MASK)
 
         colormap = gtk.gdk.colormap_get_system()
+        black = colormap.alloc_color(0, 0, 0)
         green = colormap.alloc_color(0, 65535, 0)
         orange = colormap.alloc_color(65535, 32768, 0)
         red = colormap.alloc_color(65535, 0, 0)
         yellow = colormap.alloc_color(65535, 65535, 0)
+        self.black_gc = gdk.GC(self.window, foreground=black)
         self.green_gc = gdk.GC(self.window, foreground=green)
         self.orange_gc = gdk.GC(self.window, foreground=orange)
         self.red_gc = gdk.GC(self.window, foreground=red)
@@ -169,7 +172,7 @@ class FVUMeter(gtk.DrawingArea):
         x, y, w, h = self.allocation
         vumeter_width = w - (self.leftborder + self.rightborder)
         vumeter_height = h - (self.topborder + self.bottomborder)
-        self.window.draw_rectangle(self.style.black_gc, True,
+        self.window.draw_rectangle(self.black_gc, True,
                                    self.leftborder, self.topborder,
                                    vumeter_width,
                                    vumeter_height)
@@ -214,7 +217,7 @@ class FVUMeter(gtk.DrawingArea):
         for level, scale in scalers:
             # tick mark, 6 pixels high
             # we cheat again here by putting the 0 at the first pixel
-            self.window.draw_line(self.style.black_gc,
+            self.window.draw_line(self.black_gc,
                 self.leftborder + int(scale * (vumeter_width - 1)),
                 h - self.bottomborder,
                 self.leftborder + int(scale * (vumeter_width - 1)),
@@ -222,7 +225,7 @@ class FVUMeter(gtk.DrawingArea):
             # tick label
             layout = self.create_pango_layout(level)
             layout_width, layout_height = layout.get_pixel_size()
-            self.window.draw_layout(self.style.black_gc,
+            self.window.draw_layout(self.black_gc,
                 self.leftborder + int(scale * vumeter_width)
                     - int(layout_width / 2),
                 h - self.bottomborder + 7, layout)
@@ -230,7 +233,7 @@ class FVUMeter(gtk.DrawingArea):
         # draw the peak level to the right
         layout = self.create_pango_layout("%.2fdB" % self.peaklevel)
         layout_width, layout_height = layout.get_pixel_size()
-        self.window.draw_layout(self.style.black_gc,
+        self.window.draw_layout(self.black_gc,
             self.leftborder + vumeter_width + 5,
             self.topborder + int(vumeter_height / 2 - layout_height / 2),
             layout)
