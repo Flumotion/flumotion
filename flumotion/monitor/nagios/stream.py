@@ -195,6 +195,8 @@ class CheckBase(util.LogCommand):
         (fd, self._tmpfile) = tempfile.mkstemp(
             suffix='.flumotion-nagios.%s-%s' % (
                 datetime.datetime.now().strftime('%Y%m%dT%H%M%S'), slug))
+        # make the dump file group readable
+        os.chmod(self._tmpfile, 0640)
 
         if self.options.bouncer:
             # Check for a valid IPv4 address with numbers and dots

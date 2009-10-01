@@ -1,5 +1,10 @@
 2009-10-01  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/monitor/nagios/stream.py:
+	Make dumps files from failed Nagios checks group readable.
+
+2009-10-01  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/ui/fvumeter.py:
 	Create a black graphic context instead of using the one from the style.
 	Fixes a crash on recent Debian machines.
