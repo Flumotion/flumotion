@@ -115,8 +115,8 @@ class TestXDGConfig(testsuite.TestCase):
         # the subdir should be created
         path = os.path.join(self.xdg_config_home, app, 'subdir', 'write')
         f = xdg.config_write_path('subdir/write')
-        self.assertTrue(os.path.isdir(os.path.join(
-                    self.xdg_config_home, app, 'subdir')))
+        self.assertEquals(os.path.isdir(os.path.join(
+                    self.xdg_config_home, app, 'subdir')), True)
         self.assertEquals(f.name, path)
         # default mode is 'w'
         self.assertEquals(f.mode, 'w')

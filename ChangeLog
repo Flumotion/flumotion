@@ -1,5 +1,10 @@
 2009-10-06  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/test/test_common_xdg.py:
+	Avoid assertTrue in the tests, for dinosaur-age Twisted compatibility.
+
+2009-10-06  Jan Urbanski  <jurbanski@flumotion.com>
+
 	reviewed by: Sebastien Merle
 
 	* flumotion/admin/connections.py:
