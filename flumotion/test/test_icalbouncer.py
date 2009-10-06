@@ -39,6 +39,7 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.common.planet import moods
 from flumotion.component.bouncers import icalbouncer
+from flumotion.component.base import scheduler
 
 from flumotion.common import eventcalendar
 
@@ -285,4 +286,125 @@ class TestIcalBouncerFloating(TestIcalBouncerRunning, RequiredModulesMixin):
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
         d.addCallback(self._approved_callback)
         d.addBoth(_restoreTZEnv, oldTZ)
+        return d
+
+
+class TestIcalBouncerOverlap(testsuite.TestCase, RequiredModulesMixin):
+
+    def setUp(self):
+        self.bouncer = None
+        self.now = datetime.now(eventcalendar.UTC)
+        td = icalbouncer.IcalBouncer.maxKeyCardDuration
+        self.maxKeyCardDuration = max(td.days * 24 * 60 * 60 + td.seconds + \
+                                            td.microseconds / 1e6, 0)
+        self.ical_template = """
+BEGIN:VCALENDAR
+PRODID:-//Flumotion Fake Calendar Creator//flumotion.com//
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART:%(dtstart1)s
+DTEND:%(dtend1)s
+SUMMARY:Test calendar
+UID:uid1
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART:%(dtstart2)s
+DTEND:%(dtend2)s
+SUMMARY:Test calendar
+UID:uid2
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART:%(dtstart3)s
+DTEND:%(dtend3)s
+SUMMARY:Test calendar
+UID:uid3
+END:VEVENT
+END:VCALENDAR
+"""
+
+    def tearDown(self):
+        if self.bouncer:
+            self.bouncer.stop()
+
+    def ical_from_specs(self, dates):
+        return self.ical_template % {'dtstart1': vDatetime(dates[0]).ical(),
+                                     'dtend1': vDatetime(dates[1]).ical(),
+                                     'dtstart2': vDatetime(dates[2]).ical(),
+                                     'dtend2': vDatetime(dates[3]).ical(),
+                                     'dtstart3': vDatetime(dates[4]).ical(),
+                                     'dtend3': vDatetime(dates[5]).ical(),
+                                     }
+
+    def _denied_callback(self, keycard):
+        self.failIf(keycard)
+
+    def _approved_and_calculate(self, result, target):
+        self.failUnless(result)
+        self.assertEquals(result.state,
+        keycards.AUTHENTICATED)
+        self.failUnless(result.duration)
+        self.failUnless(target - 30 < result.duration < target + 30)
+
+    def bouncer_from_ical(self, data):
+        tmp = tempfile.NamedTemporaryFile()
+        tmp.write(data)
+        tmp.flush()
+        conf = _get_config(tmp.name)
+        return icalbouncer.IcalBouncer(conf)
+
+    def _timedeltaToSeconds(self, td):
+        return max(td.days * 24 * 60 * 60 + td.seconds + \
+                                    td.microseconds / 1e6, 0)
+
+    def testOverlapLessThanWindowSize(self):
+        dates = [self.now - timedelta(minutes=1),
+            self.now + timedelta(seconds=0.4*self.maxKeyCardDuration),
+            self.now + timedelta(seconds=0.2*self.maxKeyCardDuration),
+            self.now + timedelta(seconds=0.6*self.maxKeyCardDuration),
+            self.now + timedelta(seconds=0.4*self.maxKeyCardDuration),
+            self.now + timedelta(seconds=0.8*self.maxKeyCardDuration),
+        ]
+        data = self.ical_from_specs(dates)
+        self.bouncer = self.bouncer_from_ical(data)
+        keycard = keycards.KeycardGeneric()
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
+
+        d.addCallback(self._approved_and_calculate,\
+                                    0.8*self.maxKeyCardDuration)
+        return d
+
+    def testOverlapMoreThanWindowSize(self):
+        dates = [self.now - timedelta(minutes=1),
+            self.now + timedelta(seconds=0.6*self.maxKeyCardDuration),
+            self.now + timedelta(seconds=0.3*self.maxKeyCardDuration),
+            self.now + timedelta(seconds=0.9*self.maxKeyCardDuration),
+            self.now + timedelta(seconds=0.6*self.maxKeyCardDuration),
+            self.now + timedelta(seconds=1.2*self.maxKeyCardDuration),
+        ]
+        data = self.ical_from_specs(dates)
+        self.bouncer = self.bouncer_from_ical(data)
+        keycard = keycards.KeycardGeneric()
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
+        d.addCallback(self._approved_and_calculate, self.maxKeyCardDuration)
+        return d
+
+    def testOverlapEndingSimulteanously(self):
+        dates = [self.now - timedelta(minutes=1),
+            self.now + timedelta(seconds=0.6*self.maxKeyCardDuration),
+            self.now - timedelta(minutes=2),
+            self.now + timedelta(seconds=0.6*self.maxKeyCardDuration),
+            self.now - timedelta(seconds=10),
+            self.now - timedelta(seconds=1),
+        ]
+        data = self.ical_from_specs(dates)
+        self.bouncer = self.bouncer_from_ical(data)
+        keycard = keycards.KeycardGeneric()
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+
+        d.addCallback(self._approved_and_calculate,\
+                                    0.6*self.maxKeyCardDuration)
         return d

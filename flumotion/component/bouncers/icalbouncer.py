@@ -23,7 +23,7 @@
 A bouncer that only lets in during an event scheduled with an ical file.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from twisted.internet import defer
 
@@ -45,6 +45,7 @@ class IcalBouncer(bouncer.Bouncer):
     logCategory = 'icalbouncer'
     keycardClasses = (KeycardGeneric, )
     events = []
+    maxKeyCardDuration = timedelta(days=1)
 
     def init(self):
         self.iCalScheduler = None
@@ -94,24 +95,34 @@ class IcalBouncer(bouncer.Bouncer):
         self.debug('authenticating keycard')
 
         # need to check if inside an event time
-        # FIXME: think of a strategy for handling overlapping events
         cal = self.iCalScheduler.getCalendar()
+        now = datetime.now(eventcalendar.UTC)
         eventInstances = cal.getActiveEventInstances()
-        if eventInstances:
-            instance = eventInstances[0]
-            now = datetime.now(eventcalendar.UTC)
-            end = instance.end
-            duration = end - now
-            durationSecs = duration.days * 86400 + duration.seconds
-            keycard.duration = durationSecs
-            if self.addKeycard(keycard):
-                keycard.state = keycards.AUTHENTICATED
-                self.info("authenticated login, duration %d seconds",
-                          durationSecs)
-                return keycard
-        keycard.state = keycards.REFUSED
-        self.info("failed in authentication, outside hours")
-        return None
+        if not eventInstances:
+            keycard.state = keycards.REFUSED
+            self.info("failed in authentication, outside hours")
+            return None
+        last_end = now
+        while eventInstances:
+            # decorate-sort-undecorate to get the event ending last
+            instance = max([(ev.end, ev) for ev in eventInstances])[1]
+            duration = instance.end - now
+
+            if duration > self.maxKeyCardDuration:
+                duration = self.maxKeyCardDuration
+                break
+            if last_end == instance.end:
+                break
+            eventInstances = cal.getActiveEventInstances(instance.end)
+            last_end = instance.end
+
+        durationSecs = duration.days * 86400 + duration.seconds
+        keycard.duration = durationSecs
+        if self.addKeycard(keycard):
+            keycard.state = keycards.AUTHENTICATED
+            self.info("authenticated login, duration %d seconds",
+                      durationSecs)
+            return keycard
 
     def do_stop(self):
         # we might not have an iCalScheduler, if something went wrong

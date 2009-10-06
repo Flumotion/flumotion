@@ -1,3 +1,12 @@
+2009-10-06  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	reviewed by: Jan Urbanski, Sebastien Merle
+
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/test/test_icalbouncer.py:
+	Handles overlapping events in the ical-bouncer and adds the proper tests.
+	Closes #1374
+
 2009-10-06  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/test/test_common_xdg.py:
