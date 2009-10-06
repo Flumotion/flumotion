@@ -2,6 +2,27 @@
 
 	reviewed by: Sebastien Merle
 
+	* flumotion/admin/connections.py:
+	Implement default connection user and password file. The file looked
+	for is named 'connections' and should be located in a location
+	confirming to the XDG Base Directory spec. Usually, that means
+	$HOME/.local/flumotion/connections.
+
+	The format is an XML file containing a <connections> element, followed
+	by a list of <connection> elements, that should be similar to the
+	format of recent connection files, but can contain shell globs in the
+	'host', 'port', 'use_insecure' and 'user' fields.
+
+	Closes #1373.
+
+	* flumotion/test/test_admin_connections.py:
+	Extend the existing tests for recent connections and test the new
+	default connections functionality.
+
+2009-10-06  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Sebastien Merle
+
 	* flumotion/common/xdg.py (added):
 	Add a module implementing parts of the XDG Base Directory
 	Specification.
