@@ -1,3 +1,16 @@
+2009-10-06  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Sebastien Merle
+
+	* flumotion/common/xdg.py (added):
+	Add a module implementing parts of the XDG Base Directory
+	Specification.
+	* flumotion/test/test_common_xdg.py (added):
+	Test the new module.
+	* flumotion/test/Makefile.am:
+	* flumotion/common/Makefile.am:
+	Distribute the new files.
+
 2009-10-01  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:

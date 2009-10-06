@@ -53,6 +53,7 @@ flumotion_PYTHON = \
 	vfsgnome.py \
 	watched.py \
 	worker.py \
+	xdg.py \
 	xmlwriter.py \
 	eventcalendar.py 
 
