@@ -20,7 +20,7 @@
 	Implement default connection user and password file. The file looked
 	for is named 'connections' and should be located in a location
 	confirming to the XDG Base Directory spec. Usually, that means
-	$HOME/.local/flumotion/connections.
+	$HOME/.config/flumotion/connections.
 
 	The format is an XML file containing a <connections> element, followed
 	by a list of <connection> elements, that should be similar to the
