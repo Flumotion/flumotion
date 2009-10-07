@@ -1,3 +1,13 @@
+2009-10-07  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali
+
+	* flumotion/component/base/scheduler.py:
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/test/test_icalbouncer.py:
+	Revokes keycards in case the new calendar hasn't a current event.
+	Closes #1157
+
 2009-10-06  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	reviewed by: Jan Urbanski, Sebastien Merle

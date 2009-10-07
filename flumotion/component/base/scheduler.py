@@ -103,6 +103,7 @@ class Scheduler(log.Loggable):
         # we do comparison of instances by content, since, while the timing
         # information may have changed, if the content is still the same,
         # then the event is still considered 'active'
+        self._calendar = calendar
         for instance in oldInstances:
             if instance.event.content not in newInstancesContent:
                 self.debug(
@@ -117,7 +118,6 @@ class Scheduler(log.Loggable):
                     instance, instance.event.content)
                 self._eventInstanceStarted(instance)
 
-        self._calendar = calendar
         self._reschedule()
 
     def getPoints(self, when=None):

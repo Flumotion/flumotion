@@ -49,6 +49,7 @@ class IcalBouncer(bouncer.Bouncer):
 
     def init(self):
         self.iCalScheduler = None
+        self.subscriptionToken = None
 
     def check_properties(self, properties, addMessage):
 
@@ -88,7 +89,8 @@ class IcalBouncer(bouncer.Bouncer):
                                mid="error-icalbouncer-file")
             self.addMessage(m)
             return defer.fail(errors.ComponentSetupHandledError())
-
+        self.subscriptionToken = \
+            self.iCalScheduler.subscribe(self._do_nothing, self._eventEnded)
         return True
 
     def do_authenticate(self, keycard):
@@ -129,3 +131,19 @@ class IcalBouncer(bouncer.Bouncer):
         # during do_setup or do_check
         if self.iCalScheduler:
             self.iCalScheduler.cleanup()
+        if self.subscriptionToken:
+            self.iCalScheduler.unsubscribe(self.subscriptionToken)
+            self.subscriptionToken = None
+
+    def _eventEnded(self, event):
+        self.debug("_eventEnded")
+        if not event.start < datetime.now(eventcalendar.UTC) < event.end:
+            return
+        cal = self.iCalScheduler.getCalendar()
+        eventInstances = cal.getActiveEventInstances()
+        if not eventInstances:
+            self.debug("We're now outside hours, revoking all keycards")
+            self.expireAllKeycards()
+
+    def _do_nothing(self, _):
+        pass

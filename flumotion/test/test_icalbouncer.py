@@ -408,3 +408,41 @@ END:VCALENDAR
         d.addCallback(self._approved_and_calculate,\
                                     0.6*self.maxKeyCardDuration)
         return d
+
+
+class TestIcalBouncerCalSwitch(TestIcalBouncerRunning, RequiredModulesMixin):
+
+    def _getCalendarFromString(self, data):
+        tmp = tempfile.NamedTemporaryFile()
+        tmp.write(data)
+        tmp.flush()
+        tmp.seek(0)
+        return eventcalendar.fromFile(tmp)
+
+    def testDonTRevoke(self):
+        data = self.ical_from_specs('', self.now,
+                                    '', self.in_half_an_hour)
+        self.bouncer = self.bouncer_from_ical(data)
+
+        keycard = keycards.KeycardGeneric()
+        self.bouncer.authenticate(keycard)
+        data = self.ical_from_specs('', self.a_day_ago,
+                                    '', self.in_half_an_hour)
+
+        calendar = self._getCalendarFromString(data)
+        self.bouncer.iCalScheduler.setCalendar(calendar)
+        self.failUnless(self.bouncer.hasKeycard(keycard))
+
+    def testRevoke(self):
+        data = self.ical_from_specs('', self.now,
+                                    '', self.in_half_an_hour)
+        self.bouncer = self.bouncer_from_ical(data)
+
+        keycard = keycards.KeycardGeneric()
+        self.bouncer.authenticate(keycard)
+        data = self.ical_from_specs('', self.a_day_ago,
+                                    '', self.half_an_hour_ago)
+
+        calendar = self._getCalendarFromString(data)
+        self.bouncer.iCalScheduler.setCalendar(calendar)
+        self.failIf(self.bouncer.hasKeycard(keycard))
