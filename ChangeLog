@@ -1,3 +1,14 @@
+2009-10-08  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/admin/connections.py:
+	Store PBConnectionInfo in RecentConnection instances, not
+	ConnectionInfo. A RecentConnection will never contain shell globs, so
+	it's safe to parse the ConnectionInfo object into a PBConnectionInfo
+	immediately in the constructor.
+	Avoids breaking other parts of code due to the change of the
+	RecentConnection 'info' instance variable type introduced in r8228.
+	Closes #1373.
+
 2009-10-07  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	reviewed by: Zaheer Abbas Merali

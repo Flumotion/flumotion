@@ -85,7 +85,7 @@ class RecentConnection(object):
     @ivar filename:  filename of the connection
     @type filename:  string
     @ivar info:      connection info
-    @type info:      L{ConnectionInfo}
+    @type info:      L{PBConnectionInfo}
     @ivar timestamp: timestamp
     @type timestamp: datetime.datetime
     """
@@ -94,7 +94,7 @@ class RecentConnection(object):
         self.name = str(info)
         self.host = host
         self.filename = filename
-        self.info = info
+        self.info = info.asPBConnectionInfo()
         self.timestamp = datetime.datetime.fromtimestamp(
             os.stat(filename).st_ctime)
 
@@ -254,7 +254,7 @@ def parsePBConnectionInfoRecent(managerString, use_ssl=True,
     recent = getRecentConnections()
     if not managerString:
         if recent:
-            return recent[0].info.asPBConnectionInfo()
+            return recent[0].info
         else:
             raise OptionError('No string given and no recent '
                               'connections to use')
