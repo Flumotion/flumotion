@@ -95,16 +95,16 @@ class AdminConnectiontionsTest(testsuite.TestCase):
 
         # the recent connections are read in reverse lexicographical order
         ci2, ci1 = r[0].info, r[1].info
-        self.assertEquals(ci1.port, '1234')
+        self.assertEquals(ci1.port, 1234)
         self.assertEquals(ci1.host, 'test.host.com')
-        self.assertEquals(ci1.use_insecure, '1')
-        self.assertEquals(ci1.user, 'testuser')
-        self.assertEquals(ci1.passwd, 'testpasswd')
-        self.assertEquals(ci2.port, '1235')
+        self.assertEquals(ci1.use_ssl, False)
+        self.assertEquals(ci1.authenticator.username, 'testuser')
+        self.assertEquals(ci1.authenticator.password, 'testpasswd')
+        self.assertEquals(ci2.port, 1235)
         self.assertEquals(ci2.host, 'test2.host.com')
-        self.assertEquals(ci2.use_insecure, '0')
-        self.assertEquals(ci2.user, 'test2user')
-        self.assertEquals(ci2.passwd, 'test2passwd')
+        self.assertEquals(ci2.use_ssl, True)
+        self.assertEquals(ci2.authenticator.username, 'test2user')
+        self.assertEquals(ci2.authenticator.password, 'test2passwd')
 
     def testParsePBConnectionRecent(self):
         pPBCIR = parsePBConnectionInfoRecent

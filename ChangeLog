@@ -1,6 +1,15 @@
 2009-10-08  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/admin/connections.py:
+	Always use ConnectionInfo objects to update the PBConnectionInfo with
+	the username and the password.
+	* flumotion/test/test_admin_connections.py:
+	Adapt the tests to the fact that RecentConnections store a
+	PBConnectionInfo, not a ConnectionInfo.
+
+2009-10-08  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/admin/connections.py:
 	Store PBConnectionInfo in RecentConnection instances, not
 	ConnectionInfo. A RecentConnection will never contain shell globs, so
 	it's safe to parse the ConnectionInfo object into a PBConnectionInfo

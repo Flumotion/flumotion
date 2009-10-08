@@ -101,6 +101,16 @@ class RecentConnection(object):
     def updateTimestamp(self):
         os.utime(self.filename, None)
 
+    def asConnectionInfo(self):
+        """
+        Return a L{ConnectionInfo} object constructed from my state.
+        """
+        info = self.info
+        return ConnectionInfo(info.host, str(info.port),
+                              info.use_ssl and '0' or '1',
+                              info.authenticator.username,
+                              info.authenticator.password)
+
 
 def _getRecentFilenames():
     # DSU, or as perl folks call it, a Schwartz Transform
@@ -173,7 +183,7 @@ def getDefaultConnections():
     Fetches a list of default connections.
 
     @returns: default connections
-    @rtype: list of L{PBDefaultConnectionInfo}
+    @rtype: list of L{ConnectionInfo}
     """
 
     filename = xdg.config_read_path('connections')
@@ -195,7 +205,7 @@ def updateFromConnectionList(info, connections, match_glob=False):
     @param info:        connection info
     @type info:         L{PBConnectionInfo}
     @param connections: recent or default connections
-    @type:              a list of L{PBConnectionInfo}
+    @type:              a list of L{ConnectionInfo}
     @param match_glob:  if values of host, port, etc. to be matched between
                         info and the recent or default connections should be
                         treated as shell globs
@@ -265,7 +275,7 @@ def parsePBConnectionInfoRecent(managerString, use_ssl=True,
                                  use_ssl=use_ssl)
 
     if not (info.authenticator.username and info.authenticator.password):
-        recent_infos = [r.info for r in recent]
+        recent_infos = [r.asConnectionInfo() for r in recent]
         updateFromConnectionList(info, recent_infos, match_glob=False)
     if not (info.authenticator.username and info.authenticator.password):
         defaults = getDefaultConnections()
