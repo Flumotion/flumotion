@@ -1,3 +1,12 @@
+2009-10-13  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: Zaheer
+
+	* flumotion/component/producers/firewire/firewire.py:
+	Use a drop factor of 1 for framerates greater than 12.5
+	Fixes #1369
+
+
 2009-10-08  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/admin/connections.py:

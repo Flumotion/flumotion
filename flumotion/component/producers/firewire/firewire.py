@@ -66,13 +66,13 @@ class Firewire(feedcomponent.ParseLaunchComponent):
 
         scale_correction = width - scaled_width
 
-        if 12.5 < framerate_float <= 25:
+        if 12.5 < framerate_float:
             drop_factor = 1
         elif 6.3 < framerate_float <= 12.5:
             drop_factor = 2
         elif 3.2 < framerate_float <= 6.3:
             drop_factor = 4
-        else:
+        elif framerate_float <= 3.2:
             drop_factor = 8
 
         if is_square:
