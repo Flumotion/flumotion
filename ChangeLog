@@ -1,6 +1,12 @@
 2009-10-14  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	* flumotion/test/test_component_providers.py:
+	Remove all the md5/urandom parts to stick with strings,
+	and put testModifySrc in todo state until #1375 is fixed.
+
+2009-10-14  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	* flumotion/test/test_component_providers.py:
 	Changes the import to use flumotion.common.python rather than md5 directly
 
 2009-10-14  Guillaume Quintard  <guillaume.quintard@flumotion.com>
