@@ -1,3 +1,10 @@
+2009-10-14  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	reviewed by: Sebastien Merle
+
+	* flumotion/test/test_component_providers.py:
+	Adds a few tests for the cachedProvider
+
 2009-10-13  Xavier Queralt  <xqueralt@flumotion.com>
 
 	reviewed by: Zaheer

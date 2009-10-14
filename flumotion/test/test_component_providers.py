@@ -21,6 +21,9 @@
 import os
 import shutil
 import tempfile
+import md5
+
+from twisted.internet import defer, reactor
 
 from flumotion.common import testsuite
 from flumotion.component.misc.httpserver import localpath
@@ -204,3 +207,109 @@ class LocalPathLocalProvider(testsuite.TestCase):
     def testOpenTraversingNonExistingDir(self):
         child = self.local.child('foo').child('bar')
         self.assertRaises(NotFoundError, child.open)
+
+
+class CachedProviderFileTest(testsuite.TestCase):
+
+    def setUp(self):
+        self.src_path = tempfile.mkdtemp(suffix=".src")
+        self.cache_path = tempfile.mkdtemp(suffix=".cache")
+
+        plugProps = {"properties": {"path": self.src_path,
+                                    "cache-dir": self.cache_path}}
+        self.fileProviderPlug = \
+            cachedprovider.FileProviderLocalCachedPlug(plugProps)
+        self.fileProviderPlug.start(None)
+        self.dataSize = 50*2**10
+        self.data = os.urandom(self.dataSize)
+        self.testFileName = self.createFile('a', self.data)
+
+    def tearDown(self):
+        self.fileProviderPlug.stop(None)
+        shutil.rmtree(self.src_path, ignore_errors=True)
+        shutil.rmtree(self.cache_path, ignore_errors=True)
+
+    def testModifySrc(self):
+        newData = os.urandom(self.dataSize)
+
+        d = self.openFile('a')
+        d.addCallback(self.readFile, self.dataSize)
+        d.addCallback(pass_through, self.cachedFile.close)
+        d.addCallback(pass_through, self.createFile, 'a', newData)
+        d.addCallback(delay, 0)
+
+        d.addCallback(lambda _: self.openFile('a'))
+        d.addCallback(self.readFile, self.dataSize)
+        d.addCallback(pass_through, self.cachedFile.close)
+
+        d.addCallback(getHash)
+        d.addCallback(self.assertEqual, getHash(self.data))
+        return d
+
+    def testSeekend(self):
+        d = self.openFile('a')
+        d.addCallback(pass_through, self.cachedFile.seek, self.dataSize-5)
+        d.addCallback(self.readFile, 5)
+        d.addCallback(pass_through, self.cachedFile.close)
+
+        d.addCallback(getHash)
+        d.addCallback(self.assertEqual, getHash(self.data[-5:]))
+        return d
+
+    def testCachedFile(self):
+        d = self.openFile('a')
+        d.addCallback(self.readFile, self.dataSize)
+        d.addCallback(pass_through, self.cachedFile.close)
+        d.addCallback(delay, 1)
+
+        d.addCallback(lambda _: self.getCachePath(self.testFileName))
+        d.addCallback(lambda p: self.failUnless(os.path.exists(p)))
+        return d
+
+    def testSimpleIntegrity(self):
+        src_checksum = getHash(self.data)
+
+        d = self.openFile('a')
+        d.addCallback(self.readFile, self.dataSize)
+        d.addCallback(pass_through, self.cachedFile.close)
+
+        d.addCallback(getHash)
+        d.addCallback(lambda cache_checksum:\
+                    self.failUnlessEqual(src_checksum, cache_checksum))
+        return d
+
+    def getCachePath(self, path):
+        return self.fileProviderPlug.getCachePath(path)
+
+    def getTempPath(self, path):
+        return self.fileProviderPlug.getTempPath(path)
+
+    def createFile(self, name, data):
+        testFileName = os.path.join(self.src_path, name)
+        testFile = open(testFileName, "w")
+        testFile.write(data)
+        testFile.close
+        return testFileName
+
+    def openFile(self, name):
+        self.cachedFile = \
+                    self.fileProviderPlug.getRootPath().child(name).open()
+        return defer.succeed(self.cachedFile)
+
+    def readFile(self, _, size):
+        return self.cachedFile.read(size)
+
+
+def getHash(data):
+    return md5.new(data).hexdigest()
+
+
+def pass_through(result, fun, *args, **kwargs):
+    fun(*args, **kwargs)
+    return result
+
+
+def delay(ret, t):
+    d = defer.Deferred()
+    reactor.callLater(t, d.callback, ret)
+    return d
