@@ -21,11 +21,11 @@
 import os
 import shutil
 import tempfile
-import md5
 
 from twisted.internet import defer, reactor
 
 from flumotion.common import testsuite
+from flumotion.common.python import md5
 from flumotion.component.misc.httpserver import localpath
 from flumotion.component.misc.httpserver import localprovider
 from flumotion.component.misc.httpserver import cachedprovider
@@ -301,7 +301,7 @@ class CachedProviderFileTest(testsuite.TestCase):
 
 
 def getHash(data):
-    return md5.new(data).hexdigest()
+    return md5(data).hexdigest()
 
 
 def pass_through(result, fun, *args, **kwargs):
