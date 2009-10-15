@@ -221,7 +221,9 @@ class CachedProviderFileTest(testsuite.TestCase):
         self.fileProviderPlug.start(None)
         self.dataSize = 7
         self.data = "foo bar"
-        self.testFileName = self.createFile('a', self.data)
+        # the old parameter assures newer files will be taken into account
+        # (avoid timing problems), like in testModifySrc
+        self.testFileName = self.createFile('a', self.data, old=True)
 
     def tearDown(self):
         self.fileProviderPlug.stop(None)
@@ -234,16 +236,14 @@ class CachedProviderFileTest(testsuite.TestCase):
         d = self.openFile('a')
         d.addCallback(self.readFile, self.dataSize)
         d.addCallback(pass_through, self.cachedFile.close)
-        d.addCallback(pass_through, self.createFile, 'a', newData)
-        #d.addCallback(delay, 0)
 
+        d.addCallback(pass_through, self.createFile, 'a', newData)
         d.addCallback(lambda _: self.openFile('a'))
         d.addCallback(self.readFile, self.dataSize)
         d.addCallback(pass_through, self.cachedFile.close)
 
-        d.addCallback(self.assertEqual, self.data)
+        d.addCallback(self.assertEqual, newData)
         return d
-    testModifySrc.todo = "Bug from the cachedProvider #1375"
 
     def testSeekend(self):
         d = self.openFile('a')
@@ -280,11 +280,14 @@ class CachedProviderFileTest(testsuite.TestCase):
     def getTempPath(self, path):
         return self.fileProviderPlug.getTempPath(path)
 
-    def createFile(self, name, data):
+    def createFile(self, name, data, old=False):
         testFileName = os.path.join(self.src_path, name)
         testFile = open(testFileName, "w")
         testFile.write(data)
-        testFile.close
+        testFile.close()
+        if old:
+            stats = os.stat(testFileName)
+            os.utime(testFileName, (1, 1))
         return testFileName
 
     def openFile(self, name):
