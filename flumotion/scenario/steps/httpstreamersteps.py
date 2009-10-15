@@ -271,9 +271,8 @@ class HTTPSpecificStep(ConsumerStep):
                         d = plugin.workerChanged(self.worker)
 
                         def cb(found, plugin, entry):
-                            if found:
-                                self._addPlug(plugin.getPlugWizard(
-                                    N_(entry.description)))
+                            self._addPlug(plugin.getPlugWizard(
+                                N_(entry.description)), found)
                         d.addCallback(cb, plugin, entry)
                     else:
                         self._addPlug(plugin.getPlugWizard(
@@ -313,7 +312,8 @@ class HTTPSpecificStep(ConsumerStep):
 
         return True
 
-    def _addPlug(self, plugin):
+    def _addPlug(self, plugin, enabled):
+        plugin.setEnabled(enabled)
         self.plugarea.addLine(plugin)
 
     def _runChecks(self):

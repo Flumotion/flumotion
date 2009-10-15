@@ -1,3 +1,12 @@
+2009-10-15  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/component/plugs/cortado/wizard_gtk.py:
+	* flumotion/scenario/steps/httpstreamersteps.py:
+	* flumotion/ui/plugarea.py:
+	Set the checkbutton unsensitive when the required plug is not available
+	in the system and show a tooltip explaining what to do to enable it.
+	Closes #1349
+
 2009-10-14  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	* flumotion/test/test_component_providers.py:

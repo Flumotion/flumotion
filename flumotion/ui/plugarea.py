@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+import gettext
 import gobject
 import gtk
 
@@ -26,13 +27,15 @@ from flumotion.common import log
 from flumotion.ui.fgtk import ProxyWidgetMapping
 from flumotion.ui.glade import GladeWidget
 
+_ = gettext.gettext
+
 __version__ = "$Rev$"
 
 
 class WizardPlugLine(GladeWidget, log.Loggable):
     """
     """
-
+    inactiveMessage = _('Plugin should be installed to enable this option')
     logCategory = 'wizard'
     gladeTypedict = ProxyWidgetMapping()
 
@@ -41,18 +44,18 @@ class WizardPlugLine(GladeWidget, log.Loggable):
             GladeWidget.__init__(self)
         else:
             gtk.VBox.__init__(self)
-        self.checkbutton = gtk.CheckButton()
+        self._cb = gtk.CheckButton()
 
         label = gtk.Label(description)
         label.set_use_underline(True)
 
-        self.checkbutton.add(label)
-        self.pack_start(self.checkbutton)
-        self.checkbutton.connect('toggled',
+        self._cb.add(label)
+        self.pack_start(self._cb)
+        self._cb.connect('toggled',
                                  self.on_checkbutton_toggled)
 
-        self.reorder_child(self.checkbutton, 0)
-        self.checkbutton.show_all()
+        self.reorder_child(self._cb, 0)
+        self._cb.show_all()
 
         self.wizard = wizard
         self.model = model
@@ -60,12 +63,12 @@ class WizardPlugLine(GladeWidget, log.Loggable):
     # Public API
 
     def setActive(self, active):
-        self.checkbutton.set_active(active)
+        self._cb.set_active(active)
 
     def getActive(self):
         """Aks wether the plug line is active or not.
         """
-        return self.checkbutton.get_active()
+        return self._cb.get_active()
 
     def plugActiveChanged(self, active):
         """Called when the checkbutton state changes.
@@ -73,6 +76,14 @@ class WizardPlugLine(GladeWidget, log.Loggable):
         state changes.
         """
         raise NotImplementedError()
+
+    def setEnabled(self, enabled):
+        """Called to set the line's sensitiveness and show/hide the related
+        information message in its tooltip
+        """
+        self.setActive(enabled)
+        self._cb.set_sensitive(enabled)
+        self._cb.set_tooltip_text(enabled and '' or self.inactiveMessage)
 
     # Callbacks
 

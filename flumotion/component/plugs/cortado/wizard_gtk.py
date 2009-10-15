@@ -22,12 +22,15 @@
 """Wizard plugin for the cortado http plug
 """
 
+import gettext
 from zope.interface import implements
 
 from flumotion.admin.assistant.interfaces import IHTTPConsumerPlugin, \
         IHTTPConsumerPluginLine
 from flumotion.admin.assistant.models import HTTPServer, HTTPPlug
 from flumotion.ui.plugarea import WizardPlugLine
+
+_ = gettext.gettext
 
 __version__ = "$Rev$"
 
@@ -130,6 +133,8 @@ class CortadoHTTPServer(HTTPServer):
 class CortadoPlugLine(WizardPlugLine):
     implements(IHTTPConsumerPluginLine)
     gladeFile = ''
+    inactiveMessage = \
+            _('Cortado player should be installed to enable this option')
 
     def __init__(self, wizard, description):
         WizardPlugLine.__init__(self, wizard, None, description)
