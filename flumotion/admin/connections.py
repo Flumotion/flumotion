@@ -49,12 +49,13 @@ class ConnectionInfo(object):
     my variables can be shell globs, they are all strings.
     """
 
-    def __init__(self, host, port, use_insecure, user, passwd):
+    def __init__(self, host, port, use_insecure, user, passwd, manager):
         self.host = host
         self.port = port
         self.use_insecure = use_insecure
         self.user = user
         self.passwd = passwd
+        self.manager = manager
 
     def asPBConnectionInfo(self):
         """
@@ -95,6 +96,7 @@ class RecentConnection(object):
         self.host = host
         self.filename = filename
         self.info = info.asPBConnectionInfo()
+        self.manager = info.manager
         self.timestamp = datetime.datetime.fromtimestamp(
             os.stat(filename).st_ctime)
 
@@ -109,7 +111,7 @@ class RecentConnection(object):
         return ConnectionInfo(info.host, str(info.port),
                               info.use_ssl and '0' or '1',
                               info.authenticator.username,
-                              info.authenticator.password)
+                              info.authenticator.password, '')
 
 
 def _getRecentFilenames():
@@ -144,7 +146,7 @@ def _parseConnection(element):
             childNode.nodeType != Node.COMMENT_NODE):
             state[childNode.nodeName] = childNode.childNodes[0].wholeText
     return ConnectionInfo(state['host'], state['port'], state['use_insecure'],
-                          state['user'], state['passwd'])
+                          state['user'], state['passwd'], state['manager'])
 
 
 def _parseSingleConnectionFile(filename):

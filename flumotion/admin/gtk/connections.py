@@ -27,7 +27,7 @@ import gettext
 import gobject
 import gtk
 from kiwi.ui.objectlist import Column
-from pango import ELLIPSIZE_MIDDLE
+from pango import ELLIPSIZE_MIDDLE, ELLIPSIZE_END
 
 from flumotion.admin.connections import getRecentConnections, \
      hasRecentConnections
@@ -55,6 +55,8 @@ class Connections(GladeWidget):
         self.connections.set_columns(
                   [Column("host", title=_("Hostname"), searchable=True,
                           ellipsize=ELLIPSIZE_MIDDLE, expand=True, width=100),
+                   Column("manager", title=_("Manager"), searchable=True,
+                          ellipsize=ELLIPSIZE_END, expand=True, width=50),
                    Column("timestamp", title=_("Last used"),
                           sorted=True,
                           order=gtk.SORT_DESCENDING,

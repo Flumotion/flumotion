@@ -29,14 +29,15 @@ from flumotion.admin.connections import getRecentConnections
 from flumotion.admin.connections import parsePBConnectionInfoRecent
 
 
-def _create_connection(f, port, host, use_insecure, user, passwd):
+def _create_connection(f, port, host, manager, use_insecure, user, passwd):
     f.write('''<connection>
                  <port>%s</port>
                  <host>%s</host>
+                 <manager>%s</manager>
                  <use_insecure>%s</use_insecure>
                  <user>%s</user>
                  <passwd>%s</passwd>
-               </connection>''' % (port, host, use_insecure,
+               </connection>''' % (port, host, manager, use_insecure,
                                    user, passwd))
 
 
@@ -50,17 +51,17 @@ class AdminConnectiontionsTest(testsuite.TestCase):
         configure.registrydir = self.new_registrydir
 
         rc1 = file(os.path.join(self.new_registrydir, 'fake.connection'), 'w')
-        _create_connection(rc1, 1234, 'test.host.com',
+        _create_connection(rc1, 1234, 'test.host.com', 'fake-manager',
                                   '1', 'testuser', 'testpasswd')
         rc1.close()
         rc2 = file(os.path.join(self.new_registrydir, 'fake2.connection'), 'w')
-        _create_connection(rc2, 1235, 'test2.host.com',
+        _create_connection(rc2, 1235, 'test2.host.com', 'fake-manager',
                                   '0', 'test2user', 'test2passwd')
         rc2.close()
 
         # this should not be picked up as a recent connection file
         nrc = file(os.path.join(self.new_registrydir, 'fake3'), 'w')
-        _create_connection(nrc, 1236, 'testx.host.com',
+        _create_connection(nrc, 1236, 'testx.host.com', 'fake-manager',
                                   '1', 'testxuser', 'testxpasswd')
         nrc.close()
 
@@ -72,9 +73,9 @@ class AdminConnectiontionsTest(testsuite.TestCase):
 
         def1 = xdg.config_write_path('connections', 'w')
         def1.write('<connections>')
-        _create_connection(def1, '2*', 'test3.host.com',
+        _create_connection(def1, '2*', 'test3.host.com', 'fake-manager',
                                   '1', 'testdefuser', 'testdefpasswd')
-        _create_connection(def1, '*', '*.host',
+        _create_connection(def1, '*', '*.host', 'fake-manager',
                                   '*', 'x', 'testxpasswd')
         def1.write('</connections>')
         def1.close()

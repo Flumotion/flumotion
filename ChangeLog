@@ -1,3 +1,13 @@
+2009-10-16  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: Jan
+
+	* flumotion/admin/connections.py:
+	* flumotion/admin/gtk/connections.py:
+	* flumotion/test/test_admin_connections.py:
+	Show manager names in the recent connections dialog.
+	Closes #830
+
 2009-10-15  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	reviewed by: Sebastien Merle
