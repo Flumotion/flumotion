@@ -1595,7 +1595,7 @@ msgstr "<b>Característiques:</b>"
 #
 #: ../flumotion/component/base/propertiesnode.py:44
 msgid "Properties"
-msgstr "Característiques:"
+msgstr "Característiques"
 
 #. FIXME: have constructor take self instead ?
 #: ../flumotion/component/bouncers/admin_gtk.py:139
