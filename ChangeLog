@@ -1,3 +1,8 @@
+2009-10-29  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	Fixed a race condition that made a test fail randomly.
+
 2009-10-16  Xavier Queralt  <xqueralt@flumotion.com>
 
 	reviewed by: Jan

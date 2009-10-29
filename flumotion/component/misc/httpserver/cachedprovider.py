@@ -608,7 +608,7 @@ class CopySession(log.Loggable):
                 reactor.callFromThread(self._onCopyFinished)
                 cont = False
         # Check for cancellation
-        if self._waitCancel:
+        if self._waitCancel and self.copying:
             # Copy has been cancelled
             self.copying = False
             reactor.callFromThread(self.plug.disableSession, self)
