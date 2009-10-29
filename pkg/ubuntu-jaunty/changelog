@@ -1,3 +1,9 @@
+flumotion (0.7.0.1-1flu1~jaunty2) jaunty; urgency=low
+
+  * Update to SVN 2009-10-29
+
+ -- Arek Korbik <arkadini@gmail.com>  Thu, 29 Oct 2009 14:13:06 +0100
+
 flumotion (0.7.0.1-1flu1~jaunty1) jaunty; urgency=low
 
   * New version

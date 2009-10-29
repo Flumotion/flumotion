@@ -1,27 +1,27 @@
-flumotion (0.7.0.1-1flu1~hardy2) hardy; urgency=low
+flumotion (0.7.0.1-1flu1~karmic1) karmic; urgency=low
 
-  * Update to SVN 2009-10-29
+  * Karmic release
 
- -- Arek Korbik <arkadini@gmail.com>  Thu, 29 Oct 2009 14:13:06 +0100
+ -- Arek Korbik <arkadini@gmail.com>  Thu, 29 Oct 2009 14:10:21 +0100
 
-flumotion (0.7.0.1-1flu1~hardy1) hardy; urgency=low
+flumotion (0.7.0.1-1flu1~jaunty1) jaunty; urgency=low
 
   * New version
 
- -- Arek Korbik <arkadini@gmail.com>  Tue, 15 Sep 2009 12:48:36 +0200
+ -- Arek Korbik <arkadini@gmail.com>  Tue, 15 Sep 2009 12:52:46 +0200
 
-flumotion (0.5.4.2-1flu1~hardy1) hardy; urgency=low
+flumotion (0.5.4.2-1flu1~jaunty1) jaunty; urgency=low
 
   * Update to 0.5.4.2 pre-release
 
  -- Arek Korbik <arek@flumotion.com>  Wed, 12 Aug 2009 18:08:08 +0200
 
-flumotion (0.5.4.1-1flu1~hardy1) hardy; urgency=low
+flumotion (0.5.4.1-1flu1~jaunty1) jaunty; urgency=low
 
-  * Update to SVN 2009-08-12, r8065
+  * Jaunty release
   * Change maintainer to myself
 
- -- Arek Korbik <arek@flumotion.com>  Wed, 12 Aug 2009 16:01:52 +0200
+ -- Arek Korbik <arek@flumotion.com>  Wed, 12 Aug 2009 12:18:49 +0200
 
 flumotion (0.5.2-1flu1~hardy4) hardy; urgency=low
 
