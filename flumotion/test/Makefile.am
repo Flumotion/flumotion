@@ -68,6 +68,7 @@ EXTRA_DIST = 					\
 	test_i18n.py				\
 	test_import.py				\
 	test_keycards.py			\
+	test_launch_parse.py			\
 	test_logfilter.py			\
 	test_manager_admin.py			\
 	test_manager_config.py			\

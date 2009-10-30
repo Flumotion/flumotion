@@ -249,17 +249,94 @@ class Linker:
 
 
 def parse_plug(arg):
-    plugargs = arg.split(',')
-    plug = plugargs.pop(0)[1:]
-    return plug, [parse_prop(arg) for arg in plugargs]
+    if ',' not in arg:
+        return arg[1:], []
+    plugname, plugargs = arg.split(',', 1)
+    return plugname[1:], parse_props(plugargs)
+
+
+def parse_props(props):
+    """
+    Splits a property line respecting compound properties.
+    Ex:    a1=[c1=d1,c2=[e1=[g1=h1],e2=f2]],a2=b2
+        -> [("a1", [("c1", "d1"),
+                    ("c2", [("e1", [("g1", "h1")]),
+                            ("e2", "f2")])],
+            ("a2", "b2")]
+    """
+    start = 0
+    level = 0
+    result = []
+    for i, c in enumerate(props):
+        if c == '[':
+            level += 1
+            continue
+        if c == ']':
+            level -= 1
+            continue
+        if c == ',' and level == 0:
+            result.append(props[start:i])
+            start = i + 1
+            continue
+    if level == 0:
+        result.append(props[start:])
+    else:
+        raise ValueError(props)
+    return [parse_prop(v) for v in result]
 
 
 def parse_prop(arg):
+    """
+    Parses a property.
+    Supports compounds properties.
+    """
     prop = arg[:arg.index('=')]
     val = arg[arg.index('=')+1:]
     if not prop or not val:
         err('Invalid property setting: %s' % arg)
+    if val[0] == '[' and val[-1] == ']':
+        val = parse_props(val[1:-1])
+    else:
+        val = sloppy_unescape(val, "[]")
     return prop, val
+
+
+def sloppy_unescape(value, escaped, escape='\\'):
+    """
+    Permissively unescapes a string.
+
+    Examples with \ as escape character,
+    E as escaped character and X as a non-escaped character:
+        X -> X
+        \E -> E
+        \\ -> \
+        \X -> \X
+        X\ -> X\
+        E\ -> E\
+        \\\E -> \E
+        \\\X -> \\X
+    """
+    res = []
+    escaping = False
+    escaped = set(list(escaped))
+    escaped.add(escape)
+    for char in value:
+        if escaping:
+            if char in escaped:
+                res.append(char)
+                escaping = False
+                continue
+            res.append(escape)
+            res.append(char)
+            escaping = False
+            continue
+        if char == escape:
+            escaping = True
+            continue
+        res.append(char)
+    if escaping:
+        res.append(escape)
+    return ''.join(res)
 
 
 def parse_arg(arg, components, linker):

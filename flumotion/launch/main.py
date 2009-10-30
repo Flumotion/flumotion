@@ -48,6 +48,13 @@ In addition, components can have plugs::
 
   flumotion-launch http-streamer /requestlogger-file,logfile=/dev/stdout
 
+Compound properties can be specified with:
+
+  propname=[subname1=value1,subname2=[subsubname1=subsubvalue1]]
+
+Characters '\', '[' and ']' can be escaped with '\'
+to remove there special meaning.
+
 Flumotion-launch explicitly avoids much of Flumotion's core logic. It
 does not import flumotion.manager, flumotion.admin, or flumotion.worker.
 There is no depgraph, no feed server, no job process. Although it might

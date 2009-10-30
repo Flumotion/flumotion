@@ -1,3 +1,12 @@
+2009-10-30  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/launch/main.py:
+	* flumotion/launch/parse.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_launch_parse.py:
+	* flumotion/test/test_launch_parse.py (added):
+	Added compound properties support in flumotion-launch.
+
 2009-10-29  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/cachedprovider.py:
