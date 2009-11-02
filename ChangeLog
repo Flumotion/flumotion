@@ -1,3 +1,8 @@
+2009-11-02  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	* flumotion/extern (svn:externals):
+	Fixes moap/extern/command revision (r451).  Closes #1381.
+
 2009-10-30  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/launch/main.py:
