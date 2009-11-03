@@ -287,6 +287,8 @@ class FireWireAudioStep(_FireWireCommon, AudioProducerStep):
     # WizardStep
 
     def setup(self):
+        self.guid.data_type = int
+        self.add_proxy(self.model.properties, ['guid'])
         self.frame_scaling.hide()
         self.frame_width_correction.hide()
         self.frame_capture.hide()
