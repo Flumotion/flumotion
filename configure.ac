@@ -284,6 +284,7 @@ flumotion/service/Makefile
 flumotion/scenario/Makefile
 flumotion/scenario/live/Makefile
 flumotion/scenario/ondemand/Makefile
+flumotion/scenario/loadconfiguration/Makefile
 flumotion/scenario/steps/Makefile
 flumotion/test/Makefile
 flumotion/tester/Makefile

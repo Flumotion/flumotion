@@ -21,6 +21,7 @@ glade_DATA =					\
 	encoding-wizard.glade			\
 	httpstreamer-wizard.glade		\
 	license-wizard.glade			\
+	loadconf-wizard.glade			\
 	ondemand-wizard.glade			\
 	overlay-wizard.glade			\
 	overview-wizard.glade			\

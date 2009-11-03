@@ -7,6 +7,7 @@ component_PYTHON = \
 	conversionsteps.py \
 	diskersteps.py \
 	httpstreamersteps.py \
+	loadconfstep.py \
 	licensestep.py \
 	ondemandstep.py \
 	productionsteps.py \

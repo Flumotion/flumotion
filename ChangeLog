@@ -1,3 +1,21 @@
+2009-11-03  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* configure.ac:
+	* data/glade/Makefile.am:
+	* flumotion/scenario/Makefile.am:
+	* flumotion/scenario/steps/Makefile.am:
+	* flumotion/scenario/steps/steps.xml:
+	* flumotion/admin/assistant/save.py:
+	* data/glade/loadconf-wizard.glade (added):
+	* flumotion/scenario/loadconfiguration (added):
+	* flumotion/scenario/loadconfiguration/__init__.py (added):
+	* flumotion/scenario/loadconfiguration/loadconfiguration.xml (added):
+	* flumotion/scenario/loadconfiguration/Makefile.am (added):
+	* flumotion/scenario/loadconfiguration/wizard_gtk.py (added):
+	* flumotion/scenario/steps/loadconfstep.py (added):
+	Add a new scenario that allows to load an existing configuration file.
+	Closes #1131
+
 2009-11-02  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	* flumotion/extern (svn:externals):

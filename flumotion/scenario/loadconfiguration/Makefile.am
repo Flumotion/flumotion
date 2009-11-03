@@ -1,21 +1,16 @@
 include $(top_srcdir)/common/python.mk
 
-componentdir = $(libdir)/flumotion/python/flumotion/scenario
+componentdir = $(libdir)/flumotion/python/flumotion/scenario/loadconfiguration
 component_PYTHON = \
-	__init__.py
+		__init__.py \
+		wizard_gtk.py
 
 component_DATA = \
-	scenario.xml
+	loadconfiguration.xml
 
 TAGS_FILES = $(component_PYTHON)
 
 clean-local:
 	rm -rf *.pyc *.pyo
-
-SUBDIRS = \
-	live \
-	loadconfiguration \
-	ondemand \
-	steps
 
 EXTRA_DIST = $(component_DATA)

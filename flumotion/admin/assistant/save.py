@@ -50,6 +50,7 @@ class AssistantSaver(object):
         self._useCCLicense = False
         self._muxerType = None
         self._muxerWorker = None
+        self._confXml = None
 
     # Public API
 
@@ -197,6 +198,9 @@ class AssistantSaver(object):
         @returns: the xml configuration
         @rtype: string
         """
+        if self._confXml:
+            return self._confXml
+
         self._handleProducers()
         self._handleMuxers()
         # Naming conflicts can only be solved after the rest is done,
@@ -209,6 +213,9 @@ class AssistantSaver(object):
                                      self._atmosphereComponents)
         xml = writer.getXML()
         return xml
+
+    def setConfigurationFile(self, xmlFile):
+        self._confXml = open(xmlFile, 'r').read()
 
     def setExistingComponentNames(self, componentNames):
         """Tells the saver about the existing components available, so
