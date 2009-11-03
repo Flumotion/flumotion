@@ -1,5 +1,13 @@
 2009-11-03  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
+	* flumotion/extern (svn:ignore):
+	Ignore command.OLD.
+
+	This gets generated in the buildbot slave when the external
+	revision of the command package is changed.
+
+2009-11-03  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
 	* flumotion/extern (svn:externals):
 	Upstream update to command package (r455).
 
