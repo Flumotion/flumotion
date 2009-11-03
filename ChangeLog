@@ -2,6 +2,14 @@
 
 	reviewed by: Xavier Queralt
 
+	* flumotion/admin/gtk/adminwindow.py:
+	Show a dialog when saving configuration fails.
+	Closes: #1353
+
+2009-11-03  Marc-André Lureau  <mlureau@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
 	* flumotion/scenario/steps/productionsteps.py:
 	Assistant: Production page forgets the producers when going
 	backwards.

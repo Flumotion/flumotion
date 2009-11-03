@@ -1408,10 +1408,14 @@ class AdminWindow(Loggable, GladeDelegate):
                 file_exists = False
 
             if not file_exists:
-                f = open(name, 'w')
-                f.write(conf_xml)
-                f.close()
-                chooser.destroy()
+                try:
+                    f = open(name, 'w')
+                    f.write(conf_xml)
+                    f.close()
+                    chooser.destroy()
+                except IOError, e:
+                    self._error(_("Could not open configuration file %s "
+                        "for writing (%s)" % (name, e[1])))
 
         def response(d, response):
             if response == gtk.RESPONSE_ACCEPT:
