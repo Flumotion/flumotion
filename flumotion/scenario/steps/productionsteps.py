@@ -55,6 +55,7 @@ class LiveProductionStep(WizardStep):
         self._audioProducer = None
         self._videoProducer = None
         self._loadedSteps = None
+        self._populated = False
         WizardStep.__init__(self, wizard)
 
     # Public API
@@ -144,7 +145,9 @@ class LiveProductionStep(WizardStep):
             _('Select this if you want to stream audio'))
 
     def activated(self):
-        self._populateCombos()
+        if not self._populated:
+            self._populateCombos()
+            self._populated = True
 
     def getNext(self):
         #TODO: Share in some way this code with the conversionsteps page.
