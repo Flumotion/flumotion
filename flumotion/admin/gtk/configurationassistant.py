@@ -253,6 +253,8 @@ class ConfigurationAssistant(SectionWizard):
     def beforeShowStep(self, step):
         if isinstance(step, WorkerWizardStep):
             self._workerList.show()
+            if step.worker:
+                self._workerList.selectWorker(step.worker)
             self._workerList.notifySelected()
         else:
             self._workerList.hide()
