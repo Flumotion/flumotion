@@ -130,6 +130,13 @@ class File(resource.Resource, log.Loggable):
         # PROBE: incoming request; see httpstreamer.resources
         self.debug('[fd %5d] (ts %f) incoming request %r',
                    request.transport.fileno(), time.time(), request)
+        # Different headers not normally set in static.File...
+        # Specify that we will close the connection after this request, and
+        # that the client must not issue further requests.
+        # We do this because future requests on this server might actually need
+        # to go to a different process (because of the porter)
+        request.setHeader('Server', 'Flumotion/%s' % configure.version)
+        request.setHeader('Connection', 'close')
 
         d = self._httpauth.startAuthentication(request)
         d.addCallbacks(self._requestAuthenticated, self._authenticationFailed,
@@ -194,13 +201,6 @@ class File(resource.Resource, log.Loggable):
         except fileprovider.AccessError:
             return self.forbiddenResource.render(request)
 
-        # Different headers not normally set in static.File...
-        # Specify that we will close the connection after this request, and
-        # that the client must not issue further requests.
-        # We do this because future requests on this server might actually need
-        # to go to a different process (because of the porter)
-        request.setHeader('Server', 'Flumotion/%s' % configure.version)
-        request.setHeader('Connection', 'close')
         # We can do range requests, in bytes.
         # UGLY HACK FIXME: if pdf, then do not accept range requests
         # because Adobe Reader plugin messes up

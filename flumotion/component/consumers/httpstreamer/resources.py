@@ -213,6 +213,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         content = self.streamer.get_content_type()
         request.setHeader('Server', HTTP_SERVER)
         request.setHeader('Date', http.datetimeToString())
+        request.setHeader('Connection', 'close')
         request.setHeader('Cache-Control', 'no-cache')
         request.setHeader('Cache-Control', 'private')
         request.setHeader('Content-type', content)

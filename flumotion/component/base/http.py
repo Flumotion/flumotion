@@ -426,6 +426,7 @@ class HTTPAuthentication(log.Loggable):
                    (request.getClientIP(), code))
         request.setHeader('content-type', 'text/html')
         request.setHeader('server', HTTP_SERVER_VERSION)
+        request.setHeader('Connection', 'close')
         if self._domain and code == http.UNAUTHORIZED:
             request.setHeader('WWW-Authenticate',
                               'Basic realm="%s"' % self._domain)

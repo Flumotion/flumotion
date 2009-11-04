@@ -412,11 +412,13 @@ class TestTextFile(testsuite.TestCase):
             length)
         self.assertEquals(request.getHeader('content-type'),
             'application/octet-stream')
+        self.assertEquals(request.getHeader('Connection'), 'close')
 
     def finishPartialCallback(self, result, request, data, start, end):
         self.finishCallback(result, request, http.PARTIAL_CONTENT, data)
         self.assertEquals(request.getHeader('Content-Range'),
             "bytes %d-%d/%d" % (start, end, 11))
+        self.assertEquals(request.getHeader('Connection'), 'close')
 
     def testFull(self):
         fr = FakeRequest()
@@ -538,6 +540,8 @@ class TestNotFound(testsuite.TestCase):
         resource = httpfile.File(component.getRoot(), component)
         fr = FakeRequest()
         resource.render(fr)
+        fr.finishDeferred.addCallback(lambda res:
+            self.assertEquals(fr.getHeader("Connection"), "close"))
         fr.finishDeferred.addCallback(lambda res:
             self.assertEquals(fr.response, http.NOT_FOUND))
         return fr.finishDeferred
