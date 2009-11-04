@@ -51,6 +51,9 @@ class LoadConfigurationStep(WizardStep):
     docAnchor = ''
     docVersion = 'local'
 
+    def activated(self):
+        self.wizard.blockNext(True)
+
     # WizardStep
 
     def setup(self):
@@ -86,6 +89,7 @@ class LoadConfigurationStep(WizardStep):
         def response(dialog, response):
             if response == gtk.RESPONSE_ACCEPT:
                 self.filename.set_text(dialog.get_filename())
+                self.wizard.blockNext(False)
             dialog.destroy()
 
         dialog.connect('response', response)
