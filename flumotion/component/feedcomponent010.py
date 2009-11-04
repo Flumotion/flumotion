@@ -742,6 +742,29 @@ class FeedComponent(basecomponent.BaseComponent):
             def _block_cb(pad, blocked):
                 pass
             srcpad.set_blocked_async(True, _block_cb)
+            # add buffer probe to drop buffers that are flagged as IN_CAPS
+            # needs to be done to gdpdepay's src pad
+            depay = self.get_element(eater.depayName)
+
+            def remove_in_caps_buffers(pad, buffer, eater):
+                if buffer.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
+                    self.info("We got streamheader buffer which " \
+                        "we are dropping because we do not want this just " \
+                        "after a reconnect because it breaks everything ")
+                    return False
+                # now we have a buffer with no flag set
+                # we should remove the handler
+                self.log("We got buffer with no in caps flag set")
+                if eater.bufferProbeHandler:
+                    pad.remove_buffer_probe(eater.bufferProbeHandler)
+                    eater.bufferProbeHandler = None
+                else:
+                    self.warning("buffer probe handler is None, bad news")
+                return True
+            self.log("Adding buffer probe on depay src pad")
+            eater.bufferProbeHandler = depay.get_pad("src").add_buffer_probe(
+                remove_in_caps_buffers, eater)
+
             self.unblock_eater(eaterAlias)
 
             # Now, we can switch FD with this mess

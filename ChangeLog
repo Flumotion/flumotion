@@ -2,6 +2,23 @@
 
 	patch by: Zaheer Abbas Merali
 
+	* flumotion/component/feedcomponent010.py:
+	Drop all IN_CAPS buffers that come in after connecting to a feeder,
+	until the first non-IN_CAPS buffer.
+	The reason is that when streaming a format that has a streamheader,
+	which can appear only at the beginning of a stream, a network glitch
+	and a subsequent reconnection will cause the multifdsink of the
+	upstream component to repeat the streamheader, which will then break
+	the stream for downstream components.
+	This is most visible  in a muxer->repeater->disker flow, because
+	restarting the repeater will make the streamheader get replayed and the
+	file produced by the disker will have the streamheader buffers twice.
+	Fixes #1370.
+
+2009-11-04  Jan Urbanski  <jurbanski@flumotion.com>
+
+	patch by: Zaheer Abbas Merali
+
 	* flumotion/component/base/http.py:
 	* flumotion/component/consumers/httpstreamer/resources.py:
 	* flumotion/component/misc/httpserver/httpfile.py:
