@@ -1,3 +1,17 @@
+2009-11-05  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/extern/log/log.py:
+	Move the Unicode encoding logic down to the exception
+	handler. Has the same effect as r8216, but avoids encoding
+	when not necessary, which for frequently-called code like logging is
+	important.
+	Tests showed that r8216 amounted to a 10% slowdown of the logging, this
+	change brings the lost performance back.
+
+	* flumotion/extern/log/README:
+	Document that logging Unicode objects will encode them with UTF-8 prior
+	to emitting the log line.
+
 2009-11-04  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/configurationassistant.py:

@@ -23,6 +23,8 @@ BUGS
 
 The logging strings should be strings, not unicode.
 
+Unicode objects are encoded with UTF-8 before being logged.
+
 log.getExceptionMessage() is not always able to extract the stack properly;
 there doesn't seem to be a good way to do so.
 Instead, it will take the stack from the last raise context, so call
