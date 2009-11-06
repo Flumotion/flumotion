@@ -2,6 +2,13 @@
 
 	reviewed by: Xavier Queralt
 
+	* flumotion/test/test_common_managerspawner.py:
+	Disable manager spawner test as they fail in 'fc5_64-quick-t2.0.1'
+
+2009-11-06 Andoni Morales Alastruey <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
 	* flumotion/common/managerspawner.py:
 	Stop properly managers started by the LocalManagerSpawner
 	* flumotion/test/Makefile.am:

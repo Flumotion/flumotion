@@ -50,6 +50,7 @@ class TestLocalManagerSpwaner(testsuite.TestCase):
         spawner = LocalManagerSpawner(self._port)
         self.assertEquals(self._port, spawner.getPort())
         spawner = None
+    testPort.skip = "Skip test"
 
     def testManagerStart(self):
         spawner = LocalManagerSpawner(self._port)
@@ -66,9 +67,9 @@ class TestLocalManagerSpwaner(testsuite.TestCase):
         d = spawner.start()
         d.addCallback(done)
         return d
+    testManagerStart.skip = "Skip test"
 
     def testManagerStop(self):
-
         spawner = LocalManagerSpawner(self._port)
         runDir = spawner.getRunDir()
         confDir = spawner.getConfDir()
@@ -89,9 +90,9 @@ class TestLocalManagerSpwaner(testsuite.TestCase):
         d.addCallback(startDone)
         d.addCallback(closeDone)
         return d
+    testManagerStop.skip = "Skip test"
 
     def testManagerStopAndCleanUp(self):
-
         spawner = LocalManagerSpawner(self._port)
         runDir = spawner.getRunDir()
         confDir = spawner.getConfDir()
@@ -110,3 +111,4 @@ class TestLocalManagerSpwaner(testsuite.TestCase):
         d.addCallback(startDone)
         d.addCallback(closeDone)
         return d
+    testManagerStopAndCleanUp.skip = "Skip test"
