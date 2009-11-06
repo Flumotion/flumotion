@@ -326,8 +326,7 @@ class AssistantSaver(object):
         audio = self._audioProducer
         if (video is not None and
             audio is not None and
-            video.componentType == audio.componentType and
-            video.worker == audio.worker):
+            video == audio):
             self._flowComponents.remove(self._audioProducer)
             if not audio.exists:
                 self._audioProducer.name = 'producer-audio-video'

@@ -1,3 +1,14 @@
+2009-11-06  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: Julien
+
+	* flumotion/admin/assistant/models.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/admin/assistant/save.py:
+	Delegate the comparisons to the component models. This way we can
+	distinguish between two firewire producers with different guid.
+	Fixes #1376
+
 2009-11-05  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/extern/log/log.py:
@@ -48,7 +59,7 @@
 	* flumotion/test/test_component_httpserver.py:
 	Test if the Connection: close header always appears.
 
-2009-11-04  Xavier Queralt,,,  <xqueralt@flumotion.com>
+2009-11-04  Xavier Queralt  <xqueralt@flumotion.com>
 
 	patch by: Andoni Morales
 

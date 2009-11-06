@@ -126,6 +126,16 @@ class Component(object, log.Loggable):
         return '<%s.%s name=%r>' % (self.__class__.__module__,
                                     self.__class__.__name__, self.name)
 
+    def __eq__(self, other):
+        if not isinstance(other, Component):
+            return False
+
+        return (self.worker == other.worker and
+                self.componentType == other.componentType)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     # Backwards compatibility
 
     @property

@@ -47,6 +47,15 @@ class FireWireProducer(AudioProducer, VideoProducer):
         self.properties.is_square = True
         self.properties.framerate = 12.5
 
+    def __eq__(self, other):
+        if not isinstance(other, FireWireProducer):
+            return False
+
+        guid1 = self.properties.get('guid', None)
+        guid2 = other.properties.get('guid', None)
+
+        return guid1 == guid2 and AudioProducer.__eq__(self, other)
+
     def getFeederName(self, component):
         if isinstance(component, AudioEncoder):
             return 'audio'
