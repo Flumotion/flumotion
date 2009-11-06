@@ -1,3 +1,15 @@
+2009-11-06 Andoni Morales Alastruey <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/common/managerspawner.py:
+	Stop properly managers started by the LocalManagerSpawner
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_common_managerspawner.py:
+	* flumotion/test/test_common_managerspawner.py (added):
+	Add a test suite for the LocalManagerSpawner
+	Close #1380
+
 2009-11-06  Xavier Queralt  <xqueralt@flumotion.com>
 
 	reviewed by: Julien

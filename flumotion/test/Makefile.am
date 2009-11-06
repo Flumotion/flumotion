@@ -28,6 +28,7 @@ EXTRA_DIST = 					\
 	test_common_eventcalendar.py		\
 	test_common_format.py			\
 	test_common_gstreamer.py		\
+	test_common_managerspawner.py		\
 	test_common_messages.py			\
 	test_common_netutils.py			\
 	test_common_package.py			\
