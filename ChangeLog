@@ -1,3 +1,14 @@
+2009-11-09  Andoni Morales Alastruey <amorales@flumotion.com>
+
+	reviewed by: Julien Le Gof
+
+	* flumotion/common/eventcalendar.py:
+	Parse properly timezones in 'TZID' with a local path 
+	prepended (e.g.:/mozilla.org/20070129_1/Europe/Madrid)
+	* flumotion/test/test_icalbouncer.py:
+	Added test for timezones with a local path in 'TZID'
+	Closes #1377
+
 2009-11-06 Andoni Morales Alastruey <amorales@flumotion.com>
 
 	reviewed by: Xavier Queralt

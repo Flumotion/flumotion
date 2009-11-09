@@ -199,6 +199,20 @@ class TestIcalBouncerTZID(TestIcalBouncerRunning, RequiredModulesMixin):
         d.addCallback(self._denied_callback)
         return d
 
+    def testDeniedLongTZID(self):
+        new_end = self.half_an_hour_ago.astimezone(self.beijing_tz)
+        naive_new_end = new_end.replace(tzinfo=None)
+
+        data = self.ical_from_specs('', self.a_day_ago,
+                                    ';TZID=/some/obscure/path/Asia/Shanghai',
+                                    naive_new_end)
+        self.bouncer = self.bouncer_from_ical(data)
+
+        keycard = keycards.KeycardGeneric()
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+        d.addCallback(self._denied_callback)
+        return d
+
     def testApprovedBothTZID(self):
         new_start = self.half_an_hour_ago.astimezone(self.beijing_tz)
         naive_new_start = new_start.replace(tzinfo=None)
@@ -207,6 +221,25 @@ class TestIcalBouncerTZID(TestIcalBouncerRunning, RequiredModulesMixin):
 
         data = self.ical_from_specs(';TZID=Asia/Shanghai', naive_new_start,
                                     ';TZID=America/Guatemala', naive_new_end)
+        self.bouncer = self.bouncer_from_ical(data)
+
+        keycard = keycards.KeycardGeneric()
+        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
+        d.addCallback(self._approved_callback)
+        return d
+
+    def testLongTZID(self):
+        # Some calendars prepend to TZID their local path
+        # e.g: TZID:/mozilla.org/200700129_1/Europe/Madrid
+        # Check that we parse it correctly as 'Europe/Madrid'
+        new_start = self.half_an_hour_ago.astimezone(self.guatemala_tz)
+        naive_new_start = new_start.replace(tzinfo=None)
+        new_end = self.in_half_an_hour.astimezone(self.guatemala_tz)
+        naive_new_end = new_end.replace(tzinfo=None)
+
+        data = self.ical_from_specs(';TZID=/mozilla.org/20070129_1/\
+                Asia/Guatemala', naive_new_start,
+                ';TZID=/some/strange/path/America/Guatemala', naive_new_end)
         self.bouncer = self.bouncer_from_ical(data)
 
         keycard = keycards.KeycardGeneric()

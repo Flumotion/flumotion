@@ -609,6 +609,23 @@ class Calendar(log.Loggable):
         return result
 
 
+def _timezoneFromTZID(timezoneInfo):
+    """
+    Returns a valid timezone from a TZID component
+    If timezoneInfo is None, return a tzinfo object representing
+    the local time, which is the Right Thing
+
+    @param timezoneInfo: A string representation of the timezone
+
+    @rtype: L{tz.tzinfo}
+    """
+    # We only care about the last 2 values in blabla/obscure/Europe/Madrid
+    # to get the time zone with tz.gettz('Europe/Madrid')
+    return timezoneInfo and \
+            tz.gettz('/'.join(timezoneInfo.split('/')[-2:])) or\
+            tz.gettz(None)
+
+
 def vDDDToDatetime(v):
     """
     Convert a vDDDType to a datetime, respecting timezones.
@@ -617,15 +634,14 @@ def vDDDToDatetime(v):
     @type  v: L{icalendar.prop.vDDDTypes}
 
     """
+    if v is None:
+        return None
     dt = _toDateTime(v.dt)
     if dt.tzinfo is None:
         # We might have a "floating" DATE-TIME value here, in
         # which case we will not have a TZID parameter; see
         # 4.3.5, FORM #3
-        # Using None as the parameter for tz.gettz will create a
-        # tzinfo object representing local time, which is the
-        # Right Thing
-        tzinfo = tz.gettz(v.params.get('TZID', None))
+        tzinfo = _timezoneFromTZID(v.params.get('TZID'))
         dt = datetime.datetime(dt.year, dt.month, dt.day,
                                dt.hour, dt.minute, dt.second,
                                dt.microsecond, tzinfo)
@@ -661,7 +677,7 @@ def fromICalendar(iCalendar):
         if end == start:
             continue
 
-        assert end >= start, "end %r should not be before start %r" % (
+        assert end > start, "end %r should not be before start %r" % (
             end, start)
 
         summary = event.decoded('SUMMARY', None)
