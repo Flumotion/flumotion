@@ -1,3 +1,9 @@
+2009-11-10  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/worker/checks/audio.py:
+	Fix a pair of stupid copy-paste programming errors that make the
+	soundcard worker check to fail from time to time.
+
 2009-11-09  Andoni Morales Alastruey <amorales@flumotion.com>
 
 	reviewed by: Julien Le Gof

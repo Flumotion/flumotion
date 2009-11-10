@@ -114,8 +114,7 @@ def getAudioDevices(source_factory, mid=None):
             m = messages.Error(T_(
                     N_("Could not find any device in the system.\n"
                        "Please check whether the device is correctly plugged "
-                       "in and whether the modules are correctly loaded."),
-                    sound_system))
+                       "in and whether the modules are correctly loaded.")))
 
             m.id = mid
             result.add(m)
@@ -184,11 +183,6 @@ def checkMixerTracks(source_factory, device, mid=None):
                 return result
 
         return failure
-
-    pipeline = ('%s name=source device=%s ! fakesink') % (
-                source_factory, device)
-    d = do_element_check(pipeline, 'source', get_tracks,
-                         set_state_deferred=True)
 
     pipeline = ('%s name=source device=%s ! fakesink') % (
                 source_factory, device)
