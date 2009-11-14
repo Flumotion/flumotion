@@ -351,7 +351,14 @@ class ConfigEntryComponent(log.Loggable):
 
 
 class ConfigEntryFlow:
-    "I represent a <flow> entry in a planet config file"
+    """
+    I represent a <flow> entry in a planet config file.
+
+    @ivar name:       name of flow
+    @type name:       str
+    @ivar components: dict of name -> component config
+    @type components: dict of str -> L{ConfigEntryComponent}
+    """
 
     def __init__(self, name, components):
         self.name = name
