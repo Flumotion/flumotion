@@ -12,58 +12,58 @@ Release:        @PACKAGE_VERSION_RELEASE@%{?dist}
 Summary:        Streaming Server based on GStreamer and Twisted
 
 Group:          Applications/Internet
-License:	GPL
+License:        GPL
 URL:            http://www.flumotion.net/
 Source:         http://www.flumotion.net/src/flumotion/%{name}-%{version}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
-Requires:	python >= 2.4
-Requires:	%{gstreamer} >= %{gst_minver}
-Requires:	%{gstreamer}-plugins-base >= %{gstpb_minver}
-Requires:	%{gstreamer}-python >= %{gstpy_minver}
-Requires:	python-twisted-core >= 2.4.0
-Requires:	python-twisted-conch
-Requires:	python-dateutil
-Requires:	pygtk2-libglade
-Requires:	pygtk2 >= %{pygtk_minver}
-Requires:	python-imaging
-Requires:	pyOpenSSL
-Requires:	pkgconfig
+Requires:       python >= 2.4
+Requires:       %{gstreamer} >= %{gst_minver}
+Requires:       %{gstreamer}-plugins-base >= %{gstpb_minver}
+Requires:       %{gstreamer}-python >= %{gstpy_minver}
+Requires:       python-twisted-core >= 2.4.0
+Requires:       python-twisted-conch
+Requires:       python-dateutil
+Requires:       pygtk2-libglade
+Requires:       pygtk2 >= %{pygtk_minver}
+Requires:       python-imaging
+Requires:       pyOpenSSL
+Requires:       pkgconfig
 Requires:       python-crypto
-Requires:	python-kiwi >= %{kiwi_minver}
+Requires:       python-kiwi >= %{kiwi_minver}
 
 # for make-dummy-cert to work
-Requires(post):	openssl
+Requires(post): openssl
 
-BuildRequires:	%{gstreamer}-devel >= %{gst_minver}
-BuildRequires:	%{gstreamer}-python >= %{gstpy_minver}
-BuildRequires:	python-twisted-core >= 2.4.0
-BuildRequires:	python-twisted-names
-BuildRequires:	python-twisted-web
+BuildRequires:  %{gstreamer}-devel >= %{gst_minver}
+BuildRequires:  %{gstreamer}-python >= %{gstpy_minver}
+BuildRequires:  python-twisted-core >= 2.4.0
+BuildRequires:  python-twisted-names
+BuildRequires:  python-twisted-web
 BuildRequires:  python-twisted-conch
 BuildRequires:  python-dateutil
 BuildRequires:  pygtk2-libglade
-BuildRequires:	python-devel >= 2.4
-BuildRequires:	pygtk2-devel >= %{pygtk_minver}
-BuildRequires:	gtk2-devel
-BuildRequires:	python-kiwi >= %{kiwi_minver}
+BuildRequires:  python-devel >= 2.4
+BuildRequires:  pygtk2-devel >= %{pygtk_minver}
+BuildRequires:  gtk2-devel
+BuildRequires:  python-kiwi >= %{kiwi_minver}
 
 # docs
-BuildRequires:	epydoc
+BuildRequires:  epydoc
 BuildRequires:  xorg-x11-server-Xvfb
 
 # sigh, libtool
 BuildRequires:  gcc-c++
 
-BuildRequires:	desktop-file-utils
+BuildRequires:  desktop-file-utils
 
 # even though intltool is included, this dependency pulls in perl(XML::Parser)
 # which is needed at configure time.
-BuildRequires:	gettext
-BuildRequires:	intltool
+BuildRequires:  gettext
+BuildRequires:  intltool
 
 # since we compile pytrayicon, we're no longer noarch
-# BuildArch:	noarch
+# BuildArch:    noarch
 
 %description
 Flumotion is a GPL streaming media server written in Python. It is distributed
@@ -114,8 +114,8 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/flumotion
 # install service files
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
 install -m 755 \
-	doc/redhat/flumotion \
-	$RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
+        doc/redhat/flumotion \
+        $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
 
 # create log and run and cache and lib rrd directory
 install -d $RPM_BUILD_ROOT%{_localstatedir}/log/flumotion
@@ -134,11 +134,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %pre
 /usr/sbin/useradd -s /sbin/nologin \
-	-r -d %{_localstatedir}/cache/flumotion -M \
-	flumotion > /dev/null 2> /dev/null || :
+        -r -d %{_localstatedir}/cache/flumotion -M \
+        flumotion > /dev/null 2> /dev/null || :
 # for old installs, we need to move the homedir
 /usr/sbin/usermod -d %{_localstatedir}/cache/flumotion \
-	flumotion > /dev/null 2> /dev/null || :
+        flumotion > /dev/null 2> /dev/null || :
 
 %post
 /sbin/chkconfig --add flumotion
@@ -238,7 +238,7 @@ fi
 %doc ChangeLog COPYING README AUTHORS flumotion.doap
 %doc doc/reference/html
 %doc conf
-%config %{_sysconfdir}/logrotate.d/flumotion
+%config(noreplace) %{_sysconfdir}/logrotate.d/flumotion
 %{_bindir}/flumotion-manager
 %{_bindir}/flumotion-worker
 %{_bindir}/flumotion-admin
