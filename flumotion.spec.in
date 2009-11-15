@@ -1,4 +1,4 @@
-%define         gst_minver      0.10.10
+%define         gst_minver      0.10.11
 %define         gstpb_minver    0.10.10
 %define         gstpy_minver    0.10.4
 %define         pygtk_minver    2.8.4
@@ -56,6 +56,9 @@ BuildRequires:  xorg-x11-server-Xvfb
 BuildRequires:  gcc-c++
 
 BuildRequires:	desktop-file-utils
+
+# even though intltool is included, this dependency pulls in perl(XML::Parser)
+# which is needed at configure time.
 BuildRequires:	gettext
 BuildRequires:	intltool
 
