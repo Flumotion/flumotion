@@ -208,8 +208,19 @@
       </dependencies>
       <directories>
         <directory name="flumotion/component/misc/httpserver">
-          <filename location="cachedprovider.py" />
+          <filename location="cachemanager.py" />
           <filename location="cachestats.py" />
+        </directory>
+      </directories>
+    </bundle>
+
+    <bundle name="localcached-provider-plug">
+      <dependencies>
+        <dependency name="cached-provider-plug" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/misc/httpserver">
+          <filename location="cachedprovider.py" />
         </directory>
       </directories>
     </bundle>

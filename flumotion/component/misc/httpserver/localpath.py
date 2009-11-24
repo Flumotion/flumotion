@@ -21,35 +21,25 @@
 
 import os
 
-from twisted.web import static
-
 from flumotion.component.misc.httpserver import fileprovider
+from flumotion.component.misc.httpserver import mimetypes
 from flumotion.component.misc.httpserver.fileprovider import InsecureError
 from flumotion.component.misc.httpserver.fileprovider import NotFoundError
 
 
-def loadMimeTypes():
-    # Add our own mime types to the ones parsed from /etc/mime.types
-    d = static.loadMimeTypes()
-    d['.flv'] = 'video/x-flv'
-    d['.mp4'] = 'video/mp4'
-    return d
-
-
 class LocalPath(fileprovider.FilePath):
 
-    contentTypes = loadMimeTypes()
+    contentTypes = mimetypes.MimeTypes()
 
     # Override parent class property by an attribute
     mimeType = None
 
     def __init__(self, path):
         self.path = path
-        ext = os.path.splitext(path)[1]
-        self.mimeType = self.contentTypes.get(ext.lower(), None)
+        self.mimeType = self.contentTypes.fromPath(path)
 
     def __str__(self):
-        return "<LocalPath '%s'>" % self.path
+        return "<%s '%s'>" % (type(self).__name__, self.path)
 
     def child(self, name):
         childpath = self._getChildPath(name)

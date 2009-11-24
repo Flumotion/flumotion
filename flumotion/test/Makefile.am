@@ -20,6 +20,7 @@ EXTRA_DIST = 					\
 	test_admin_connections.py		\
 	test_admin_multi.py			\
 	test_checkers.py			\
+	test_cache_manager.py			\
 	test_common.py				\
 	test_common_avltree.py			\
 	test_common_bundle.py			\
@@ -49,6 +50,8 @@ EXTRA_DIST = 					\
 	test_component_feed.py			\
 	test_component_feedcomponent.py     \
 	test_component_httpserver.py		\
+	test_component_httpserver_httpcached_httputils.py	\
+	test_component_httpserver_httpcached_stats.py	\
 	test_component_httpstreamer.py		\
 	test_component_init.py			\
 	test_component_padmonitor.py		\
@@ -84,6 +87,7 @@ EXTRA_DIST = 					\
 	test_reflect.py				\
 	test_registry.py			\
 	test_saltsha256.py			\
+	test_server_selector.py			\
 	test_testclasses.py			\
 	test_twisted_integration.py		\
 	test_ui_fgtk.py				\

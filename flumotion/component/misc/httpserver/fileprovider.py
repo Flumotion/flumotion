@@ -29,6 +29,14 @@ class FileError(Exception):
     """
 
 
+class FileOutOfDate(FileError):
+    """
+    I am raised when trying an operation on a file that changed since
+    it has been open, and nothing can be done to ensure the integrity
+    of the data.
+    """
+
+
 class InsecureError(FileError):
     """
     I am raised when trying to build an insecure path using FilePath.
@@ -62,6 +70,12 @@ class FileClosedError(FileError):
     """
 
 
+class UnavailableError(FileError):
+    """
+    I am raised when a plug cannot provide the requested service.
+    """
+
+
 class FilePath(object):
     """
     I am pointing at a path in the file repository.
@@ -91,7 +105,8 @@ class FilePath(object):
     def open(self):
         """
         @return: the pointed file opened as an asynchronous file
-        @rtype:  L{AsyncFile}
+                 or a deferred that will be called back with one.
+        @rtype:  L{AsyncFile} | L{defer.Deferred}
         @raises NotFoundError: if the file does not exists anymore
         @raises AccessError: if the file cannot be opened
                              because of right restriction

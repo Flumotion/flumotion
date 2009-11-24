@@ -1,3 +1,70 @@
+2009-11-24  Marc-André Lureau  <mlureau@flumotion.com>
+
+	* configure.ac:
+	* flumotion/component/misc/httpserver/Makefile.am:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/cachemanager.py:
+	* flumotion/component/misc/httpserver/fileprovider.py:
+	* flumotion/component/misc/httpserver/httpcached/Makefile.am:
+	* flumotion/component/misc/httpserver/httpcached/common.py:
+	* flumotion/component/misc/httpserver/httpcached/file_provider.py:
+	* flumotion/component/misc/httpserver/httpcached/file_reader.py:
+	* flumotion/component/misc/httpserver/httpcached/http_client.py:
+	* flumotion/component/misc/httpserver/httpcached/http_utils.py:
+	* flumotion/component/misc/httpserver/httpcached/httpcached.xml:
+	* flumotion/component/misc/httpserver/httpcached/request_manager.py:
+	* flumotion/component/misc/httpserver/httpcached/resource_manager.py:
+	* flumotion/component/misc/httpserver/httpcached/server_selection.py:
+	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
+	* flumotion/component/misc/httpserver/httpcached/strategy_basic.py:
+	* flumotion/component/misc/httpserver/httpfile.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/localpath.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_cache_manager.py:
+	* flumotion/test/test_component_httpserver_httpcached_strategy.py:
+	* flumotion/test/test_component_providers.py:
+	* flumotion/test (svn:ignore):
+	* flumotion/component/misc/httpserver/httpcached (svn:ignore):
+	*  (svnmerge-integrated):
+	* flumotion/test/test_component_httpserver_httpcached_strategy.py
+	  (added):
+	* flumotion/test/test_server_selector.py (added):
+	* flumotion/test/test_cache_manager.py (added):
+	* flumotion/test/test_component_httpserver_httpcached_stats.py
+	  (added):
+	* flumotion/test/test_component_httpserver_httpcached_httputils.py
+	  (added):
+	* flumotion/component/misc/httpserver/cachemanager.py (added):
+	* flumotion/component/misc/httpserver/mimetypes.py (added):
+	* flumotion/component/misc/httpserver/httpcached (added):
+	* flumotion/component/misc/httpserver/httpcached/common.py (added):
+	* flumotion/component/misc/httpserver/httpcached/file_provider.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/server_selection.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/strategy_base.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/http_client.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/__init__.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/http_utils.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/httpcached.xml
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/file_reader.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/resource_manager.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/Makefile.am
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/request_manager.py
+	  (added):
+	* flumotion/component/misc/httpserver/httpcached/strategy_basic.py
+	  (added):
+	Merged 'fileprovider-httpcached' branch.
+
 2009-11-24  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Julien LeGof 

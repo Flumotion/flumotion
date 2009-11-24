@@ -1,0 +1,78 @@
+<registry>
+
+  <plugs>
+
+    <plug socket="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug"
+          type="fileprovider-httpcached"
+          _description="Provides files from an HTTP server, with local caching.">
+      <entries>
+        <entry type="default"
+               location="flumotion/component/misc/httpserver/httpcached/file_provider.py"
+               function="FileProviderHTTPCachedPlug" />
+      </entries>
+
+      <properties>
+        <property name="cache-dir" type="string"
+                  _description="The directory where the files are cached.  Multiple components can share the same cache-dir, but then should also share the same cache-size." />
+        <property name="cache-size" type="int"
+                  _description="The maximum size of the cache directory (in MB, defaults to 1000)" />
+        <property name="cleanup-enabled" type="bool"
+                  _description="Whether the cache should be monitored and cleaned up; if False, files will be served from the original location instead of from the cache" />
+        <property name="cleanup-high-watermark" type="float"
+                  _description="Cache fill level that triggers cleanup (from 0.0 to 1.0, defaults to 1.0).  If more than one component share the same cache directory, it's recommended to use slightly different values for each." />
+        <property name="cleanup-low-watermark" type="float"
+                  _description="Cache fill level to drop back to after cleanup (from 0.0 to 1.0, defaults to 0.6)" />
+		<property name="cache-ttl" type="int" required="no"
+                  _description="The time in second after which cached files are checked against the server for expiration (default: 300)." />
+		<property name="server-hostname" type="string" required="yes"
+                  _description="The hostname of the resource server to use for performing HTTP request." />
+		<property name="server-port" type="int" required="no"
+                  _description="The port of the resource server to use for performing HTTP request (default: 80)." />
+		<property name="dns-refresh" type="int" required="no"
+                  _description="The period of refresh for DNS resolution in seconds (default: 60)." />
+		<property name="connection-timeout" type="int" required="no"
+                  _description="The timeout in seconds when connecting to a server (default: 5)." />
+		<property name="idle-timeout" type="int" required="no"
+                  _description="The timeout in seconds when not receiving data from a server (default: 5)." />
+		<property name="proxy-name" type="string" required="no" multiple="yes"
+                  _description="HTTP Proxy definition with format hostname:port#priority. The port and priority are not required and the default values are 3128 for port and 1 for priority. This property is mean for compatibility, use the compound property 'proxy' instead." />
+        <compound-property name="proxy" required="no" multiple="yes"
+        		  _description="HTTP proxy properties.">
+			<property name="hostname" type="string" required="yes"
+                      _description="The hostname of a proxy to use to retrieve resources." />
+			<property name="port" type="int" required="no"
+                      _description="The proxy's port to use to retrieve resources (default: 3128)." />
+			<property name="priority" type="int" required="no"
+                      _description="The proxy priority order (default: 1)." />
+        </compound-property>
+
+      </properties>
+    </plug>
+
+  </plugs>
+
+  <bundles>
+
+    <bundle name="httpcached-provider-plug">
+      <dependencies>
+        <dependency name="cached-provider-plug" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/misc/httpserver/httpcached">
+          <filename location="common.py" />
+          <filename location="file_provider.py" />
+          <filename location="file_reader.py" />
+          <filename location="http_client.py" />
+          <filename location="http_utils.py" />
+          <filename location="request_manager.py" />
+          <filename location="resource_manager.py" />
+          <filename location="server_selection.py" />
+          <filename location="strategy_base.py" />
+          <filename location="strategy_basic.py" />
+        </directory>
+      </directories>
+    </bundle>
+
+  </bundles>
+
+</registry>

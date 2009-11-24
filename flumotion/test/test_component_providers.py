@@ -218,12 +218,13 @@ class CachedProviderFileTest(testsuite.TestCase):
                                     "cache-dir": self.cache_path}}
         self.fileProviderPlug = \
             cachedprovider.FileProviderLocalCachedPlug(plugProps)
-        self.fileProviderPlug.start(None)
+        d = self.fileProviderPlug.start(None)
         self.dataSize = 7
         self.data = "foo bar"
         # the old parameter assures newer files will be taken into account
         # (avoid timing problems), like in testModifySrc
         self.testFileName = self.createFile('a', self.data, old=True)
+        return d
 
     def tearDown(self):
         self.fileProviderPlug.stop(None)
@@ -257,28 +258,30 @@ class CachedProviderFileTest(testsuite.TestCase):
     def testCachedFile(self):
         d = self.openFile('a')
         d.addCallback(self.readFile, self.dataSize)
-        d.addCallback(pass_through, self.cachedFile.close)
         d.addCallback(delay, 1)
+        d.addCallback(pass_through, self.cachedFile.close)
 
         d.addCallback(lambda _: self.getCachePath(self.testFileName))
-        d.addCallback(lambda p: self.failUnless(os.path.exists(p)))
+        d.addCallback(self.checkPathExists)
         return d
 
     def testSimpleIntegrity(self):
-
         d = self.openFile('a')
         d.addCallback(self.readFile, self.dataSize)
         d.addCallback(pass_through, self.cachedFile.close)
 
-        d.addCallback(lambda data:\
-                    self.failUnlessEqual(self.data, data))
+        d.addCallback(lambda data:
+                          self.failUnlessEqual(self.data, data))
         return d
 
     def getCachePath(self, path):
-        return self.fileProviderPlug.getCachePath(path)
+        return self.fileProviderPlug.cache.getCachePath(path)
 
     def getTempPath(self, path):
         return self.fileProviderPlug.getTempPath(path)
+
+    def checkPathExists(self, p):
+        self.failUnless(os.path.exists(p))
 
     def createFile(self, name, data, old=False):
         testFileName = os.path.join(self.src_path, name)
@@ -292,7 +295,7 @@ class CachedProviderFileTest(testsuite.TestCase):
 
     def openFile(self, name):
         self.cachedFile = \
-                    self.fileProviderPlug.getRootPath().child(name).open()
+            self.fileProviderPlug.getRootPath().child(name).open()
         return defer.succeed(self.cachedFile)
 
     def readFile(self, _, size):

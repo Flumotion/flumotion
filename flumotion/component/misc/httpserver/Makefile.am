@@ -1,10 +1,13 @@
 include $(top_srcdir)/common/python.mk
 
+SUBDIRS = httpcached
+
 httpserverdir = $(libdir)/flumotion/python/flumotion/component/misc/httpserver
 
 httpserver_PYTHON =		\
 	__init__.py		\
 	admin_gtk.py		\
+	cachemanager.py	\
 	cachedprovider.py	\
 	cachestats.py		\
 	fileprovider.py		\
@@ -14,7 +17,8 @@ httpserver_PYTHON =		\
 	localprovider.py	\
 	ratecontrol.py          \
 	serverstats.py		\
-	metadataprovider.py
+	metadataprovider.py \
+	mimetypes.py
 
 httpserver_DATA = 		\
 	httpfile.glade		\

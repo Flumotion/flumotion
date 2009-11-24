@@ -30,6 +30,7 @@ from twisted.internet import defer, reactor, abstract
 
 from flumotion.common import log, format, common, python
 from flumotion.component.misc.httpserver import cachestats
+from flumotion.component.misc.httpserver import cachemanager
 from flumotion.component.misc.httpserver import fileprovider
 from flumotion.component.misc.httpserver import localpath
 from flumotion.component.misc.httpserver.fileprovider import FileClosedError
@@ -38,23 +39,39 @@ from flumotion.component.misc.httpserver.fileprovider import NotFoundError
 
 
 SEEK_SET = 0 # os.SEEK_SET is not defined in python 2.4
-DEFAULT_CACHE_SIZE = 1000
-DEFAULT_CLEANUP_HIGH_WATERMARK = 1.0
-DEFAULT_CLEANUP_LOW_WATERMARK = 0.6
 FILE_COPY_BUFFER_SIZE = abstract.FileDescriptor.bufferSize
-TEMP_FILE_POSTFIX = ".tmp"
 MAX_LOGNAME_SIZE = 30 # maximum number of characters to use for logging a path
-ID_CACHE_MAX_SIZE = 1024
 
 
 LOG_CATEGORY = "fileprovider-localcached"
 
-_errorLookup = {errno.ENOENT: NotFoundError,
-                errno.EISDIR: fileprovider.CannotOpenError,
-                errno.EACCES: fileprovider.AccessError}
+
+errnoLookup = {errno.ENOENT: fileprovider.NotFoundError,
+               errno.EISDIR: fileprovider.CannotOpenError,
+               errno.EACCES: fileprovider.AccessError}
 
 
-class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
+def open_stat(path, mode='rb'):
+    """
+    @rtype: (file, statinfo)
+    """
+    try:
+        file = open(path, mode)
+        fd = file.fileno()
+    except IOError, e:
+        cls = errnoLookup.get(e.errno, fileprovider.FileError)
+        raise cls("Failed to open file '%s': %s" % (path, str(e)))
+    try:
+        info = os.fstat(fd)
+    except OSError, e:
+        file.close()
+        cls = errnoLookup.get(e.errno, fileprovider.FileError)
+        raise cls("Failed to stat file '%s': %s" % (path, str(e)))
+    return file, info
+
+
+class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug,
+                                  log.Loggable):
     """
 
     WARNING: Currently does not work properly in combination with rate-control.
@@ -82,44 +99,36 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
     def __init__(self, args):
         props = args['properties']
         self._sourceDir = props.get('path')
-        self._cacheDir = props.get('cache-dir', "/tmp")
-        cacheSizeInMB = int(props.get('cache-size', DEFAULT_CACHE_SIZE))
-        self._cacheSize = cacheSizeInMB * 10 ** 6 # in bytes
-        self._cleanupEnabled = props.get('cleanup-enabled', True)
-        highWatermark = props.get('cleanup-high-watermark',
-            DEFAULT_CLEANUP_HIGH_WATERMARK)
-        highWatermark = max(0.0, min(1.0, float(highWatermark)))
-        lowWatermark = props.get('cleanup-low-watermark',
-            DEFAULT_CLEANUP_LOW_WATERMARK)
-        lowWatermark = max(0.0, min(1.0, float(lowWatermark)))
-        self._identifiers = {} # {path: identifier}
+        cacheDir = props.get('cache-dir')
+        cacheSizeInMB = props.get('cache-size')
+        if cacheSizeInMB is not None:
+            cacheSize = cacheSizeInMB * 10 ** 6 # in bytes
+        else:
+            cacheSize = None
+        cleanupEnabled = props.get('cleanup-enabled')
+        cleanupHighWatermark = props.get('cleanup-high-watermark')
+        cleanupLowWatermark = props.get('cleanup-low-watermark')
+
         self._sessions = {} # {CopySession: None}
         self._index = {} # {path: CopySession}
 
-        self.info("Cached file provider initialized")
-        self.debug("Source directory: '%s'", self._sourceDir)
-        self.debug("Cache directory: '%s'", self._cacheDir)
-        self.debug("Cache size: %d bytes", self._cacheSize)
-        self.debug("Cache cleanup enabled: %s", self._cleanupEnabled)
-
-        common.ensureDir(self._sourceDir, "source")
-        common.ensureDir(self._cacheDir, "cache")
-
-        self._cacheUsage = None # in bytes
-        self._cacheUsageLastUpdate = None
-        self._lastCacheTime = None
-        self._cacheMaxUsage = self._cacheSize * highWatermark # in bytes
-        self._cacheMinUsage = self._cacheSize * lowWatermark # in bytes
         self.stats = cachestats.CacheStatistics()
 
-        # Initialize cache usage
-        self.updateCacheUsage()
+        self.cache = cachemanager.CacheManager(self.stats,
+                                               cacheDir, cacheSize,
+                                               cleanupEnabled,
+                                               cleanupHighWatermark,
+                                               cleanupLowWatermark)
+
+        common.ensureDir(self._sourceDir, "source")
 
         # Startup copy thread
         self._thread = CopyThread(self)
 
     def start(self, component):
-        self._thread.start()
+        d = self.cache.setUp()
+        d.addCallback(lambda x: self._thread.start())
+        return d
 
     def stop(self, component):
         self._thread.stop()
@@ -156,159 +165,6 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug, log.Loggable):
         if len(basename) > prefixMaxLen:
             basename = basename[:prefixMaxLen-1] + "*"
         return basename + postfix
-
-    def getIdentifier(self, path):
-        """
-        Returns an identifier for a path.
-        The identifier is a digest of the path encoded in hex string.
-        The hash function used is SHA1.
-        It caches the identifiers in a dictionary indexed by path and with
-        a maximum number of entry specified by the constant ID_CACHE_MAX_SIZE.
-        """
-        ident = self._identifiers.get(path, None)
-        if ident is None:
-            hash = python.sha1()
-            hash.update(path)
-            ident = hash.digest().encode("hex").strip('\n')
-            # Prevent the cache from growing endlessly
-            if len(self._identifiers) >= ID_CACHE_MAX_SIZE:
-                self._identifiers.clear()
-            self._identifiers[path] = ident
-        return ident
-
-    def getCachePath(self, path):
-        ident = self.getIdentifier(path)
-        return os.path.join(self._cacheDir, ident)
-
-    def getTempPath(self, path):
-        ident = self.getIdentifier(path)
-        return os.path.join(self._cacheDir, ident + TEMP_FILE_POSTFIX)
-
-    def updateCacheUsageStatistics(self):
-        self.stats.onEstimateCacheUsage(self._cacheUsage, self._cacheSize)
-
-    def updateCacheUsage(self):
-        """
-        @returns: the cache usage, in bytes
-        """
-        # Only calculate cache usage if the cache directory
-        # modification time changed since the last time we looked at it.
-        cacheTime = os.path.getmtime(self._cacheDir)
-        if ((self._cacheUsage is None) or (self._lastCacheTime < cacheTime)):
-            self._lastCacheTime = cacheTime
-            os.chdir(self._cacheDir)
-
-            # There's a possibility here that we got the filename from
-            # os.listdir, but before we get to os.stat, the file is gone. We'll
-            # get a OSError with a ENOENT errno and we should ignore that file,
-            # since we're just estimating the amount of space taken by the
-            # cache
-            sizes = []
-            for f in os.listdir('.'):
-                try:
-                    sizes.append(os.path.getsize(f))
-                except OSError, e:
-                    if e.errno == errno.ENOENT:
-                        pass
-                    else:
-                        raise
-
-            self._cacheUsage = sum(sizes)
-            self.updateCacheUsageStatistics()
-            self._cacheUsageLastUpdate = time.time()
-        return self._cacheUsage
-
-    def allocateCacheSpace(self, size):
-        """
-        Try to reserve cache space.
-
-        If there is not enough space and the cache cleanup is enabled,
-        it will delete files from the cache starting with the ones
-        with oldest access time until the cache usage drops below
-        the fraction specified by the property cleanup-low-threshold.
-
-        Returns a 'tag' that should be used to 'free' the cache space
-        using releaseCacheSpace.
-        This tag is needed to better estimate the cache usage,
-        if the cache usage has been updated since cache space
-        has been allocated, freeing up the space should not change
-        the cache usage estimation.
-
-        @param size: size to reserve, in bytes
-        @type  size: int
-
-        @returns: an allocation tag or None if the allocation failed.
-        @rtype:   tuple
-        """
-        usage = self.updateCacheUsage()
-        if (usage + size) < self._cacheMaxUsage:
-            self._cacheUsage += size
-            self.updateCacheUsageStatistics()
-            return (self._cacheUsageLastUpdate, size)
-
-        self.debug('cache usage will be %sbytes, need more cache',
-            format.formatStorage(usage + size))
-
-        if not self._cleanupEnabled:
-            self.debug('not allowed to clean up cache, so cannot cache')
-            # No space available and cleanup disabled: allocation failed.
-            return None
-
-        # Update cleanup statistics
-        self.stats.onCleanup()
-        # List the cached files with file state
-        os.chdir(self._cacheDir)
-
-        files = []
-        for f in os.listdir('.'):
-            # There's a possibility of getting an error on os.stat here. See
-            # similar comment in updateCacheUsage()
-            try:
-                files.append((f, os.stat(f)))
-            except OSError, e:
-                if e.errno == errno.ENOENT:
-                    pass
-                else:
-                    raise
-
-        # Calculate the cached file total size
-        usage = sum([d[1].st_size for d in files])
-        # Delete the cached file starting by the oldest accessed ones
-        files.sort(key=lambda d: d[1].st_atime)
-        for path, info in files:
-            try:
-                os.remove(path)
-                usage -= info.st_size
-            except OSError, e:
-                if e.errno == errno.ENOENT:
-                    # Already been deleted by another process,
-                    # but subtract the size anyway
-                    usage -= info.st_size
-                else:
-                    self.warning("Error cleaning cached file: %s", str(e))
-            if usage <= self._cacheMinUsage:
-                # We reach the cleanup limit
-                self.debug('cleaned up, cache use is now %sbytes',
-                    format.formatStorage(usage))
-                break
-
-        # Update the cache usage
-        self._cacheUsage = usage
-        self._cacheUsageLastUpdate = time.time()
-        if (usage + size) < self._cacheSize:
-            # There is enough space to allocate, allocation succeed
-            self._cacheUsage += size
-            self.updateCacheUsageStatistics()
-            return (self._cacheUsageLastUpdate, size)
-        # There is no enough space, allocation failed
-        self.updateCacheUsageStatistics()
-        return None
-
-    def releaseCacheSpace(self, tag):
-        lastUpdate, size = tag
-        if lastUpdate == self._cacheUsageLastUpdate:
-            self._cacheUsage -= size
-            self.updateCacheUsageStatistics()
 
     def getCopySession(self, path):
         return self._index.get(path, None)
@@ -380,7 +236,7 @@ class LocalPath(localpath.LocalPath, log.Loggable):
     ## Private Methods ##
 
     def _removeCachedFile(self, sourcePath):
-        cachePath = self.plug.getCachePath(sourcePath)
+        cachePath = self.plug.cache.getCachePath(sourcePath)
         try:
             os.remove(cachePath)
             self.debug("Deleted cached file '%s'", cachePath)
@@ -461,8 +317,8 @@ class CopySession(log.Loggable):
         self.logName = plug.getLogName(sourcePath, sourceFile.fileno())
         self.copying = None # Not yet started
         self.sourcePath = sourcePath
-        self.tempPath = plug.getTempPath(sourcePath)
-        self.cachePath = plug.getCachePath(sourcePath)
+        self.tempPath = plug.cache.getTempPath(sourcePath)
+        self.cachePath = plug.cache.getCachePath(sourcePath)
         # The size and modification time is not supposed to change over time
         self.mtime = sourceInfo[stat.ST_MTIME]
         self.size = sourceInfo[stat.ST_SIZE]
@@ -535,7 +391,7 @@ class CopySession(log.Loggable):
             stats.onBytesRead(len(data), 0, 0)
             return data
         except IOError, e:
-            cls = _errorLookup.get(e.errno, FileError)
+            cls = errnoLookup.get(e.errno, FileError)
             raise cls("Failed to read source file: %s" % str(e))
 
     def incRef(self):
@@ -548,8 +404,8 @@ class CopySession(log.Loggable):
         if (self._refCount == 1) and self._cancelled:
             # Cancel the copy and close the writing temporary file.
             self._cancelCopy(False, True)
-        # We close if not still copying source file
-        if (self._refCount == 0) and (self._wTempFile is None):
+        # We close if the copy is finished (if _copied is None)
+        if (self._refCount == 0) and (self._copied is None):
             self.close()
 
     def close(self):
@@ -621,15 +477,11 @@ class CopySession(log.Loggable):
 
     def _allocCacheSpace(self):
         # Retrieve a cache allocation tag, used to track the cache free space
-        tag = self.plug.allocateCacheSpace(self.size)
-        if tag is None:
-            return False
-        self._allocTag = tag
-        return True
+        return self.plug.cache.allocateCacheSpace(self.size)
 
     def _releaseCacheSpace(self):
         if not (self._cancelled or self._allocTag is None):
-            self.plug.releaseCacheSpace(self._allocTag)
+            self.plug.cache.releaseCacheSpace(self._allocTag)
         self._allocTag = None
 
     def _cancelSession(self):#
@@ -643,12 +495,10 @@ class CopySession(log.Loggable):
                 # Cancel and close the temp write file.
                 self._cancelCopy(False, True)
 
-    def _startCopying(self):
-        self.log("Start copy session")
-        # First ensure there is not already a temporary file
-        self._removeTempFile()
-        # Reserve cache space, may trigger a cache cleanup
-        if not self._allocCacheSpace():
+    def _gotCacheSpace(self, tag):
+        self._allocTag = tag
+
+        if not tag:
             # No free space, proxying source file directly
             self._cancelSession()
             return
@@ -690,6 +540,15 @@ class CopySession(log.Loggable):
         # Activate the copy
         self.copying = True
         self.plug.activateSession(self)
+
+    def _startCopying(self):
+        self.log("Start copy session")
+        # First ensure there is not already a temporary file
+        self._removeTempFile()
+        # Reserve cache space, may trigger a cache cleanup
+        d = self._allocCacheSpace()
+        d.addCallback(self._gotCacheSpace)
+        return d
 
     def _cancelCopy(self, closeSource, closeTempWrite):
         if self.copying:
@@ -903,21 +762,21 @@ class DirectFileDelegate(log.Loggable):
         try:
             return self._file.tell()
         except IOError, e:
-            cls = _errorLookup.get(e.errno, FileError)
+            cls = errnoLookup.get(e.errno, FileError)
             raise cls("Failed to tell position in file: %s" % str(e))
 
     def seek(self, offset):
         try:
             self._file.seek(offset, SEEK_SET)
         except IOError, e:
-            cls = _errorLookup.get(e.errno, FileError)
+            cls = errnoLookup.get(e.errno, FileError)
             raise cls("Failed to seek in cached file: %s" % str(e))
 
     def read(self, size):
         try:
             return self._file.read(size)
         except IOError, e:
-            cls = _errorLookup.get(e.errno, FileError)
+            cls = errnoLookup.get(e.errno, FileError)
             raise cls("Failed to read data from file: %s" % str(e))
 
     def close(self):
@@ -928,7 +787,7 @@ class DirectFileDelegate(log.Loggable):
                 finally:
                     self._file = None
             except IOError, e:
-                cls = _errorLookup.get(e.errno, FileError)
+                cls = errnoLookup.get(e.errno, FileError)
                 raise cls("Failed to close file: %s" % str(e))
 
 
@@ -995,7 +854,7 @@ class CachedFile(fileprovider.File, log.Loggable):
                 return d
             return defer.succeed(d)
         except IOError, e:
-            cls = _errorLookup.get(e.errno, FileError)
+            cls = errnoLookup.get(e.errno, FileError)
             return defer.fail(cls("Failed to read cached data: %s", str(e)))
         except:
             return defer.fail()
@@ -1015,23 +874,6 @@ class CachedFile(fileprovider.File, log.Loggable):
 
     ## Private Methods ##
 
-    def _open(self, path):
-        """
-        @rtype: (file, statinfo)
-        """
-        try:
-            file = open(path, 'rb')
-            fd = file.fileno()
-        except IOError, e:
-            cls = _errorLookup.get(e.errno, FileError)
-            raise cls("Failed to open file '%s': %s" % (path, str(e)))
-        try:
-            info = os.fstat(fd)
-        except OSError, e:
-            cls = _errorLookup.get(e.errno, FileError)
-            raise cls("Failed to stat file '%s': %s" % (path, str(e)))
-        return file, info
-
     def _closeSourceFile(self, sourceFile):
         self.log("Closing source file [fd %d]", sourceFile.fileno())
         try:
@@ -1042,10 +884,10 @@ class CachedFile(fileprovider.File, log.Loggable):
 
     def _selectDelegate(self):
         sourcePath = self._path
-        cachedPath = self.plug.getCachePath(sourcePath)
+        cachedPath = self.plug.cache.getCachePath(sourcePath)
         # Opening source file
         try:
-            sourceFile, sourceInfo = self._open(sourcePath)
+            sourceFile, sourceInfo = open_stat(sourcePath)
             self.log("Opened source file [fd %d]", sourceFile.fileno())
         except NotFoundError:
             self.debug("Source file not found")
@@ -1056,7 +898,7 @@ class CachedFile(fileprovider.File, log.Loggable):
         self.logName = self.plug.getLogName(self._path, sourceFile.fileno())
         # Opening cached file
         try:
-            cachedFile, cachedInfo = self._open(cachedPath)
+            cachedFile, cachedInfo = open_stat(cachedPath)
             self.log("Opened cached file [fd %d]", cachedFile.fileno())
         except NotFoundError:
             self.debug("Did not find cached file '%s'", cachedPath)

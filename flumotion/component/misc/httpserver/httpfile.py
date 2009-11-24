@@ -70,6 +70,18 @@ class InternalServerError(weberror.ErrorPage):
                                     "Internal Server Error", message)
 
 
+class ServiceUnavailableError(weberror.ErrorPage):
+    """
+    Web error for when the request cannot be served.
+    """
+
+    def __init__(self, message="The server is currently unable to handle "
+                               "the request due to a temporary overloading "
+                               "or maintenance of the server"):
+        weberror.ErrorPage.__init__(self, http.SERVICE_UNAVAILABLE,
+                                    "Service Unavailable", message)
+
+
 class File(resource.Resource, log.Loggable):
     """
     this file is inspired by/adapted from twisted.web.static
@@ -83,6 +95,7 @@ class File(resource.Resource, log.Loggable):
     forbiddenResource = weberror.ForbiddenResource("Access forbidden")
     badRequest = BadRequest()
     internalServerError = InternalServerError()
+    serviceUnavailable = ServiceUnavailableError()
 
     def __init__(self, path, httpauth,
                  mimeToResource=None,
@@ -169,7 +182,19 @@ class File(resource.Resource, log.Loggable):
             # Something went wrong, log it
             self.warning("Failure during request rendering: %s",
                          log.getFailureMessage(body))
-            body = self.internalServerError.render(request)
+            if body.check(weberror.Error):
+                err = body.value
+                page = weberror.ErrorPage(err.status, err.message,
+                                          err.response)
+            elif body.check(fileprovider.UnavailableError):
+                page = self.serviceUnavailable
+            elif body.check(fileprovider.AccessError):
+                page = self.forbiddenResource
+            elif body.check(fileprovider.NotFoundError):
+                page = self.childNotFound
+            else:
+                page = self.internalServerError
+            body = page.render(request)
         if body:
             # the callback chain from _renderRequest chose to return a string
             # body, write it out to the client
@@ -189,18 +214,39 @@ class File(resource.Resource, log.Loggable):
         # We override static.File to implement Range requests, and to get
         # access to the transfer object to abort it later; the bulk of this
         # is a direct copy of static.File.render, though.
-        try:
-            self.debug("Opening file %s", self._path)
-            provider = self._path.open()
-        except fileprovider.NotFoundError:
+
+        self.debug("Opening file %s", self._path)
+
+        # Use a deferred chain to uniformize error handling
+        # whether open returns a Deferred or directly a file.
+        d = defer.Deferred()
+        d.addCallback(lambda _: self._path.open())
+        d.addCallbacks(self._gotProvider, self._fileOpenFailure,
+                       callbackArgs=[request], errbackArgs=[request])
+        d.callback(None)
+        return d
+
+    def _fileOpenFailure(self, failure, request):
+        if failure.check(fileprovider.NotFoundError):
             self.debug("Could not find resource %s", self._path)
             return self.childNotFound.render(request)
-        except fileprovider.CannotOpenError:
+        if failure.check(fileprovider.CannotOpenError):
             self.debug("%s is a directory, can't be GET", self._path)
             return self.childNotFound.render(request)
-        except fileprovider.AccessError:
+        if failure.check(fileprovider.AccessError):
             return self.forbiddenResource.render(request)
+        return failure
 
+    def _gotProvider(self, provider, request):
+        self.debug("Rendering file %s", self._path)
+
+        # Different headers not normally set in static.File...
+        # Specify that we will close the connection after this request, and
+        # that the client must not issue further requests.
+        # We do this because future requests on this server might actually need
+        # to go to a different process (because of the porter)
+        request.setHeader('Server', 'Flumotion/%s' % configure.version)
+        request.setHeader('Connection', 'close')
         # We can do range requests, in bytes.
         # UGLY HACK FIXME: if pdf, then do not accept range requests
         # because Adobe Reader plugin messes up
@@ -609,6 +655,10 @@ class FileTransfer(log.Loggable):
 
     def _ebReadFailed(self, failure):
         self._pending = None
+
+        if self._finished:
+            return
+
         self.warning('Failure during file %s reading: %s',
                      self.provider, log.getFailureMessage(failure))
         self._terminate()
@@ -621,6 +671,9 @@ class FileTransfer(log.Loggable):
         self.consumer.write(data)
 
     def _terminate(self):
+        if self.size != self.bytesWritten:
+            self.warning("Terminated before writing the full %s bytes, "
+                         "only %s byte written", self.size, self.bytesWritten)
         try:
             self.provider.close()
         finally:
