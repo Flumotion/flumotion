@@ -92,6 +92,11 @@ class LocalPath(testsuite.TestCase):
 class LocalPathCachedProvider(testsuite.TestCase):
 
     def setUp(self):
+        from twisted.python import threadpool
+        reactor.threadpool = threadpool.ThreadPool(0, 10,
+                                                   'twisted.internet.reactor')
+        reactor.threadpool.start()
+
         self.path = tempfile.mkdtemp(suffix=".flumotion.test")
         a = os.path.join(self.path, 'a')
         open(a, "w").write('test file a')
@@ -106,6 +111,9 @@ class LocalPathCachedProvider(testsuite.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.path, ignore_errors=True)
+
+        reactor.threadpool.stop()
+        reactor.threadpool = None
 
     def testExistingPath(self):
         local = self.fileProviderPlug.getRootPath()
@@ -211,6 +219,11 @@ class LocalPathLocalProvider(testsuite.TestCase):
 class CachedProviderFileTest(testsuite.TestCase):
 
     def setUp(self):
+        from twisted.python import threadpool
+        reactor.threadpool = threadpool.ThreadPool(0, 10,
+                                                   'twisted.internet.reactor')
+        reactor.threadpool.start()
+
         self.src_path = tempfile.mkdtemp(suffix=".src")
         self.cache_path = tempfile.mkdtemp(suffix=".cache")
 
@@ -230,6 +243,9 @@ class CachedProviderFileTest(testsuite.TestCase):
         self.fileProviderPlug.stop(None)
         shutil.rmtree(self.src_path, ignore_errors=True)
         shutil.rmtree(self.cache_path, ignore_errors=True)
+
+        reactor.threadpool.stop()
+        reactor.threadpool = None
 
     def testModifySrc(self):
         newData = "bar foo"
