@@ -52,11 +52,9 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
     componentMediumClass = AudioTestMedium
 
     def init(self):
-        self.uiState.addKey('wave-names',
-                            ['Sine', 'Square', 'Saw', 'Triangle'])
         self.uiState.addKey('wave', 0)
         self.uiState.addKey('frequency', 440)
-        self.uiState.addKey('samplerate', 441000)
+        self.uiState.addKey('samplerate', 44100)
 
     def do_check(self):
         levelD = check.do_check(self, check.checkPlugin, 'level', 'level')

@@ -1,3 +1,10 @@
+2009-11-24  Guillem Solà,,,  <garanda@flumotion.com>
+
+	reviewed by: xqueralt
+
+	* flumotion/component/producers/audiotest/audiotest.py:
+	fixed a typo and definition not needed
+
 2009-11-24  Marc-André Lureau  <mlureau@flumotion.com>
 
 	* configure.ac:
