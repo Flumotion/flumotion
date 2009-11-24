@@ -132,6 +132,13 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug,
 
     def stop(self, component):
         self._thread.stop()
+        dl = []
+        for s in self._index.values():
+            d = s.close()
+            if d:
+                dl.append(d)
+        if len(dl) != 0:
+            return defer.DeferredList(dl)
 
     def startStatsUpdates(self, updater):
         #FIXME: This is temporary. Should be done with plug UI.
@@ -333,7 +340,7 @@ class CopySession(log.Loggable):
         self._refCount = 0
         self._copied = 0 # None when the file is fully copied
         self._correction = 0 # Used to take into account copies data for stats
-        self._startCopying()
+        self._startCopyingDefer = self._startCopying()
 
     def outdate(self):
         self.log("Copy session outdated")
@@ -408,14 +415,20 @@ class CopySession(log.Loggable):
         if (self._refCount == 0) and (self._copied is None):
             self.close()
 
+    def _close(self):
+        self.log("Closing copy session")
+        # Cancel the copy, close the source file and the writing temp file.
+        self._cancelCopy(True, True)
+        self._closeReadTempFile()
+        self.plug.removeCopySession(self)
+        self.plug = None
+
     def close(self):
-        if self.plug is not None:
-            self.log("Closing copy session")
-            # Cancel the copy, close the source file and the writing temp file.
-            self._cancelCopy(True, True)
-            self._closeReadTempFile()
-            self.plug.removeCopySession(self)
-            self.plug = None
+        if self._startCopyingDefer:
+            d = self._startCopyingDefer
+            self._startCopyingDefer = None
+            d.addCallback(lambda _: self._close())
+            return d
 
     def doServe(self):
         if not (self.copying and self._pending):
@@ -595,6 +608,8 @@ class CopySession(log.Loggable):
             self._closeWriteTempFile()
 
     def _onCopyFinished(self):
+        if self._sourceFile is None:
+            return
         # Called when the copy thread really stopped to read/write
         self.debug("Finished caching '%s' [fd %d]",
                    self.sourcePath, self._sourceFile.fileno())

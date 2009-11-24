@@ -1,3 +1,10 @@
+2009-11-24  Marc-André Lureau  <mlureau@flumotion.com>
+
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	Fix make check on buildbot, wait for CopySession to close().
+	* flumotion/test/test_component_httpserver_httpcached_stats.py:
+	Don't use hardcoded port, use ListenTCP(0) instead.
+
 2009-11-24  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/test/test_component_httpserver_httpcached_stats.py:

@@ -70,12 +70,13 @@ class TestHTTPCachedPlugStats(TestCase):
         src = File(self.src_path)
         src.putChild("hello", Hello())
         factory = Site(src)
-        self.httpserver = reactor.listenTCP(62345, factory)
+        self.httpserver = reactor.listenTCP(0, factory)
+        p = self.httpserver.getHost().port
 
         plugProps = {"properties": {"cache-size": CACHE_SIZE,
                                     "cache-dir": self.cache_path,
                                     "server-hostname": "localhost",
-                                    "server-port": 62345}}
+                                    "server-port": p}}
 
         self.plug = \
             file_provider.FileProviderHTTPCachedPlug(plugProps)
