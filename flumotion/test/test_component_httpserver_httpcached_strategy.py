@@ -1389,17 +1389,17 @@ class TestBasicCachingStrategy(TestCase):
 
     def _checkFilesClosed(self, result):
         for f in self.cachemgr.files:
-            self.failUnless(f.closed)
+            self.failIf(f.opened and not f.closed)
         return result
 
     def _checkFilesUnlinked(self, result):
         for f in self.cachemgr.files:
-            self.failUnless(f.unlinked)
+            self.failIf(f.opened and not f.unlinked)
         return result
 
     def _checkFilesCompleted(self, result):
         for f in self.cachemgr.files:
-            self.failUnless(f.completed)
+            self.failIf(f.opened and not f.completed)
         return result
 
     def _checkFileCount(self, result, count):
@@ -1481,6 +1481,7 @@ class DummyFile(object):
         self.mgr = mgr
         self.fdef = fdef
         self._isTemp = isTemp
+        self.opened = False
         self.closed = False
         self.completed = False
         self.unlinked = False
@@ -1628,8 +1629,14 @@ class DummyCacheMgr(object):
 
     def _delayed(self, timeout, value):
         d = defer.Deferred()
+        d.addCallback(self._set_open)
         self._call(timeout, os.urandom(64), d.callback, value)
         return d
+
+    def _set_open(self, file):
+        if file is not None:
+            file.opened = True
+        file
 
     def _call(self, timeout, key, fun, *args, **kwargs):
         dc = reactor.callLater(timeout, self._called, key, fun, args, kwargs)
