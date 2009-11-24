@@ -239,13 +239,16 @@ class CachedProviderFileTest(testsuite.TestCase):
         self.testFileName = self.createFile('a', self.data, old=True)
         return d
 
-    def tearDown(self):
-        self.fileProviderPlug.stop(None)
+    def _tearDown(self):
         shutil.rmtree(self.src_path, ignore_errors=True)
         shutil.rmtree(self.cache_path, ignore_errors=True)
-
         reactor.threadpool.stop()
         reactor.threadpool = None
+
+    def tearDown(self):
+        d = defer.maybeDeferred(self.fileProviderPlug.stop, None)
+        d.addCallback(lambda _: self._tearDown())
+        return d
 
     def testModifySrc(self):
         newData = "bar foo"
