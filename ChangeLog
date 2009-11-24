@@ -1,3 +1,13 @@
+2009-11-24  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/feedcomponent010.py:
+	Revert r8319, dropping IN_CAPS buffers.
+	It has been observed that after restarting an upstream component the
+	log of the disker worker starts being filled with "buffer probe handler
+	is None" messages, which suggests some kind of race where the buffer
+	probe handler is set to None, but the probe itself is not removed.
+	Reopens #1370.
+
 2009-11-14  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/config.py:
