@@ -1,3 +1,8 @@
+2009-11-24  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion.spec.in:
+	Revert r8360, this change should wait until buildbot is upgraded.
+
 2009-11-24  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/feedcomponent010.py:
