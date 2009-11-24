@@ -1246,8 +1246,8 @@ class TestBasicCachingStrategy(TestCase):
 
         d.addCallback(self._updateResource, res, data=data2, mtime=mtime2)
 
-        # Wait a little
-        d.addCallback(self._waitForSessionSize, "session", SUB_BLOCK_SIZE)
+        # Wait for the session to be finished or to fail
+        d.addCallback(self._waitFinished, "session")
 
         d.addCallback(self._readAllData)
         d.addCallbacks(self._fail, self._checkError,
