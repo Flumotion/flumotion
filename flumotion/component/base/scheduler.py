@@ -298,7 +298,10 @@ class ICalScheduler(Scheduler):
 
             def fileChanged(filename):
                 self.info("ics file %s changed", filename)
-                self._parseFromFile(open(filename, 'r'))
+                try:
+                    self._parseFromFile(open(filename, 'r'))
+                except:
+                    self.warning("error parsing ics file %s", filename)
 
             self.watcher = watcher.FilesWatcher([fileObj.name])
             fileObj.close()

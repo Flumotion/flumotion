@@ -1,3 +1,12 @@
+2009-11-24  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Julien LeGof 
+
+	* flumotion/component/base/scheduler.py:
+	Catch errors parsing iCalendar files and output a warning
+	message to allow reloading a new file.
+	Closes #1385
+
 2009-11-24  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion.spec.in:
