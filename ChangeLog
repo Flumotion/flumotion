@@ -1,3 +1,9 @@
+2009-11-24  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/test/test_component_httpserver_httpcached_stats.py:
+	* flumotion/test/test_component_httpserver_httpcached_strategy.py:
+	Should fix the make check on the build-bot.
+
 2009-11-24  Guillem Solà,,,  <garanda@flumotion.com>
 
 	reviewed by: xqueralt

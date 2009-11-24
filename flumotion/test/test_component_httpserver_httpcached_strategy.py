@@ -576,7 +576,8 @@ class TestBasicCachingStrategy(TestCase):
         d.addCallback(self._isInstance, strategy_base.RemoteSource)
         d.addCallback(self._checkSessions, 1)
 
-        d.addCallback(self._readAllData)
+        # Make reading slow to prevent pipelining
+        d.addCallback(self._readAllData, 0.08)
         d.addCallback(self._checkData, data)
         d.addCallback(self._closeSource, "source3")
         d.addCallback(self._checkFileCount, 1)
@@ -1250,7 +1251,7 @@ class TestBasicCachingStrategy(TestCase):
         d.addCallback(self._waitForSessionSize, "session", SUB_BLOCK_SIZE)
 
         # and slow down reading to prevent pipelining
-        d.addCallback(self._readAllData, 0.05)
+        d.addCallback(self._readAllData, 0.08)
         d.addCallbacks(self._fail, self._checkError,
                        callbackArgs=("Success not expected", ),
                        errbackArgs=(fileprovider.FileOutOfDate, ))

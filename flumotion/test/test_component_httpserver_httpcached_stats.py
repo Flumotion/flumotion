@@ -38,7 +38,7 @@ CACHE_SIZE = 1024 * 1024
 twisted.internet.base.DelayedCall.debug = True
 
 
-class DummyStats():
+class DummyStats(object):
 
     def __init__(self):
         self.stats = {}
