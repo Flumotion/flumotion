@@ -56,12 +56,20 @@ class DummyStats:
 class TestCacheManager(testsuite.TestCase):
 
     def setUp(self):
+        from twisted.python import threadpool
+        reactor.threadpool = threadpool.ThreadPool(0, 10,
+                                                   'twisted.internet.reactor')
+        reactor.threadpool.start()
+
         self.path = tempfile.mkdtemp(suffix=".flumotion.test")
         self.stats = DummyStats()
         self._file = None
 
     def tearDown(self):
         shutil.rmtree(self.path, ignore_errors=True)
+
+        reactor.threadpool.stop()
+        reactor.threadpool = None
 
     def completeAndClose(self, t, m):
         try:

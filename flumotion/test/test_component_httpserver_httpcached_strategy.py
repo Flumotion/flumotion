@@ -503,7 +503,7 @@ class TestBasicCachingStrategy(TestCase):
         # Another request should be started for the remaining
 
         # Make the transfer slow for the caching session
-        d.addCallback(self._set, "reqmgr", "trans_delay", 0.08)
+        d.addCallback(self._set, "reqmgr", "trans_delay", 0.1)
 
         d.addCallback(self._checkSessions, 0)
         d.addCallback(self._getSource, "http://www.flumotion.net/dummy")
@@ -576,8 +576,7 @@ class TestBasicCachingStrategy(TestCase):
         d.addCallback(self._isInstance, strategy_base.RemoteSource)
         d.addCallback(self._checkSessions, 1)
 
-        # Make reading slow to prevent pipelining
-        d.addCallback(self._readAllData, 0.08)
+        d.addCallback(self._readAllData)
         d.addCallback(self._checkData, data)
         d.addCallback(self._closeSource, "source3")
         d.addCallback(self._checkFileCount, 1)
@@ -1250,8 +1249,7 @@ class TestBasicCachingStrategy(TestCase):
         # Wait a little
         d.addCallback(self._waitForSessionSize, "session", SUB_BLOCK_SIZE)
 
-        # and slow down reading to prevent pipelining
-        d.addCallback(self._readAllData, 0.08)
+        d.addCallback(self._readAllData)
         d.addCallbacks(self._fail, self._checkError,
                        callbackArgs=("Success not expected", ),
                        errbackArgs=(fileprovider.FileOutOfDate, ))
