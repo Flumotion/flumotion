@@ -50,6 +50,10 @@ class DummyStats(object):
 class TestHTTPCachedPlugStats(TestCase):
 
     def setUp(self):
+        from twisted.python import threadpool
+        reactor.threadpool = threadpool.ThreadPool(0, 10,
+                                                   'twisted.internet.reactor')
+        reactor.threadpool.start()
 
         class Hello(resource.Resource):
             isLeaf = True
@@ -87,6 +91,9 @@ class TestHTTPCachedPlugStats(TestCase):
         self.httpserver.stopListening()
         shutil.rmtree(self.cache_path, ignore_errors=True)
         shutil.rmtree(self.src_path, ignore_errors=True)
+
+        reactor.threadpool.stop()
+        reactor.threadpool = None
 
     def test404(self):
         d = self.plug.getRootPath().child("SuperMan").open()
