@@ -118,29 +118,9 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
         """
         Create the icon
         """
-        if hasattr(gtk, 'StatusIcon'):
-            icon = gtk.StatusIcon()
-            icon.connect('popup-menu', self._on_trayicon__popup_menu)
-            icon.connect('activate', self._on_trayicon__activated)
-        else:
-            try:
-                from flumotion.extern import pytrayicon
-                icon = pytrayicon.TrayIcon("Flumotion")
-            except ImportError:
-                self.debug('No pytrayicon module found,'
-                           ' no trayicon will be shown')
-                return
-            except AttributeError:
-                self.debug('No pytrayicon installed,'
-                           'no trayicon will be shown')
-                return
-
-            event_box = gtk.EventBox()
-            self._tray_image = gtk.Image()
-            event_box.add(self._tray_image)
-            event_box.connect('button-press-event', self._on_trayicon__clicked)
-            icon.add(event_box)
-            icon.show_all()
+        icon = gtk.StatusIcon()
+        icon.connect('popup-menu', self._on_trayicon__popup_menu)
+        icon.connect('activate', self._on_trayicon__activated)
 
         return icon
 
@@ -148,12 +128,7 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
         if not self._tray_icon:
             return
 
-        if self._tray_image:
-            pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
-            scaled_buf = pixbuf.scale_simple(24, 24, gtk.gdk.INTERP_BILINEAR)
-            self._tray_image.set_from_pixbuf(scaled_buf)
-        else:
-            self._tray_icon.set_from_file(filename)
+        self._tray_icon.set_from_file(filename)
 
     # FIXME: looks like cutnpaste from a similar function, squash duplication
 
@@ -185,17 +160,6 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
             self._set_icon_from_filename(_DEFAULT_ICON)
 
     # Callbacks
-
-    def _on_trayicon__clicked(self, widget, event):
-        """
-        @param widget: the trayicon eventbox that was clicked
-        @param event: the event object
-        """
-        # left click triggers window visibility
-        if event.button == 1:
-            self._on_trayicon__activated()
-        elif event.button == 3:
-            self._on_trayicon__popup_menu()
 
     def _on_trayicon__popup_menu(self, *p):
         """

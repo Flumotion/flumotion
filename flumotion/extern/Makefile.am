@@ -23,12 +23,6 @@ command_PYTHON = \
 
 EXTRA_DIST = log/test_log.py
 
-if BUILD_TRAYICON
-PTI_DIR = pytrayicon
-else
-PTI_DIR =
-endif
-
 check-local:
 	PYTHONPATH=$(srcdir):$$PYTHONPATH trial log.test_log
 
@@ -38,4 +32,4 @@ clean-local:
 SUBDIRS = fdpass \
 	$(PTI_DIR)
 
-DIST_SUBDIRS = pytrayicon fdpass
+DIST_SUBDIRS = fdpass

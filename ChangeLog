@@ -1,3 +1,23 @@
+2009-11-24  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* configure.ac:
+	* flumotion.spec.in:
+	* flumotion/extern/Makefile.am:
+	Require at least pygtk 2.10
+	* flumotion/ui/trayicon.py:
+	Use only gtk.StatusIcon.
+	* flumotion/extern/pytrayicon (deleted):
+	* flumotion/extern/pytrayicon/pytrayicon.override (deleted):
+	* flumotion/extern/pytrayicon/eggtrayicon.h (deleted):
+	* flumotion/extern/pytrayicon/pytrayicon.defs (deleted):
+	* flumotion/extern/pytrayicon/ltihooks.py (deleted):
+	* flumotion/extern/pytrayicon/__init__.py (deleted):
+	* flumotion/extern/pytrayicon/pytrayiconmodule.c (deleted):
+	* flumotion/extern/pytrayicon/Makefile.am (deleted):
+	* flumotion/extern/pytrayicon/config.h (deleted):
+	* flumotion/extern/pytrayicon/eggtrayicon.c (deleted):
+	Remove pytrayicon.
+
 2009-11-25  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/consumers/disker/disker.py:

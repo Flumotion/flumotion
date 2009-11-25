@@ -20,7 +20,7 @@ AUTHORS=$srcdir/AUTHORS
 
 dnl keep in sync with flumotion/common/boot.py and
 dnl                   flumotion.spec.in
-AC_SUBST(PYGTK_010_REQ, 2.8.4)
+AC_SUBST(PYGTK_010_REQ, 2.10.0)
 AC_SUBST(PYGST_010_REQ, 0.10.0)
 AC_SUBST(GST_010_REQ, 0.10.0.1)
 
@@ -89,42 +89,6 @@ AS_PYTHON_IMPORT(kiwi,,AC_MSG_ERROR([kiwi not found or too old]),,
 
 PYTHONPATH=$as_save_PYTHONPATH
 export PYTHONPATH
-
-PKG_CHECK_MODULES(GTK, gtk+-2.0, HAVE_GTK=yes, HAVE_GTK=no)
-
-# decide on tray icon
-BUILD_TRAYICON=yes
-if test "x$HAVE_PYTHON_H" = "xno"
-then
-  AC_MSG_NOTICE([Python headers missing, not building tray icon])
-  BUILD_TRAYICON=no
-fi
-if test "x$HAVE_GTK" = "xno"
-then
-  AC_MSG_NOTICE([GTK+ 2 development files missing, not building tray icon])
-  BUILD_TRAYICON=no
-fi
-
-if test "x$BUILD_TRAYICON" = "xyes"
-then
-  AC_MSG_NOTICE([Building tray icon])
-
-  PKG_CHECK_MODULES(PYGTK, pygtk-2.0)
-  dnl check stuff we can generate the tray icon with
-  AC_MSG_CHECKING(for pygtk codegen)
-  PYGTK_CODEGEN="$PYTHON `$PKG_CONFIG --variable=codegendir pygtk-2.0`/codegen.py"
-  dnl PYGTK_CODEGEN="$PYTHON \$(top_srcdir)/codegen/codegen.py"
-  AC_SUBST(PYGTK_CODEGEN)
-  AC_MSG_RESULT($PYGTK_CODEGEN)
-
-  AC_MSG_CHECKING(for pygtk defsdir)
-  PYGTK_DEFSDIR=`$PKG_CONFIG --variable=defsdir pygtk-2.0`
-  AC_SUBST(PYGTK_DEFSDIR)
-  AC_MSG_RESULT($PYGTK_DEFSDIR)
-fi
-
-AM_CONDITIONAL(BUILD_TRAYICON, test "x$BUILD_TRAYICON" = "xyes")
-
 
 dnl XVFB can be used for documentation building and testing because
 dnl some things need to import gtk
@@ -274,7 +238,6 @@ flumotion/configure/installed.py
 flumotion/configure/uninstalled.py
 flumotion/extern/Makefile
 flumotion/extern/fdpass/Makefile
-flumotion/extern/pytrayicon/Makefile
 flumotion/job/Makefile
 flumotion/launch/Makefile
 flumotion/manager/Makefile
