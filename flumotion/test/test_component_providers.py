@@ -93,8 +93,7 @@ class LocalPathCachedProvider(testsuite.TestCase):
 
     def setUp(self):
         from twisted.python import threadpool
-        reactor.threadpool = threadpool.ThreadPool(0, 10,
-                                                   'twisted.internet.reactor')
+        reactor.threadpool = threadpool.ThreadPool(0, 10)
         reactor.threadpool.start()
 
         self.path = tempfile.mkdtemp(suffix=".flumotion.test")
@@ -220,8 +219,7 @@ class CachedProviderFileTest(testsuite.TestCase):
 
     def setUp(self):
         from twisted.python import threadpool
-        reactor.threadpool = threadpool.ThreadPool(0, 10,
-                                                   'twisted.internet.reactor')
+        reactor.threadpool = threadpool.ThreadPool(0, 10)
         reactor.threadpool.start()
 
         self.src_path = tempfile.mkdtemp(suffix=".src")

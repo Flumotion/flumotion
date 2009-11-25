@@ -1,3 +1,10 @@
+2009-11-25  Marc-André Lureau  <mlureau@flumotion.com>
+
+	* flumotion/test/test_cache_manager.py:
+	* flumotion/test/test_component_httpserver_httpcached_stats.py:
+	* flumotion/test/test_component_providers.py:
+	In t2.0.1, ThreadPool() takes at most 3 arguments.
+
 2009-11-24  Marc-André Lureau  <mlureau@flumotion.com>
 
 	* flumotion/component/misc/httpserver/cachedprovider.py:
