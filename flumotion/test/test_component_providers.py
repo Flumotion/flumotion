@@ -23,6 +23,13 @@ import shutil
 import tempfile
 
 from twisted.internet import defer, reactor
+from twisted.trial import unittest
+
+import twisted.copyright
+if twisted.copyright.version.split('.') <= ['2', '0', '1']:
+    SKIP_MSG = "Twisted 2.0.1 thread pool is broken for tests"
+else:
+    SKIP_MSG = None
 
 from flumotion.common import testsuite
 from flumotion.component.misc.httpserver import localpath
@@ -90,6 +97,8 @@ class LocalPath(testsuite.TestCase):
 
 
 class LocalPathCachedProvider(testsuite.TestCase):
+
+    skip = SKIP_MSG
 
     def setUp(self):
         from twisted.python import threadpool
@@ -216,6 +225,8 @@ class LocalPathLocalProvider(testsuite.TestCase):
 
 
 class CachedProviderFileTest(testsuite.TestCase):
+
+    skip = SKIP_MSG
 
     def setUp(self):
         from twisted.python import threadpool

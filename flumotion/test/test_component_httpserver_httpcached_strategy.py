@@ -503,7 +503,7 @@ class TestBasicCachingStrategy(TestCase):
         # Another request should be started for the remaining
 
         # Make the transfer slow for the caching session
-        d.addCallback(self._set, "reqmgr", "trans_delay", 0.1)
+        d.addCallback(self._set, "reqmgr", "trans_delay", 0.2)
 
         d.addCallback(self._checkSessions, 0)
         d.addCallback(self._getSource, "http://www.flumotion.net/dummy")
@@ -513,7 +513,7 @@ class TestBasicCachingStrategy(TestCase):
 
         # Restoring normal speed for pipelining,
         # and scheduling an error during the first pipelined block.
-        d.addCallback(self._set, "reqmgr", "trans_delay", 0.01)
+        d.addCallback(self._set, "reqmgr", "trans_delay", 0.001)
         d.addCallback(self._set, "reqmgr", "error_reset_countdown", 2)
         d.addCallback(self._set, "reqmgr", "block_error_countdown", 2)
         d.addCallback(self._set, "reqmgr", "block_error_code",

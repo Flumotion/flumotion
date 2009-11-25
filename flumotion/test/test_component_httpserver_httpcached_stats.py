@@ -25,6 +25,13 @@ import tempfile
 
 import twisted
 from twisted.internet import reactor, defer
+from twisted.trial import unittest
+
+import twisted.copyright
+if twisted.copyright.version.split('.') <= ['2', '0', '1']:
+    SKIP_MSG = "Twisted 2.0.1 thread pool is broken for tests"
+else:
+    SKIP_MSG = None
 
 from twisted.web import resource
 from twisted.web.server import Site
@@ -48,6 +55,8 @@ class DummyStats(object):
 
 
 class TestHTTPCachedPlugStats(TestCase):
+
+    skip = SKIP_MSG
 
     def setUp(self):
         from twisted.python import threadpool

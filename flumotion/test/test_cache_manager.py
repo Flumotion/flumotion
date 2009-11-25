@@ -27,6 +27,14 @@ import tempfile
 import time
 
 from twisted.internet import defer, threads, reactor
+from twisted.trial import unittest
+
+import twisted.copyright
+if twisted.copyright.version.split('.') <= ['2', '0', '1']:
+    SKIP_MSG = "Twisted 2.0.1 thread pool is broken for tests"
+else:
+    SKIP_MSG = None
+
 from flumotion.common import testsuite, errors
 from flumotion.component.misc.httpserver import cachemanager, fileprovider
 
@@ -54,6 +62,8 @@ class DummyStats:
 
 
 class TestCacheManager(testsuite.TestCase):
+
+    skip = SKIP_MSG
 
     def setUp(self):
         from twisted.python import threadpool
