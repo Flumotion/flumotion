@@ -1636,7 +1636,7 @@ class DummyCacheMgr(object):
     def _set_open(self, file):
         if file is not None:
             file.opened = True
-        file
+        return file
 
     def _call(self, timeout, key, fun, *args, **kwargs):
         dc = reactor.callLater(timeout, self._called, key, fun, args, kwargs)
