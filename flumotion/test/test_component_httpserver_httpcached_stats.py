@@ -28,7 +28,7 @@ from twisted.internet import reactor, defer
 from twisted.trial import unittest
 
 import twisted.copyright
-if twisted.copyright.version.split('.') <= ['2', '0', '1']:
+if twisted.copyright.version == "SVN-Trunk":
     SKIP_MSG = "Twisted 2.0.1 thread pool is broken for tests"
 else:
     SKIP_MSG = None
