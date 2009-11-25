@@ -28,7 +28,6 @@ import gobject
 import gst
 
 from twisted.internet import reactor
-from zope.interface import implements
 
 from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer, pygobject, messages, errors
@@ -37,7 +36,14 @@ from flumotion.common import eventcalendar, poller
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.mimetypes import mimeTypeToExtention
 from flumotion.common.pygobject import gsignal
-from flumotion.twisted.flavors import IStateCacheableListener
+
+#   the flumotion.twisted.flavors is not bundled, and as we only need it for
+#   the interface, we can skip doing the import and thus not create
+#   incompatibilities with workers running old versions of flavors that will be
+#   asked to create diskers importing the IStateCacheableListener from that
+#   module
+# from flumotion.twisted.flavors import IStateCacheableListener
+
 # proxy import
 from flumotion.component.component import moods
 
@@ -114,7 +120,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     _symlinkToLastRecording = None
     _symlinkToCurrentRecording = None
 
-    implements(IStateCacheableListener)
+    #   see the commented out import statement for IStateCacheableListener at
+    #   the beginning of this file
+    # implements(IStateCacheableListener)
 
     ### BaseComponent methods
 

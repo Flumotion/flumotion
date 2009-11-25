@@ -1,3 +1,11 @@
+2009-11-25  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/consumers/disker/disker.py:
+	Do not import IStateCacheableListener from flumotion.twisted.flavors,
+	as this module is not bundled. It seems that the price of breaking
+	compatibility between old workers and new managers is too high for the
+	small gain of having the component implement the interface.
+
 2009-11-25  Marc-André Lureau  <mlureau@flumotion.com>
 
 	* flumotion/test/test_cache_manager.py:
