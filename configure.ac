@@ -19,10 +19,11 @@ AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
 dnl keep in sync with flumotion/common/boot.py and
-dnl                   flumotion.spec.in
-AC_SUBST(PYGTK_010_REQ, 2.10.0)
-AC_SUBST(PYGST_010_REQ, 0.10.0)
-AC_SUBST(GST_010_REQ, 0.10.0.1)
+# FIXME: Change this requirement to 2.10.0 when buildbot is upgraded
+AC_SUBST(PYGTK_010_REQ, 2.8.4)
+AC_SUBST(PYGST_010_REQ, 0.10.4)
+# FIXME: Change this requirement to 0.10.11 when buildbot is upgraded
+AC_SUBST(GST_010_REQ, 0.10.10)
 
 GST_010_SUPPORTED=true
 

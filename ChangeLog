@@ -1,3 +1,9 @@
+2009-11-26  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* configure.ac:
+	* flumotion.spec.in:
+	Update requirements of pygtk, pygst and gst and use them in the spec
+
 2009-11-24  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* configure.ac:
@@ -46,7 +52,7 @@
 	* flumotion/test/test_component_httpserver_httpcached_strategy.py:
 	Should fix the make check on the build-bot.
 
-2009-11-24  Guillem Solà,,,  <garanda@flumotion.com>
+2009-11-24  Guillem Solà  <garanda@flumotion.com>
 
 	reviewed by: xqueralt
 
