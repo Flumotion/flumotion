@@ -20,7 +20,6 @@
 # Headers in this file shall remain intact.
 
 import stat
-from cStringIO import StringIO
 import time
 
 from twisted.internet import defer, reactor, abstract
@@ -593,12 +592,11 @@ class CachingSession(BaseCachingSession, log.Loggable):
         self.log("Caching session with type %s, size %s, mtime %s for %s",
                  self.mimeType, self.size, self.mtime, self.url)
 
-        self._file = StringIO() # To wait until we got the real one
+        self._request.pause() # Wait until we got the temporary file
 
-        self.log("Requesting temporary file for %s", self.url)
+        self.debug("Requesting temporary file for %s", self.url)
         d = self.strategy.cachemgr.newTempFile(self.url.path, info.size,
                                                info.mtime)
-        self.debug("Start buffering %s", self.url)
         d.addCallback(self._gotTempFile)
 
         # We have got meta data, so callback
@@ -622,15 +620,10 @@ class CachingSession(BaseCachingSession, log.Loggable):
 
         self.debug("Start caching %s", self.url)
 
-        data = self._file.getvalue()
         self._file = tempFile
-        tempFile.write(data)
+        self._request.resume()
 
-        if self._state == self.CACHED:
-            # Already got all the data
-            self._real_complete()
-        else:
-            self._state = self.CACHING
+        self._state = self.CACHING
 
     def onData(self, getter, data):
         assert self._state in (self.BUFFERING, self.CACHING), "Not caching"
@@ -704,7 +697,7 @@ class CachingSession(BaseCachingSession, log.Loggable):
 
         self.log("Closing caching session for %s", self.url)
 
-        if self._state >= self.BUFFERING:
+        if self._state > self.BUFFERING:
             self._file.close()
             self._file = None
 

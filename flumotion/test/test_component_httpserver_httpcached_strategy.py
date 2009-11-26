@@ -1,4 +1,4 @@
-    # -*- Mode: Python; test-case-name: flumotion.test.test_common -*-
+# -*- Mode: Python; test-case-name: flumotion.test.test_common -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
 # Flumotion - a streaming media server
@@ -1266,6 +1266,47 @@ class TestBasicCachingStrategy(TestCase):
         d.callback(None)
         return d
 
+    def testSlowCacheAllocation(self):
+        data = os.urandom(BLOCK_SIZE*4 + EXTRA_DATA)
+        mtime = time.time()
+
+        d = defer.Deferred()
+
+        d.addCallback(self._setup, [], [ResDef("/dummy", data, mtime)])
+
+        # The file is not cached and the resource exists.
+        # We make the temporary file creation very slow,
+        # and the session transfer too to test pipelining.
+
+        d.addCallback(self._set, "cachemgr", "new_temp_delay", 0.8)
+        d.addCallback(self._set, "reqmgr", "trans_delay", 0.04)
+        d.addCallback(self._checkSessions, 0)
+        d.addCallback(self._getSource, "http://www.flumotion.net/dummy")
+        d.addCallback(self._gotSource, "source", "session")
+        d.addCallback(self._isInstance, strategy_base.RemoteSource)
+        d.addCallback(self._checkSessions, 1)
+
+        d.addCallback(self._checkReqCount, 1)
+
+        # Restore transfer speed for pipelining
+        d.addCallback(self._set, "reqmgr", "trans_delay", 0.001)
+
+        d.addCallback(self._readAllData)
+        d.addCallback(self._checkData, data)
+        d.addCallback(self._closeSource, "source")
+        # Wait complete caching
+        d.addCallback(self._waitFinished, "session")
+        d.addCallback(self._checkFileCount, 1)
+        d.addCallback(self._checkFilesClosed)
+        d.addCallback(self._checkFilesCompleted)
+        d.addCallback(self._checkReqCount, 1 + 5)
+        d.addCallback(self._checkReqsCode, [None]*5) # No error
+        d.addCallback(self._checkReqsSize,
+                      [len(data)] + [BLOCK_SIZE]*4 + [EXTRA_DATA])
+
+        d.callback(None)
+        return d
+
     def _setup(self, _, files, resources, ttl=DEFAULT_TTL):
         self.cachemgr = DummyCacheMgr(*files)
         self.reqmgr = DummyReqMgr(*resources)
@@ -1674,11 +1715,18 @@ class DummyReq(object):
         self.trans_block = mgr.trans_block
         self.block_error_countdown = mgr.block_error_countdown
         self.block_error_code = mgr.block_error_code
+        self.paused = False
         self.code = code
         self.size = 0
         self.canceled = False
 
         self.logName = "Dummy"
+
+    def pause(self):
+        self.paused = True
+
+    def resume(self):
+        self.paused = False
 
     def cancel(self):
         self.canceled = True
@@ -1812,6 +1860,10 @@ class DummyReqMgr(object):
 
     def _sendBlock(self, consumer, req, data):
         if self._canceled(req):
+            return
+
+        if req.paused:
+            self._call(0.1, req, self._sendBlock, consumer, req, data)
             return
 
         if req.block_error_countdown is not None:

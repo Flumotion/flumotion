@@ -1,3 +1,10 @@
+2009-11-26  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
+	* flumotion/test/test_component_httpserver_httpcached_strategy.py:
+	Do not bufferize data for copy sessions before having a temporary file,
+	this could lead to big peaks of memory usage.
+
 2009-11-26  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* configure.ac:
