@@ -95,14 +95,19 @@ class TestHTTPCachedPlugStats(TestCase):
         return self.plug.start(None)
 
     def tearDown(self):
-        self.plug.stop(None)
-        self.plug.stopStatsUpdates()
-        self.httpserver.stopListening()
-        shutil.rmtree(self.cache_path, ignore_errors=True)
-        shutil.rmtree(self.src_path, ignore_errors=True)
+        d = self.plug.stop(None)
 
-        reactor.threadpool.stop()
-        reactor.threadpool = None
+        def finish_cleanup(_):
+            self.plug.stopStatsUpdates()
+            self.httpserver.stopListening()
+            shutil.rmtree(self.cache_path, ignore_errors=True)
+            shutil.rmtree(self.src_path, ignore_errors=True)
+
+            reactor.threadpool.stop()
+            reactor.threadpool = None
+
+        d.addCallback(finish_cleanup)
+        return d
 
     def test404(self):
         d = self.plug.getRootPath().child("SuperMan").open()

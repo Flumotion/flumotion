@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 import stat
+from cStringIO import StringIO
 import time
 
 from twisted.internet import defer, reactor, abstract
@@ -81,6 +82,8 @@ class CachingStrategy(log.Loggable):
     def cleanup(self):
         self._stopCleanupLoop()
         self.reqmgr.cleanup()
+        for session in self._identifiers.values():
+            session.cancel()
         return self
 
     def getSourceFor(self, url, stats):
@@ -592,12 +595,18 @@ class CachingSession(BaseCachingSession, log.Loggable):
         self.log("Caching session with type %s, size %s, mtime %s for %s",
                  self.mimeType, self.size, self.mtime, self.url)
 
-        self._request.pause() # Wait until we got the temporary file
+        self._file = StringIO() # To wait until we got the real one
 
-        self.debug("Requesting temporary file for %s", self.url)
+        self.log("Requesting temporary file for %s", self.url)
         d = self.strategy.cachemgr.newTempFile(self.url.path, info.size,
                                                info.mtime)
+        self.debug("Start buffering %s", self.url)
         d.addCallback(self._gotTempFile)
+
+        # But we don't want to accumulate data
+        # but it is possible to receive a small amount of data
+        # even after calling pause(), so we need buffering.
+        self._request.pause()
 
         # We have got meta data, so callback
         self._fireInfo(self)
@@ -620,10 +629,17 @@ class CachingSession(BaseCachingSession, log.Loggable):
 
         self.debug("Start caching %s", self.url)
 
+        data = self._file.getvalue()
         self._file = tempFile
+        tempFile.write(data)
+
         self._request.resume()
 
-        self._state = self.CACHING
+        if self._state == self.CACHED:
+            # Already got all the data
+            self._real_complete()
+        else:
+            self._state = self.CACHING
 
     def onData(self, getter, data):
         assert self._state in (self.BUFFERING, self.CACHING), "Not caching"
@@ -697,7 +713,7 @@ class CachingSession(BaseCachingSession, log.Loggable):
 
         self.log("Closing caching session for %s", self.url)
 
-        if self._state > self.BUFFERING:
+        if self._state >= self.BUFFERING:
             self._file.close()
             self._file = None
 

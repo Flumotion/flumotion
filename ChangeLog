@@ -1,3 +1,10 @@
+2009-11-27  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
+	* flumotion/test/test_component_httpserver_httpcached_stats.py:
+	Put back the buffering for caching sessions, but still pausing.
+	Fixed a cleanup bug that made tests fail sometimes.
+
 2009-11-27  Guillem Solà  <garanda@flumotion.com>
 
 	reviewed by: xqueralt
