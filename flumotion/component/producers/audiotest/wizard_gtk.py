@@ -63,10 +63,10 @@ class TestAudioProducerStep(AudioProducerStep):
                            '32000',
                            '44100'])
 
-        self.wave.prefill([(_('sine'), 0),
-                          (_('square'), 1),
-                          (_('saw'), 2),
-                          (_('ticks'), 8)])
+        self.wave.prefill([(_('Sine'), 0),
+                          (_('Square'), 1),
+                          (_('Saw'), 2),
+                          (_('Ticks'), 8)])
 
         self.add_proxy(self.model.properties,
                        ['frequency', 'volume', 'samplerate', 'wave'])

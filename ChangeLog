@@ -1,3 +1,10 @@
+2009-11-27  Guillem Solà  <garanda@flumotion.com>
+
+	reviewed by: xqueralt
+
+	* flumotion/component/producers/audiotest/wizard_gtk.py:
+	fix lowercase names in r8413.
+
 2009-11-27  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
@@ -5,22 +12,22 @@
 
 2009-11-27 Guillem Solà  <garanda@flumotion.com>
 
-        reviewed by: xqueralt
+	reviewed by: xqueralt
 
-        * flumotion/component/producers/audiotest/admin_gtk.py:
-        * flumotion/component/producers/audiotest/audiotest.py:
-        * flumotion/component/producers/audiotest/audiotest.xml:
-        * flumotion/component/producers/audiotest/wizard.glade:
-        * flumotion/component/producers/audiotest/wizard_gtk.py:
-        * flumotion/component/producers/videotest/admin_gtk.py:
-        * flumotion/component/producers/videotest/wizard_gtk.py:
-        * po/ca.po:
-        * po/es.po:
-        add wave property to audiotest.
-        add choose wave in audiotest wizard.
-        add blink pattern in videotest wizard.
-        Fixes #1387.
- 
+	* flumotion/component/producers/audiotest/admin_gtk.py:
+	* flumotion/component/producers/audiotest/audiotest.py:
+	* flumotion/component/producers/audiotest/audiotest.xml:
+	* flumotion/component/producers/audiotest/wizard.glade:
+	* flumotion/component/producers/audiotest/wizard_gtk.py:
+	* flumotion/component/producers/videotest/admin_gtk.py:
+	* flumotion/component/producers/videotest/wizard_gtk.py:
+	* po/ca.po:
+	* po/es.po:
+	add wave property to audiotest.
+	add choose wave in audiotest wizard.
+	add blink pattern in videotest wizard.
+	Fixes #1387.
+
 2009-11-27  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpserver.xml:
