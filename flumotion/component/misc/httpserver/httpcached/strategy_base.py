@@ -573,6 +573,12 @@ class CachingSession(BaseCachingSession, log.Loggable):
             self._error(fileprovider.FileError(message))
 
     def onInfo(self, getter, info):
+        if self._state == self.BUFFERING:
+            # We are resuming while waiting for a temporary file,
+            # so we still don't want to accumulate data
+            self._request.pause()
+            return
+
         if self._state != self.REQUESTING:
             # Already canceled, or recovering from disconnection
             return
@@ -633,7 +639,9 @@ class CachingSession(BaseCachingSession, log.Loggable):
         self._file = tempFile
         tempFile.write(data)
 
-        self._request.resume()
+        if self._request is not None:
+            # We still have a request, so we want more data of it
+            self._request.resume()
 
         if self._state == self.CACHED:
             # Already got all the data
