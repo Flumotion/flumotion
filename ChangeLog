@@ -1,5 +1,12 @@
 2009-11-27  Sébastien Merle  <sebastien@flumotion.com>
 
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/httpcached/strategy_fifo.py
+	  (deleted):
+	  Removed unused file, and fixed the bundle declaration.
+
+2009-11-27  Sébastien Merle  <sebastien@flumotion.com>
+
 	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
 	* flumotion/test/test_component_httpserver_httpcached_stats.py:
 	Put back the buffering for caching sessions, but still pausing.
