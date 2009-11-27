@@ -56,14 +56,20 @@ class TestAudioProducerStep(AudioProducerStep):
     def setup(self):
         self.samplerate.data_type = str
         self.volume.data_type = float
+        self.wave.data_type = int
 
         self.samplerate.prefill(['8000',
                            '16000',
                            '32000',
                            '44100'])
 
+        self.wave.prefill([(_('sine'), 0),
+                          (_('square'), 1),
+                          (_('saw'), 2),
+                          (_('ticks'), 8)])
+
         self.add_proxy(self.model.properties,
-                       ['frequency', 'volume', 'samplerate'])
+                       ['frequency', 'volume', 'samplerate', 'wave'])
 
         self.samplerate.set_sensitive(True)
 

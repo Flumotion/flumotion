@@ -32,10 +32,24 @@ __version__ = "$Rev$"
 
 VideoTestPattern = enum.EnumClass(
     'VideoTestPattern',
-    ['Bars', 'Snow', 'Black'],
-    [_('SMPTE Color bars'),
+    ['Bars', 'Snow', 'Black', 'White', 'Red', 'Green', 'Blue', 'Checkers-1',
+            'Checkers-2', 'Checkers-4', 'Checkers-8', 'Circular', 'Blink',
+            'Bars 75%', 'Zone-plate'],
+    [_('SMPTE 100% color bars'),
      _('Random (television snow)'),
-     _('Totally black')])
+     _('100% Black'),
+     _('100% White'),
+     _('100% Red'),
+     _('100% Green'),
+     _('100% Blue'),
+     _('Checkers 1px'),
+     _('Checkers 2px'),
+     _('Checkers 4px'),
+     _('Checkers 8px'),
+     _('Circular'),
+     _('Blink'),
+     _('SMPTE 75% color bars'),
+     _('Zone plate')])
 
 
 class PatternNode(BaseAdminGtkNode):

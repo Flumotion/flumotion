@@ -31,6 +31,8 @@
                   _description="The Sample rate (in Hz).  Defaults to 44100." />
         <property name="frequency" type="int"
                   _description="The frequency of the test signal (in Hz). Defaults to 440." />
+        <property name="wave" type="int"
+		_description="The oscillator waveform (Sine/Square/Saw/...). Defaults to 0 (Sine)." />
         <property name="drop-probability" type="float"
                   _description="The fraction of buffers to drop (0.0 - 1.0). Only useful for debugging." />
       </properties>

@@ -62,7 +62,8 @@ class TestVideoProducerStep(VideoProducerStep):
         self.pattern.prefill([
             (_('SMPTE Color bars'), 0),
             (_('Random (television snow)'), 1),
-            (_('Totally black'), 2)])
+            (_('100% Black'), 2),
+            (_('Blink'), 12)])
 
         self.add_proxy(self.model.properties,
                        ['pattern', 'width', 'height',

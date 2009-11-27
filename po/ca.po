@@ -2559,6 +2559,10 @@ msgstr "_Velocitat del mostreix:"
 msgid "_Volume:"
 msgstr "_Volum:"
 
+#: ../flumotion/component/producers/audiotest/wizard.glade.h:5
+msgid "_Wave:"
+msgstr "_Ona:"
+
 #: ../flumotion/component/producers/audiotest/wizard_gtk.py:46
 msgid "Test Audio Producer"
 msgstr "Productor de so de proves"

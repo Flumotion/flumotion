@@ -2535,6 +2535,10 @@ msgstr "_Tasa de muestreo:"
 msgid "_Volume:"
 msgstr "_Volumen:"
 
+#: ../flumotion/component/producers/audiotest/wizard.glade.h:5
+msgid "_Wave:"
+msgstr "_Onda:"
+
 #: ../flumotion/component/producers/audiotest/wizard_gtk.py:46
 msgid "Test Audio Producer"
 msgstr "Fuente de audio de prueba"

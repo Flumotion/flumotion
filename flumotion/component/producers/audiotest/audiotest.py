@@ -66,6 +66,7 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
 
     def get_pipeline_string(self, properties):
         samplerate = properties.get('samplerate', 44100)
+        wave = properties.get('wave', 0)
         self.samplerate = samplerate
         volume = properties.get('volume', 1.0)
 
@@ -75,10 +76,11 @@ class AudioTest(feedcomponent.ParseLaunchComponent):
         if not gstreamer.element_factory_exists(source):
             raise errors.MissingElementError(source)
 
-        return ('%s name=source %s ! identity name=identity silent=TRUE ! ' \
+        return ('%s name=source wave=%s %s ! ' \
+            'identity name=identity silent=TRUE ! ' \
             'audio/x-raw-int,rate=%d ! ' \
             'volume name=volume volume=%f ! level name=level'
-                % (source, is_live, samplerate, volume))
+                % (source, wave, is_live, samplerate, volume))
 
     def configure_pipeline(self, pipeline, properties):
 
