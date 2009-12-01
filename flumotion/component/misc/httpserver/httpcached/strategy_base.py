@@ -567,7 +567,7 @@ class CachingSession(BaseCachingSession, log.Loggable):
         self._close()
         if code == common.STREAM_NOTFOUND:
             self._error(fileprovider.NotFoundError(message))
-        elif code == common.STREAM_FOBIDDEN:
+        elif code == common.STREAM_FORBIDDEN:
             self._error(fileprovider.AccessError(message))
         else:
             self._error(fileprovider.FileError(message))

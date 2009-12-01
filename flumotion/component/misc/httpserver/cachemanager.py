@@ -24,7 +24,6 @@ import os
 import tempfile
 import time
 import stat
-import subprocess
 
 from twisted.internet import defer, threads, protocol, reactor
 
@@ -52,7 +51,8 @@ class CacheManager(object, log.Loggable):
                  cacheSize = None,
                  cleanupEnabled = None,
                  cleanupHighWatermark = None,
-                 cleanupLowWatermark = None):
+                 cleanupLowWatermark = None,
+                 cacheRealm = None):
 
         if cacheDir is None:
             cacheDir = DEFAULT_CACHE_DIR
@@ -71,6 +71,8 @@ class CacheManager(object, log.Loggable):
         self._cleanupEnabled = cleanupEnabled
         highWatermark = max(0.0, min(1.0, float(cleanupHighWatermark)))
         lowWatermark = max(0.0, min(1.0, float(cleanupLowWatermark)))
+
+        self._cachePrefix = (cacheRealm and (cacheRealm + ":")) or ""
 
         self._identifiers = {} # {path: identifier}
 
@@ -110,7 +112,7 @@ class CacheManager(object, log.Loggable):
         ident = self._identifiers.get(path, None)
         if ident is None:
             hash = python.sha1()
-            hash.update(path)
+            hash.update(self._cachePrefix + path)
             ident = hash.digest().encode("hex").strip('\n')
             # Prevent the cache from growing endlessly
             if len(self._identifiers) >= ID_CACHE_MAX_SIZE:

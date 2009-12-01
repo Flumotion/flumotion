@@ -83,8 +83,8 @@ class TestHTTPCachedPlugStats(TestCase):
 
         plugProps = {"properties": {"cache-size": CACHE_SIZE,
                                     "cache-dir": self.cache_path,
-                                    "server-hostname": "localhost",
-                                    "server-port": p}}
+                                    "virtual-hostname": "localhost",
+                                    "virtual-port": p}}
 
         self.plug = \
             file_provider.FileProviderHTTPCachedPlug(plugProps)

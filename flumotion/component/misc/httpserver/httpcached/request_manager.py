@@ -113,6 +113,7 @@ class ConsumerManager(common.StreamConsumer, log.Loggable):
             code = self.last_error or common.SERVER_UNAVAILABLE
             message = self.last_message or ""
             self.consumer.serverError(self, code, message)
+            return self
 
     def pause(self):
         self.log("Pausing request %s", self.url)

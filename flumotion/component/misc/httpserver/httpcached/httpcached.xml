@@ -24,26 +24,28 @@
                   _description="Cache fill level to drop back to after cleanup (from 0.0 to 1.0, defaults to 0.6)" />
 		<property name="cache-ttl" type="int" required="no"
                   _description="The time in second after which cached files are checked against the server for expiration (default: 300)." />
-		<property name="server-hostname" type="string" required="yes"
+		<property name="virtual-hostname" type="string" required="yes"
                   _description="The hostname of the resource server to use for performing HTTP request." />
-		<property name="server-port" type="int" required="no"
+		<property name="virtual-port" type="int" required="no"
                   _description="The port of the resource server to use for performing HTTP request (default: 80)." />
-		<property name="dns-refresh" type="int" required="no"
+		<property name="virtual-path" type="string" required="no"
+                  _description="The root URI to prepend to the requested URI relative to the HTTP server mount-point. The default is to not prepend anything.." />
+		<property name="dns-refresh-period" type="int" required="no"
                   _description="The period of refresh for DNS resolution in seconds (default: 60)." />
 		<property name="connection-timeout" type="int" required="no"
-                  _description="The timeout in seconds when connecting to a server (default: 5)." />
+                  _description="The timeout in seconds when connecting to a server (default: 2)." />
 		<property name="idle-timeout" type="int" required="no"
                   _description="The timeout in seconds when not receiving data from a server (default: 5)." />
-		<property name="proxy-name" type="string" required="no" multiple="yes"
-                  _description="HTTP Proxy definition with format hostname:port#priority. The port and priority are not required and the default values are 3128 for port and 1 for priority. This property is mean for compatibility, use the compound property 'proxy' instead." />
-        <compound-property name="proxy" required="no" multiple="yes"
-        		  _description="HTTP proxy properties.">
+		<property name="http-server-old" type="string" required="no" multiple="yes"
+                  _description="HTTP server connection string with format hostname:port#priority. The port and priority are not required and the default values are 3128 for port and 1 for priority. This property is mean for compatibility, use the compound property 'http-server' instead." />
+        <compound-property name="http-server" required="no" multiple="yes"
+        		  _description="HTTP server properties.">
 			<property name="hostname" type="string" required="yes"
-                      _description="The hostname of a proxy to use to retrieve resources." />
+                      _description="The hostname of an HTTP server to use to retrieve resources." />
 			<property name="port" type="int" required="no"
-                      _description="The proxy's port to use to retrieve resources (default: 3128)." />
+                      _description="The HTTP server port to use to retrieve resources (default: 3128)." />
 			<property name="priority" type="int" required="no"
-                      _description="The proxy priority order (default: 1)." />
+                      _description="The server priority order (default: 1)." />
         </compound-property>
 
       </properties>

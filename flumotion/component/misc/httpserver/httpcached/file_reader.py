@@ -37,10 +37,11 @@ LOG_CATEGORY = "filereader-httpcached"
 
 DEFAULT_CACHE_TTL = 5*60
 DEFAULT_DNS_REFRESH = 60
-DEFAULT_SERVER_PORT = 80
-DEFAULT_PROXY_PORT = 3128
+DEFAULT_VIRTUAL_PORT = 80
+DEFAULT_VIRTUAL_PATH = ""
+DEFAULT_VIRTUAL_PORT = 3128
 DEFAULT_PROXY_PRIORITY = 1
-DEFAULT_CONN_TIMEOUT = 5
+DEFAULT_CONN_TIMEOUT = 2
 DEFAULT_IDLE_TIMEOUT = 5
 
 
@@ -49,8 +50,8 @@ class FileReaderHTTPCachedPlug(log.Loggable):
     Offers a file-like interface to streams retrieved using HTTP.
     It supports:
      - Local caching with TTL expiration, and cooperative managment.
-     - Load-balanced proxies with priority level of proxies (fall-back).
-     - More than one IP by proxy hostname with periodic DNS refresh.
+     - Load-balanced HTTP servers with priority level (fall-back).
+     - More than one IP by server hostname with periodic DNS refresh.
      - Connection resuming if HTTP connection got disconnected.
     """
 
@@ -69,48 +70,50 @@ class FileReaderHTTPCachedPlug(log.Loggable):
         cleanupHighWatermark = props.get('cleanup-high-watermark')
         cleanupLowWatermark = props.get('cleanup-low-watermark')
 
+        self.virtualHost = props.get('virtual-hostname')
+        self.virtualPort = props.get('virtual-port', DEFAULT_VIRTUAL_PORT)
+        self.virtualPath = props.get('virtual-path', DEFAULT_VIRTUAL_PATH)
+        dnsRefresh = props.get('dns-refresh-period', DEFAULT_DNS_REFRESH)
+        servers = props.get('http-server')
+        compat_servers = props.get('http-server-old')
+
         self.stats = cachestats.CacheStatistics()
 
         self.cachemgr = cachemanager.CacheManager(self.stats,
-                                             cacheDir, cacheSize,
-                                             cleanupEnabled,
-                                             cleanupHighWatermark,
-                                             cleanupLowWatermark)
-
-        self.serverHost = props.get('server-hostname')
-        self.serverPort = props.get('server-port', DEFAULT_SERVER_PORT)
-        dnsRefresh = props.get('dns-refresh', DEFAULT_DNS_REFRESH)
-        proxies = props.get('proxy')
-        compat_proxies = props.get('proxy-name')
+                                                  cacheDir, cacheSize,
+                                                  cleanupEnabled,
+                                                  cleanupHighWatermark,
+                                                  cleanupLowWatermark,
+                                                  self.virtualHost)
 
         selector = server_selection.ServerSelector(dnsRefresh)
 
-        if not (proxies or compat_proxies):
-            selector.addServer(self.serverHost, self.serverPort)
+        if not (servers or compat_servers):
+            selector.addServer(self.virtualHost, self.virtualPort)
         else:
-            if compat_proxies:
-                # Add the proxies specified by name
-                for proxyname in compat_proxies:
-                    if '#' in proxyname:
-                        proxyname, priostr = proxyname.split('#', 1)
+            if compat_servers:
+                # Add the servers specified by name
+                for hostname in compat_servers:
+                    if '#' in hostname:
+                        hostname, priostr = hostname.split('#', 1)
                         priority = int(priostr)
                     else:
                         priority = DEFAULT_PROXY_PRIORITY
-                    if ':' in proxyname:
-                        proxyname, portstr = proxyname.split(':', 1)
+                    if ':' in hostname:
+                        hostname, portstr = hostname.split(':', 1)
                         port = int(portstr)
                     else:
-                        port = DEFAULT_PROXY_PORT
-                    selector.addServer(proxyname, port, priority)
+                        port = DEFAULT_VIRTUAL_PORT
+                    selector.addServer(hostname, port, priority)
 
 
-            if proxies:
-                # Add the proxies specified by compound properties
-                for proxyProps in proxies:
-                    hostname = proxyProps.get('hostname')
-                    port = proxyProps.get('port', DEFAULT_PROXY_PORT)
-                    priority = proxyProps.get('priority',
-                                              DEFAULT_PROXY_PRIORITY)
+            if servers:
+                # Add the servers specified by compound properties
+                for serverProps in servers:
+                    hostname = serverProps.get('hostname')
+                    port = serverProps.get('port', DEFAULT_VIRTUAL_PORT)
+                    priority = serverProps.get('priority',
+                                               DEFAULT_PROXY_PRIORITY)
                     selector.addServer(hostname, port, priority)
 
         connTimeout = props.get('connection-timeout', DEFAULT_CONN_TIMEOUT)
@@ -144,7 +147,7 @@ class FileReaderHTTPCachedPlug(log.Loggable):
         return d
 
     def open(self, path):
-        url = http_utils.Url(hostname=self.serverHost,
-                             port=self.serverPort,
-                             path=path)
+        url = http_utils.Url(hostname=self.virtualHost,
+                             port=self.virtualPort,
+                             path=self.virtualPath + path)
         return self.resmgr.getResourceFor(url)
