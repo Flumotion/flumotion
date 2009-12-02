@@ -61,6 +61,7 @@
       </dependencies>
       <directories>
         <directory name="flumotion/component/misc/httpserver/httpcached">
+          <filename location="__init__.py" />
           <filename location="common.py" />
           <filename location="file_provider.py" />
           <filename location="file_reader.py" />

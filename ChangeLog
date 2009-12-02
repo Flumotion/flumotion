@@ -1,3 +1,8 @@
+2009-12-02  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/component/misc/httpserver/httpcached/httpcached.xml:
+	Fixed fileprovider-httpcached bundle definition.
+
 2009-12-01  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/cachemanager.py:
