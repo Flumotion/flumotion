@@ -362,9 +362,6 @@ flumotion/extern/code.py
 flumotion/extern/exceptiondialog.py
 flumotion/extern/fdpass/__init__.py
 flumotion/extern/log/__init__.py
-flumotion/extern/pytrayicon/__init__.py
-flumotion/extern/pytrayicon/eggtrayicon.c
-flumotion/extern/pytrayicon/ltihooks.py
 flumotion/job/__init__.py
 flumotion/job/job.py
 flumotion/job/main.py
