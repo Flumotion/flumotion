@@ -269,12 +269,12 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         plugs = self.plugs.get(FILEPROVIDER_SOCKET, [])
         if plugs:
             if path:
-                txt = "The component property 'path' should not " \
-                      "be used in conjunction with a file provider plug."
-                self.warning(txt)
-                msg = messages.Warning(T_(N_(txt)))
+                self.warning("The component property 'path' should not be used"
+                             " in conjunction with a file provider plug.")
+                msg = messages.Warning(T_(N_(
+                             "The component property 'path' should not be used"
+                             " in conjunction with a file provider plug.")))
                 self.addMessage(msg)
-            return
 
         if props.get('type', 'master') == 'slave':
             for k in 'socket-path', 'username', 'password':
