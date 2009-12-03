@@ -1,5 +1,20 @@
 2009-12-03  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/monitor/nagios/component.py (added):
+	Add a separate component module.
+	Add a FlipFlop check that connects to the manager and watches the state
+	of a component for a given amout of time. Raises a critical if the mood
+	alternates between two extremes (by default: happy and hungry) more
+	than the given number of times.
+
+	* flumotion/monitor/nagios/main.py:
+	Move the Mood check to the component module.
+
+	* flumotion/monitor/nagios/Makefile.am:
+	Dist the new file.
+
+2009-12-03  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/monitor/nagios/main.py:
 	Do not return an the status twice when failing to connect to a
 	manager.

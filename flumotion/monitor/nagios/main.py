@@ -32,68 +32,11 @@ from flumotion.common import common, errors, planet, log
 from flumotion.admin.connections import parsePBConnectionInfoRecent
 from flumotion.admin import admin
 
-from flumotion.monitor.nagios import util, process, stream, log as nlog
+from flumotion.monitor.nagios import util, process, stream, component
+from flumotion.monitor.nagios import log as nlog
 
 __version__ = "$Rev$"
 
-
-class Mood(util.LogCommand):
-    description = "Check the mood of a component."
-    usage = "[mood options] [component id]"
-
-    def addOptions(self):
-        default = "hungry"
-        self.parser.add_option('-w', '--warning',
-            action="store", dest="warning",
-            help="moods to give a warning for (defaults to %s)" % (default),
-            default=default)
-        default = "sleeping,lost,sad"
-        self.parser.add_option('-c', '--critical',
-            action="store", dest="critical",
-            help="moods to give a critical for (defaults to %s)" % (default),
-            default=default)
-
-    def handleOptions(self, options):
-        self._warning = options.warning.split(',')
-        self._critical = options.critical.split(',')
-
-    def do(self, args):
-        if not args:
-            self.stderr.write(
-                'Please specify a component to check the mood of.\n.')
-            return 3
-
-        self._component = args[0]
-        # call our callback after connecting
-        self.parentCommand.managerDeferred.addCallback(self._callback)
-
-    def _callback(self, result):
-        d = self.parentCommand.adminModel.callRemote('getPlanetState')
-
-        def gotPlanetStateCb(result):
-            self.debug('gotPlanetStateCb')
-            c = util.findComponent(result, self._component)
-            if not c:
-                return util.unknown('Could not find component %s' %
-                    self._component)
-
-            moodValue = c.get('mood')
-            moodName = planet.moods.get(moodValue).name
-
-            if moodName in self._critical:
-                return util.critical('Component %s is %s' % (self._component,
-                    moodName))
-
-            if moodName in self._warning:
-                return util.warning('Component %s is %s' % (self._component,
-                    moodName))
-
-            return util.ok('Component %s is %s' % (self._component,
-                moodName))
-
-        d.addCallback(gotPlanetStateCb)
-        d.addCallback(lambda e: setattr(reactor, 'exitStatus', e))
-        return d
 
 # Because we run a reactor and use deferreds, the flow is slightly different
 # from the usual Command flow.
@@ -118,7 +61,7 @@ class Manager(util.LogCommand):
     managerDeferred = None # deferred that fires upon connection
     adminModel = None      # AdminModel connected to the manager
 
-    subCommandClasses = [Mood]
+    subCommandClasses = [component.Mood, component.FlipFlop]
 
     def addOptions(self):
         default = "user:test@localhost:7531"
