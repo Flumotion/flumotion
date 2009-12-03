@@ -1,3 +1,9 @@
+2009-12-03  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/component/misc/httpserver/httpserver.py:
+	Add a warning message to the http-server component when its property
+	path has been set in conjunction with a file provider plug.
+
 2009-12-02  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpcached/httpcached.xml:

@@ -44,6 +44,9 @@ T_ = gettexter()
 
 UPTIME_UPDATE_INTERVAL = 5
 
+FILEPROVIDER_SOCKET = 'flumotion.component.misc.httpserver' \
+                      '.fileprovider.FileProviderPlug'
+
 
 class CancellableRequest(server.Request):
 
@@ -262,14 +265,23 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             ('porter_password', 'porter-password'),
             ('mount_point', 'mount-point')])
 
+        path = props.get('path', None)
+        plugs = self.plugs.get(FILEPROVIDER_SOCKET, [])
+        if plugs:
+            if path:
+                txt = "The component property 'path' should not " \
+                      "be used in conjunction with a file provider plug."
+                self.warning(txt)
+                msg = messages.Warning(T_(N_(txt)))
+                self.addMessage(msg)
+            return
+
         if props.get('type', 'master') == 'slave':
             for k in 'socket-path', 'username', 'password':
                 if not 'porter-' + k in props:
                     msg = 'slave mode, missing required property porter-%s' % k
                     return defer.fail(errors.ConfigError(msg))
-
-            path = props.get('path', None)
-            if path is None:
+            if plugs or not path:
                 return
             if os.path.isfile(path):
                 self._singleFile = True
@@ -328,9 +340,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             path = props.get('path')
             self._rateControlPlug = self.plugs[socket][-1]
 
-        socket = \
-            'flumotion.component.misc.httpserver.fileprovider.FileProviderPlug'
-        plugs = self.plugs.get(socket, [])
+        plugs = self.plugs.get(FILEPROVIDER_SOCKET, [])
         if plugs:
             # FileProvider factory plug; only one supported.
             self._fileProviderPlug = plugs[-1]
