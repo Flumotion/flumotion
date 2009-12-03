@@ -209,11 +209,15 @@ class TestCacheManager(testsuite.TestCase):
     def fillTestCache(self, manager, size):
         d = defer.Deferred()
         i = 0
+
+        def requestNewTempFile(_, i, s):
+            return manager.newTempFile(str(i), s)
+
         while (size > 0):
             i += 1
             filesize = random.randint(MAX_PAGE_SIZE, MAX_PAGE_SIZE * 3)
             size -= filesize
-            d.addCallback(lambda _: manager.newTempFile(str(i), filesize))
+            d.addCallback(requestNewTempFile, i, filesize)
             d.addCallback(self.completeAndClose, manager)
         d.callback(None)
         return d

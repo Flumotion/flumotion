@@ -1,3 +1,14 @@
+2009-12-03  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/test/test_cache_manager.py:
+	Fix fillTestCache. The `i' and `filesize' variables were not evaluated
+	until the lambda function (callback) was fired. Unfortunately, when ALL
+	the callbacks were fired, the last value of those two variables was used
+	producing the same tempfiles overwriting them instead of making the
+	cache grow.
+	* flumotion/test/test_component_httpserver.py:
+	Fix a typpo, we add a callback, not an errback
+
 2009-12-03  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/monitor/nagios/component.py (added):

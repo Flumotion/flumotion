@@ -301,7 +301,7 @@ class PlugTest(testsuite.TestCase):
         d1.addCallback(gotCortadoHTML)
 
         d2 = client.getPage(self._getURL('/m/c/index.html'))
-        d2.addErrback(gotCortadoHTML)
+        d2.addCallback(gotCortadoHTML)
 
         return defer.DeferredList([d1, d2], fireOnOneErrback=True)
 
@@ -324,7 +324,7 @@ class PlugTest(testsuite.TestCase):
         d1.addCallback(gotCortadoHTML)
 
         d2 = client.getPage(self._getURL('/m/c/index.html?FLUREQID=blabla'))
-        d2.addErrback(gotCortadoHTML)
+        d2.addCallback(gotCortadoHTML)
 
         return defer.DeferredList([d1, d2], fireOnOneErrback=True)
 
