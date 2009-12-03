@@ -1,3 +1,12 @@
+2009-12-03  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/monitor/nagios/main.py:
+	Do not return an the status twice when failing to connect to a
+	manager.
+	The errback on manager connection was giving the correct status
+	message, but the generic errback was also being fired. Prevent that by
+	forwarding a NagiosException to the generic errback.
+
 2009-12-03  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpserver.py:

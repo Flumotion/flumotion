@@ -26,6 +26,7 @@ main for flumotion-nagios
 import sys
 
 from twisted.internet import reactor, defer
+from twisted.internet.defer import failure
 
 from flumotion.common import common, errors, planet, log
 from flumotion.admin.connections import parsePBConnectionInfoRecent
@@ -117,7 +118,7 @@ class Manager(util.LogCommand):
     managerDeferred = None # deferred that fires upon connection
     adminModel = None      # AdminModel connected to the manager
 
-    subCommandClasses = [Mood, ]
+    subCommandClasses = [Mood]
 
     def addOptions(self):
         default = "user:test@localhost:7531"
@@ -163,12 +164,12 @@ class Manager(util.LogCommand):
             self.debug('parse: cb: done')
             reactor.callLater(0, reactor.stop)
 
-        def eb(failure):
+        def eb(f):
             self.debug(
-                'parse: eb: failure %s' % log.getFailureMessage(failure))
+                'parse: eb: failure %s' % log.getFailureMessage(f))
             # Nagios exceptions have already got their feedback covered
-            if not failure.check(util.NagiosException):
-                util.unknown(log.getFailureMessage(failure))
+            if not f.check(util.NagiosException):
+                util.unknown(log.getFailureMessage(f))
             reactor.callLater(0, reactor.stop)
         self.managerDeferred.addCallback(cb)
         self.managerDeferred.addErrback(eb)
@@ -225,12 +226,19 @@ class Manager(util.LogCommand):
         self.debug('Connected to manager.')
         self.managerDeferred.callback(result)
 
-    def _connectedEb(self, failure):
-        if failure.check(errors.ConnectionFailedError):
-            util.unknown("Unable to connect to manager.")
-        if failure.check(errors.ConnectionRefusedError):
-            util.critical("Manager refused connection.")
-        self.managerDeferred.errback(failure)
+    def _connectedEb(self, f):
+        if f.check(errors.ConnectionFailedError):
+            # switch the failure and return an UNKNOWN status
+            msg = "Unable to connect to manager."
+            f = failure.Failure(util.NagiosUnknown(msg))
+            util.unknown(msg)
+        if f.check(errors.ConnectionRefusedError):
+            # switch the failure and return a CRITICAL status
+            msg = "Manager refused connection."
+            f = failure.Failure(util.NagiosCritical(msg))
+            util.critical(msg)
+        # all other failures get forwarded to the managerDeferred errback as-is
+        self.managerDeferred.errback(f)
 
 
 class Stream(util.LogCommand):
