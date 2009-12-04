@@ -271,10 +271,11 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             if path:
                 self.warning("The component property 'path' should not be used"
                              " in conjunction with a file provider plug.")
-                msg = messages.Warning(T_(N_(
-                             "The component property 'path' should not be used"
-                             " in conjunction with a file provider plug.")))
-                self.addMessage(msg)
+                # For now we don't want the admin to show a warning messages
+                #msg = messages.Warning(T_(N_(
+                #            "The component property 'path' should not be used"
+                #            " in conjunction with a file provider plug.")))
+                #self.addMessage(msg)
 
         if props.get('type', 'master') == 'slave':
             for k in 'socket-path', 'username', 'password':

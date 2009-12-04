@@ -39,7 +39,7 @@ DEFAULT_CACHE_TTL = 5*60
 DEFAULT_DNS_REFRESH = 60
 DEFAULT_VIRTUAL_PORT = 80
 DEFAULT_VIRTUAL_PATH = ""
-DEFAULT_VIRTUAL_PORT = 3128
+DEFAULT_SERVER_PORT = 3128
 DEFAULT_PROXY_PRIORITY = 1
 DEFAULT_CONN_TIMEOUT = 2
 DEFAULT_IDLE_TIMEOUT = 5
@@ -103,7 +103,7 @@ class FileReaderHTTPCachedPlug(log.Loggable):
                         hostname, portstr = hostname.split(':', 1)
                         port = int(portstr)
                     else:
-                        port = DEFAULT_VIRTUAL_PORT
+                        port = DEFAULT_SERVER_PORT
                     selector.addServer(hostname, port, priority)
 
 
@@ -111,7 +111,7 @@ class FileReaderHTTPCachedPlug(log.Loggable):
                 # Add the servers specified by compound properties
                 for serverProps in servers:
                     hostname = serverProps.get('hostname')
-                    port = serverProps.get('port', DEFAULT_VIRTUAL_PORT)
+                    port = serverProps.get('port', DEFAULT_SERVER_PORT)
                     priority = serverProps.get('priority',
                                                DEFAULT_PROXY_PRIORITY)
                     selector.addServer(hostname, port, priority)

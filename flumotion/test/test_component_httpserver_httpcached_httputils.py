@@ -23,8 +23,36 @@ from flumotion.common.testsuite import TestCase
 
 from flumotion.component.misc.httpserver.httpcached.http_utils import Url
 
+#TODO: Add a test for multiple different query fields (reordering issues)
+
 
 class TestURL(TestCase):
+
+    def testQuotedSpaces(self):
+
+        def check(_url, _loc, _path, _query, **kwargs):
+            obj = Url(**kwargs)
+            self.assertEqual(str(obj), _url)
+            self.assertEqual(obj.url, _url)
+            self.assertEqual(obj.location, _loc)
+            self.assertEqual(obj.path, _path)
+            self.assertEqual(obj.query, _query)
+
+            obj2 = Url.fromString(_url)
+            self.assertEqual(str(obj2), str(obj))
+            self.assertEqual(str(obj2), _url)
+
+        check("/", "/", "/", {}, path="/")
+
+        check("/with%20lots/%20of%20/nasty%20spaces.txt",
+              "/with%20lots/%20of%20/nasty%20spaces.txt",
+              "/with lots/ of /nasty spaces.txt", {},
+              path="/with lots/ of /nasty spaces.txt")
+
+        check("/path?que%20ry=val%20u",
+              "/path?que%20ry=val%20u",
+              "/path", {"que ry": ["val u"]},
+              path="/path", query={"que ry": ["val u"]})
 
     def testRelativeToString(self):
 
@@ -37,7 +65,7 @@ class TestURL(TestCase):
         check("/", "/")
         check("/", "/", path="/")
         check("/;P", "/;P", params="P")
-        check("/?n=v", "/?n=v", query="n=v")
+        check("/?n=v", "/?n=v", query={"n": ["v"]})
         check("/#f", "/#f", fragment="f")
         check("/", "/", username="user")
         check("/", "/", password="test")
@@ -45,23 +73,23 @@ class TestURL(TestCase):
         check("/sub/dir/file.py;params?query=val#anchor",
               "/sub/dir/file.py;params?query=val#anchor",
               path="/sub/dir/file.py", params="params",
-              query="query=val", fragment="anchor")
+              query={"query": ["val"]}, fragment="anchor")
         check("/;params?query=val#anchor",
               "/;params?query=val#anchor",
               params="params",
-              query="query=val", fragment="anchor")
+              query={"query": ["val"]}, fragment="anchor")
         check("/sub/dir/file.py?query=val#anchor",
               "/sub/dir/file.py?query=val#anchor",
               path="/sub/dir/file.py",
-              query="query=val", fragment="anchor")
+              query={"query": ["val"]}, fragment="anchor")
         check("/sub/dir/file.py;params#anchor",
               "/sub/dir/file.py;params#anchor",
               path="/sub/dir/file.py", params="params",
-              fragment="anchor")
+              query={}, fragment="anchor")
         check("/sub/dir/file.py;params?query=val",
               "/sub/dir/file.py;params?query=val",
               path="/sub/dir/file.py", params="params",
-              query="query=val")
+              query={"query": ["val"]})
 
     def testAbsoluteToString(self):
 
@@ -96,10 +124,10 @@ class TestURL(TestCase):
               "user:test@localhost:8080", "localhost:8080",
               hostname="localhost", port=8080,
               username='user', password='test')
-        check("http://localhost/sub/dir/file.py;P?Q#F",
-              "/sub/dir/file.py;P?Q#F", "localhost", "localhost",
+        check("http://localhost/sub/dir/file.py;P?Q=#F",
+              "/sub/dir/file.py;P?Q=#F", "localhost", "localhost",
               hostname="localhost", path="/sub/dir/file.py",
-              query="Q", params="P", fragment="F")
+              query={"Q": [""]}, params="P", fragment="F")
 
     def testRelativeFromString(self):
 
@@ -114,33 +142,36 @@ class TestURL(TestCase):
         check("/",
               scheme="", hostname="", path="/",
               username=None, password=None, port=None,
-              params="", query="", fragment="",
+              params="", query={}, fragment="",
               location="/")
         check("/sub/file;param?query=string#fragment",
               scheme="", hostname="", path="/sub/file",
               username=None, password=None, port=None,
-              params="param", query="query=string", fragment="fragment",
+              params="param", query={"query": ["string"]},
+              fragment="fragment",
               location="/sub/file;param?query=string#fragment")
-        check("/;param?query=string#fragment",
+        check("/;param?query=s1&query=s2#fragment",
               scheme="", hostname="", path="/",
               username=None, password=None, port=None,
-              params="param", query="query=string", fragment="fragment",
-              location="/;param?query=string#fragment")
-        check("/sub/file?query=string#fragment",
+              params="param", query={"query": ["s1", "s2"]},
+              fragment="fragment",
+              location="/;param?query=s1&query=s2#fragment")
+        check("/sub/file?q1=s1#fragment",
               scheme="", hostname="", path="/sub/file",
               username=None, password=None, port=None,
-              params="", query="query=string", fragment="fragment",
-              location="/sub/file?query=string#fragment")
+              params="", query={"q1": ["s1"]},
+              fragment="fragment",
+              location="/sub/file?q1=s1#fragment")
         check("/sub/file;param#fragment",
               scheme="", hostname="", path="/sub/file",
               username=None, password=None, port=None,
-              params="param", query="", fragment="fragment",
+              params="param", query={}, fragment="fragment",
               location="/sub/file;param#fragment")
         check("/sub/file;param?query=string",
               scheme="", hostname="", path="/sub/file",
               username=None, password=None, port=None,
-              params="param", query="query=string", fragment="",
-              location="/sub/file;param?query=string")
+              params="param", query={"query": ["string"]},
+              fragment="", location="/sub/file;param?query=string")
 
     def testAbsoluteFromString(self):
 
@@ -157,31 +188,35 @@ class TestURL(TestCase):
               "user:test@localhost:8080", "localhost:8080",
               scheme="http", hostname="localhost", path="/sub/file",
               username="user", password="test", port=8080,
-              params="param", query="query=string", fragment="fragment",
+              params="param", query={"query": ["string"]},
+              fragment="fragment",
               location="/sub/file;param?query=string#fragment")
 
         check("https://user:test@localhost:8080"
-              "/sub/file;param?query=string#fragment",
+              "/sub/file;param?q=s1&q=s2&q=s3#fragment",
               "user:test@localhost:8080", "localhost:8080",
               scheme="https", hostname="localhost", path="/sub/file",
               username="user", password="test", port=8080,
-              params="param", query="query=string", fragment="fragment",
-              location="/sub/file;param?query=string#fragment")
+              params="param", query={"q": ["s1", "s2", "s3"]},
+              fragment="fragment",
+              location="/sub/file;param?q=s1&q=s2&q=s3#fragment")
 
         check("http://user@localhost:8080"
-              "/sub/file;param?query=string#fragment",
+              "/sub/file;param?query=#fragment",
               "user@localhost:8080", "localhost:8080",
               scheme="http", hostname="localhost", path="/sub/file",
               username="user", password=None, port=8080,
-              params="param", query="query=string", fragment="fragment",
-              location="/sub/file;param?query=string#fragment")
+              params="param", query={"query": [""]},
+              fragment="fragment",
+              location="/sub/file;param?query=#fragment")
 
         check("http://localhost:8080"
               "/sub/file;param?query=string#fragment",
               "localhost:8080", "localhost:8080",
               scheme="http", hostname="localhost", path="/sub/file",
               username=None, password=None, port=8080,
-              params="param", query="query=string", fragment="fragment",
+              params="param", query={"query": ["string"]},
+              fragment="fragment",
               location="/sub/file;param?query=string#fragment")
 
         check("http://user:test@localhost"
@@ -189,7 +224,8 @@ class TestURL(TestCase):
               "user:test@localhost", "localhost",
               scheme="http", hostname="localhost", path="/sub/file",
               username="user", password="test", port=80,
-              params="param", query="query=string", fragment="fragment",
+              params="param", query={"query": ["string"]},
+              fragment="fragment",
               location="/sub/file;param?query=string#fragment")
 
         check("https://user:test@localhost"
@@ -197,7 +233,8 @@ class TestURL(TestCase):
               "user:test@localhost", "localhost",
               scheme="https", hostname="localhost", path="/sub/file",
               username="user", password="test", port=443,
-              params="param", query="query=string", fragment="fragment",
+              params="param", query={"query": ["string"]},
+              fragment="fragment",
               location="/sub/file;param?query=string#fragment")
 
         check("http://user:test@localhost:8080"
@@ -205,7 +242,8 @@ class TestURL(TestCase):
               "user:test@localhost:8080", "localhost:8080",
               scheme="http", hostname="localhost", path="/",
               username="user", password="test", port=8080,
-              params="param", query="query=string", fragment="fragment",
+              params="param", query={"query": ["string"]},
+              fragment="fragment",
               location="/;param?query=string#fragment")
 
         check("http://user:test@localhost:8080"
@@ -213,19 +251,20 @@ class TestURL(TestCase):
               "user:test@localhost:8080", "localhost:8080",
               scheme="http", hostname="localhost", path="/sub/file",
               username="user", password="test", port=8080,
-              params="", query="query=string", fragment="fragment",
+              params="", query={"query": ["string"]},
+              fragment="fragment",
               location="/sub/file?query=string#fragment")
 
         check("http://user:test@localhost:8080/sub/file;param#fragment",
               "user:test@localhost:8080", "localhost:8080",
               scheme="http", hostname="localhost", path="/sub/file",
               username="user", password="test", port=8080,
-              params="param", query="", fragment="fragment",
+              params="param", query={}, fragment="fragment",
               location="/sub/file;param#fragment")
 
         check("http://user:test@localhost:8080/sub/file;param?query=string",
               "user:test@localhost:8080", "localhost:8080",
               scheme="http", hostname="localhost", path="/sub/file",
               username="user", password="test", port=8080,
-              params="param", query="query=string", fragment="",
-              location="/sub/file;param?query=string")
+              params="param", query={"query": ["string"]},
+              fragment="", location="/sub/file;param?query=string")

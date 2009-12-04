@@ -1,3 +1,13 @@
+2009-12-04  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/component/misc/httpserver/httpcached/file_reader.py:
+	* flumotion/component/misc/httpserver/httpcached/http_utils.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/test/test_component_httpserver_httpcached_httputils.py:
+	Fixed a constant name clash for default values.
+	Fixed the URL quoting.
+	Removed the admin warning message when path is specified with a plug.
+
 2009-12-03  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/test/test_cache_manager.py:

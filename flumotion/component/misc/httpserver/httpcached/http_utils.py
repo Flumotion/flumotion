@@ -20,7 +20,9 @@
 # Headers in this file shall remain intact.
 
 import urlparse
+import urllib
 
+from twisted.web import http
 
 DEFAULT_PORTS = {'http': 80,
                  'https': 443}
@@ -28,7 +30,16 @@ DEFAULT_PORTS = {'http': 80,
 DEFAULT_SCHEME = 'http'
 
 
-class Dummy(object):
+def unparse_qs(query):
+    result = []
+    for name, values in query.items():
+        qname = urllib.quote(name)
+        for value in values:
+            result.append(qname + "=" + urllib.quote(value))
+    return "&".join(result)
+
+
+class _Dummy(object):
     pass
 
 
@@ -71,7 +82,7 @@ class Url(object):
             port = DEFAULT_PORTS.get(scheme, None)
 
 
-        obj = Dummy()
+        obj = _Dummy()
 
         obj.url = url
         obj.scheme = scheme
@@ -79,7 +90,7 @@ class Url(object):
         obj.host = host
         obj.path = path
         obj.params = parsed[3]
-        obj.query = parsed[4]
+        obj.query = http.parse_qs(parsed[4], 1)
         obj.fragment = parsed[5]
         obj.location = location
         obj.hostname = hostname
@@ -92,7 +103,7 @@ class Url(object):
         return obj
 
     def __init__(self, scheme=None, hostname=None, path="/",
-                 params="", query="", fragment="",
+                 params="", query={}, fragment="",
                  username=None, password=None, port=None):
 
         self.path = path
@@ -142,11 +153,15 @@ class Url(object):
             self.password = None
             self.port = None
 
-        self.location = urlparse.urlunparse(('', '', self.path, self.params,
-                                             self.query, self.fragment))
+        query_string = unparse_qs(self.query)
+        quoted_path = urllib.quote(self.path)
 
-        self.url = urlparse.urlunparse((self.scheme, self.netloc, self.path,
-            self.params, self.query, self.fragment))
+        self.location = urlparse.urlunparse(('', '', quoted_path, self.params,
+                                             query_string, self.fragment))
+
+        self.url = urlparse.urlunparse((self.scheme, self.netloc, quoted_path,
+                                        self.params, query_string,
+                                        self.fragment))
 
     def toString(self):
         return self.url
