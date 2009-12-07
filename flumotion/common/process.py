@@ -236,16 +236,25 @@ def _acquirePidFile(type, name=None):
     return open(path, 'w')
 
 
-def deletePidFile(type, name=None):
+def deletePidFile(type, name=None, force=False):
     """
     Delete the pid file in the run directory, using the given process type
     and process name for the filename.
+
+    @param force: if errors due to the file not existing should be ignored
+    @type  force: bool
 
     @rtype:   str
     @returns: full path to the pid file that was written
     """
     path = _getPidPath(type, name)
-    os.unlink(path)
+    try:
+        os.unlink(path)
+    except OSError, e:
+        if e.errno == errno.ENOENT and force:
+            pass
+        else:
+            raise
     return path
 
 

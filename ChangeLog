@@ -1,3 +1,14 @@
+2009-12-07  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/process.py:
+	Add a force flag to deletePidFile that makes it ignore errors due to
+	the pid file not being present.
+
+	* flumotion/service/service.py:
+	Always remove the pid file of a process when asked to stop it,
+	regardless of whether the stopping was successful or not.
+	Remove stale pid files when asked to start a process.
+
 2009-12-04  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpcached/file_reader.py:

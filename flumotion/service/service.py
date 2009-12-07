@@ -426,8 +426,11 @@ user:PSfNpHTkpTx1M
                 raise errors.FatalError, \
                     "Manager %s is already running (with pid %d)" % (name, pid)
             else:
-                raise errors.FatalError, \
-                    "Manager %s is dead (stale pid %d)" % (name, pid)
+                # there is a stale PID file, warn about it, remove it and
+                # continue
+                self.warning("Removing stale pid file %d for manager %s",
+                             pid, name)
+                deletePidFile('manager', name)
 
         dirOptions = self._getDirOptions()
         command = "flumotion-manager %s -D --daemonize-to %s " \
@@ -470,8 +473,11 @@ user:PSfNpHTkpTx1M
                 raise errors.FatalError, \
                     "Worker %s is already running (with pid %d)" % (name, pid)
             else:
-                raise errors.FatalError, \
-                    "Worker %s is dead (stale pid %d)" % (name, pid)
+                # there is a stale PID file, warn about it, remove it and
+                # continue
+                self.warning("Removing stale pid file %d for worker %s",
+                             pid, name)
+                deletePidFile('worker', name)
 
         # we are sure the worker is not running and there's no pid file
         self.info("Loading worker %s" % workerFile)
@@ -521,15 +527,22 @@ user:PSfNpHTkpTx1M
 
         # FIXME: ensure a correct process is running this pid
         if not checkPidRunning(pid):
-            self.info("Manager %s is dead (stale pid %d)" % (name, pid))
+            self.info("Manager %s is dead (stale pid %d), "
+                      "cleaning up" % (name, pid))
+            deletePidFile('manager', name)
             return False
 
         self.debug('Stopping manager %s with pid %d' % (name, pid))
-        if not self.stopProcess(pid):
-            return False
 
-        self.info('Stopped manager %s with pid %d' % (name, pid))
-        return True
+        ret = self.stopProcess(pid)
+
+        # we may need to remove the pid file ourselves, in case the process
+        # failed to do it
+        deletePidFile('manager', name, force=True)
+
+        if ret:
+            self.info('Stopped manager %s with pid %d' % (name, pid))
+        return ret
 
     def stopWorker(self, name):
         """
@@ -543,15 +556,22 @@ user:PSfNpHTkpTx1M
 
         # FIXME: ensure a correct process is running this pid
         if not checkPidRunning(pid):
-            self.info("Worker %s is dead (stale pid %d)" % (name, pid))
+            self.info("Worker %s is dead (stale pid %d), "
+                      "cleaning up" % (name, pid))
+            deletePidFile('worker', name)
             return False
 
         self.debug('Stopping worker %s with pid %d' % (name, pid))
-        if not self.stopProcess(pid):
-            return False
 
-        self.info('Stopped worker %s with pid %d' % (name, pid))
-        return True
+        ret = self.stopProcess(pid)
+
+        # we may need to remove the pid file ourselves, in case the process
+        # failed to do it
+        deletePidFile('worker', name, force=True)
+
+        if ret:
+            self.info('Stopped worker %s with pid %d' % (name, pid))
+        return ret
 
     def stopProcess(self, pid):
         """
