@@ -81,7 +81,6 @@ _flumotion_admin()
         --version -m --manager --no-ssl' -- $cur ) )
 } &&
 complete -F _flumotion_admin flumotion-admin
-}
 
 _flumotion_command()
 {
@@ -105,4 +104,3 @@ _flumotion_command()
     COMPREPLY=( $( compgen -W "$_command_options" -- "$cur") )
 } &&
 complete -F _flumotion_command flumotion-command
-}

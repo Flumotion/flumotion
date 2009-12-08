@@ -1,5 +1,10 @@
 2009-12-08  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* tools/flumotion-completion:
+	Remove leftover brace.
+
+2009-12-08  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* tools/flumotion-completion (added):
 	Add bash completion functions for flumotion-admin and
 	flumotion-command.
