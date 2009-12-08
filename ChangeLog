@@ -1,5 +1,11 @@
 2009-12-08  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* tools/flumotion-completion (added):
+	Add bash completion functions for flumotion-admin and
+	flumotion-command.
+
+2009-12-08  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/admin/command/main.py:
 	Make flumotion-command use values from the default connections file,
 	similar to what has been done for flumotion-admin in r8828.

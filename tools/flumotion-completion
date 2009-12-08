@@ -1,0 +1,108 @@
+# Command completion for flumotion-admin and flumotion-command
+# Put this in /etc/bash_completion.d/
+
+# recent connection parser
+_flumotion_recent_connections()
+{
+    _recent_connections=$(python - <<EOF
+try:
+   from flumotion.admin.connections import getRecentConnections
+   print " ".join(map(lambda c: "%s:%s" % (c.info.host, c.info.port), getRecentConnections()))
+except:
+   pass
+EOF
+)
+}
+
+# flumotion.extern.command --help parser
+_flumotion_command_help()
+{
+    local all awk_script help_output
+
+    # make a copy of the whole array
+    all=( ${COMP_WORDS[@]} )
+    # remove the last word: it's either unfinished or blank
+    unset all[COMP_CWORD]
+
+    help_output="$( ${all[@]} --help 2>/dev/null )"
+    if [ -z "$help_output" ]; then
+	return
+    fi
+
+    awk_script='
+BEGIN {
+    in_commands = 0;
+    in_options = 0;
+}
+/^commands:/ {
+    in_commands = 1;
+}
+/^Options:/ {
+    in_commands = 0;
+    in_options = 1;
+}
+in_commands && /^  [a-z]/ {
+    out = out " " $1;
+}
+in_options && /^  -/ {
+    match($0, /-[^-]/);
+    out = out " " substr($0, RSTART, RLENGTH);
+    match($0, /--[-a-zA-Z_]+/);
+    out = out " " substr($0, RSTART, RLENGTH);
+}
+END {
+    print out;
+}
+' 
+    # parse output
+    _command_options=$(awk "$awk_script" <<< "$help_output")
+}
+
+_flumotion_admin()
+{
+    local cur prev
+    cur=`_get_cword`
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    case $prev in
+        -m|--manager)
+	    local _recent_connections
+            _flumotion_recent_connections
+	    COMPREPLY=( $( compgen -W "$_recent_connections" -- "$cur") )
+            return 0
+            ;;
+        -d|--debug)
+	    COMPREPLY=( $( compgen -W "0 1 2 3 4 5" -- "$cur") )
+            return 0
+            ;;
+    esac
+
+    COMPREPLY=( $( compgen -W '-h --help -d --debug -v --verbose \
+        --version -m --manager --no-ssl' -- $cur ) )
+} &&
+complete -F _flumotion_admin flumotion-admin
+}
+
+_flumotion_command()
+{
+    # manager connection infos have ':' in them, disable splitting on colons
+    COMP_WORDBREAKS=${COMP_WORDBREAKS//:}
+    local cur prev
+    cur=`_get_cword`
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    case $prev in
+        -m|--manager)
+	    local _recent_connections
+            _flumotion_recent_connections
+	    COMPREPLY=( $( compgen -W "$_recent_connections" -- "$cur") )
+            return 0
+            ;;
+    esac
+
+    local _command_options
+    _flumotion_command_help
+    COMPREPLY=( $( compgen -W "$_command_options" -- "$cur") )
+} &&
+complete -F _flumotion_command flumotion-command
+}
