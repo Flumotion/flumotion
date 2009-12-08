@@ -155,7 +155,7 @@ class Command(util.LogCommand):
         return reactor.exitStatus
 
     def connect(self, options):
-        connection = connections.parsePBConnectionInfo(options.manager,
+        connection = connections.parsePBConnectionInfoRecent(options.manager,
            use_ssl=options.transport == 'ssl')
 
         # platform-3/trunk compatibility stuff to guard against
