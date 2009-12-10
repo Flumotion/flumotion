@@ -1,3 +1,19 @@
+2009-12-10  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* bin/flumotion-admin-text.in:
+	* bin/flumotion-admin.in:
+	* bin/flumotion-command.in:
+	* bin/flumotion-inspect.in:
+	* bin/flumotion-job.in:
+	* bin/flumotion-launch.in:
+	* bin/flumotion-manager.in:
+	* bin/flumotion-rrdmon.in:
+	* bin/flumotion-tester.in:
+	* bin/flumotion-worker.in:
+	* bin/flumotion.in:
+	Let configure expand the PYTHON macro instead of us hardcoding
+	paths in our .in files.
+
 2009-12-08  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* tools/flumotion-completion:
