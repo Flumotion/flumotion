@@ -2,6 +2,16 @@
 
 	reviewed by: Zaheer
 
+	* flumotion/admin/gtk/componentlist.py:
+	  Also fix the name.
+	  Remove CPU from treeview.
+	  show-popup-menu is now simply a callback, the menu pops up
+	  somewhere else.
+
+2009-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	reviewed by: Zaheer
+
 	* tests/ComponentsView.py (deleted):
 	  Remove old test that wasn't working anymore.
 	* flumotion/admin/gtk/componentlist.py:

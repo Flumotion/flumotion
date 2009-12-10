@@ -57,8 +57,7 @@ MOODS_INFO = {
  COL_PID,
  COL_STATE,
  COL_MOOD_VALUE, # to sort COL_MOOD
- COL_CPU,
- COL_TOOLTIP) = range(8)
+ COL_TOOLTIP) = range(7)
 
 
 def getComponentLabel(state):
@@ -111,7 +110,6 @@ class ComponentList(log.Loggable, gobject.GObject):
             str,            # pid
             object,         # state
             int,            # mood-value
-            str,            # cpu
             str,            # tooltip
             )
         treeView.set_model(treeModel)
@@ -501,7 +499,7 @@ if __name__ == '__main__':
             self.window.show_all()
             self.view = ComponentList(self.widget)
             self.view.connect('selection-changed', self._selection_changed_cb)
-            #self.view.connect('activated', self._activated_cb)
+            self.view.connect('show-popup-menu', self._show_popup_menu_cb)
             self.window.connect('destroy', gtk.main_quit)
 
         def _createComponent(self, dict):
@@ -517,19 +515,23 @@ if __name__ == '__main__':
         def update(self):
             components = {}
             c = self._createComponent(
-                {'name': 'one', 'mood': moods.happy.value,
+                {'config': {'name': 'one'},
+                 'mood': moods.happy.value,
                  'workerName': 'R2D2', 'pid': 1, 'type': 'dummy'})
             components['one'] = c
             c = self._createComponent(
-                {'name': 'two', 'mood': moods.sad.value,
+                {'config': {'name': 'two'},
+                 'mood': moods.sad.value,
                  'workerName': 'R2D2', 'pid': 2, 'type': 'dummy'})
             components['two'] = c
             c = self._createComponent(
-                {'name': 'three', 'mood': moods.hungry.value,
+                {'config': {'name': 'three'},
+                 'mood': moods.hungry.value,
                  'workerName': 'C3PO', 'pid': 3, 'type': 'dummy'})
             components['three'] = c
             c = self._createComponent(
-                {'name': 'four', 'mood': moods.sleeping.value,
+                {'config': {'name': 'four'},
+                 'mood': moods.sleeping.value,
                  'workerName': 'C3PO', 'pid': None, 'type': 'dummy'})
             components['four'] = c
             self.view.clearAndRebuild(components)
@@ -537,11 +539,10 @@ if __name__ == '__main__':
         def _selection_changed_cb(self, view, states):
             # states: list of AdminComponentState
             print "Selected component(s) %s" % ", ".join(
-                [s.get('name') for s in states])
+                [s.get('config')['name'] for s in states])
 
-        def _activated_cb(self, view, state, action_name):
-            name = state.get('name')
-            print "Do action %s on component %s" % (action_name, name)
+        def _show_popup_menu_cb(self, view, button, time):
+            print "Pressed button %r at time %r" % (button, time)
 
 
     app = Main()
