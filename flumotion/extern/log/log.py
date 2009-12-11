@@ -715,7 +715,7 @@ def outputToFiles(stdout=None, stderr=None):
 # base class for loggable objects
 
 
-class Loggable(object):
+class Loggable:
     """
     Base class for objects that want to be able to log messages with
     different level of severity.  The levels are, in order from least
