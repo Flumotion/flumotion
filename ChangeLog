@@ -1,3 +1,11 @@
+2009-12-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Jan
+
+	* flumotion/extern/log/log.py:
+	Make Loggable a new style object. Fixes weird issues when mixing
+	multi-inheritance with gobject objects.
+
 2009-12-10  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	reviewed by: Zaheer
