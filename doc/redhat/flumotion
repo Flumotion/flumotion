@@ -7,7 +7,7 @@
 # chkconfig: - 80 20
 #
 # description: Flumotion is a streaming server for audio and video. \
-#              See http://www.fluendo.com for details.
+#              See http://www.flumotion.net for details.
 #
 # Source function library.
 . /etc/rc.d/init.d/functions
