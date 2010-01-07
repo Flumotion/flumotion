@@ -35,8 +35,8 @@ class LooperMedium(feedcomponent.FeedComponentMedium):
     def __init__(self, comp):
         feedcomponent.FeedComponentMedium.__init__(self, comp)
 
-    def remote_gimme5(self, text):
-        return self.comp.do_seek()
+    def remote_restartLoop(self):
+        return self.comp.do_seek(False)
 
     def remote_getNbIterations(self):
         return self.comp.nbiterations

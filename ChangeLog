@@ -1,3 +1,9 @@
+2010-01-07  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/looper/looper.py:
+	Replace broken badly named gimme5 remote method with working
+	restartLoop remote method.
+	
 2009-12-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	reviewed by: Jan
