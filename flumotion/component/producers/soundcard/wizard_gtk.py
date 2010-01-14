@@ -113,7 +113,7 @@ class SoundcardStep(AudioProducerStep):
 
     def _updateDevices(self):
         self.wizard.waitForTask('soundcard checks')
-        self.wizard.clear_msg('soundcard-device')
+        self.wizard.clear_msg('soundcard-check')
 
         msg = Info(T_(
             N_("Looking for the sound devices present on the system. "
@@ -135,7 +135,7 @@ class SoundcardStep(AudioProducerStep):
 
         d = self.runInWorker(
             'flumotion.worker.checks.audio', 'getAudioDevices',
-            sourceElement, mid='soundcard-device')
+            sourceElement, mid='soundcard-check')
 
         d.addCallback(gotSoundDevices)
         d.addErrback(checkFailed)
