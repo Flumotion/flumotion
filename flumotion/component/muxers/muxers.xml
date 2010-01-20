@@ -9,7 +9,10 @@
       <entries>
         <entry type="component" location="ogg.py"
                function="Ogg"/>
+        <entry type="wizard" location="wizard_gtk.py"
+               function="OggWizardPlugin"/>
       </entries>
+
       <wizard _description="Ogg" type="muxer"
               feeder="default" eater="default">
         <accept-format media-type="dirac" />
@@ -28,6 +31,8 @@
       <entries>
         <entry type="component" location="multipart.py"
                function="Multipart"/>
+        <entry type="wizard" location="wizard_gtk.py"
+               function="MultipartWizardPlugin"/>
       </entries>
       <wizard _description="Multipart" type="muxer"
               feeder="default" eater="default">
@@ -41,10 +46,18 @@
   </components>
 
   <bundles>
+    <bundle name="muxers-base">
+        <directories>
+            <directory name="flumotion/component/muxers">
+                <filename location="base.py" />
+            </directory>
+        </directories>
+    </bundle>
 
     <bundle name="muxers">
         <dependencies>
             <dependency name="component" />
+            <dependency name="muxers-base" />
         </dependencies>
 
         <directories>
@@ -52,6 +65,7 @@
                 <filename location="multipart.py" />
                 <filename location="ogg.py" />
                 <filename location="checks.py" />
+                <filename location="wizard_gtk.py" />
             </directory>
         </directories>
     </bundle>

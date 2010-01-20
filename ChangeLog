@@ -1,3 +1,16 @@
+2010-01-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: jribas
+
+	* flumotion/component/muxers/Makefile.am:
+	* flumotion/component/muxers/base.py (added):
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/component/muxers/wizard_gtk.py (added):
+	Added wizard plugin to muxers.
+	With them, require the elements the muxer needs when the worker changes
+	and don't let the user to go forward if the check fails.
+	Closes #855
+
 2010-01-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: jribas
