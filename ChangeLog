@@ -1,5 +1,10 @@
 2010-01-20  Xavier Queralt Mateu,,,  <xqueralt@flumotion.com>
 
+	* data/glade/Makefile.am:
+	And another one...
+
+2010-01-20  Xavier Queralt Mateu,,,  <xqueralt@flumotion.com>
+
 	* configure.ac:
 	Forgot to rename a file to its new name in last commit.
 
