@@ -38,16 +38,16 @@ _ = gettext.gettext
 T_ = gettexter()
 
 
-class LoadConfigurationStep(WizardStep):
+class LoadFlowStep(WizardStep):
     """I am a step of the wizard which allows you to use an existing
     configuration file to set up the server
     """
-    name = 'LoadConfiguration'
-    title = _('Load Configuration')
-    sidebarName = _('Configuration')
-    section = _('Configuration')
-    gladeFile = 'loadconf-wizard.glade'
-    docSection = 'help-configuration-assistant-loadconf'
+    name = 'LoadFlow'
+    title = _('Load Flow')
+    sidebarName = _('Load Flow')
+    section = _('Load Flow')
+    gladeFile = 'loadflow-wizard.glade'
+    docSection = 'help-configuration-assistant-loadflow'
     docAnchor = ''
     docVersion = 'local'
 
@@ -64,21 +64,21 @@ class LoadConfigurationStep(WizardStep):
 
     # Public
 
-    def getConfigurationFilename(self):
+    def getFlowFilename(self):
         return self.filename.get_text()
 
     # Callbacks
 
     def on_select__clicked(self, button):
         dialog = gtk.FileChooserDialog(
-            _("Import Configuration..."), self._window,
+            _("Import Flow..."), self._window,
             gtk.FILE_CHOOSER_ACTION_OPEN,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
              _('Import'), gtk.RESPONSE_ACCEPT))
         dialog.set_modal(True)
         dialog.set_default_response(gtk.RESPONSE_ACCEPT)
         ffilter = gtk.FileFilter()
-        ffilter.set_name(_("Flumotion XML Configuration files"))
+        ffilter.set_name(_("Flumotion XML Flow files"))
         ffilter.add_pattern("*.xml")
         dialog.add_filter(ffilter)
         ffilter = gtk.FileFilter()

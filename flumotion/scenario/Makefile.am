@@ -14,7 +14,7 @@ clean-local:
 
 SUBDIRS = \
 	live \
-	loadconfiguration \
+	loadflow \
 	ondemand \
 	steps
 

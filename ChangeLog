@@ -1,3 +1,29 @@
+2010-01-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: jribas
+
+	* flumotion/admin/assistant/save.py:
+	* flumotion/scenario/Makefile.am:
+	* flumotion/scenario/loadflow/Makefile.am:
+	* flumotion/scenario/loadflow/loadflow.xml:
+	* flumotion/scenario/loadflow/wizard_gtk.py:
+	* flumotion/scenario/steps/Makefile.am:
+	* flumotion/scenario/steps/loadflowstep.py:
+	* flumotion/scenario/steps/steps.xml:
+	* +    data/glade/loadflow-wizard.glade (added):
+	* +    flumotion/scenario/loadflow (added):
+	* +    flumotion/scenario/loadflow/loadflow.xml (added):
+	* +    flumotion/scenario/steps/loadflowstep.py (added):
+	* data/glade/loadconf-wizard.glade (deleted):
+	* flumotion/scenario/loadconfiguration (deleted):
+	* flumotion/scenario/loadconfiguration/__init__.py (deleted):
+	* flumotion/scenario/loadconfiguration/loadconfiguration.xml (deleted):
+	* flumotion/scenario/loadconfiguration/Makefile.am (deleted):
+	* flumotion/scenario/loadconfiguration/wizard_gtk.py (deleted):
+	* flumotion/scenario/loadflow/loadconfiguration.xml (deleted):
+	* flumotion/scenario/steps/loadconfstep.py (deleted):
+	Rename loadconfiguration scenario and related to loadflow, it's shorter
+
 2010-01-15  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* doc/man/flumotion-worker.1:

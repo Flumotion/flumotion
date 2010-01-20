@@ -24,29 +24,29 @@ import gettext
 from zope.interface import implements
 
 from flumotion.admin.assistant.interfaces import IScenarioAssistantPlugin
-from flumotion.scenario.steps.loadconfstep import LoadConfigurationStep
+from flumotion.scenario.steps.loadflowstep import LoadFlowStep
 from flumotion.scenario.steps.summarysteps import LiveSummaryStep
 
 _ = gettext.gettext
 
 
-class LoadConfigurationAssistantPlugin(object):
+class LoadFlowAssistantPlugin(object):
     implements(IScenarioAssistantPlugin)
-    short = _("Load configuration")
+    short = _("Load flow")
     description = _(
-        """Allows you to load an existing configuration file to set up a flow.
+        """Allows you to load an existing flow file to set up a flow.
         """)
 
     # IScenarioAssistantPlugin
 
     def addSteps(self, wizard):
-        wizard.addStepSection(LoadConfigurationStep)
+        wizard.addStepSection(LoadFlowStep)
         wizard.addStepSection(LiveSummaryStep)
 
     def save(self, wizard, saver):
-        configurationStep = wizard.getStep('LoadConfiguration')
-        xmlFile = configurationStep.getConfigurationFilename()
-        saver.setConfigurationFile(xmlFile)
+        step = wizard.getStep('LoadFlow')
+        xmlFile = step.getFlowFilename()
+        saver.setFlowFile(xmlFile)
 
     def getSelectComponentName(self):
         return None

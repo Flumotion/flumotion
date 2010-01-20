@@ -214,7 +214,7 @@ class AssistantSaver(object):
         xml = writer.getXML()
         return xml
 
-    def setConfigurationFile(self, xmlFile):
+    def setFlowFile(self, xmlFile):
         self._confXml = open(xmlFile, 'r').read()
 
     def setExistingComponentNames(self, componentNames):

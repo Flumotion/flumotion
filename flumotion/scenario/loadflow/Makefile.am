@@ -1,12 +1,12 @@
 include $(top_srcdir)/common/python.mk
 
-componentdir = $(libdir)/flumotion/python/flumotion/scenario/loadconfiguration
+componentdir = $(libdir)/flumotion/python/flumotion/scenario/loadflow
 component_PYTHON = \
 		__init__.py \
 		wizard_gtk.py
 
 component_DATA = \
-	loadconfiguration.xml
+	loadflow.xml
 
 TAGS_FILES = $(component_PYTHON)
 

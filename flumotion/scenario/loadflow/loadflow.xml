@@ -1,22 +1,22 @@
 <registry>
     <scenarios>
-        <scenario type="loadconfiguration-scenario"
-                  base="flumotion/scenario/loadconfiguration"
-                  _description="Import an existing configuration.">
+        <scenario type="loadflow-scenario"
+                  base="flumotion/scenario/loadflow"
+                  _description="Import an existing flow.">
             <entries>
                 <entry type="wizard" location="wizard_gtk.py"
-                       function="LoadConfigurationAssistantPlugin" />
+                       function="LoadFlowAssistantPlugin" />
             </entries>
         </scenario>
     </scenarios>
     <bundles>
-        <bundle name="loadconfiguration-scenario-base">
+        <bundle name="loadflow-scenario-base">
             <dependencies>
                 <dependency name="scenario-base" />
                 <dependency name="scenario-steps"/>
             </dependencies>
             <directories>
-                <directory name="flumotion/scenario/loadconfiguration">
+                <directory name="flumotion/scenario/loadflow">
                     <filename location="wizard_gtk.py" />
                     <filename location="__init__.py" />
                 </directory>
