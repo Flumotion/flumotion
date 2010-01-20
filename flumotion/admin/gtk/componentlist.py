@@ -36,6 +36,7 @@ from zope.interface import implements
 
 from flumotion.configure import configure
 from flumotion.common import log, planet
+from flumotion.common.messages import ERROR, WARNING, INFO
 from flumotion.common.planet import moods
 from flumotion.common.pygobject import gsignal, gproperty
 from flumotion.common.xmlwriter import cmpComponentType
@@ -43,6 +44,13 @@ from flumotion.twisted import flavors
 
 __version__ = "$Rev$"
 _ = gettext.gettext
+
+_stock_icons = {
+    ERROR: gtk.STOCK_DIALOG_ERROR,
+    WARNING: gtk.STOCK_DIALOG_WARNING,
+    INFO: gtk.STOCK_DIALOG_INFO,
+    }
+
 MOODS_INFO = {
     moods.sad: _('Sad'),
     moods.happy: _('Happy'),
@@ -55,9 +63,10 @@ MOODS_INFO = {
  COL_NAME,
  COL_WORKER,
  COL_PID,
+ COL_MSG,
  COL_STATE,
  COL_MOOD_VALUE, # to sort COL_MOOD
- COL_TOOLTIP) = range(7)
+ COL_TOOLTIP) = range(8)
 
 
 def getComponentLabel(state):
@@ -108,6 +117,7 @@ class ComponentList(log.Loggable, gobject.GObject):
             str,            # name
             str,            # worker
             str,            # pid
+            gtk.gdk.Pixbuf, # message level
             object,         # state
             int,            # mood-value
             str,            # tooltip
@@ -138,6 +148,12 @@ class ComponentList(log.Loggable, gobject.GObject):
         col = gtk.TreeViewColumn(_('PID'), t, text=COL_PID)
         col.set_sort_column_id(COL_PID)
         treeView.append_column(col)
+
+        col = gtk.TreeViewColumn('', gtk.CellRendererPixbuf(),
+                                 pixbuf=COL_MSG)
+        treeView.append_column(col)
+
+
         if gtk.pygtk_version >= (2, 12):
             treeView.set_tooltip_column(COL_TOOLTIP)
 
@@ -287,7 +303,8 @@ class ComponentList(log.Loggable, gobject.GObject):
 
     def appendComponent(self, component, componentNameToSelect):
         self.debug('adding component %r to listview' % component)
-        component.addListener(self, set_=self.stateSet)
+        component.addListener(self, set_=self.stateSet, append=self.stateSet,
+                              remove=self.stateSet)
 
         titer = self._model.append()
         self._iters[component] = titer
@@ -296,6 +313,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         self.debug('component has mood %r' % mood)
         messages = component.get('messages')
         self.debug('component has messages %r' % messages)
+        self._setMsgLevel(titer, messages)
 
         if mood != None:
             self._setMoodValue(titer, mood)
@@ -334,6 +352,7 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         titer = self._iters[state]
         self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
+        print 'stateset...', key, value
 
         if key == 'mood':
             self.debug('stateSet: mood of %r changed to %r' % (state, value))
@@ -352,8 +371,22 @@ class ComponentList(log.Loggable, gobject.GObject):
             self._updateWorker(titer, state)
         elif key == 'pid':
             self._model.set(titer, COL_PID, (value and str(value) or ''))
+        elif key =='messages':
+            self._setMsgLevel(titer, state.get('messages'))
 
     # Private
+
+    def _setMsgLevel(self, titer, messages):
+        icon = None
+
+        if messages:
+            messages = sorted(messages, cmp=lambda x, y: x.level - y.level)
+            level = messages[0].level
+            st = _stock_icons.get(level, gtk.STOCK_MISSING_IMAGE)
+            w = gtk.Invisible()
+            icon = w.render_icon(st, gtk.ICON_SIZE_MENU)
+
+        self._model.set(titer, COL_MSG, icon)
 
     def _updateStartStop(self):
         oldstop = self.get_property('can-stop-any')
