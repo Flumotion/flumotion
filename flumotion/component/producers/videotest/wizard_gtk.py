@@ -28,6 +28,7 @@ from zope.interface import implements
 from flumotion.admin.assistant.interfaces import IProducerPlugin
 from flumotion.admin.assistant.models import VideoProducer
 from flumotion.admin.gtk.basesteps import VideoProducerStep
+from flumotion.configure import configure
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -59,11 +60,19 @@ class TestVideoProducerStep(VideoProducerStep):
         self.pattern.data_type = int
         self.framerate.data_type = float
 
-        self.pattern.prefill([
-            (_('SMPTE Color bars'), 0),
-            (_('Random (television snow)'), 1),
-            (_('100% Black'), 2),
-            (_('Blink'), 12)])
+        patterns = [('SMPTE Color bars', 0, 'pattern_smpte.png'),
+                    ('Random (television snow)', 1, 'pattern_snow.png'),
+                    ('100% Black', 2, 'pattern_black.png'),
+                    ('Blink', 12, 'pattern_blink.png')]
+        self.pattern_icons = dict()
+
+        for description, id, image in patterns:
+            self.pattern.append_item(_(description), id)
+            if image:
+                self.pattern_icons[id] = os.path.join(configure.imagedir,
+                                                      'wizard', image)
+
+        self.pattern.connect('changed', self._change_image)
 
         self.add_proxy(self.model.properties,
                        ['pattern', 'width', 'height',
@@ -77,6 +86,10 @@ class TestVideoProducerStep(VideoProducerStep):
     def workerChanged(self, worker):
         self.model.worker = worker
         self.wizard.requireElements(worker, 'videotestsrc', 'level')
+
+    def _change_image(self, combo):
+        self.pattern_image.set_from_file(
+            self.pattern_icons.get(combo.get_selected_data(), None))
 
 
 class VideoTestWizardPlugin(object):
