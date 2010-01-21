@@ -22,6 +22,8 @@
 import gettext
 import re
 
+from twisted.internet import defer
+
 from flumotion.admin.assistant.models import AudioEncoder, VideoEncoder, Muxer
 from flumotion.admin.gtk.workerstep import WorkerWizardStep
 from flumotion.ui.wizard import WizardStep
@@ -55,6 +57,10 @@ class ConversionStep(WorkerWizardStep):
     docSection = 'help-configuration-assistant-encoders'
     docAnchor = ''
     docVersion = 'local'
+
+    def __init__(self, wizard):
+        WorkerWizardStep.__init__(self, wizard)
+        self._muxer = None
 
     # Public API
 
@@ -144,20 +150,31 @@ class ConversionStep(WorkerWizardStep):
         else:
             raise AssertionError
 
+    def workerChanged(self, worker):
+        if self._muxer:
+            self._muxer.workerChanged(worker)
+
     # Private
 
     def _populateCombos(self, combos, provides=None):
         self.debug("populating combos %r", combos)
+        self.wizard.waitForTask('querying encoders')
+
+        defers = []
         for ctype, combo, defaultType, oldComponent in combos:
+            combo.prefill([('...', None)])
+            combo.set_sensitive(False)
+
             d = self.wizard.getWizardEntries(
                 wizardTypes=[ctype],
                 provides=provides)
             d.addCallback(self._addEntries, ctype, combo, defaultType,
                           oldComponent)
-            combo.prefill([('...', None)])
-            combo.set_sensitive(False)
-        self.wizard.waitForTask('querying encoders')
+            defers.append(d)
+
+        d = defer.DeferredList(defers)
         d.addCallback(lambda x: self.wizard.taskFinished())
+        return d
 
     def _canAddMuxer(self, entry):
         # Fetch the media types the muxer accepts ('audio', 'video')
@@ -222,7 +239,6 @@ class ConversionStep(WorkerWizardStep):
         entry = combo.get_selected()
         d = self._loadPlugin(entry)
         d.addCallback(pluginLoaded, entry)
-
         return d
 
     def _getAudioPage(self):
@@ -251,18 +267,36 @@ class ConversionStep(WorkerWizardStep):
 
     def _muxerChanged(self):
         muxerEntry = self.muxer.get_selected()
+        self.wizard.message_area.clear()
         # '...' used while waiting for the query to be done
         if muxerEntry is None:
             return
 
+        def combosPopulated(unused):
+            return self._loadPlugin(muxerEntry)
+
+        def pluginLoaded(plugin, entry):
+            if plugin:
+                self._muxer = plugin
+                return plugin.workerChanged(self.worker)
+            else:
+                # no plugin defined, behaving like before
+                # FIXME: make check should make sure all muxers have a
+                # plugin/factory and fail if not
+                self.wizard.clear_msg('assistant-bundle')
+                self.wizard.taskFinished()
+
         provides = map(lambda f: f.find(':') > 0 and f.split(':', 1)[1] or f,
-                        muxerEntry.getAcceptedMediaTypes())
-        self._populateCombos(
+                       muxerEntry.getAcceptedMediaTypes())
+        d = self._populateCombos(
             [('audio-encoder', self.audio, _PREFERRED_AUDIO_ENCODER,
               self.wizard.getScenario().getAudioEncoder()),
              ('video-encoder', self.video, _PREFERRED_VIDEO_ENCODER,
               self.wizard.getScenario().getVideoEncoder())],
             provides=provides)
+        d.addCallback(combosPopulated)
+        d.addCallback(pluginLoaded, muxerEntry)
+        return d
 
     # Callbacks
 
