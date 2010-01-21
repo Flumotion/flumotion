@@ -2,6 +2,14 @@
 
 	reviewed by: xqueralt
 
+	* flumotion/admin/gtk/componentlist.py:
+	Sad component names in the admin component list are red
+	Closes #990
+
+2010-01-21  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: xqueralt
+
 	* flumotion/component/producers/videotest/wizard.glade:
 	* flumotion/component/producers/videotest/wizard_gtk.py:
 	* data/image/wizard/Makefile.am:

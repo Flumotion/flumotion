@@ -66,7 +66,11 @@ MOODS_INFO = {
  COL_MSG,
  COL_STATE,
  COL_MOOD_VALUE, # to sort COL_MOOD
- COL_TOOLTIP) = range(8)
+ COL_TOOLTIP,
+ COL_FG,
+ COL_SAD) = range(10)
+
+SAD_COLOR = "#FF0000"
 
 
 def getComponentLabel(state):
@@ -121,6 +125,8 @@ class ComponentList(log.Loggable, gobject.GObject):
             object,         # state
             int,            # mood-value
             str,            # tooltip
+            str,            # color
+            bool,           # colorize
             )
         treeView.set_model(treeModel)
 
@@ -135,17 +141,23 @@ class ComponentList(log.Loggable, gobject.GObject):
         treeView.append_column(col)
 
         col = gtk.TreeViewColumn(_('Component'), gtk.CellRendererText(),
-                                 text=COL_NAME)
+                                 text=COL_NAME,
+                                 foreground=COL_FG,
+                                 foreground_set=COL_SAD)
         col.set_sort_column_id(COL_NAME)
         treeView.append_column(col)
 
         col = gtk.TreeViewColumn(_('Worker'), gtk.CellRendererText(),
-                                 markup=COL_WORKER)
+                                 markup=COL_WORKER,
+                                 foreground=COL_FG,
+                                 foreground_set=COL_SAD)
         col.set_sort_column_id(COL_WORKER)
         treeView.append_column(col)
 
         t = gtk.CellRendererText()
-        col = gtk.TreeViewColumn(_('PID'), t, text=COL_PID)
+        col = gtk.TreeViewColumn(_('PID'), t, text=COL_PID,
+                                 foreground=COL_FG,
+                                 foreground_set=COL_SAD)
         col.set_sort_column_id(COL_PID)
         treeView.append_column(col)
 
@@ -318,6 +330,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         if mood != None:
             self._setMoodValue(titer, mood)
 
+        self._model.set(titer, COL_FG, SAD_COLOR)
         self._model.set(titer, COL_STATE, component)
         componentName = getComponentLabel(component)
         self._model.set(titer, COL_NAME, componentName)
@@ -438,6 +451,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         """
         self._model.set(titer, COL_MOOD, self._moodPixbufs[value])
         self._model.set(titer, COL_MOOD_VALUE, value)
+        self._model.set(titer, COL_SAD, moods.sad.value == value)
         mood = moods.get(value)
         self._model.set(titer, COL_TOOLTIP,
                 _("<b>Component is %s</b>") % (MOODS_INFO[mood].lower(), ))
