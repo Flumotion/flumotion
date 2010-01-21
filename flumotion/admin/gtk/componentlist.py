@@ -352,7 +352,6 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         titer = self._iters[state]
         self.log('stateSet: state %r, key %s, value %r' % (state, key, value))
-        print 'stateset...', key, value
 
         if key == 'mood':
             self.debug('stateSet: mood of %r changed to %r' % (state, value))
