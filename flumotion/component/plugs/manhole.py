@@ -29,20 +29,20 @@ from flumotion.common.manhole import openAnonymousTelnetManhole
 __version__ = "$Rev$"
 
 
-class ManagerManholePlug(base.ManagerPlug):
+class ManholeMixin():
     """
     """
 
     def __init__(self, args):
-        base.ManagerPlug.__init__(self, args)
+
         self.useSSH = False
         self.authorizedKeysFile = None
         self.port = None
         self.requestedPortNum = None
+        self.namespace = {}
 
-    def start(self, vishnu):
-        self.namespace = {'vishnu': vishnu}
-
+    def start(self, namespace):
+        self.namespace.update(namespace)
         props = self.args['properties']
         if 'ssh-authorized-keys-file' in props:
             self.useSSH = True
@@ -56,7 +56,7 @@ class ManagerManholePlug(base.ManagerPlug):
         if props.get('initially-open', False):
             self.openManhole()
 
-    def stop(self, vishnu):
+    def stop(self, obj):
         self.closeManhole()
 
     def _insinuate(self):
@@ -84,3 +84,25 @@ class ManagerManholePlug(base.ManagerPlug):
             ret = defer.succeed(None)
         self.port = None
         return ret
+
+
+class ManagerManholePlug(base.ManagerPlug, ManholeMixin):
+
+    def __init__(self, args):
+        base.ManagerPlug.__init__(self, args)
+        ManholeMixin.__init__(self, args)
+
+    def start(self, vishnu):
+        namespace = {'vishnu': vishnu}
+        ManholeMixin.start(self, namespace)
+
+
+class ComponentManholePlug(base.ComponentPlug, ManholeMixin):
+
+    def __init__(self, args):
+        base.ComponentPlug.__init__(self, args)
+        ManholeMixin.__init__(self, args)
+
+    def start(self, component):
+        namespace = {'component': component}
+        ManholeMixin.start(self, namespace)

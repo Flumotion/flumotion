@@ -122,6 +122,22 @@
       </properties>
     </plug>
 
+   <plug socket="flumotion.component.plugs.base.ComponentPlug"
+          type="component-manhole"
+          _description="Creates a manhole to a component to which you can log in over telnet or ssh.">
+      <entry location="flumotion/component/plugs/manhole.py"
+             function="ComponentManholePlug" />
+
+      <properties>
+        <property name="ssh-authorized-keys-file" type="string" required="false"
+                  _description="Path to a file containing authorized keys for SSH login" />
+        <property name="initially-open" type="bool" required="false"
+                  _description="Whether the SSH port is open from the start" />
+        <property name="port" type="int" required="false"
+                  _description="The port to listen on for incoming manhole connections" />
+      </properties>
+    </plug>
+
   </plugs>
 
   <bundles>
