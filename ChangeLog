@@ -1,5 +1,10 @@
 2010-01-22  Julien Le Goff  <jlegoff@flumotion.com>
 
+	* flumotion/component/plugs/manhole.py:
+	Fixed syntax error.
+
+2010-01-22  Julien Le Goff  <jlegoff@flumotion.com>
+
 	reviewed by: Sébastien 
 
 	* flumotion/component/plugs/manhole.py:

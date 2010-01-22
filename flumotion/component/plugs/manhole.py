@@ -29,7 +29,7 @@ from flumotion.common.manhole import openAnonymousTelnetManhole
 __version__ = "$Rev$"
 
 
-class ManholeMixin():
+class ManholeMixin(object):
     """
     """
 
