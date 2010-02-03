@@ -31,11 +31,13 @@ import time
 import datetime
 import urlparse
 import urllib2
+import cookielib
 
 import gst
 import gobject
 
 from twisted.internet import reactor, defer
+from twisted.python import failure
 
 from flumotion.admin import admin, connections
 from flumotion.common import errors, keycards, python
@@ -57,6 +59,8 @@ CHECKS = {'videowidth': 'video_width',
           'audiodepth': 'audio_depth',
           'audiomimetype': 'audio_mime'}
 
+jar = cookielib.FileCookieJar("cookies")
+
 
 def gen_timed_link(relative_path, secret_key, timeout, type):
     start_time = '%08x' % (time.time() - 10)
@@ -69,9 +73,15 @@ def gen_timed_link(relative_path, secret_key, timeout, type):
     return '%s%s%s' % (hashed, start_time, stop_time)
 
 
+def urlOpenWithCookies(url):
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(jar))
+    r = opener.open(url)
+    return r
+
+
 def getURLFromPlaylist(url):
     try:
-        playlist = urllib2.urlopen(url)
+        playlist = urlOpenWithCookies(url)
     except urllib2.URLError, e:
         raise util.NagiosCritical(e)
 
@@ -98,7 +108,6 @@ class CheckBase(util.LogCommand):
         self.model = None
         self._path = ''
         self._tmpfile = ''
-        self.token = ''
         util.LogCommand.__init__(self, parentCommand, **kwargs)
 
     def handleOptions(self, options):
@@ -211,14 +220,6 @@ class CheckBase(util.LogCommand):
             if reactor.exitStatus != 0:
                 sys.exit(reactor.exitStatus)
 
-        # Simple playlist detection
-        if not self.options.playlist and self._url[-3:] in PLAYLIST_SUFFIX:
-            self._url = getURLFromPlaylist(self._url)
-            self.options.playlist = True
-        # If it is a playlist, take the correct URL
-        elif self.options.playlist:
-            self._url = getURLFromPlaylist(self._url)
-
         # Determine if this stream would have audio/video
         if self.options.videowidth or self.options.videoheight or \
            self.options.videoframerate or self.options.videopar or \
@@ -229,11 +230,30 @@ class CheckBase(util.LogCommand):
            self.options.audiomimetype:
             self._expectAudio = True
 
-        # Add token only if we need it
-        if self.token:
-            self._url += '?token=%s' % self.token
+        # Simple playlist detection
+        p = urlparse.urlparse(self._url)
+        (tmpfd, tmpPath) = tempfile.mkstemp()
+        tmp = os.fdopen(tmpfd, 'wb')
+        if p.path[-4:] == "m3u8":
+            self._url = getURLFromPlaylist(self._url)
+            p = urlparse.urlparse(self._url)
+            if p.path[-4:] == "m3u8":
+                self._url = getURLFromPlaylist(self._url)
+            self.options.playlist = True
+            segment = urlOpenWithCookies(self._url)
+            c = segment.read()
+            tmp.write(c)
+            tmp.close()
+            self._url = "file://%s" % (tmpPath, )
+        elif not self.options.playlist and self._url[-3:] in PLAYLIST_SUFFIX:
+            self._url = getURLFromPlaylist(self._url)
+            self.options.playlist = True
+        # If it is a playlist, take the correct URL
+        elif self.options.playlist:
+            self._url = getURLFromPlaylist(self._url)
 
         result = self.checkStream()
+        os.unlink(tmpPath)
         return result
 
     def checkStream(self):
@@ -378,24 +398,14 @@ class GstInfo:
     error = None
 
     def __init__(self, uri, options, tmpfile):
-        # it's fine to not have any of them and then have pipeline parsing
-        # fail trying to use the last option
-        for factory in ['gnomevfssrc', 'neonhttpsrc', 'souphttpsrc']:
-            try:
-                gst.element_factory_make(factory)
-                break
-            except gst.PluginNotFoundError:
-                pass
-        PIPELINE = '%s name=input ! tee name = t ! \
+        PIPELINE = '%s ! tee name = t ! \
             queue ! decodebin name=dbin t. ! \
-            queue ! filesink location=%s' % (factory, tmpfile)
+            queue ! filesink location=%s' % (uri, tmpfile)
 
         if options.timeout:
             gobject.timeout_add(int(options.timeout) * 1000, self.timedOut)
         self.mainloop = gobject.MainLoop()
         self.pipeline = gst.parse_launch(PIPELINE)
-        self.input = self.pipeline.get_by_name('input')
-        self.input.props.location = uri
         self.dbin = self.pipeline.get_by_name('dbin')
         self.bus = self.pipeline.get_bus()
         self.bus.add_watch(self.onBusMessage)
