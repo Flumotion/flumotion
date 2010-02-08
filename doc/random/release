@@ -39,6 +39,7 @@
   ../flumotion-$VERSION/env make
   ../flumotion-$VERSION/env make pdf
 * fix up ticket list to do and milestone (trac)
+* add version in trac
 * add news entry on site (edit flumotion.net/src/htdocs/news/news.xml, then commit)
 * send out release announcement mail;
   see https://apestaart.org/thomas/trac/browser/src/moap/trunk/README.
