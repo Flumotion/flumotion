@@ -127,3 +127,6 @@ if hasattr(gtk, 'LinkButton'):
                 self._callback(uri)
 else:
     LinkWidget = LinkWidgetOld
+
+if not hasattr(LinkWidget, 'set_tooltip_text'):
+    LinkWidget.set_tooltip_text = lambda self, text: None

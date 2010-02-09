@@ -1,3 +1,9 @@
+2010-02-09  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/ui/linkwidget.py:
+	Add a fake set_tooltip_text method to LinkWidget for when it is not
+	available (it was introduced in PyGTK 2.12)
+
 2010-02-03  Marc-André Lureau  <mlureau@flumotion.com>
 
 	reviewed by: Zaheer Abbas Merali
