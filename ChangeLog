@@ -1,3 +1,8 @@
+2010-02-10  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
+	Fixed a bug when temporary files creation failed synchronously.
+
 2010-02-09  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/ui/linkwidget.py:

@@ -606,8 +606,6 @@ class CachingSession(BaseCachingSession, log.Loggable):
         self.log("Requesting temporary file for %s", self.url)
         d = self.strategy.cachemgr.newTempFile(self.url.path, info.size,
                                                info.mtime)
-        self.debug("Start buffering %s", self.url)
-        d.addCallback(self._gotTempFile)
 
         # But we don't want to accumulate data
         # but it is possible to receive a small amount of data
@@ -617,6 +615,9 @@ class CachingSession(BaseCachingSession, log.Loggable):
         # We have got meta data, so callback
         self._fireInfo(self)
         self._fireStarted(self)
+
+        self.debug("Start buffering %s", self.url)
+        d.addCallback(self._gotTempFile)
 
     def _gotTempFile(self, tempFile):
         if self._state not in (self.BUFFERING, self.CACHED):
