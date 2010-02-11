@@ -361,6 +361,13 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         except TypeError:
             return False
 
+    def resend_streamheader_supported(self, sink):
+        try:
+            sink.get_property('resend-streamheader')
+            return True
+        except TypeError:
+            return False
+
     def setup_burst_mode(self, sink):
         if self.burst_on_connect:
             if self.burst_time and self.time_bursting_supported(sink):
@@ -464,6 +471,12 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.burst_time = properties.get('burst-time', 0.0)
 
         self.setup_burst_mode(sink)
+
+        if self.resend_streamheader_supported(sink):
+            sink.set_property('resend-streamheader', False)
+        else:
+            self.debug("resend-streamheader property not available, "
+                       "resending streamheader when it changes in the caps")
 
         sink.connect('deep-notify::caps', self._notify_caps_cb)
 
