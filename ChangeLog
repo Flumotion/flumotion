@@ -1,3 +1,17 @@
+2010-02-15  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Sebastien Merle
+
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/httpcached/file_provider.py:
+	* flumotion/component/misc/httpserver/localpath.py:
+	* flumotion/component/misc/httpserver/localprovider.py:
+        Make 'path' from LocalPath a private variable.
+	* flumotion/component/misc/httpserver/httpfile.py:
+	Use the url path to retrieve the file's metadata information since
+	the file's path is not the same for VirtualPath and LocalPath.
+	Closes #7967
+
 2010-02-11  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Zaheer Abbas Merali
@@ -31,7 +45,7 @@
 
 2010-01-22  Julien Le Goff  <jlegoff@flumotion.com>
 
-	reviewed by: Sébastien 
+	reviewed by: Sébastien
 
 	* flumotion/component/plugs/manhole.py:
 	* flumotion/component/plugs/plugs.xml:
@@ -140,7 +154,7 @@
 	* flumotion/component/producers/looper/looper.py:
 	Replace broken badly named gimme5 remote method with working
 	restartLoop remote method.
-	
+
 2009-12-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	reviewed by: Jan
@@ -483,7 +497,7 @@
 
 2009-11-24  Andoni Morales Alastruey  <amorales@flumotion.com>
 
-	reviewed by: Julien LeGof 
+	reviewed by: Julien LeGof
 
 	* flumotion/component/base/scheduler.py:
 	Catch errors parsing iCalendar files and output a warning
@@ -521,7 +535,7 @@
 	reviewed by: Julien Le Gof
 
 	* flumotion/common/eventcalendar.py:
-	Parse properly timezones in 'TZID' with a local path 
+	Parse properly timezones in 'TZID' with a local path
 	prepended (e.g.:/mozilla.org/20070129_1/Europe/Madrid)
 	* flumotion/test/test_icalbouncer.py:
 	Added test for timezones with a local path in 'TZID'
@@ -1158,7 +1172,7 @@
 
 2009-08-26  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
-	reviewed by: xmartinez/jan 
+	reviewed by: xmartinez/jan
 
 	* flumotion/component/misc/httpserver/httpfile.py:
 	avoid leaking of sockets in CLOSE_WAIT state

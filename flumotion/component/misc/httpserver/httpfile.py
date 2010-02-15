@@ -250,7 +250,7 @@ class File(resource.Resource, log.Loggable):
         # We can do range requests, in bytes.
         # UGLY HACK FIXME: if pdf, then do not accept range requests
         # because Adobe Reader plugin messes up
-        if not self._path.path.endswith('.pdf'):
+        if not self._path.mimeType == 'application/pdf':
             request.setHeader('Accept-Ranges', 'bytes')
 
         if request.setLastModified(provider.getmtime()) is http.CACHED:
@@ -348,14 +348,16 @@ class File(resource.Resource, log.Loggable):
 
         if self._metadataProvider:
             self.log("Retrieving metadata using %r", self._metadataProvider)
-            d = self._metadataProvider.getMetadata(self._path.path)
+            # The URL can't be rewrited. If we ever want to do so the API
+            # of the file provider will have to be changed. see pub#7967
+            d = self._metadataProvider.getMetadata(request.path)
         else:
             d = defer.succeed(None)
 
         def metadataError(failure):
             self.warning('Error retrieving metadata for file %s'
                         ' using plug %r. %r',
-                        self._path.path,
+                        request.path,
                         self._metadataProvider,
                         failure.value)
 

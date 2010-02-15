@@ -84,4 +84,4 @@ class VirtualPath(localpath.LocalPath, log.Loggable):
         return VirtualPath(self.plug, childpath)
 
     def open(self):
-        return self.plug._reader.open(self.path)
+        return self.plug._reader.open(self._path)

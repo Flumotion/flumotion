@@ -64,7 +64,7 @@ class FileProviderLocalPlug(fileprovider.FileProviderPlug, log.Loggable):
 class LocalPath(localpath.LocalPath):
 
     def open(self):
-        return LocalFile(self.path, self.mimeType)
+        return LocalFile(self._path, self.mimeType)
 
 
 class LocalFile(fileprovider.File, log.Loggable):

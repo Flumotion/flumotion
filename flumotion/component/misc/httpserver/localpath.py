@@ -35,11 +35,11 @@ class LocalPath(fileprovider.FilePath):
     mimeType = None
 
     def __init__(self, path):
-        self.path = path
+        self._path = path
         self.mimeType = self.contentTypes.fromPath(path)
 
     def __str__(self):
-        return "<%s '%s'>" % (type(self).__name__, self.path)
+        return "<%s '%s'>" % (type(self).__name__, self._path)
 
     def child(self, name):
         childpath = self._getChildPath(name)
@@ -64,8 +64,8 @@ class LocalPath(fileprovider.FilePath):
         if os.sep in norm:
             raise InsecureError("Child name '%s' contains one or more "
                                 "directory separators" % (name, ))
-        childpath = os.path.abspath(os.path.join(self.path, norm))
-        if not childpath.startswith(self.path):
+        childpath = os.path.abspath(os.path.join(self._path, norm))
+        if not childpath.startswith(self._path):
             raise InsecureError("Path '%s' is not a child of '%s'"
-                                % (childpath, self.path))
+                                % (childpath, self._path))
         return childpath

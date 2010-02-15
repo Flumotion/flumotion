@@ -232,12 +232,12 @@ class LocalPath(localpath.LocalPath, log.Loggable):
         return LocalPath(self.plug, childpath)
 
     def open(self):
-        if not os.path.exists(self.path):
+        if not os.path.exists(self._path):
             # Delete the cached file and outdate the copying session
-            self.plug.outdateCopySession(self.path)
-            self._removeCachedFile(self.path)
-            raise NotFoundError("Path '%s' not found" % self.path)
-        return CachedFile(self.plug, self.path, self.mimeType)
+            self.plug.outdateCopySession(self._path)
+            self._removeCachedFile(self._path)
+            raise NotFoundError("Path '%s' not found" % self._path)
+        return CachedFile(self.plug, self._path, self.mimeType)
 
 
     ## Private Methods ##
