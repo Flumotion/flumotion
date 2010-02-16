@@ -1,3 +1,10 @@
+2010-02-16  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Julien Le Goff
+
+	* flumotion/component/misc/httpserver/httpfile.py:
+	Remove unnecessary comment
+
 2010-02-15  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Sebastien Merle
@@ -6,11 +13,10 @@
 	* flumotion/component/misc/httpserver/httpcached/file_provider.py:
 	* flumotion/component/misc/httpserver/localpath.py:
 	* flumotion/component/misc/httpserver/localprovider.py:
-        Make 'path' from LocalPath a private variable.
+	Make 'path' from LocalPath a private variable.
 	* flumotion/component/misc/httpserver/httpfile.py:
 	Use the url path to retrieve the file's metadata information since
 	the file's path is not the same for VirtualPath and LocalPath.
-	Closes #7967
 
 2010-02-11  Josep Joan Ribas  <jribas@flumotion.com>
 

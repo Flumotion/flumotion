@@ -349,7 +349,7 @@ class File(resource.Resource, log.Loggable):
         if self._metadataProvider:
             self.log("Retrieving metadata using %r", self._metadataProvider)
             # The URL can't be rewrited. If we ever want to do so the API
-            # of the file provider will have to be changed. see pub#7967
+            # of the file provider will have to be changed.
             d = self._metadataProvider.getMetadata(request.path)
         else:
             d = defer.succeed(None)
