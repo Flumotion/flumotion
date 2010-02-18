@@ -1,3 +1,13 @@
+2010-02-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: jribas, xqueralt
+	patch by: Zaheer Abbas Merali
+
+	* flumotion/component/eater.py:
+	* flumotion/component/feedcomponent010.py:
+	Fix case where streamheader gets repeated in-stream and causes
+	client breakage.
+
 2010-02-16  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Julien Le Goff
