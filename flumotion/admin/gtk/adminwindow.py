@@ -326,6 +326,18 @@ class AdminWindow(Loggable, GladeDelegate):
 
     # Private
 
+    def _resize_vpaned(self, widget, minimize):
+        if minimize:
+            self._eat_resize_id = self._vpaned.connect(
+                'button-press-event', self._eat_resize_vpaned_event)
+            self._vpaned.set_position(-1)
+        else:
+            self._vpaned.disconnect(self._eat_resize_id)
+
+    def _eat_resize_vpaned_event(self, *args, **kwargs):
+        # Eat button-press-event not to allow resize of the vpaned
+        return True
+
     def _createUI(self):
         self.debug('creating UI')
 
@@ -339,6 +351,12 @@ class AdminWindow(Loggable, GladeDelegate):
         del self.statusbar
         self._messageView = self.messages_view
         del self.messages_view
+
+        self._messageView.connect('resize-event', self._resize_vpaned)
+        self._vpaned = self.vpaned
+        del self.vpaned
+        self._eat_resize_id = self._vpaned.connect(
+            'button-press-event', self._eat_resize_vpaned_event)
 
         self._window.set_name("AdminWindow")
         self._window.connect('delete-event',

@@ -1,3 +1,14 @@
+2010-02-24  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: xqueralt
+
+	* data/glade/admin.glade:
+	* data/glade/sectionwizard.glade:
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/message.py:
+	Improved the MessageView widget in the admin and wizard views.
+	Fixed an issue when moving down the slider in the admin view.
+
 2010-02-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: jribas, xqueralt

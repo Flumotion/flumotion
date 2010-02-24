@@ -33,6 +33,7 @@ from flumotion.common.documentation import getMessageWebLink
 from flumotion.common.i18n import Translator
 from flumotion.common.messages import ERROR, WARNING, INFO
 from flumotion.configure import configure
+from flumotion.common.pygobject import gsignal
 
 _ = gettext.gettext
 __version__ = "$Rev$"
@@ -61,7 +62,7 @@ class MessageButton(gtk.ToggleButton):
         i = gtk.Image()
         i.set_from_stock(_stock_icons.get(message.level,
                                           gtk.STOCK_MISSING_IMAGE),
-                         gtk.ICON_SIZE_BUTTON)
+                         gtk.ICON_SIZE_MENU)
         i.show()
         self.add(i)
         self.set_focus_on_click(False)
@@ -81,6 +82,7 @@ class MessagesView(gtk.VBox):
     # I am a vbox with first row the label and icons,
     # second row a separator
     # and third row a text view
+    gsignal('resize-event', bool)
 
     def __init__(self):
         gtk.VBox.__init__(self)
@@ -99,21 +101,19 @@ class MessagesView(gtk.VBox):
     def _createUI(self):
         h1 = gtk.HBox()
         self.pack_start(h1, False, False, 0)
-        self.label = gtk.Label()
-        self.label.show()
-        h1.pack_start(self.label, False, False, 6)
 
+        self.hline = gtk.HSeparator()
+        h1.pack_start(self.hline, True, True, 3)
         # button box holding the message icons at the top right
         h2 = gtk.HBox()
         h1.pack_end(h2, False, False, 0)
         self.buttonbox = h2
 
-        s = gtk.HSeparator()
-        self.pack_start(s, False, False, 6)
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         self.pack_start(sw, True, True, 0)
+        self.sw = sw
 
         # text view shows the messages, plus debug information
         # FIXME: needs to be hyperlinkable in the future
@@ -160,11 +160,11 @@ class MessagesView(gtk.VBox):
 
         firstButton = self._sortMessages()
 
+        self.show()
         if not self.active_button:
             b.set_active(True)
         elif b == firstButton:
             b.set_active(True)
-        self.show()
 
     def clearMessage(self, id):
         """
@@ -204,8 +204,6 @@ class MessagesView(gtk.VBox):
         textbuffer = gtk.TextBuffer()
         textbuffer.set_text(text)
         self.textview.set_buffer(textbuffer)
-        self.label.set_markup('<b>%s</b>' %
-            _headings.get(message.level, _('Message')))
 
         # if we have help information, add it to the end of the text view
         description = message.getDescription()
@@ -250,7 +248,11 @@ class MessagesView(gtk.VBox):
         # on toggling the button, show the message
         if not button.get_active():
             if self.active_button == button:
-                button.set_active(True)
+                self.sw.hide()
+                self.hline.hide()
+                button.set_active(False)
+                self.active_button = None
+                self.emit('resize-event', True)
             return
         old_active = self.active_button
         self.active_button = button
@@ -258,6 +260,8 @@ class MessagesView(gtk.VBox):
             old_active.set_active(False)
 
         self._addMessageToBuffer(message)
+        self.show_all()
+        self.emit('resize-event', False)
 
     # when the mouse cursor moves, set the cursor image accordingly
 
