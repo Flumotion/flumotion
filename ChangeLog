@@ -2,6 +2,23 @@
 
 	reviewed by: xqueralt
 
+	* flumotion/admin/gtk/adminwindow.py:
+	* flumotion/admin/gtk/componentlist.py:
+	* flumotion/admin/gtk/componentview.py:
+	Added support in the admin view when multiple components selected.
+	* flumotion/component/component.py:
+	Added total memory to the component's uiState.
+	* flumotion/component/base/Makefile.am:
+	* flumotion/component/base/base.xml:
+	* flumotion/component/base/multiple.py (added):
+	Added admin view for multiple components.
+	Show cpu/memory usage for each component selected.
+	Closes #1317
+
+2010-02-24  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: xqueralt
+
 	* data/glade/admin.glade:
 	* data/glade/sectionwizard.glade:
 	* flumotion/admin/gtk/adminwindow.py:

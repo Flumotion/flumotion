@@ -293,6 +293,7 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         self.debug('updating components view')
         # clear and rebuild
+        self._view.get_selection().unselect_all()
         self._model.clear()
         self._iters = {}
 

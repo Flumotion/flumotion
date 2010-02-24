@@ -16,6 +16,7 @@
           <filename location="effectsnode.py" />
           <filename location="feedersnode.py" />
           <filename location="feeders.glade" />
+          <filename location="multiple.py" />
           <filename location="properties.glade" />
           <filename location="propertiesnode.py" />
           <filename location="statewatcher.py" />

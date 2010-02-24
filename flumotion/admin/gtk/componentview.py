@@ -31,6 +31,7 @@ from flumotion.common import componentui, log, errors, messages
 from flumotion.common.common import pathToModuleName
 from flumotion.common.planet import AdminComponentState, moods
 from flumotion.common.i18n import N_, gettexter
+from twisted.internet import defer
 from gettext import gettext as _
 
 T_ = gettexter()
@@ -64,6 +65,34 @@ class Placeholder(object):
     def removed(self):
         """Called when the placeholder is inactivated, eg
         detached from the parent"""
+
+
+class SingleNodePlaceholder(Placeholder, log.Loggable):
+    """This is a placeholder containing a vbox
+    """
+    logCategory = 'nodebook'
+
+    def __init__(self, admingtk):
+        """
+        @param admingtk: the GTK Admin with its nodes
+        @type  admingtk: L{flumotion.component.base.admin_gtk.BaseAdminGtk}
+        """
+        self._debugEnabled = False
+        self._admingtk = admingtk
+        self.widget = self._admingtk.getWidget()
+        self.widget.show()
+
+    # BaseComponentHolder
+
+    def getWidget(self):
+        return self.widget
+
+    def removed(self):
+        if self._admingtk:
+            # needed for compatibility with managers with old code
+            if hasattr(self._admingtk, 'cleanup'):
+                self._admingtk.cleanup()
+            self._admingtk = None
 
 
 class NotebookPlaceholder(Placeholder, log.Loggable):
@@ -176,6 +205,44 @@ class PlanetPlaceholder(Placeholder):
         return self._widget
 
 
+class MultipleAdminComponentStates(log.Loggable):
+    """
+    I represent the state of a list of components in the admin client.
+    See L{flumotion.common.planet.AdminComponentState}.
+    """
+
+    def __init__(self, states):
+        self._componentStates = states
+        self._state = dict(mood=moods.happy,
+                           name='multiple-components',
+                           type='MultipleComponents')
+
+    def addListener(self, *args, **kwargs):
+        for state in self._componentStates:
+            try:
+                state.addListener(*args, **kwargs)
+            except KeyError, e:
+                self.debug('Error adding listener for component %s',
+                           state.get('name'))
+
+    def removeListener(self, listener):
+        for state in self._componentStates:
+            try:
+                state.removeListener(listener)
+            except KeyError:
+                self.debug('Error removing listener for component %s',
+                           state.get('name'))
+
+    def hasKey(self, key):
+        return key in self._state.keys()
+
+    def get(self, key):
+        return self._state.get(key, None)
+
+    def getComponentStates(self):
+        return self._componentStates
+
+
 class ComponentView(gtk.VBox, log.Loggable):
     logCategory = 'componentview'
 
@@ -263,8 +330,6 @@ class ComponentView(gtk.VBox, log.Loggable):
         placeholder.removed()
 
     def _getWidgetConstructor(self, componentState):
-        if not isinstance(componentState, AdminComponentState):
-            return LabelPlaceholder()
 
         def noBundle(failure):
             failure.trap(errors.NoBundleError)
@@ -313,15 +378,21 @@ class ComponentView(gtk.VBox, log.Loggable):
 
             return d
 
-        def gotFactory(factory):
+        def gotFactory(factory, placeholder=NotebookPlaceholder):
             # instantiate from factory and wrap in a NotebookPlaceHolder
             widget = factory(componentState, admin)
-            return NotebookPlaceholder(widget)
+            return placeholder(widget)
 
         def sleepingComponent(failure):
             failure.trap(errors.SleepingComponentError)
             return LabelPlaceholder(_("Component '%s' is still sleeping.") %
                                     componentState.get('name'))
+
+        def noMultipleComponents(failure):
+            # admin connected to an old manager without multiple
+            # components view
+            failure.trap(errors.RemoteRunError)
+            return LabelPlaceholder()
 
         def handledExceptionErrback(failure):
             # already handle, so let call chain short-circuit here and
@@ -330,16 +401,28 @@ class ComponentView(gtk.VBox, log.Loggable):
             return LabelPlaceholder(_("Component '%s' has a UI bug.") %
                                     componentState.get('name'))
 
-        admin = self.getAdminForComponent(componentState)
-        componentType = componentState.get('type')
-        d = admin.callRemote('getEntryByType', componentType, 'admin/gtk')
-        d.addErrback(oldVersion)
-        d.addErrback(noBundle)
-        d.addCallback(gotEntryPoint)
-        d.addCallback(gotFactory)
-        d.addErrback(sleepingComponent)
-        d.addErrback(handledExceptionErrback)
-        return d
+        if isinstance(componentState, AdminComponentState):
+            admin = self.getAdminForComponent(componentState)
+            componentType = componentState.get('type')
+            d = admin.callRemote('getEntryByType', componentType, 'admin/gtk')
+            d.addErrback(oldVersion)
+            d.addErrback(noBundle)
+            d.addCallback(gotEntryPoint)
+            d.addCallback(gotFactory)
+            d.addErrback(sleepingComponent)
+            d.addErrback(handledExceptionErrback)
+            return d
+        elif isinstance(componentState, MultipleAdminComponentStates):
+            admin = self.getAdminForComponent(componentState)
+            d = gotEntryPoint(("flumotion/component/base/multiple.py",
+                               "MultipleComponentsAdminGtk"))
+            d.addCallback(gotFactory, SingleNodePlaceholder)
+            d.addErrback(sleepingComponent)
+            d.addErrback(handledExceptionErrback)
+            d.addErrback(noMultipleComponents)
+            return d
+        else:
+            return defer.succeed(LabelPlaceholder())
 
     def _componentUnsetToInactive(self):
 

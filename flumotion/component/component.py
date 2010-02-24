@@ -361,6 +361,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.addKey('start-time')
         self.uiState.addKey('current-time')
         self.uiState.addKey('virtual-size')
+        self.uiState.addKey('total-memory')
+
         self.uiState.addHook(self)
 
         self.plugs = {}
@@ -575,6 +577,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.setMood(moods.waking)
         self.uiState.set('start-time', time.time())
 
+        self.uiState.set('total-memory', self._getTotalMemory())
         d = run_setups()
         d.addCallbacks(setup_complete, got_error)
         # all status info via messages and the mood
@@ -758,3 +761,9 @@ class BaseComponent(common.InitMixin, log.Loggable):
         vsize = int(fields[22])
         self.log('vsize is %d', vsize)
         self.uiState.set('virtual-size', vsize)
+
+    def _getTotalMemory(self):
+        f = open("/proc/meminfo")
+        memtotal = f.readline()
+        f.close()
+        return int(memtotal[memtotal.index(":") + 1: -3]) * 1024

@@ -83,6 +83,7 @@ from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
      ProgressDialog, showConnectionErrorDialog
 from flumotion.admin.gtk.connections import ConnectionsDialog
 from flumotion.admin.gtk.componentlist import getComponentLabel, ComponentList
+from flumotion.admin.gtk.componentview import MultipleAdminComponentStates
 from flumotion.admin.gtk.debugmarkerview import DebugMarkerDialog
 from flumotion.admin.gtk.statusbar import AdminStatusbar
 from flumotion.common.common import componentId
@@ -1237,6 +1238,7 @@ class AdminWindow(Loggable, GladeDelegate):
             elif states:
                 self.debug("more than one components are selected in the "
                            "components view")
+                state = MultipleAdminComponentStates(states)
         self._componentView.activateComponent(state)
 
         statusbarMessage = " "
