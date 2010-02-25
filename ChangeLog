@@ -1,3 +1,8 @@
+2010-02-25  Josep Joan Ribas  <jribas@flumotion.com>
+
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	Disable OndemandBrowser when serving cortado.
+
 2010-02-24  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: xqueralt

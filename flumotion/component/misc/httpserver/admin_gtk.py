@@ -283,6 +283,7 @@ class BrowserAdminGtkNode(BaseAdminGtkNode):
     def __init__(self, state, admin, title=None):
         BaseAdminGtkNode.__init__(self, state, admin, title)
         self.browser = self._create_browser()
+        self._path = self.state.get('config').get('properties').get('path')
 
     def haveWidgetTree(self):
         self.widget = self.wtree.get_widget('browser_vbox')
@@ -294,7 +295,8 @@ class BrowserAdminGtkNode(BaseAdminGtkNode):
 
     def setUIState(self, state):
         BaseAdminGtkNode.setUIState(self, state)
-        if state.hasKey('allow-browsing') and state.get('allow-browsing'):
+        if self._path and state.hasKey('allow-browsing') \
+           and state.get('allow-browsing'):
             self.browser.setBaseUri(state.get('stream-url'))
         else:
             self.browser.hide_all()
@@ -311,8 +313,8 @@ class BrowserAdminGtkNode(BaseAdminGtkNode):
         return browser
 
     def _configure_browser(self):
-        path = self.state.get('config').get('properties').get('path')
-        self.browser.setRoot(path)
+        if self._path:
+            self.browser.setRoot(self._path)
 
     def _on_realize(self, widget):
         self._configure_browser()
