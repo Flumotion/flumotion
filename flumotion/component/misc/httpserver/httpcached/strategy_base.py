@@ -525,9 +525,9 @@ class CachingSession(BaseCachingSession, log.Loggable):
     ### StreamConsumer ###
 
     def serverError(self, getter, code, message):
+        self.warning("Session request error %s (%s) for %s using %s:%s",
+                     message, code, self.url, getter.host, getter.port)
         if code in (common.SERVER_DISCONNECTED, common.SERVER_TIMEOUT):
-            self.warning("Session request error %s (%s) for %s",
-                         message, code, self.url)
             if self._resumes > 0:
                 self._resumes -= 1
                 if self._state > self.REQUESTING:

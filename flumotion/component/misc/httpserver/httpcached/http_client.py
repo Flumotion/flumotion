@@ -146,6 +146,9 @@ class StreamGetter(protocol.ClientFactory, http.HTTPClient, log.Loggable):
 
     HTTP_METHOD = 'GET'
 
+    host = None
+    port = None
+
     def __init__(self, consumer, url,
                  ifModifiedSince=None, ifUnmodifiedSince=None,
                  start=None, size=None, timeout=0):
@@ -180,14 +183,15 @@ class StreamGetter(protocol.ClientFactory, http.HTTPClient, log.Loggable):
         assert not self._connected, "Already connected"
         self._connected = True
         url = self.url
+        self.host = proxyAddress or url.hostname
+        self.port = proxyPort or url.port
         if url.scheme != 'http':
             msg = "URL scheme %s not implemented" % url.scheme
             self._serverError(common.NOT_IMPLEMENTED, msg)
         else:
-            host = proxyAddress or url.hostname
-            port = proxyPort or url.port
-            self.log("Connecting to %s:%s for %s", host, port, self.url)
-            reactor.connectTCP(host, port, self, timeout)
+            self.log("Connecting to %s:%s for %s",
+                     self.host, self.port, self.url)
+            reactor.connectTCP(self.host, self.port, self, timeout)
 
     def pause(self):
         if not self.paused and self.transport is not None:

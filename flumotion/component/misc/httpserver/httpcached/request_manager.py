@@ -86,6 +86,18 @@ class ConsumerManager(common.StreamConsumer, log.Loggable):
 
         self.logName = common.log_id(self) # To be able to track the instance
 
+    @property
+    def host(self):
+        if self.current_request:
+            return self.current_request.host
+        return None
+
+    @property
+    def port(self):
+        if self.current_request:
+            return self.current_request.port
+        return None
+
     def retrieve(self):
         try:
             s = self.servers.next()
@@ -129,8 +141,8 @@ class ConsumerManager(common.StreamConsumer, log.Loggable):
         self.current_request = None
 
     def serverError(self, getter, code, message):
-        self.debug("Server Error %s (%s) for %s",
-                   message, code, self.url)
+        self.debug("Server Error %s (%s) for %s using %s:%s",
+                   message, code, self.url, getter.host, getter.port)
         self.last_error = code
         self.last_message = message
         if code in (common.SERVER_DISCONNECTED,
