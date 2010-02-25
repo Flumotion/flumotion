@@ -15,6 +15,7 @@ httpserver_PYTHON =		\
 	httpserver.py		\
 	localpath.py		\
 	localprovider.py	\
+	ondemandbrowser.py	\
 	ratecontrol.py          \
 	serverstats.py		\
 	metadataprovider.py \

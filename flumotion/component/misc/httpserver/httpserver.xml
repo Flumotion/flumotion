@@ -175,6 +175,7 @@
             <directory name="flumotion/component/misc/httpserver">
                 <filename location="admin_gtk.py" />
                 <filename location="httpserver.glade" />
+                <filename location="ondemandbrowser.py" />
             </directory>
         </directories>
     </bundle>

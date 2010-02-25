@@ -1,5 +1,14 @@
 2010-02-25  Josep Joan Ribas  <jribas@flumotion.com>
 
+	* flumotion/component/misc/httpserver/Makefile.am:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/ondemandbrowser.py (added):
+	* flumotion/ui/ondemandbrowser.py (deleted):
+	Add OndemandBrowser to the httpserver bundle.
+
+2010-02-25  Josep Joan Ribas  <jribas@flumotion.com>
+
 	* data/cortado-template.html:
 	Replaced wrong url to get java.
 

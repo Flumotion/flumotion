@@ -30,7 +30,7 @@ from flumotion.common.format import formatTime, formatStorage, formatTimeStamp
 from flumotion.component.base.admin_gtk import BaseAdminGtk
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.ui.linkwidget import LinkWidget
-from flumotion.ui.ondemandbrowser import OnDemandBrowser
+from flumotion.component.misc.httpserver.ondemandbrowser import OnDemandBrowser
 
 __version__ = "$Rev$"
 _ = gettext.gettext
