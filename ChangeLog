@@ -1,5 +1,10 @@
 2010-02-25  Josep Joan Ribas  <jribas@flumotion.com>
 
+	* flumotion/ui/Makefile.am:
+	Remove ondemandbrowser.py
+
+2010-02-25  Josep Joan Ribas  <jribas@flumotion.com>
+
 	* flumotion/component/misc/httpserver/Makefile.am:
 	* flumotion/component/misc/httpserver/admin_gtk.py:
 	* flumotion/component/misc/httpserver/httpserver.xml:
