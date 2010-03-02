@@ -1719,6 +1719,8 @@ class DummyReq(object):
         self.code = code
         self.size = 0
         self.canceled = False
+        self.host = None
+        self.port = None
 
         self.logName = "Dummy"
 

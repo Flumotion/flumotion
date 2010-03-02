@@ -1,5 +1,10 @@
 2010-03-02  Josep Joan Ribas  <jribas@flumotion.com>
 
+	* flumotion/test/test_component_httpserver_httpcached_strategy.py:
+	Fix tests.
+
+2010-03-02  Josep Joan Ribas  <jribas@flumotion.com>
+
 	* flumotion/admin/gtk/adminwindow.py:
 	Reset ComponentView when performing actions on multiple components.
 
