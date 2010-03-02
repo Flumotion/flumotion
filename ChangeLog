@@ -1,3 +1,10 @@
+2010-03-02  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/monitor/nagios/stream.py:
+	Fix the flumotion-nagios stream command. In Python2.4 the properties of
+	the object returned by urlparse.urlparse() cannot be access by name,
+	only by index.
+
 2010-03-02  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/test/test_component_httpserver_httpcached_strategy.py:

@@ -234,10 +234,10 @@ class CheckBase(util.LogCommand):
         p = urlparse.urlparse(self._url)
         (tmpfd, tmpPath) = tempfile.mkstemp()
         tmp = os.fdopen(tmpfd, 'wb')
-        if p.path[-4:] == "m3u8":
+        if p[2][-4:] == "m3u8":
             self._url = getURLFromPlaylist(self._url)
             p = urlparse.urlparse(self._url)
-            if p.path[-4:] == "m3u8":
+            if p[2][-4:] == "m3u8":
                 self._url = getURLFromPlaylist(self._url)
             self.options.playlist = True
             segment = urlOpenWithCookies(self._url)
