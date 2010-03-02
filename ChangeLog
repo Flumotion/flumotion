@@ -1,3 +1,8 @@
+2010-03-02  Josep Joan Ribas  <jribas@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Reset ComponentView when performing actions on multiple components.
+
 2010-02-25  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpcached/http_client.py:

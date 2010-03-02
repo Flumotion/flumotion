@@ -1102,6 +1102,7 @@ class AdminWindow(Loggable, GladeDelegate):
         # 'look at the current selection'
         if state is None:
             states = self._componentList.getSelectedStates()
+            self._componentView.activateComponent(None)
         else:
             states = [state]
 
