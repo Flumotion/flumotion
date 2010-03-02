@@ -1,3 +1,14 @@
+2010-03-02  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/scenario/steps/conversionsteps.py:
+	Ask the scenario if the stream has audio/video instead of getting the
+	producer directly. Sometimes the same producer can offer audio-video or
+	they can be already in the flow if we are adding a new stream/format.
+	* flumotion/scenario/steps/productionsteps.py:
+	Add two methods to set the audio/video producers.
+	* flumotion/ui/wizard.py:
+	Add a method to clear all the messages in wizard.
+
 2010-03-02  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/monitor/nagios/stream.py:

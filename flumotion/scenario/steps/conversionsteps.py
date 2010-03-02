@@ -109,8 +109,7 @@ class ConversionStep(WorkerWizardStep):
     def activated(self):
         data = [('muxer', self.muxer, None, None)]
 
-        audioProducer = self.wizard.getScenario().getAudioProducer(self.wizard)
-        if audioProducer:
+        if self.wizard.getScenario().hasAudio(self.wizard):
             oldAudioEncoder = self.wizard.getScenario().getAudioEncoder()
             data.append(('audio-encoder', self.audio,
                          _PREFERRED_AUDIO_ENCODER,
@@ -120,8 +119,7 @@ class ConversionStep(WorkerWizardStep):
             self.label_audio.hide()
             self.wizard.getScenario().setAudioEncoder(None)
 
-        videoProducer = self.wizard.getScenario().getVideoProducer(self.wizard)
-        if videoProducer:
+        if self.wizard.getScenario().hasVideo(self.wizard):
             oldVideoEncoder = self.wizard.getScenario().getVideoEncoder()
             data.append(('video-encoder', self.video,
                          _PREFERRED_VIDEO_ENCODER,

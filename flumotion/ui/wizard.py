@@ -678,6 +678,9 @@ class SectionWizard(GladeWindow, log.Loggable):
     def add_msg(self, msg):
         self.message_area.addMessage(msg)
 
+    def clear_all_msg(self):
+        self.message_area.clear()
+
     def goNext(self):
         """Show the next step, this is called when
         the next button is clicked

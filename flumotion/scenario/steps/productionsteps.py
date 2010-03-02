@@ -86,6 +86,17 @@ class LiveProductionStep(WizardStep):
         if self.has_audio.get_active():
             return self._audioProducer
 
+    def getComponentType(self, ctype):
+        if ctype == 'audio':
+            return self.audio.get_selected()
+        elif ctype == 'video':
+            return self.video.get_selected()
+        else:
+            return None
+
+    def setAudioProducer(self, value):
+        self._audioProducer = value
+
     def getVideoProducer(self):
         """Returns the selected video producer or None
         @returns: producer or None
@@ -93,6 +104,9 @@ class LiveProductionStep(WizardStep):
         """
         if self.has_video.get_active():
             return self._videoProducer
+
+    def setVideoProducer(self, value):
+        self._videoProducer = value
 
     def getVideoStep(self):
         """Return the video step to be shown, given the currently
