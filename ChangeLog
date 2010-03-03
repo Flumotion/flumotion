@@ -1,7 +1,7 @@
 2010-03-03  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/component/producers/soundcard/wizard_gtk.py:
-	Check if samplerate is tuple or int. Fixes #1317.
+	Check if samplerate is tuple or int. Fixes #1371.
 
 2010-03-02  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
