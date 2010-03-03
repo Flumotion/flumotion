@@ -206,7 +206,11 @@ class SoundcardStep(AudioProducerStep):
         capStruct = self._capStructs.get(self.depth.get_selected())
         if capStruct is None:
             return
-        max, min = capStruct['rate']
+        if type(capStruct['rate']) == int:
+            max = min = capStruct['rate']
+        else:
+            max, min = capStruct['rate']
+
         self.samplerate.prefill(
             [(str(rate), rate) for rate in SAMPLE_RATES if min <= rate <= max])
         self.samplerate.set_sensitive(True)
