@@ -97,7 +97,13 @@ class BaseWatcher(log.Loggable):
         """
         for s in self.subscribers.values():
             if s[event]:
-                s[event](*args, **kwargs)
+                # Exceptions raised by subscribers need to be catched to
+                # continue polling for changes
+                try:
+                    s[event](*args, **kwargs)
+                except Exception, e:
+                    self.warning("A callback for event %s raised an error: %s"
+                            % (event, log.getExceptionMessage(e)))
 
     # FIXME: this API has tripped up two people thus far, including its
     # author. make subscribe() call start() if necessary?

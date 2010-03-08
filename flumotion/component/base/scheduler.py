@@ -302,6 +302,7 @@ class ICalScheduler(Scheduler):
                     self._parseFromFile(open(filename, 'r'))
                 except:
                     self.warning("error parsing ics file %s", filename)
+                    raise
 
             self.watcher = watcher.FilesWatcher([fileObj.name])
             fileObj.close()

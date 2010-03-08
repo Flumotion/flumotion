@@ -1,3 +1,14 @@
+2010-03-08  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/component/base/scheduler.py:
+	* flumotion/component/base/watcher.py:
+	* flumotion/test/test_component_base_watcher.py:
+	Prevent the watcher to stop polling for changes when a
+	subscriber raises an Exception.
+	Closes #1385
+
 2010-03-03  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/component/producers/soundcard/wizard_gtk.py:
