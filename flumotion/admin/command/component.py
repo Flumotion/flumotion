@@ -50,7 +50,8 @@ class Delete(common.AdminCommand):
             self.stdout.write("Deleted component.\n")
 
         def eb(failure):
-            if failure.trap(errors.ComponentMoodError):
+            if failure.check(errors.ComponentMoodError,
+                             errors.BusyComponentError):
                 common.errorRaise("Component '%s' is in the wrong mood." %
                     self.parentCommand.componentId)
             else:
