@@ -5,6 +5,7 @@
 	* flumotion/admin/command/component.py:
 	Fix errback of the delete command. They were never called and the
 	failure was not handled.
+	Fixes #1404
 
 2010-03-08  Andoni Morales Alastruey  <amorales@flumotion.com>
 
