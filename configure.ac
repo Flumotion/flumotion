@@ -126,9 +126,10 @@ AS_PYTHON_IMPORT(twisted,
   AC_MSG_CHECKING(for Twisted >= 2.0.1)
   prog="
 import sys
-import twisted.copyright
-minver = '2.0.1'
-if twisted.copyright.version < minver:
+from twisted import version as v
+minver = (2, 0, 1)
+curver = (v.major, v.minor, v.micro)
+if curver < minver:
     sys.exit(1)
 sys.exit(0)
 "
