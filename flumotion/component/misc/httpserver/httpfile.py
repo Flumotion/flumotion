@@ -50,10 +50,10 @@ __version__ = "$Rev$"
 LOG_CATEGORY = "httpserver"
 
 try:
-    weberror.ErrorPage
-    errorpage = weberror
-except AttributeError:
+    resource.ErrorPage
     errorpage = resource
+except AttributeError:
+    errorpage = weberror
 
 
 class BadRequest(errorpage.ErrorPage):
