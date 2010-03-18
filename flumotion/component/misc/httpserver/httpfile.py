@@ -49,28 +49,34 @@ __version__ = "$Rev$"
 
 LOG_CATEGORY = "httpserver"
 
+try:
+    weberror.ErrorPage
+    errorpage = weberror
+except AttributeError:
+    errorpage = resource
 
-class BadRequest(weberror.ErrorPage):
+
+class BadRequest(errorpage.ErrorPage):
     """
     Web error for invalid requests
     """
 
     def __init__(self, message="Invalid request format"):
-        weberror.ErrorPage.__init__(self, http.BAD_REQUEST,
+        errorpage.ErrorPage.__init__(self, http.BAD_REQUEST,
                                     "Bad Request", message)
 
 
-class InternalServerError(weberror.ErrorPage):
+class InternalServerError(errorpage.ErrorPage):
     """
     Web error for internal failures
     """
 
     def __init__(self, message="The server failed to complete the request"):
-        weberror.ErrorPage.__init__(self, http.INTERNAL_SERVER_ERROR,
+        errorpage.ErrorPage.__init__(self, http.INTERNAL_SERVER_ERROR,
                                     "Internal Server Error", message)
 
 
-class ServiceUnavailableError(weberror.ErrorPage):
+class ServiceUnavailableError(errorpage.ErrorPage):
     """
     Web error for when the request cannot be served.
     """
@@ -78,7 +84,7 @@ class ServiceUnavailableError(weberror.ErrorPage):
     def __init__(self, message="The server is currently unable to handle "
                                "the request due to a temporary overloading "
                                "or maintenance of the server"):
-        weberror.ErrorPage.__init__(self, http.SERVICE_UNAVAILABLE,
+        errorpage.ErrorPage.__init__(self, http.SERVICE_UNAVAILABLE,
                                     "Service Unavailable", message)
 
 
@@ -91,8 +97,8 @@ class File(resource.Resource, log.Loggable):
 
     defaultType = "application/octet-stream"
 
-    childNotFound = weberror.NoResource("File not found.")
-    forbiddenResource = weberror.ForbiddenResource("Access forbidden")
+    childNotFound = errorpage.NoResource("File not found.")
+    forbiddenerrorpage = errorpage.ForbiddenResource("Access forbidden")
     badRequest = BadRequest()
     internalServerError = InternalServerError()
     serviceUnavailable = ServiceUnavailableError()
