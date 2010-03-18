@@ -126,6 +126,10 @@ AS_PYTHON_IMPORT(twisted,
   AC_MSG_CHECKING(for Twisted >= 2.0.1)
   prog="
 import sys
+from twisted import __version__
+if __version__ == 'SVN-Trunk':
+   sys.exit(0)
+
 from twisted import version as v
 minver = (2, 0, 1)
 curver = (v.major, v.minor, v.micro)
