@@ -42,8 +42,8 @@ __version__ = "$Rev$"
 # Since we're doing this over a stream socket, our file descriptor messages
 # aren't guaranteed to be received alone; they could arrive along with some
 # unrelated data.
-# So, we prefix the message with a 16 byte magic signature, and a length,
-# and if we receive file descriptors decode based on this.
+# So, we prefix the message with a 16 byte randomly generated magic signature,
+# and a length, and if we receive file descriptors decode based on this.
 #
 # map() instead of a string to workaround gettext encoding problems.
 #
