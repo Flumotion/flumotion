@@ -61,7 +61,7 @@ PYCHECKER_BLACKLIST = \
 
 COVERAGE_MODULES = flumotion
 
-.PHONY: test
+.PHONY: test 
 
 integration:
 	trial tests.integration
@@ -81,3 +81,10 @@ DISTCLEANFILES = \
 	intltool-merge \
 	intltool-update
 
+update-externals: update-external-command
+
+update-external-command:
+	find flumotion/extern/command -type d -name '.svn' -prune -o -type f -delete
+	svn export --force https://thomas.apestaart.org/moap/svn/trunk/moap/extern/command flumotion/extern/command
+
+.PHONY: update-externals update-external-command

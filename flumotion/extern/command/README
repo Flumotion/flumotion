@@ -1,0 +1,12 @@
+This module implements commands with subtrees of commands.
+
+Suggested use in your project (if you are using Subversion):
+
+- create myproject/extern directory
+- svn commit myproject/extern
+- svn propset svn:externals "command https://thomas.apestaart.org/moap/svn/trunk/moap/extern/command"
+
+Alternatively, you can embed only the command.py file with proper svn:externals.
+
+If you are worried about stability, check out a specific revision by
+putting -r (revision number) in between log and https
