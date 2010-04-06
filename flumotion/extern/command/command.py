@@ -35,7 +35,6 @@ class CommandHelpFormatter(optparse.IndentedHelpFormatter):
         # textwrap doesn't allow for a way to preserve double newlines
         # to separate paragraphs, so we do it here.
         paragraphs = description.split('\n\n')
-        print paragraphs
         rets = []
 
         for paragraph in paragraphs:
@@ -255,8 +254,9 @@ class Command:
         """
         # note: no arguments should be passed as an empty list, not a list
         # with an empty str as ''.split(' ') returns
+        self.debug('calling parse_args')
         self.options, args = self.parser.parse_args(argv)
-        self.debug('parse_args called')
+        self.debug('called parse_args')
 
         # if we were asked to print help or usage, we are done
         if self.parser.usage_printed or self.parser.help_printed:

@@ -1,5 +1,13 @@
 2010-04-06  Sébastien Merle  <sebastien@flumotion.com>
 
+	* flumotion/extern/command/command.py:
+	* flumotion/extern/command/help2man.py:
+	* flumotion/extern/command/help2man.py (added):
+	Updated external/command to revision 468.
+	Fixed help2man.py to pass pepe8.
+
+2010-04-06  Sébastien Merle  <sebastien@flumotion.com>
+
 	* Makefile.am:
 	Fixed the external update target.
 	Command find's -prune do not work with -delete.
