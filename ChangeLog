@@ -1,5 +1,11 @@
 2010-04-06  Sébastien Merle  <sebastien@flumotion.com>
 
+	* Makefile.am:
+	Fixed the external update target.
+	Command find's -prune do not work with -delete.
+
+2010-04-06  Sébastien Merle  <sebastien@flumotion.com>
+
 	reviewed by: Xavier Martinez
 
 	* Makefile.am:

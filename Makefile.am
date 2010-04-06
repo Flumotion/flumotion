@@ -84,7 +84,7 @@ DISTCLEANFILES = \
 update-externals: update-external-command
 
 update-external-command:
-	find flumotion/extern/command -type d -name '.svn' -prune -o -type f -delete
+	find flumotion/extern/command -type f ! -regex '.*/.svn/.*' -delete
 	svn export --force https://thomas.apestaart.org/moap/svn/trunk/moap/extern/command flumotion/extern/command
 
 .PHONY: update-externals update-external-command
