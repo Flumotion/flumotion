@@ -1,6 +1,6 @@
 #!/bin/sh
 # Print a version string.
-scriptversion=2010-04-08.12
+scriptversion=2010-04-08.19
 
 # Copyright (C) 2007-2009 Free Software Foundation
 #
@@ -105,6 +105,8 @@ elif test -d .svn \
     && v=`svnversion`
 then
     v=$default_version-$v
+    echo "$v" | tr -d '\012'
+    exit 0
 elif test -d .git \
     && v=`git describe --abbrev=4 --match='v*' HEAD 2>/dev/null \
 	  || git describe --abbrev=4 HEAD 2>/dev/null` \
