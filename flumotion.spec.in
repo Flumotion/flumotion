@@ -7,14 +7,14 @@
 %{!?gstreamer:  %define         gstreamer       gstreamer}
 
 Name:           @PACKAGE@
-Version:        @VERSION@
+Version:        @PACKAGE_VERSION_SPEC@
 Release:        @PACKAGE_VERSION_RELEASE@%{?dist}
 Summary:        Streaming Server based on GStreamer and Twisted
 
 Group:          Applications/Internet
 License:        GPL
 URL:            http://www.flumotion.net/
-Source:         http://www.flumotion.net/src/flumotion/%{name}-%{version}.tar.bz2
+Source:         http://www.flumotion.net/src/flumotion/@PACKAGE_TARNAME@-@PACKAGE_VERSION@.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Requires:       python >= 2.4
@@ -82,7 +82,7 @@ To define the base name of GStreamer packages to build against
   --define 'gstreamer gstreamer010'
 
 %prep
-%setup -q
+%setup -q -n @PACKAGE_TARNAME@-@PACKAGE_VERSION@
 
 %build
 %configure

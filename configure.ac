@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE([-Wno-portability])
 
 dnl define PACKAGE_VERSION_* variables
 AS_VERSION
-
+AC_SUBST(PACKAGE_VERSION_SPEC, `echo $VERSION | tr '-' '_'`)
 AS_NANO
 
 AC_SUBST_FILE(AUTHORS)

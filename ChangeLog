@@ -1,3 +1,11 @@
+2010-04-08  Marc-André Lureau  <mlureau@flumotion.com> 
+
+	reviewed by: Sébastien Merle
+
+	* configure.ac:
+	* flumotion.spec.in:
+	Fix flumotion.spec.in broken with version-gen changes.
+
 2010-04-08  Sébastien Merle  <sebastien@flumotion.com>
 
 	* common/common.mk:
