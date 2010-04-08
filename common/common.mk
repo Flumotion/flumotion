@@ -13,8 +13,8 @@ check-local-config:
 	ret=0; for f in $(CONFIG); do echo "Validating $$f"; $(top_builddir)/env bash -c "export PYTHONPATH=$(FLUMOTION_DIR):$(top_srcdir)${PYTHONPATH:+:$PYTHONPATH} && $(PYTHON) $(top_srcdir)/common/validate-config.py $(srcdir)/$$f" || ret=1; done && exit $$ret
 
 check-local-pep8:
-	find $(top_srcdir)/flumotion -name \*.py | sort -u | xargs $(PYTHON) $(top_srcdir)/common/pep8.py --repeat
-	find $(top_srcdir)/flumotion -name \*.py.in | sort -u | xargs $(PYTHON) $(top_srcdir)/common/pep8.py --repeat
+	find $(top_srcdir)/flumotion ! -regex $(top_srcdir)/flumotion/extern/.\* -name \*.py | sort -u | xargs $(PYTHON) $(top_srcdir)/common/pep8.py --repeat
+	find $(top_srcdir)/flumotion ! -regex $(top_srcdir)/flumotion/extern/.\* -name \*.py.in | sort -u | xargs $(PYTHON) $(top_srcdir)/common/pep8.py --repeat
 
 # run our hacked-up version of trial with all the reactors that we actually use and build up the final result
 coverage:

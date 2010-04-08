@@ -1,3 +1,8 @@
+2010-04-08  Sébastien Merle  <sebastien@flumotion.com>
+
+	* common/common.mk:
+	Do not check flumotion/extern with pep8.
+
 2010-04-08  Marc-André Lureau  <mlureau@flumotion.com>
 
 	reviewed by: Sébastien Merle
@@ -17,6 +22,12 @@
 	* . (svn:ignore):
 	Make version from SVN or GIT or tarball release.
 	Ignore .version and .tarball-version
+
+2010-04-06  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/extern/command/command.py:
+	Fixed option parsing errors.
+	Added a callback for sub-classes special error handling.
 
 2010-04-06  Sébastien Merle  <sebastien@flumotion.com>
 
