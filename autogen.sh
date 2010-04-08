@@ -2,9 +2,6 @@
 set -x
 
 rm -f .version
-[ x"$VERSION" = x ] && VERSION=0.7.0.1
-export VERSION
-
 libtoolize -c --force || exit 1
 autopoint --force || exit 1
 cp -f common/intltool-Makefile.in.in po/Makefile.in.in

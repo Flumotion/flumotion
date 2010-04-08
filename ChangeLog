@@ -1,4 +1,14 @@
-2010-04-08  Marc-André Lureau  <mlureau@flumotion.com> 
+2010-04-08  Marc-André Lureau  <mlureau@flumotion.com>
+
+	reviewed by: Sébastien Merle
+
+	* autogen.sh:
+	* configure.ac:
+	Fix automatic autoconf.
+	* flumotion/common/common.py:
+	Split version string such as '0.7.0.1-foo'
+
+2010-04-08  Marc-André Lureau  <mlureau@flumotion.com>
 
 	reviewed by: Sébastien Merle
 

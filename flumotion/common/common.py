@@ -301,6 +301,7 @@ def versionStringToTuple(versionString):
 
     @rtype: tuple of int
     """
+    versionString = versionString.split('-')[0]
     t = tuple(map(int, versionString.split('.')))
     if len(t) < 4:
         t = t + (0, )
