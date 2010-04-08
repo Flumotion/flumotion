@@ -1,3 +1,23 @@
+2010-04-08  Marc-André Lureau  <mlureau@flumotion.com>
+
+	reviewed by: Sébastien Merle
+
+	* autogen.sh:
+	Set default version to 0.7.0.1.
+	Overridable with "VERSION=foo autogen.sh"
+	Clean .version before autofoo.
+	* flumotion/configure/configure.py:
+	Split version string such as '0.7.0.1-foo'
+	* common/common.mk:
+	Make dist-hook use double-colon rule, to be able to add others
+	dist-hook rules in different files.
+	* common/version-gen (added):
+	* Makefile.am:
+	* configure.ac:
+	* . (svn:ignore):
+	Make version from SVN or GIT or tarball release.
+	Ignore .version and .tarball-version
+
 2010-04-06  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/extern/command/command.py:

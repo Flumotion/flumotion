@@ -112,6 +112,7 @@ else:
 
 
 def _versionStringToTuple(versionString):
+    versionString = versionString.split('-')[0]
     t = tuple(map(int, versionString.split('.')))
     if len(t) < 4:
         t = t + (0, )

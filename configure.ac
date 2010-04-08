@@ -1,9 +1,7 @@
--*- mode: m4 -*-
-
 dnl initialize autoconf
 dnl when going to/from release please remove/add the nano (fourth number)
 dnl releases only do Wall, cvs and prerelease does Werror too
-AC_INIT(flumotion, 0.7.0.1,
+AC_INIT(flumotion, m4_esyscmd([common/version-gen $VERSION .tarball-version]),
    http://https://code.fluendo.com/flumotion/trac/newticket?component=flumotion,
    flumotion)
 
@@ -276,7 +274,11 @@ po/Makefile.in
 )
 
 echo
-echo "Building documentation: $enable_docs"
+echo "    $PACKAGE_STRING ($PACKAGE_VERSION_RELEASE)"
+echo
+echo "    Building documentation: $enable_docs"
+echo "    pychecker:              $PYCHECKER"
+echo "    epydoc:                 $EPYDOC"
 echo
 echo "Now type \"make\" to build flumotion"
 

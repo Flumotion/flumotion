@@ -39,7 +39,7 @@ fixme:
 	tools/fixme | less -R
 
 # remove any cache written in distcheck	
-dist-hook:
+dist-hook::
 	rm -rf cache
 
 release: dist
