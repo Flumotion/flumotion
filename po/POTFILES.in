@@ -17,6 +17,7 @@ data/glade/greeter-start_new_error.glade
 data/glade/greeter-start_new_success.glade
 data/glade/httpstreamer-wizard.glade
 data/glade/license-wizard.glade
+data/glade/loadflow-wizard.glade
 data/glade/ondemand-wizard.glade
 data/glade/open-connection.glade
 data/glade/overlay-wizard.glade
@@ -127,6 +128,7 @@ flumotion/component/base/effectsnode.py
 flumotion/component/base/feeders.glade
 flumotion/component/base/feedersnode.py
 flumotion/component/base/http.py
+flumotion/component/base/multiple.py
 flumotion/component/base/properties.glade
 flumotion/component/base/propertiesnode.py
 flumotion/component/base/scheduler.py
@@ -169,6 +171,7 @@ flumotion/component/consumers/disker/disker.glade
 flumotion/component/consumers/disker/disker.py
 flumotion/component/consumers/disker/disker.xml
 flumotion/component/consumers/disker/disker_plug.py
+flumotion/component/consumers/disker/status.glade
 flumotion/component/consumers/gdp/__init__.py
 flumotion/component/consumers/gdp/gdp.py
 flumotion/component/consumers/gdp/gdp.xml
@@ -248,6 +251,7 @@ flumotion/component/feeder.py
 flumotion/component/misc/__init__.py
 flumotion/component/misc/httpserver/__init__.py
 flumotion/component/misc/httpserver/admin_gtk.py
+flumotion/component/misc/httpserver/httpcached/httpcached.xml
 flumotion/component/misc/httpserver/httpfile.glade
 flumotion/component/misc/httpserver/httpfile.py
 flumotion/component/misc/httpserver/httpserver.glade
@@ -275,6 +279,7 @@ flumotion/component/plugs/plugs.xml
 flumotion/component/plugs/request.py
 flumotion/component/plugs/rrd.py
 flumotion/component/plugs/streamdata.py
+flumotion/component/plugs/wizard.glade
 flumotion/component/producers/__init__.py
 flumotion/component/producers/audiotest/__init__.py
 flumotion/component/producers/audiotest/admin_gtk.py
@@ -355,8 +360,6 @@ flumotion/component/producers/webcam/wizard.glade
 flumotion/component/producers/webcam/wizard_gtk.py
 flumotion/configure/__init__.py
 flumotion/configure/configure.py
-flumotion/configure/installed.py
-flumotion/configure/uninstalled.py
 flumotion/extern/__init__.py
 flumotion/extern/code.py
 flumotion/extern/exceptiondialog.py
@@ -386,11 +389,12 @@ flumotion/monitor/nagios/stream.py
 flumotion/monitor/nagios/util.py
 flumotion/package.xml
 flumotion/project/__init__.py
-flumotion/project/flumotion.locale.xml
 flumotion/project/project.py
 flumotion/scenario/__init__.py
 flumotion/scenario/live/live.xml
 flumotion/scenario/live/wizard_gtk.py
+flumotion/scenario/loadflow/loadflow.xml
+flumotion/scenario/loadflow/wizard_gtk.py
 flumotion/scenario/ondemand/ondemand.xml
 flumotion/scenario/ondemand/wizard_gtk.py
 flumotion/scenario/scenario.xml
