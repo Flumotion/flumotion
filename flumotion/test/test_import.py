@@ -46,7 +46,7 @@ def find_modules(pkg_name, pkg_path, pkg_exclude=[]):
 class TestImport(testsuite.TestCase):
 
     def testImportAllModules(self):
-        pkg_exclude = ['flumotion.test']
+        pkg_exclude = ['flumotion.test', 'flumotion.extern']
 
         try:
             import rrdtool

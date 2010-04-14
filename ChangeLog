@@ -1,3 +1,8 @@
+2010-04-14  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/test/test_import.py:
+	Do not try to import everything from external.
+
 2010-04-14  Marc-André Lureau  <mlureau@flumotion.com>
 
 	* po/POTFILES.in:
