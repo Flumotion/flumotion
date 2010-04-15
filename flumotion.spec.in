@@ -162,7 +162,7 @@ then
     <port>7531</port>
     <transport>ssl</transport>
 -->
-    <!-- certificate path can be relative to $sysconfdir/flumotion,
+    <!-- certificate path can be relative to /etc/flumotion,
          or absolute -->
 <!--
     <certificate>default.pem</certificate>

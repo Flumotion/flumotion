@@ -1,5 +1,11 @@
 2010-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion.spec.in:
+	  Since the rpm installs in /etc usually and there is no other way
+	  to expand the location where rpm will put sysconf, hardcode it.
+
+2010-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* common/validate-registry.py:
 	  Only fail on deprecationwarnings that are ours.
 
