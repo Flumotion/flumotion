@@ -186,6 +186,7 @@ class BaseJobHeaven(pb.Root, log.Loggable):
         # Rather than a listenUNIX(), we use listenWith so that we can specify
         # our particular Port, which creates Transports that we know how to
         # pass FDs over.
+        self.debug("Listening for FD's on unix socket %s", self._socketPath)
         port = reactor.listenWith(fdserver.FDPort, self._socketPath, f)
         self._port = port
 

@@ -162,6 +162,7 @@ class ComponentJobInfo(base.JobInfo):
 
 class ComponentJobHeaven(base.BaseJobHeaven):
     avatarClass = ComponentJobAvatar
+    logCategory = 'component-job-heaven'
 
     def getManagerConnectionInfo(self):
         """
@@ -267,6 +268,7 @@ class CheckJobAvatar(base.BaseJobAvatar):
 
 class CheckJobHeaven(base.BaseJobHeaven):
     avatarClass = CheckJobAvatar
+    logCategory = 'check-job-heaven'
 
     _checkCount = 0
     _timeout = 45
