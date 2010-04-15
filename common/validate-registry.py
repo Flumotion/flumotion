@@ -24,8 +24,15 @@ def showwarning(message, category, filename, lineno, file=None, line=None):
     # uncomment to see better where the problem comes from when it claims
     # to be in ihooks.py
     # import traceback; traceback.print_stack()
+
+    # if it's not in our code, it's not our fault
+    if filename.startswith('/usr/lib'):
+        return
+
+    # count the deprecation as a fatal error
     global exitCode
     exitCode += 1
+
 warnings.showwarning = showwarning
 
 from flumotion.common import setup
