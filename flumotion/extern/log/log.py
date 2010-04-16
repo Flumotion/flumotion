@@ -636,8 +636,13 @@ def getExceptionMessage(exception, frame=-1, filename=None):
     stack = traceback.extract_tb(sys.exc_info()[2])
     if filename:
         stack = [f for f in stack if f[0].find(filename) > -1]
-    #import code; code.interact(local=locals())
-    (filename, line, func, text) = stack[frame]
+
+    # badly raised exceptions can come without a stack
+    if stack:
+        (filename, line, func, text) = stack[frame]
+    else:
+        (filename, line, func, text) = ('no stack', 0, 'none', '')
+
     filename = scrubFilename(filename)
     exc = exception.__class__.__name__
     msg = ""
