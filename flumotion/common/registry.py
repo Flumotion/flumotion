@@ -30,6 +30,7 @@ from StringIO import StringIO
 
 from xml.sax import saxutils
 from twisted.spread import pb
+from twisted.python import runtime
 
 from flumotion.common import common, log, errors, fxml, python
 from flumotion.common.python import makedirs
@@ -1514,13 +1515,15 @@ class ComponentRegistry(log.Loggable):
     defaultCachePath = os.path.join(configure.registrydir, 'registry.xml')
 
     def __init__(self, paths=None, prefix=configure.PACKAGE,
-                 cachePath=defaultCachePath):
+                 cachePath=defaultCachePath, seconds=runtime.seconds):
         if paths is not None:
             self._paths = paths
         else:
             self._paths = self._getRegistryPathsFromEnviron()
         self.prefix = prefix
         self.filename = cachePath
+        self.seconds = seconds
+        self.mtime = None
 
         self._parser = RegistryParser()
 
@@ -1702,7 +1705,7 @@ class ComponentRegistry(log.Loggable):
         self._parser.clean()
 
     def rebuildNeeded(self):
-        if not os.path.exists(self.filename):
+        if self.mtime is None or not os.path.exists(self.filename):
             return True
 
         # A bit complicated because we want to allow FLU_PROJECT_PATH to
@@ -1716,7 +1719,7 @@ class ComponentRegistry(log.Loggable):
             if filter(os.path.exists, registryPaths - oldRegistryPaths):
                 return True
 
-        registry_modified = _getMTime(self.filename)
+        registry_modified = self.mtime
         for d in self._parser.getDirectories():
             if d.rebuildNeeded(registry_modified):
                 return True
@@ -1774,9 +1777,11 @@ class ComponentRegistry(log.Loggable):
             if self.rebuildNeeded():
                 self.info("Rebuild of registry is needed")
             self.clean()
+            mtime = self.seconds()
             for path in self._paths:
                 if not self.addRegistryPath(path):
                     self._parser.removeDirectoryByPath(path)
+            self.mtime = mtime
             self.save(True)
 
 

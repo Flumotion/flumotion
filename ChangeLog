@@ -2,6 +2,16 @@
 
 	reviewed by: Jan Urbanski
 
+	* flumotion/common/registry.py:
+	* flumotion/test/test_registry.py:
+	Rebuild registry when ComponentRegistry() instance is outdated,
+	regardless of whether registry cache file is up-to-date.
+	Fixes #1395.
+
+2010-04-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
 	* flumotion/test/test_registry.py:
 	Instance ComponentRegistry() with empty path list in test suite
 

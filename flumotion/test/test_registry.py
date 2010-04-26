@@ -21,9 +21,12 @@
 
 import StringIO
 import os
-import warnings
+import shutil
 import tempfile
+import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
+
+from twisted.internet import task
 
 from flumotion.common import testsuite
 from flumotion.common import registry, fxml, common
@@ -558,6 +561,19 @@ def rmdir(root):
     os.rmdir(root)
 
 
+def writeComponent(filename, name):
+    open(filename, 'w').write("""
+<registry>
+  <components>
+    <component type="%s" base="/">
+      <properties>
+      </properties>
+    </component>
+  </components>
+</registry>""" % name)
+    return filename
+
+
 class TestFindComponents(testsuite.TestCase):
 
     def setUp(self):
@@ -575,9 +591,9 @@ class TestFindComponents(testsuite.TestCase):
         os.makedirs('subdir')
         os.makedirs('subdir/foo')
         os.makedirs('subdir/bar')
-        self.writeComponent('subdir/first.xml', 'first')
-        self.writeComponent('subdir/foo/second.xml', 'second')
-        self.writeComponent('subdir/bar/third.xml', 'third')
+        writeComponent('subdir/first.xml', 'first')
+        writeComponent('subdir/foo/second.xml', 'second')
+        writeComponent('subdir/bar/third.xml', 'third')
 
     def tearDown(self):
         rmdir('subdir')
@@ -588,17 +604,6 @@ class TestFindComponents(testsuite.TestCase):
         if os.path.exists(self.reg.filename):
             os.unlink(self.reg.filename)
 
-    def writeComponent(self, filename, name):
-        open(filename, 'w').write("""
-<registry>
-  <components>
-    <component type="%s" base="/">
-      <properties>
-      </properties>
-    </component>
-  </components>
-</registry>""" % name)
-
     def testSimple(self):
         self.reg.addRegistryPath('.', prefix='subdir')
         components = self.reg.getComponents()
@@ -606,3 +611,49 @@ class TestFindComponents(testsuite.TestCase):
         types = [c.getType() for c in components]
         types.sort()
         self.assertEquals(types, ['first', 'second', 'third']) # alpha order
+
+
+class TestRegistryUpdate(testsuite.TestCase):
+
+    def setUp(self):
+        self.tempdir = tempfile.mkdtemp()
+        self.regcache = os.path.join(self.tempdir, 'registry.xml')
+        self.regpath = self.tempdir
+
+        # monkeypatch registry._getMTime() so we can simulate filesystem
+        # updates
+        self.mtime = {}
+        self._getMTime = registry._getMTime
+        registry._getMTime = self.mtime.__getitem__
+
+    def tearDown(self):
+        registry._getMTime = self._getMTime
+        shutil.rmtree(self.tempdir, ignore_errors=True)
+
+    def testConcurrentCacheUpdate(self):
+        clock = task.Clock()
+
+        # create tree containing registry snippets
+        d = os.path.join(self.regpath, 'flumotion')
+        os.mkdir(d)
+        f1 = writeComponent(os.path.join(d, 'first.xml'), 'first')
+        f2 = writeComponent(os.path.join(d, 'second.xml'), 'second')
+        self.mtime[d] = self.mtime[f1] = self.mtime[f2] = clock.seconds()
+
+        # initialize registry
+        reg = registry.ComponentRegistry(
+            [self.regpath], 'flumotion', self.regcache, clock.seconds)
+
+        # modify registry snippet
+        clock.advance(1)
+        f2 = writeComponent(os.path.join(d, 'second.xml'), 'second-new')
+        self.mtime[f2] += clock.seconds()
+
+        # another process updates the registry cache
+        self.mtime[self.regcache] = clock.seconds()
+
+        # the registry should be rebuilt anyway
+        self.assert_(reg.rebuildNeeded())
+        reg.verify()
+        types = sorted(c.getType() for c in reg.getComponents())
+        self.assertEquals(types, ['first', 'second-new'])
