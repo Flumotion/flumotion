@@ -2,6 +2,21 @@
 
 	reviewed by: Jan Urbanski
 
+	* flumotion/test/test_registry.py:
+	Instance ComponentRegistry() with empty path list in test suite
+
+	This avoids building the whole `flumotion` registry during the
+	test suite execution, speeding it up by 20x.
+
+	Note that the correctness of `flumotion` registry is already
+	checked by validate-registry.py, so we do not need to re-check it
+	during test_registry execution (which should only check registry
+	code correctness).
+
+2010-04-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
 	* flumotion/common/registry.py:
 	Add paths, prefix, and cachePath keyword args to
 	ComponentRegistry.__init__().

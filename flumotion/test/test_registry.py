@@ -32,7 +32,7 @@ from flumotion.common import registry, fxml, common
 class TestRegistry(testsuite.TestCase):
 
     def setUp(self):
-        self.reg = registry.ComponentRegistry()
+        self.reg = registry.ComponentRegistry(paths=[])
         self.reg.clean()
 
     def testDefault(self):
@@ -221,13 +221,13 @@ class TestRegistry(testsuite.TestCase):
     </component>
   </components>
 </registry>"""
-        reg = registry.ComponentRegistry()
+        reg = registry.ComponentRegistry(paths=[])
         reg.addFromString(xml)
         reg.clean()
         self.failUnless(reg.isEmpty())
 
     def testComponentTypeError(self):
-        reg = registry.ComponentRegistry()
+        reg = registry.ComponentRegistry(paths=[])
         xml = """
 <registry>
   <components>
@@ -237,7 +237,7 @@ class TestRegistry(testsuite.TestCase):
         reg.addFromString(xml)
 
     def testAddXmlParseError(self):
-        reg = registry.ComponentRegistry()
+        reg = registry.ComponentRegistry(paths=[])
         xml = """
 <registry>
   <components>
@@ -249,7 +249,7 @@ class TestRegistry(testsuite.TestCase):
         self.assertRaises(fxml.ParserError, reg.addFromString, xml)
 
     def _compareRegistryAfterDump(self, orig, expected, name=''):
-        reg = registry.ComponentRegistry()
+        reg = registry.ComponentRegistry(paths=[])
         reg.clean()
         reg.addFromString(orig)
         s = StringIO.StringIO()
@@ -561,7 +561,7 @@ def rmdir(root):
 class TestFindComponents(testsuite.TestCase):
 
     def setUp(self):
-        self.reg = registry.ComponentRegistry()
+        self.reg = registry.ComponentRegistry(paths=[])
         self.reg.clean()
 
         # override the registry's filename so make distcheck works
