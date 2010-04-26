@@ -1511,9 +1511,17 @@ class ComponentRegistry(log.Loggable):
     """Registry, this is normally not instantiated."""
 
     logCategory = 'registry'
-    filename = os.path.join(configure.registrydir, 'registry.xml')
+    defaultCachePath = os.path.join(configure.registrydir, 'registry.xml')
 
-    def __init__(self):
+    def __init__(self, paths=None, prefix=configure.PACKAGE,
+                 cachePath=defaultCachePath):
+        if paths is not None:
+            self._paths = paths
+        else:
+            self._paths = self._getRegistryPathsFromEnviron()
+        self.prefix = prefix
+        self.filename = cachePath
+
         self._parser = RegistryParser()
 
         if (READ_CACHE and
@@ -1549,17 +1557,20 @@ class ComponentRegistry(log.Loggable):
         self.addFile(f)
         f.close()
 
-    def addRegistryPath(self, path, prefix=configure.PACKAGE):
+    def addRegistryPath(self, path, prefix=None):
         """
         Add a registry path to this registry, scanning it for registry
         snippets.
 
-        @param path: a full path containing a 'flumotion' directory,
-                     which will be scanned for registry files.
+        @param path: a full path containing a PREFIX directory, which will be
+                     scanned for registry files.
+        @param prefix: directory name under path which will be scanned
+                     (defaults to 'flumotion' and cannot be an empty string).
 
         @rtype:   bool
         @returns: whether the path could be added
         """
+        prefix = prefix or self.prefix
         self.debug('path %s, prefix %s' % (path, prefix))
         if not os.path.exists(path):
             self.warning(
@@ -1696,7 +1707,7 @@ class ComponentRegistry(log.Loggable):
 
         # A bit complicated because we want to allow FLU_PROJECT_PATH to
         # point to nonexistent directories
-        registryPaths = python.set(self._getRegistryPathsFromEnviron())
+        registryPaths = python.set(self._paths)
         oldRegistryPaths = python.set([directory.getPath()
                                 for directory in self.getDirectories()])
         if registryPaths != oldRegistryPaths:
@@ -1763,7 +1774,7 @@ class ComponentRegistry(log.Loggable):
             if self.rebuildNeeded():
                 self.info("Rebuild of registry is needed")
             self.clean()
-            for path in self._getRegistryPathsFromEnviron():
+            for path in self._paths:
                 if not self.addRegistryPath(path):
                     self._parser.removeDirectoryByPath(path)
             self.save(True)

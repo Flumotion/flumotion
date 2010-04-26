@@ -1,3 +1,15 @@
+2010-04-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/common/registry.py:
+	Add paths, prefix, and cachePath keyword args to
+	ComponentRegistry.__init__().
+
+	This decouples ComponentRegistry initialization from the
+	environment (configure and FLU_PROJECT_PATH), increasing its
+	testability.
+
 2010-04-15  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion.spec.in:
