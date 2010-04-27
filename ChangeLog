@@ -1,5 +1,10 @@
 2010-04-27  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
+	* common/trial.mk:
+	Add timing information to "make check" trial output.
+
+2010-04-27  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
 	* flumotion/test/test_pb.py:
 	Fix test_pb.TestTwisted_PortalAuthChallenger in Twisted 8.0.
 	Fixes #943.

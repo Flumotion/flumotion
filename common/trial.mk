@@ -11,7 +11,7 @@ trial: rm-trial-test-log
 	    echo "Please set the TRIAL_ENV Makefile variable."; 	\
 	    exit 1; fi
 	$(TRIAL_ENV) $(top_srcdir)/common/flumotion-trial -r default  \
-						flumotion.test 2>&1     \
+				--reporter=timing flumotion.test 2>&1   \
 		| tee trial.test.log;					\
 	if ! test $${PIPESTATUS[0]} -eq 0;				\
 	then								\
@@ -19,7 +19,7 @@ trial: rm-trial-test-log
 		exit 1;							\
 	fi;								\
 	$(TRIAL_ENV) $(top_srcdir)/common/flumotion-trial -r gtk2	\
-						flumotion.test 2>&1     \
+				--reporter=timing flumotion.test 2>&1   \
 		| tee -a trial.test.log;				\
 	if test $${PIPESTATUS[0]} -eq 0;				\
 	then 								\
