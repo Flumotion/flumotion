@@ -123,7 +123,7 @@ AM_CONDITIONAL(HAVE_PYCHECKER, test "x$PYCHECKER" = "xyes")
 dnl check for Twisted
 AS_PYTHON_IMPORT(twisted,
   [
-  AC_MSG_CHECKING(for Twisted >= 2.0.1)
+  AC_MSG_CHECKING(for Twisted >= 2.5.0)
   prog="
 import sys
 from twisted import __version__
@@ -131,7 +131,7 @@ if __version__ == 'SVN-Trunk':
    sys.exit(0)
 
 from twisted import version as v
-minver = (2, 0, 1)
+minver = (2, 5, 0)
 curver = (v.major, v.minor, v.micro)
 if curver < minver:
     sys.exit(1)
@@ -142,11 +142,11 @@ sys.exit(0)
     AC_MSG_RESULT(found)
   else
     AC_MSG_RESULT(too old)
-    AC_MSG_ERROR([You need at least version 2.0.1 of Twisted])
+    AC_MSG_ERROR([You need at least version 2.5.0 of Twisted])
   fi
   ]
   ,
-  AC_MSG_ERROR([You need at least version 2.0.1 of Twisted])
+  AC_MSG_ERROR([You need at least version 2.5.0 of Twisted])
 )
 
 TWISTED_MODULE([twisted.names])

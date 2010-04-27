@@ -1,5 +1,19 @@
 2010-04-27  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
+	* README:
+	* configure.ac:
+	* flumotion.spec.in:
+	* pkg/debian-common/control:
+	* pkg/ubuntu-gutsy/control:
+	* pkg/ubuntu-hardy/control:
+	* pkg/ubuntu-intrepid/control:
+	* pkg/ubuntu-jaunty/control:
+	* pkg/ubuntu-karmic/control:
+	Bump the required version of Twisted to 2.5.0.
+	Closes #1411.
+
+2010-04-27  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
 	* common/trial.mk:
 	Add timing information to "make check" trial output.
 

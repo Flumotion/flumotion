@@ -21,7 +21,7 @@ Requires:       python >= 2.4
 Requires:       %{gstreamer} >= %{gst_minver}
 Requires:       %{gstreamer}-plugins-base >= %{gstpb_minver}
 Requires:       %{gstreamer}-python >= %{gstpy_minver}
-Requires:       python-twisted-core >= 2.4.0
+Requires:       python-twisted-core >= 2.5.0
 Requires:       python-twisted-conch
 Requires:       python-dateutil
 Requires:       pygtk2-libglade
@@ -37,7 +37,7 @@ Requires(post): openssl
 
 BuildRequires:  %{gstreamer}-devel >= %{gst_minver}
 BuildRequires:  %{gstreamer}-python >= %{gstpy_minver}
-BuildRequires:  python-twisted-core >= 2.4.0
+BuildRequires:  python-twisted-core >= 2.5.0
 BuildRequires:  python-twisted-names
 BuildRequires:  python-twisted-web
 BuildRequires:  python-twisted-conch
