@@ -1,3 +1,9 @@
+2010-04-27  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	* flumotion/test/test_pb.py:
+	Fix test_pb.TestTwisted_PortalAuthChallenger in Twisted 8.0.
+	Fixes #943.
+
 2010-04-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	reviewed by: Jan Urbanski

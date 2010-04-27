@@ -53,14 +53,21 @@ saltsha256Conf = {
 ### lots of fake objects to have fun with
 
 
+class FakePortalPlaintext(portal.Portal):
+    # a fake portal with a checker that lets username, password in
+
+    def __init__(self):
+        checker = checkers.FlexibleCredentialsChecker()
+        checker.addUser("username", "password")
+        portal.Portal.__init__(self, FakeTRealm(), (checker, ))
+
+
 class FakePortalWrapperPlaintext:
     # a fake wrapper with a checker that lets username, password in
 
     def __init__(self):
         self.broker = FakeBroker()
-        self.checker = checkers.FlexibleCredentialsChecker()
-        self.checker.addUser("username", "password")
-        self.portal = portal.Portal(FakeTRealm(), (self.checker, ))
+        self.portal = FakePortalplaintext()
 
 
 class FakePortalWrapperCrypt:
@@ -129,17 +136,12 @@ class FakeBroker(tpb.Broker):
 
 
 class TestTwisted_PortalAuthChallenger(testsuite.TestCase):
-    if haveTwisted(8, 0):
-        # FIXME: don't directly use twisted's private classes!
-        skip = 'Test broken since twisted 8.0.'
 
     def setUp(self):
-        # PB server creates a challenge
-        self.challenge = tpb.challenge()
-        # and a challenger to send to the client
-        self.challenger = tpb._PortalAuthChallenger(
-            FakePortalWrapperPlaintext(),
-            'username', self.challenge)
+        root = tpb.IPBRoot(FakePortalPlaintext()).rootObject(
+            broker=FakeBroker())
+        # PB server creates a challenge and a challenger to send to the client
+        self.challenge, self.challenger = root.remote_login('username')
 
     def testRightPassword(self):
         # client is asked to respond, so generate the response
