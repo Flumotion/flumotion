@@ -290,8 +290,10 @@ class ConfigEntryComponent(log.Loggable):
                     return maj, min, mic, nan
                 return parse(*map(int, version.split('.')))
             except:
-                raise errors.ConfigError("<component> version not parseable")
-        raise errors.ConfigError("<component> version not parseable")
+                raise errors.ConfigError(
+                    "<component> version %r not parseable" % version)
+        raise errors.ConfigError(
+            "<component> version %r not parseable" % version)
 
     def _buildConfig(self, propertyList, plugsList, eatersList,
                      isClockMaster, project, version, virtualFeeds):
