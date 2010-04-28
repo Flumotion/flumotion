@@ -285,10 +285,7 @@ class ConfigEntryComponent(log.Loggable):
             return version
         elif isinstance(version, str):
             try:
-
-                def parse(maj, min, mic, nan=0):
-                    return maj, min, mic, nan
-                return parse(*map(int, version.split('.')))
+                return common.versionStringToTuple(version)
             except:
                 raise errors.ConfigError(
                     "<component> version %r not parseable" % version)

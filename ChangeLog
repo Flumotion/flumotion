@@ -1,3 +1,8 @@
+2010-04-28  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/manager/config.py:
+	Use common's versionStringToTuple when parsing the version
+
 2010-04-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/manager/config.py:
