@@ -794,7 +794,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 self._porterPassword)
             self._pbclient.startLogin(creds, self._pbclient.medium)
 
-            self.debug("Starting porter login at \"%s\"", self._porterPath)
+            self.info("Starting porter login at \"%s\"", self._porterPath)
             # This will eventually cause d to fire
             reactor.connectWith(
                 fdserver.FDConnector, self._porterPath,
@@ -802,8 +802,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         else:
             # Streamer is standalone.
             try:
-                self.debug('Listening on %d' % self.port)
                 iface = self.iface or ""
+                self.info('Listening on port %d, interface=%r',
+                          self.port, iface)
                 self._tport = reactor.listenTCP(
                     self.port, server.Site(resource=root),
                     interface=iface)
