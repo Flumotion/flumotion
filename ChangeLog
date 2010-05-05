@@ -2,6 +2,15 @@
 
 	reviewed by: Marc-André Lureau  <mlureau@flumotion.com>
 
+	* common/flumotion-trial:
+	* flumotion/common/testsuite.py:
+	Add --skip-slow option to flumotion-trial to skip test suites and
+	test cases marked with slow=True.
+
+2010-05-05  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Marc-André Lureau  <mlureau@flumotion.com>
+
 	* flumotion/component/producers/icecast/icecast.py:
 	Use souphttpsrc instead of gnomevfssrc, to avoid blocking on
 	socket connect().

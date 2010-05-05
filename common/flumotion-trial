@@ -39,6 +39,10 @@ _Options = twisted.scripts.trial.Options
 
 class FOptions(_Options):
 
+    optFlags = [
+        ['skip-slow', None,
+         "Skip slow test cases (marked with a 'slow = True' attribute)."]]
+
     optParameters = [['saved-coverage', None, None,
                       'Filename to store coverage results.'
                       ' Can only be used with --coverage.']]
@@ -56,6 +60,11 @@ class FOptions(_Options):
                                       infile=self['saved-coverage'],
                                       outfile=self['saved-coverage'])
             sys.settrace(self.tracer.globaltrace)
+
+        # make options available to flumotion.testsuite
+        def getConfig():
+            return dict(self)
+        twisted.scripts.trial.getConfig = getConfig
 
 twisted.scripts.trial.Options = FOptions
 

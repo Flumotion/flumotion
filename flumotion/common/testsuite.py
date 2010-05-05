@@ -24,12 +24,20 @@
 
 from twisted.spread import pb
 from twisted.internet import reactor, defer, selectreactor
-from twisted.trial import unittest
+from twisted.scripts import trial
+from twisted.trial import unittest, util
 
 from flumotion.common import log
 from flumotion.configure import configure
 
 __version__ = "$Rev$"
+
+
+try:
+    _getConfig = trial.getConfig
+except AttributeError:
+    # trial.getConfig() is only available when using flumotion-trial
+    _getConfig = dict
 
 
 class TestCase(unittest.TestCase, log.Loggable):
@@ -95,6 +103,20 @@ class TestCase(unittest.TestCase, log.Loggable):
                 defaults = inspect.getargspec(unittest.TestCase.__init__)[3]
                 methodName = defaults[0]
             unittest.TestCase.__init__(self, methodName=methodName)
+
+        # Skip slow tests if '--skip-slow' option is enabled
+        if _getConfig().get('skip-slow'):
+            if self.getSlow() and not self.getSkip():
+                self.skip = 'slow test'
+
+    def getSlow(self):
+        """
+        Return whether this test has been marked as slow. Checks on the
+        instance first, then the class, then the module, then packages. As
+        soon as it finds something with a C{slow} attribute, returns that.
+        Returns C{False} if it cannot find anything.
+        """
+        return util.acquireAttribute(self._parents, 'slow', False)
 
     # Loggable and TestCase both have a debug method; prefer ours
 
