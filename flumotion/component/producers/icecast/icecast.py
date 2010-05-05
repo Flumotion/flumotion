@@ -31,7 +31,7 @@ __version__ = "$Rev$"
 class Icecast(feedcomponent.ParseLaunchComponent):
 
     def get_pipeline_string(self, properties):
-        return "gnomevfssrc name=src ! typefind name=tf"
+        return "souphttpsrc name=src ! typefind name=tf"
 
     def configure_pipeline(self, pipeline, properties):
         # Later, when the typefind element has successfully found the type
@@ -70,8 +70,8 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         typefind = pipeline.get_by_name('tf')
         self.signal_id = typefind.connect('have-type', have_caps)
 
-        self._pad_monitors.attach(self.src.get_pad('src'), 'gnomevfs-src')
-        self._pad_monitors['gnomevfs-src'].addWatch(
+        self._pad_monitors.attach(self.src.get_pad('src'), 'souphttp-src')
+        self._pad_monitors['souphttp-src'].addWatch(
                 self._src_connected, self._src_disconnected)
         self.reconnecting = False
         self.reconnector = RetryingDeferred(self.connect)
