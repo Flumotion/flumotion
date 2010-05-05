@@ -2,6 +2,18 @@
 
 	reviewed by: Marc-André Lureau  <mlureau@flumotion.com>
 
+	* flumotion/common/testsuite.py:
+	Add @attr decorator to testsuite, to help marking test
+	suites/cases with an attribute.
+
+	Test suites/cases can be decorated with @attr(todo='wip'),
+	@attr(skip='reason'), or @attr('slow') (the last is only supported
+	by flumotion-trial).
+
+2010-05-05  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Marc-André Lureau  <mlureau@flumotion.com>
+
 	* common/flumotion-trial:
 	* flumotion/common/testsuite.py:
 	Add --skip-slow option to flumotion-trial to skip test suites and

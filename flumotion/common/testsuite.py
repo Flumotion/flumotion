@@ -40,6 +40,22 @@ except AttributeError:
     _getConfig = dict
 
 
+def attr(*args, **kwargs):
+    """Decorator that adds attributes to objects.
+
+    It can be used to set the 'slow', 'skip', or 'todo' flags in test cases.
+    """
+
+    def wrap(func_or_class):
+        for name in args:
+            # these are just True flags:
+            setattr(func_or_class, name, True)
+        for name, value in kwargs.items():
+            setattr(func_or_class, name, value)
+        return func
+    return wrap
+
+
 class TestCase(unittest.TestCase, log.Loggable):
 
     # A sequence of reactors classes that this test supports, can be
