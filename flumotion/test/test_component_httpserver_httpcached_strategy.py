@@ -29,7 +29,7 @@ import twisted
 from twisted.internet import reactor, defer
 
 from flumotion.common import python
-from flumotion.common.testsuite import TestCase
+from flumotion.common.testsuite import attr, TestCase
 
 from flumotion.component.misc.httpserver import fileprovider
 from flumotion.component.misc.httpserver.httpcached import common
@@ -43,6 +43,7 @@ EXTRA_DATA = BLOCK_SIZE/2
 DEFAULT_TTL = 5*60
 
 
+@attr('slow')
 class TestBasicCachingStrategy(TestCase):
 
     def setUp(self):

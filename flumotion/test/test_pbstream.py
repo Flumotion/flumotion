@@ -31,7 +31,7 @@ from zope.interface import implements
 from flumotion.common import log
 from flumotion.common import testsuite
 
-
+attr = testsuite.attr
 
 
 # this example sets up a PB connection from client to server,
@@ -296,6 +296,7 @@ class TestClientEater(testsuite.TestCase):
 
         return server
 
+    @attr('slow')
     def testRun(self):
         d = defer.Deferred()
         s = self.startServer()

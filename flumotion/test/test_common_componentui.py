@@ -23,6 +23,8 @@ from flumotion.common import componentui
 from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator_method
 
+attr = testsuite.attr
+
 
 class FakeObject:
     pass
@@ -174,6 +176,7 @@ class TestStateSet(testsuite.TestCase):
         d.addCallback(workerBearChildCallback)
         return d
 
+    @attr('slow')
     def testStateListener(self):
 
         def getStateCallback(state):
@@ -225,6 +228,7 @@ class TestStateSet(testsuite.TestCase):
     # verify if we have the right number of items proxied,
     # ie the manager reference doesn't do something weird
 
+    @attr('slow')
     def testStateListenerIntermediate(self):
 
         def workerGetStateCallback(state):
@@ -285,6 +289,7 @@ class TestStateSet(testsuite.TestCase):
         d.addCallback(workerHaveAdoptedCallback)
         return d
 
+    @attr('slow')
     def testStateSaveReference(self):
         # show that we need to keep the state reference around for listener
         # to work

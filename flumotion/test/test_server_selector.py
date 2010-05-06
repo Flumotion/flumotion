@@ -28,9 +28,12 @@ from twisted.internet import defer, threads, reactor
 from flumotion.common import testsuite, errors
 from flumotion.component.misc.httpserver.httpcached import server_selection
 
+attr = testsuite.attr
+
 twisted.internet.base.DelayedCall.debug = True
 
 
+@attr('slow')
 class TestServerSelector(testsuite.TestCase):
 
     def setUp(self):

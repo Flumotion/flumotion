@@ -31,6 +31,8 @@ import StringIO
 import zipfile
 import time
 
+attr = testsuite.attr
+
 
 class TestBundler(testsuite.TestCase):
     # everything we need to set up the test environment
@@ -93,6 +95,7 @@ class TestBundler(testsuite.TestCase):
     # create a bundle of two files then update one of them and check
     # the md5sum changes
 
+    @attr('slow')
     def testBundlerTwoFiles(self):
         data = open(self.filename, "r").read()
 

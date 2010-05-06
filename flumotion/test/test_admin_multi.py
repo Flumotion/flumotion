@@ -27,6 +27,8 @@ from flumotion.admin import multi
 from flumotion.common import connection
 from flumotion.twisted import pb
 
+attr = testsuite.attr
+
 
 class MultiAdminTest(testsuite.TestCaseWithManager):
 
@@ -66,6 +68,7 @@ class MultiAdminTest(testsuite.TestCaseWithManager):
         d.addCallbacks(connected, failure)
         return d
 
+    @attr('slow')
     def testReconnect(self):
 
         class Listener:

@@ -25,10 +25,13 @@ import gtk
 from flumotion.admin.gtk import dialogs
 from flumotion.common import testsuite
 
+attr = testsuite.attr
+
 
 INTERVAL = 100 # in ms
 
 
+@attr('slow')
 class TestProgressDialog(testsuite.TestCase):
 
     def setUp(self):
@@ -57,6 +60,7 @@ class TestProgressDialog(testsuite.TestCase):
         gtk.main()
 
 
+@attr('slow')
 class TestErrorDialog(testsuite.TestCase):
 
     def setUp(self):

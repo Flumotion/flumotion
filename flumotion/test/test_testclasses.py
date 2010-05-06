@@ -25,7 +25,7 @@ from twisted.spread import pb
 from flumotion.common import log
 from flumotion.common import testsuite
 
-
+attr = testsuite.attr
 
 
 # an object that subclasses from both Cacheable and RemoteCache
@@ -149,6 +149,7 @@ class TestOnePB(testsuite.TestCase):
         return d
 
 
+@attr('slow')
 class TestTwoPB(testsuite.TestCase):
     # test if our classes work over two chained PB connections
 

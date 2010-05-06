@@ -38,6 +38,8 @@ else:
 from flumotion.common import testsuite, errors
 from flumotion.component.misc.httpserver import cachemanager, fileprovider
 
+attr = testsuite.attr
+
 CACHE_SIZE = 1 * 1024 * 1024
 MAX_CLEANUPS = 64
 MAX_PAGE_SIZE = 32 * 1024
@@ -172,6 +174,7 @@ class TestCacheManager(testsuite.TestCase):
         d.addCallback(lambda c: self.failUnless(c is None))
         return d
 
+    @attr('slow')
     def testHitMiss(self):
         m = cachemanager.CacheManager(self.stats, self.path,
                                       CACHE_SIZE, True, 0.5, 0.2)
@@ -222,6 +225,7 @@ class TestCacheManager(testsuite.TestCase):
         d.callback(None)
         return d
 
+    @attr('slow')
     def testCacheCleanUp(self):
         m = cachemanager.CacheManager(self.stats, self.path,
                                       CACHE_SIZE, True, 0.4, 0.2)

@@ -25,6 +25,8 @@ from twisted.internet import defer, reactor
 
 from flumotion.common import keycards
 
+attr = testsuite.attr
+
 
 class FakeMedium:
     calls = []
@@ -99,6 +101,7 @@ class TrivialBouncerTest(testsuite.TestCase):
         # can be overridden
         self.obj._expirer.timeout = interval
 
+    @attr('slow')
     def testTimeoutAlgorithm(self):
         # the plan: make a keycard that expires in 0.75 seconds, and
         # set up the component such that it checks for expired keycards

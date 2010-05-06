@@ -24,6 +24,8 @@ import random
 from flumotion.common import avltree
 from flumotion.common import testsuite
 
+attr = testsuite.attr
+
 
 class TestAVLTree(testsuite.TestCase):
 
@@ -111,6 +113,7 @@ class TestAVLTree(testsuite.TestCase):
             self.assertOrdered(tree.tree, i, 40-i-1)
             self.assertBalanced(tree.tree)
 
+    @attr('slow')
     def testInsertRandomRemoveRandom(self):
         tree = avltree.AVLTree()
 

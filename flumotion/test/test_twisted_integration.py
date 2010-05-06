@@ -28,6 +28,8 @@ from twisted.internet import defer, error, reactor
 from flumotion.common import testsuite
 from flumotion.twisted import integration
 
+attr = testsuite.attr
+
 
 def _call_in_reactor(proc):
     # Because twisted doesn't have its signal handlers installed until
@@ -69,6 +71,8 @@ class IntegrationProcessTest(testsuite.TestCase):
         return p.wait(0)
     testTransientProcess = _call_in_reactor(testTransientProcess)
 
+    @attr('slow')
+    @_call_in_reactor
     def testTimeOut(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
                                 self.tempdir)
@@ -90,7 +94,6 @@ class IntegrationProcessTest(testsuite.TestCase):
         d.addCallback(cleanup)
         self.failUnlessFailure(d, error.ProcessTerminated)
         return d
-    testTimeOut = _call_in_reactor(testTimeOut)
 
     def testKill(self):
         p = integration.Process('cat', ('cat', '/dev/random'),
@@ -154,6 +157,7 @@ class IntegrationPlanExecuteTest(testsuite.TestCase):
         plan.kill(process)
         return plan.execute()
 
+    @attr('slow')
     def testUnexpectedProcessExit(self):
         plan = integration.Plan(self, 'testUnexpectedProcessExit')
         processes = []

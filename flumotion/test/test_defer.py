@@ -25,6 +25,8 @@ from flumotion.common import errors
 from flumotion.common import testsuite
 from flumotion.twisted.defer import defer_generator, RetryingDeferred
 
+attr = testsuite.attr
+
 
 class TestDefer(testsuite.TestCase):
     result = None
@@ -41,6 +43,7 @@ class TestDefer(testsuite.TestCase):
         d.addCallback(lambda x: setattr(self, 'result', x))
         assert self.result == 42
 
+    @attr('slow')
     def testYieldResultAfter(self):
         self.result = None
 
@@ -62,6 +65,7 @@ class TestDefer(testsuite.TestCase):
         d.addCallback(checkResult)
         return d
 
+    @attr('slow')
     def testYieldNothing(self):
         self.result = 42
 
@@ -82,6 +86,7 @@ class TestDefer(testsuite.TestCase):
         d.addCallback(checkResult)
         return d
 
+    @attr('slow')
     def testValues(self):
         self.result = None
 
@@ -119,6 +124,7 @@ class TestDefer(testsuite.TestCase):
         except Exception:
             pass
 
+    @attr('slow')
     def testException(self):
         self.result = None
 
@@ -157,6 +163,7 @@ class TestDefer(testsuite.TestCase):
         d.addCallback(checkResult)
         return d
 
+    @attr('slow')
     def testExceptionChain(self):
 
         def divide_later(x, y):
@@ -219,6 +226,7 @@ class TestRetryingDeferred(testsuite.TestCase):
 
         return d
 
+    @attr('slow')
     def testRetryOnce(self):
         self.__first = True
 

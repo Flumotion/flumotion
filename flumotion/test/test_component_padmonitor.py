@@ -27,7 +27,10 @@ from twisted.trial import unittest
 from flumotion.common import testsuite
 from flumotion.component import padmonitor
 
+attr = testsuite.attr
 
+
+@attr('slow')
 class TestPadMonitor(testsuite.TestCase):
 
     def _run_pipeline(self, pipeline):

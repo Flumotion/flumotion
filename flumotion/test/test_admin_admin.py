@@ -26,12 +26,15 @@ from flumotion.common import connection
 from flumotion.common import testsuite
 from flumotion.twisted import pb
 
+attr = testsuite.attr
+
 
 class AdminTest(testsuite.TestCaseWithManager):
 
     def testConstructor(self):
         model = admin.AdminModel()
 
+    @attr('slow')
     def testConnectSuccess(self):
 
         def connected(_):
@@ -46,6 +49,7 @@ class AdminTest(testsuite.TestCaseWithManager):
         d.addCallback(connected)
         return d
 
+    @attr('slow')
     def testReconnect(self):
         disconnectDeferred = defer.Deferred()
         reconnectDeferred = defer.Deferred()

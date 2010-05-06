@@ -38,6 +38,8 @@ from flumotion.component.misc.httpserver import cachedprovider
 from flumotion.component.misc.httpserver.fileprovider \
     import InsecureError, NotFoundError, CannotOpenError
 
+attr = testsuite.attr
+
 
 class LocalPath(testsuite.TestCase):
 
@@ -259,6 +261,7 @@ class CachedProviderFileTest(testsuite.TestCase):
         d.addCallback(lambda _: self._tearDown())
         return d
 
+    @attr('slow')
     def testModifySrc(self):
         newData = "bar foo"
 
@@ -283,6 +286,7 @@ class CachedProviderFileTest(testsuite.TestCase):
         d.addCallback(self.assertEqual, self.data[-5:])
         return d
 
+    @attr('slow')
     def testCachedFile(self):
         d = self.openFile('a')
         d.addCallback(self.readFile, self.dataSize)

@@ -30,6 +30,8 @@ from flumotion.component.consumers.disker import disker
 
 from flumotion.test import comptest
 
+attr = testsuite.attr
+
 
 class PluggableComponentTestCase(comptest.CompTestTestCase):
 
@@ -68,6 +70,7 @@ class TestConfig(PluggableComponentTestCase, log.Loggable):
                 'type': 'disk-consumer',
                 'properties': properties}
 
+    @attr('slow')
     def test_config_minimal(self):
         properties = {'directory': '/tmp'}
 
@@ -137,6 +140,7 @@ class TestConfig(PluggableComponentTestCase, log.Loggable):
         return d
 
 
+@attr('slow')
 class TestFlow(PluggableComponentTestCase, log.Loggable):
 
     def setUp(self):

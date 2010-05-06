@@ -20,8 +20,11 @@
 # Headers in this file shall remain intact.
 
 from flumotion.admin.gtk.greeter import Greeter
+from flumotion.common import testsuite
 from flumotion.test.gtkunit import UITestCase
 from flumotion.ui.simplewizard import SimpleWizard, WizardStep
+
+attr = testsuite.attr
 
 
 class FakeAdminWindow:
@@ -30,6 +33,7 @@ class FakeAdminWindow:
         return None
 
 
+@attr('slow')
 class WizardTest(UITestCase):
 
     def _prev(self):

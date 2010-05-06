@@ -30,6 +30,7 @@ except RuntimeError:
     import os
     os._exit(0)
 
+attr = testsuite.attr
 
 INTERVAL = 100 # in ms
 
@@ -60,6 +61,7 @@ class VUTest(testsuite.TestCase):
         w.set_property('red-threshold', -50.0)
         self.assertEquals(w.get_property('red-threshold'), -50.0)
 
+    @attr('slow')
     def testWidget(self):
         w = FVUMeter()
         window = gtk.Window()

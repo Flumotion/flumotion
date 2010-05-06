@@ -24,7 +24,7 @@ import time
 
 from flumotion.common.process import checkPidRunning, deletePidFile, getPid, \
      killPid, termPid, waitForTerm, waitPidFile, writePidFile
-from flumotion.common.testsuite import TestCase
+from flumotion.common.testsuite import attr, TestCase
 
 
 class TestPid(TestCase):
@@ -41,6 +41,7 @@ class TestPid(TestCase):
 
 class TestProcess(TestCase):
 
+    @attr('slow')
     def testTermPid(self):
         ret = os.fork()
         if ret == 0:

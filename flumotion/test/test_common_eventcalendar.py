@@ -31,6 +31,8 @@ from dateutil import parser, rrule, tz
 from flumotion.common import testsuite
 from flumotion.common import eventcalendar
 
+attr = testsuite.attr
+
 LOCAL = eventcalendar.LOCAL
 LOCAL = icalendar.LocalTimezone()
 UTC = eventcalendar.UTC
@@ -382,6 +384,7 @@ END:VCALENDAR
         self.assertEquals(instances[0].start, start + delta)
 
 
+@attr('slow')
 class ICalSchedulerURGentTest(testsuite.TestCase):
 
     def setUp(self):

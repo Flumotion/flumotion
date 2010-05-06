@@ -24,6 +24,8 @@ from twisted.trial import unittest
 from flumotion.common import testsuite
 from flumotion.component.consumers.httpstreamer import httpstreamer
 
+attr = testsuite.attr
+
 CONFIG = {
     'feed': [],
     'name': 'http-video',
@@ -40,6 +42,7 @@ CONFIG = {
 }
 
 
+@attr('slow')
 class StreamerTestCase(testsuite.TestCase):
     properties = {}
     config = CONFIG

@@ -38,7 +38,10 @@ from flumotion.component.plugs.base import ComponentPlug
 from flumotion.component.plugs.cortado import cortado
 from flumotion.test import test_http
 
+attr = testsuite.attr
 
+
+@attr('slow')
 class MountTest(testsuite.TestCase):
 
     def setUp(self):
@@ -197,6 +200,7 @@ class SimpleTestPlug2(ComponentPlug):
 PLUGTYPE = 'flumotion.component.plugs.base.ComponentPlug'
 
 
+@attr('slow')
 class PlugTest(testsuite.TestCase):
 
     def setUp(self):

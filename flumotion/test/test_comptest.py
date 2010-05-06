@@ -32,6 +32,8 @@ from flumotion.test import comptest
 from flumotion.test.comptest import ComponentTestHelper, ComponentWrapper, \
     CompTestTestCase, ComponentSad, pipeline_src, pipeline_cnv
 
+attr = testsuite.attr
+
 
 class TestCompTestGtk2Reactorness(testsuite.TestCase):
     supportedReactors = []
@@ -230,6 +232,7 @@ class TestCompTestSetup(CompTestTestCase):
         self.failIfEquals(slave.sync, None)
 
 
+@attr('slow')
 class TestCompTestFlow(CompTestTestCase):
 
     def setUp(self):
