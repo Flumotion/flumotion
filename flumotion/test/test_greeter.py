@@ -33,8 +33,9 @@ class FakeAdminWindow:
         return None
 
 
-@attr('slow')
 class WizardTest(UITestCase):
+
+    slow = True
 
     def _prev(self):
         self.click('button_prev')

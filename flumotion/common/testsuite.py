@@ -46,13 +46,13 @@ def attr(*args, **kwargs):
     It can be used to set the 'slow', 'skip', or 'todo' flags in test cases.
     """
 
-    def wrap(func_or_class):
+    def wrap(func):
         for name in args:
             # these are just True flags:
-            setattr(func_or_class, name, True)
+            setattr(func, name, True)
         for name, value in kwargs.items():
-            setattr(func_or_class, name, value)
-        return func_or_class
+            setattr(func, name, value)
+        return func
     return wrap
 
 

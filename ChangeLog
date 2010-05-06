@@ -1,5 +1,22 @@
 2010-05-06  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
+	* flumotion/common/testsuite.py:
+	* flumotion/test/test_common_eventcalendar.py:
+	* flumotion/test/test_component_disker.py:
+	* flumotion/test/test_component_httpserver.py:
+	* flumotion/test/test_component_httpserver_httpcached_strategy.py:
+	* flumotion/test/test_component_httpstreamer.py:
+	* flumotion/test/test_component_padmonitor.py:
+	* flumotion/test/test_comptest.py:
+	* flumotion/test/test_dialogs.py:
+	* flumotion/test/test_greeter.py:
+	* flumotion/test/test_server_selector.py:
+	* flumotion/test/test_testclasses.py:
+	Do not decorate classes.  Support for class decorators was added
+	in Python 2.6 (and we support Python >= 2.4).
+
+2010-05-06  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
 	reviewed by: Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/test/bouncertest.py:

@@ -41,8 +41,9 @@ from flumotion.test import test_http
 attr = testsuite.attr
 
 
-@attr('slow')
 class MountTest(testsuite.TestCase):
+
+    slow = True
 
     def setUp(self):
         self.path = tempfile.mkdtemp(suffix=".flumotion.test")
@@ -200,8 +201,9 @@ class SimpleTestPlug2(ComponentPlug):
 PLUGTYPE = 'flumotion.component.plugs.base.ComponentPlug'
 
 
-@attr('slow')
 class PlugTest(testsuite.TestCase):
+
+    slow = True
 
     def setUp(self):
         self.component = None

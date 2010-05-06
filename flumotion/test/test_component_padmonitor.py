@@ -30,8 +30,9 @@ from flumotion.component import padmonitor
 attr = testsuite.attr
 
 
-@attr('slow')
 class TestPadMonitor(testsuite.TestCase):
+
+    slow = True
 
     def _run_pipeline(self, pipeline):
         pipeline.set_state(gst.STATE_PLAYING)

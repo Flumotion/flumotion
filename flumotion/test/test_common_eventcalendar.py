@@ -384,8 +384,9 @@ END:VCALENDAR
         self.assertEquals(instances[0].start, start + delta)
 
 
-@attr('slow')
 class ICalSchedulerURGentTest(testsuite.TestCase):
+
+    slow = True
 
     def setUp(self):
         __thisdir = os.path.dirname(os.path.abspath(__file__))

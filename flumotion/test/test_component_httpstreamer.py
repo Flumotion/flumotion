@@ -42,8 +42,10 @@ CONFIG = {
 }
 
 
-@attr('slow')
 class StreamerTestCase(testsuite.TestCase):
+
+    slow = True
+
     properties = {}
     config = CONFIG
 

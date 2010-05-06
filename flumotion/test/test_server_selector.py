@@ -33,8 +33,9 @@ attr = testsuite.attr
 twisted.internet.base.DelayedCall.debug = True
 
 
-@attr('slow')
 class TestServerSelector(testsuite.TestCase):
+
+    slow = True
 
     def setUp(self):
         self.ss = server_selection.ServerSelector()

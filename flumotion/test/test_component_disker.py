@@ -140,8 +140,9 @@ class TestConfig(PluggableComponentTestCase, log.Loggable):
         return d
 
 
-@attr('slow')
 class TestFlow(PluggableComponentTestCase, log.Loggable):
+
+    slow = True
 
     def setUp(self):
         self.tp = comptest.ComponentTestHelper()

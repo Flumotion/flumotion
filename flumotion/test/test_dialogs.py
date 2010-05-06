@@ -31,8 +31,9 @@ attr = testsuite.attr
 INTERVAL = 100 # in ms
 
 
-@attr('slow')
 class TestProgressDialog(testsuite.TestCase):
+
+    slow = True
 
     def setUp(self):
         self.window = gtk.Window()
@@ -60,8 +61,9 @@ class TestProgressDialog(testsuite.TestCase):
         gtk.main()
 
 
-@attr('slow')
 class TestErrorDialog(testsuite.TestCase):
+
+    slow = True
 
     def setUp(self):
         self.window = gtk.Window()

@@ -232,8 +232,9 @@ class TestCompTestSetup(CompTestTestCase):
         self.failIfEquals(slave.sync, None)
 
 
-@attr('slow')
 class TestCompTestFlow(CompTestTestCase):
+
+    slow = True
 
     def setUp(self):
         self.duration = 2.0

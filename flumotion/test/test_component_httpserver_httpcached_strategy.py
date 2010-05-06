@@ -43,8 +43,9 @@ EXTRA_DATA = BLOCK_SIZE/2
 DEFAULT_TTL = 5*60
 
 
-@attr('slow')
 class TestBasicCachingStrategy(TestCase):
+
+    slow = True
 
     def setUp(self):
         self.cachemgr = None
@@ -1475,7 +1476,6 @@ class TestBasicCachingStrategy(TestCase):
             for r in self.reqmgr.resources:
                 self.assertEqual(r.size, size)
         return result
-
 
 
 ######################################################################

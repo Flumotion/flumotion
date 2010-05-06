@@ -149,9 +149,10 @@ class TestOnePB(testsuite.TestCase):
         return d
 
 
-@attr('slow')
 class TestTwoPB(testsuite.TestCase):
     # test if our classes work over two chained PB connections
+
+    slow = True
 
     def setUp(self):
         self.pb1 = testsuite.TestPB()
