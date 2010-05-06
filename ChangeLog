@@ -1,3 +1,8 @@
+2010-05-06  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	* flumotion/common/testsuite.py:
+	Fix local variable name.
+
 2010-05-05  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	reviewed by: Marc-André Lureau  <mlureau@flumotion.com>

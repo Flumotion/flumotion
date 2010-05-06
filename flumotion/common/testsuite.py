@@ -52,7 +52,7 @@ def attr(*args, **kwargs):
             setattr(func_or_class, name, True)
         for name, value in kwargs.items():
             setattr(func_or_class, name, value)
-        return func
+        return func_or_class
     return wrap
 
 
