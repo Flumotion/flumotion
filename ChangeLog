@@ -1,5 +1,14 @@
 2010-05-06  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
+	reviewed by: Sébastien Merle  <sebastien@flumotion.com>
+
+	* common/common.mk:
+	* common/trial.mk:
+	Add "make quicktest" target to run trial on flumotion.test
+	skipping slow tests.
+
+2010-05-06  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
 	* flumotion/common/testsuite.py:
 	Fix local variable name.
 

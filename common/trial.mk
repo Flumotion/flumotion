@@ -6,12 +6,14 @@
 # base package flumotion tests to run always, instead of
 # the current package
 
+TRIAL_FLAGS = --reporter=timing
+
 trial: rm-trial-test-log
 	@if test -z "$(TRIAL_ENV)"; then 				\
 	    echo "Please set the TRIAL_ENV Makefile variable."; 	\
 	    exit 1; fi
-	$(TRIAL_ENV) $(top_srcdir)/common/flumotion-trial -r default  \
-				--reporter=timing flumotion.test 2>&1   \
+	$(TRIAL_ENV) $(top_srcdir)/common/flumotion-trial -r default    \
+				$(TRIAL_FLAGS) flumotion.test 2>&1      \
 		| tee trial.test.log;					\
 	if ! test $${PIPESTATUS[0]} -eq 0;				\
 	then								\
@@ -19,7 +21,7 @@ trial: rm-trial-test-log
 		exit 1;							\
 	fi;								\
 	$(TRIAL_ENV) $(top_srcdir)/common/flumotion-trial -r gtk2	\
-				--reporter=timing flumotion.test 2>&1   \
+				$(TRIAL_FLAGS) flumotion.test 2>&1      \
 		| tee -a trial.test.log;				\
 	if test $${PIPESTATUS[0]} -eq 0;				\
 	then 								\

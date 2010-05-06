@@ -2,6 +2,10 @@
 test:
 	@make check -C flumotion/test
 
+quicktest:
+	@make check -C flumotion/test \
+	  TRIAL_FLAGS="--reporter=verbose --skip-slow"
+
 check-docs:
 	@make check -C doc/reference
 
@@ -54,7 +58,7 @@ release: dist
 sloc:
 	sloccount flumotion | grep "(SLOC)" | cut -d = -f 2
 
-.PHONY: test
+.PHONY: test quicktest
 
 
 locale-uninstalled-1:
