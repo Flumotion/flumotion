@@ -103,10 +103,6 @@ class LocalPathCachedProvider(testsuite.TestCase):
     skip = SKIP_MSG
 
     def setUp(self):
-        from twisted.python import threadpool
-        reactor.threadpool = threadpool.ThreadPool(0, 10)
-        reactor.threadpool.start()
-
         self.path = tempfile.mkdtemp(suffix=".flumotion.test")
         a = os.path.join(self.path, 'a')
         open(a, "w").write('test file a')
@@ -118,12 +114,15 @@ class LocalPathCachedProvider(testsuite.TestCase):
         plugProps = {"properties": {"path": self.path}}
         self.fileProviderPlug = \
             cachedprovider.FileProviderLocalCachedPlug(plugProps)
+        return self.fileProviderPlug.start(component=None)
 
     def tearDown(self):
-        shutil.rmtree(self.path, ignore_errors=True)
+        d = defer.maybeDeferred(self.fileProviderPlug.stop, component=None)
 
-        reactor.threadpool.stop()
-        reactor.threadpool = None
+        def _rmTempDir(result):
+            shutil.rmtree(self.path, ignore_errors=True)
+        d.addBoth(_rmTempDir)
+        return d
 
     def testExistingPath(self):
         local = self.fileProviderPlug.getRootPath()

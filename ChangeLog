@@ -1,3 +1,14 @@
+2010-05-07  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Julien Le Goff  <jlegoff@flumotion.com>
+
+	* flumotion/component/misc/httpserver/cachemanager.py:
+	* flumotion/test/test_component_providers.py:
+	Start and stop plug in LocalPathCachedProvider setup()/teardown().
+
+	This fixes the race condition in the test suite execution, and
+	removes the need for the ProcessOutputHelper wrapper.
+
 2010-05-06  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	* flumotion/common/testsuite.py:

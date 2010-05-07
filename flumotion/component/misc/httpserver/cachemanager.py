@@ -25,7 +25,7 @@ import tempfile
 import time
 import stat
 
-from twisted.internet import defer, threads, protocol, reactor
+from twisted.internet import defer, threads, protocol, reactor, utils
 
 from flumotion.common import log, common, python, format, errors
 
@@ -141,6 +141,7 @@ class CacheManager(object, log.Loggable):
         self.stats.onEstimateCacheUsage(self._cacheUsage, self._cacheSize)
 
     def _updateCacheUsage(self, usage):
+        self.log('Disk usage for path %r is %d bytes', self._cacheDir, usage)
         self._cacheUsageLastUpdate = time.time()
         self._cacheUsage = usage
         self.updateCacheUsageStatistics()
@@ -161,12 +162,8 @@ class CacheManager(object, log.Loggable):
 
         if ((self._cacheUsage is None) or (self._lastCacheTime < cacheTime)):
             self._lastCacheTime = cacheTime
-
-            du = ProcessOutputHelper()
-
-            reactor.callWhenRunning(reactor.spawnProcess, du,
-                                    "du", ["du", '-bs', self._cacheDir], {})
-            d = du.getOutput()
+            self.log('Getting disk usage for path %r', self._cacheDir)
+            d = utils.getProcessOutput('du', ['-bs', self._cacheDir])
             d.addCallback(lambda o: int(o.split('\t', 1)[0]))
             d.addCallback(self._updateCacheUsage)
             return d
@@ -499,30 +496,6 @@ class TempFile:
         self.name = self._finishPath
         self.cachemgr.log("Temporary file renamed to '%s' [fd %d]",
                           self._finishPath, self.fileno())
-
-
-class ProcessOutputHelper(protocol.ProcessProtocol):
-    """
-    I am a helper to get only stdout from a process. See ChangeLog for
-    the reasons why I exist, after several failing attemps from my
-    creator.
-    """
-
-    def __init__(self):
-        self.data = ""
-        self.result = defer.Deferred()
-
-    def getOutput(self):
-        return self.result
-
-    def connectionMade(self):
-        self.transport.closeStdin()
-
-    def outReceived(self, data):
-        self.data = self.data + data
-
-    def processEnded(self, status):
-        self.result.callback(self.data)
 
 
 def main(argv=None):
