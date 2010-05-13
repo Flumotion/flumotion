@@ -242,7 +242,7 @@ class Producer(Component):
 
         if self.eaters:
             raise ComponentValidationError(
-                "producer component %s can not have any easters" %
+                "producer component %s can not have any eaters" %
                 (self.name, ))
 
         if not self.feeders:

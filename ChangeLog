@@ -1,3 +1,8 @@
+2010-05-13  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/admin/assistant/models.py:
+	Fix typo.
+
 2010-05-07  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	reviewed by: Julien Le Goff  <jlegoff@flumotion.com>
