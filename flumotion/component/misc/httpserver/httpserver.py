@@ -398,7 +398,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
             self._pbclient.startLogin(creds, self._pbclient.medium)
-            self.debug("Starting porter login!")
+            self.info("Logging to porter on socketPath %s", self._porterPath)
             # This will eventually cause d to fire
             reactor.connectWith(fdserver.FDConnector, self._porterPath,
                 self._pbclient, 10, checkPID=False)
@@ -412,7 +412,8 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 self._twistedPort = reactor.listenTCP(self.port,
                     site, interface=iface)
                 self.port = self._twistedPort.getHost().port
-                self.debug('Listening on port %d' % self.port)
+                self.info('Listening on interface %r on port %d',
+                          iface, self.port)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
                 self.warning(t)
