@@ -326,7 +326,7 @@ class Porter(component.BaseComponent, log.Loggable):
 
             self._socketlistener = reactor.listenWith(
                 fdserver.FDPort, self._socketPath, serverfactory)
-            self.debug("Now listening on socketPath %s" % self._socketPath)
+            self.info("Now listening on socketPath %s", self._socketPath)
         except error.CannotListenError, e:
             self.warning("Failed to create socket %s" % self._socketPath)
             m = messages.Error(T_(N_(
@@ -353,9 +353,11 @@ class Porter(component.BaseComponent, log.Loggable):
             reactor.listenWith(
                 fdserver.PassableServerPort, self._port, factory,
                     interface=self._interface)
-            self.debug("Now listening on port %d" % self._port)
+            self.info("Now listening on interface %r on port %d",
+                      self._interface, self._port)
         except error.CannotListenError, e:
-            self.warning("Failed to listen on port %d" % self._port)
+            self.warning("Failed to listen on interface %r on port %d",
+                         self._interface, self._port)
             m = messages.Error(T_(N_(
                 "Network error: TCP port %d is not available."), self._port))
             self.addMessage(m)

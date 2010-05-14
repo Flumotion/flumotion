@@ -1,3 +1,8 @@
+2010-05-14  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	* flumotion/component/misc/porter/porter.py:
+	Increase porter set up messages log level.
+
 2010-05-13  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/admin/assistant/models.py:
