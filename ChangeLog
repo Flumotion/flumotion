@@ -1,5 +1,10 @@
 2010-05-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/test/test_component_feedcomponent.py:
+	Allow tests to be run with the gtk2reactor.
+
+2010-05-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	reviewed by: Xavier Queralt
 
 	* flumotion/component/feedcomponent.py:
