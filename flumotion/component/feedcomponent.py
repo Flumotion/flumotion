@@ -473,6 +473,21 @@ class ParseLaunchComponent(FeedComponent):
         """
         return '!'
 
+    def get_eater_srcpad(self, eaterAlias):
+        """
+        Method that returns the source pad of the final element in an eater.
+
+        @returns:   the GStreamer source pad of the final element in an eater
+        @rtype:     L{gst.Pad}
+        """
+        e = self.eaters[eaterAlias]
+        identity = self.get_element(e.elementName + '-identity')
+        depay = self.get_element(e.depayName)
+        srcpad = depay.get_pad("src")
+        if identity:
+            srcpad = identity.get_pad("src")
+        return srcpad
+
 
 class Effect(log.Loggable):
     """
@@ -528,6 +543,7 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
     with a queue attached to each input.
     """
     QUEUE_SIZE_BUFFERS = 16
+    LINK_MUXER = True
 
     def get_muxer_string(self, properties):
         """
@@ -556,7 +572,9 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
         pipeline = ''
         for e in eaters:
             for feed, alias in eaters[e]:
-                pipeline += '@ eater:%s @ ! muxer. ' % alias
+                pipeline += '@ eater:%s @ ' % alias
+                if self.LINK_MUXER:
+                    pipeline += ' ! muxer. '
 
         pipeline += self.get_muxer_string(properties) + ' '
 
@@ -594,3 +612,60 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
             pad.set_blocked_async(False, _block_cb)
 
         signalid = queue.connect("underrun", _underrun_cb)
+
+
+class MuxerComponent(MultiInputParseLaunchComponent):
+
+    LINK_MUXER = False
+
+    def configure_pipeline(self, pipeline, properties):
+        """
+        Method not overridable by muxer subclasses.
+        """
+        # link the muxers' sink pads when data comes in so we get compatible
+        # sink pads with input data
+        # gone are the days when we know we only have one pad template in
+        # muxers
+        self.fired_eaters = 0
+        self._probes = {} # depay element -> id
+
+        def buffer_probe_cb(a, b, depay, eaterAlias):
+            pad = depay.get_pad("src")
+            caps = pad.get_negotiated_caps()
+            if not caps:
+                return False
+            srcpad_to_link = self.get_eater_srcpad(eaterAlias)
+            muxer = self.pipeline.get_by_name("muxer")
+            self.debug("Trying to get compatible pad for pad %r with caps %s",
+                srcpad_to_link, caps)
+            linkpad = muxer.get_compatible_pad(srcpad_to_link, caps)
+            self.debug("Got link pad %r", linkpad)
+            if not linkpad:
+                m = messages.Error(T_(N_(
+                    "The incoming data is not compatible with this muxer.")),
+                    debug="Caps %s not compatible with this muxer." % (
+                        caps.to_string()))
+                self.addMessage(m)
+                # this is the streaming thread, cannot set state here
+                # so we do it in the mainloop
+                reactor.callLater(0, self.pipeline.set_state, gst.STATE_NULL)
+                return True
+            srcpad_to_link.link(linkpad)
+            depay.get_pad("src").remove_buffer_probe(self._probes[depay])
+            srcpad_to_link.set_blocked_async(True, self.is_blocked_cb)
+            return True
+
+        for e in self.eaters:
+            depay = self.get_element(self.eaters[e].depayName)
+            self._probes[depay] = \
+                depay.get_pad("src").add_buffer_probe(
+                    buffer_probe_cb, depay, e)
+
+    def is_blocked_cb(self, pad, is_blocked):
+        if is_blocked:
+            self.fired_eaters = self.fired_eaters + 1
+            if self.fired_eaters == len(self.eaters):
+                self.debug("All pads are now blocked")
+                for e in self.eaters:
+                    srcpad = self.get_eater_srcpad(e)
+                    srcpad.set_blocked_async(False, self.is_blocked_cb)

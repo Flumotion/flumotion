@@ -21,7 +21,14 @@
 
 from flumotion.common.testsuite import TestCase
 from flumotion.component import feedcomponent
+from flumotion.component.eater import Eater
 from twisted.internet import defer
+
+
+class FakeMuxerComponent(feedcomponent.MuxerComponent):
+
+    def get_muxer_string(self, properties):
+        return "identity name=muxer"
 
 
 class FakeComponent(feedcomponent.ParseLaunchComponent):
@@ -91,3 +98,27 @@ class TestFeedComponentMedium(TestCase):
                                               host,
                                               port)
         self.failUnlessEqual(None, rs)
+
+
+class TestMuxer(TestCase):
+
+    def setup(self):
+        self.fakecomp = None
+
+    def tearDown(self):
+        if self.fakecomp:
+            self.fakecomp.stop()
+
+    def testPipelineString(self):
+        config = {"name": "blah", "plugs": {}, "properties": {},
+            "eater": {"eater1": [("blah", "eater1")]}}
+        self.fakecomp = FakeMuxerComponent(config)
+
+        pipeline = self.fakecomp.get_pipeline_string({})
+        self.assertEquals(pipeline, "@ eater:eater1 @ identity name=muxer ")
+        pipeline = self.fakecomp.parse_pipeline(pipeline)
+        self.assertEquals(pipeline,
+            "fdsrc name=eater:eater1 ! "
+            "queue name=eater:eater1-queue max-size-buffers=16 ! "
+            "gdpdepay name=eater:eater1-depay "
+            "identity name=muxer")

@@ -27,7 +27,7 @@ from flumotion.component import feedcomponent
 __version__ = "$Rev$"
 
 
-class Ogg(feedcomponent.MultiInputParseLaunchComponent):
+class Ogg(feedcomponent.MuxerComponent):
     checkTimestamp = True
 
     def do_check(self):

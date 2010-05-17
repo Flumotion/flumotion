@@ -27,7 +27,7 @@ __version__ = "$Rev$"
 T_ = gettexter()
 
 
-class Multipart(feedcomponent.MultiInputParseLaunchComponent):
+class Multipart(feedcomponent.MuxerComponent):
 
     def do_check(self):
         if gstreamer.get_plugin_version('multipart') <= (0, 10, 16, 0):

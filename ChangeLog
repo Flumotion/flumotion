@@ -1,3 +1,17 @@
+2010-05-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/muxers/multipart.py:
+	* flumotion/component/muxers/ogg.py:
+	* flumotion/test/test_component_feedcomponent.py:
+	Create MuxerComponent class for muxers to inherit.
+	This makes muxers link only after receiving data and makes them
+	link to the compatible sink pad template according to the caps
+	of the data coming in.
+	Add test to check pipeline string output is correct.
+
 2010-05-14  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpserver.py:
