@@ -211,6 +211,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._recentMenuID = None
         self._trayicon = None
         self._configurationAssistantIsRunning = False
+        self._currentDir = None
 
         self._createUI()
         self._appendRecentConnections()
@@ -1383,6 +1384,8 @@ class AdminWindow(Loggable, GladeDelegate):
              _('Import'), gtk.RESPONSE_ACCEPT))
         dialog.set_modal(True)
         dialog.set_default_response(gtk.RESPONSE_ACCEPT)
+        dialog.set_select_multiple(True)
+
         ffilter = gtk.FileFilter()
         ffilter.set_name(_("Flumotion XML configuration files"))
         ffilter.add_pattern("*.xml")
@@ -1392,11 +1395,15 @@ class AdminWindow(Loggable, GladeDelegate):
         ffilter.add_pattern("*")
         dialog.add_filter(ffilter)
 
+        if self._currentDir:
+            dialog.set_current_folder_uri(self._currentDir)
+
         def response(dialog, response):
             if response == gtk.RESPONSE_ACCEPT:
-                name = dialog.get_filename()
-                conf_xml = open(name, 'r').read()
-                self._adminModel.loadConfiguration(conf_xml)
+                self._currentDir = dialog.get_current_folder_uri()
+                for name in dialog.get_filenames():
+                    conf_xml = open(name, 'r').read()
+                    self._adminModel.loadConfiguration(conf_xml)
             dialog.destroy()
 
         dialog.connect('response', response)
@@ -1411,6 +1418,9 @@ class AdminWindow(Loggable, GladeDelegate):
         d.set_modal(True)
         d.set_default_response(gtk.RESPONSE_ACCEPT)
         d.set_current_name("configuration.xml")
+
+        if self._currentDir:
+            d.set_current_folder_uri(self._currentDir)
 
         def getConfiguration(conf_xml, name, chooser):
             if not name.endswith('.xml'):
@@ -1440,6 +1450,7 @@ class AdminWindow(Loggable, GladeDelegate):
 
         def response(d, response):
             if response == gtk.RESPONSE_ACCEPT:
+                self._currentDir = d.get_current_folder_uri()
                 deferred = self._adminModel.getConfiguration()
                 name = d.get_filename()
                 deferred.addCallback(getConfiguration, name, d)
