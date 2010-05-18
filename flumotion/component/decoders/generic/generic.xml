@@ -1,0 +1,52 @@
+<registry>
+  <components>
+
+    <component type="single-generic-decoder"
+               base="flumotion/component/decoders/generic"
+               _description="Decodes an encoded stream with only audio or video.">
+      <source location="flumotion.component.decoders.generic.generic" />
+
+      <feeder name="default" />
+      <eater name="default" />
+
+      <entries>
+        <entry type="component" location="generic.py"
+               function="SingleGenericDecoder" />
+      </entries>
+
+      <properties>
+	<property name="media-type" type="string" required="yes"
+		  _description="Decides whether the component decodes an audio or a video stream. Should be set to either &quot;audio&quot; or &quot;video&quot;." />
+      </properties>
+    </component>
+
+    <component type="av-generic-decoder"
+               base="flumotion/component/decoders/generic"
+               _description="Decodes an encoded stream with audio and video.">
+      <source location="flumotion.component.decoders.generic.generic" />
+
+      <feeder name="audio" />
+      <feeder name="video" />
+      <eater name="default" />
+
+      <entries>
+        <entry type="component" location="generic.py"
+               function="AVGenericDecoder" />
+      </entries>
+    </component>
+
+  </components>
+  <bundles>
+    <bundle name="generic-decoder-component">
+        <dependencies>
+            <dependency name="decoders-base" />
+        </dependencies>
+        <directories>
+            <directory name="flumotion/component/decoders/generic">
+                <filename location="generic.py" />
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+  </bundles>
+</registry>

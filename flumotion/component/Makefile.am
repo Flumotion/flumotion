@@ -23,6 +23,7 @@ SUBDIRS = \
 	combiners \
 	consumers \
 	converters \
+	decoders \
 	effects \
 	encoders \
 	misc \

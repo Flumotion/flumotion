@@ -1,5 +1,26 @@
 2010-05-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	reviewed by: Xavier Martinez-Hidalgo
+
+	* configure.ac:
+	* flumotion/component/Makefile.am:
+	* flumotion/component/decoders (added):
+	* flumotion/component/decoders/__init__.py (added):
+	* flumotion/component/decoders/decoders.xml (added):
+	* flumotion/component/decoders/Makefile.am (added):
+	* flumotion/component/decoders/generic (added):
+	* flumotion/component/decoders/generic/generic.py (added):
+	* flumotion/component/decoders/generic/__init__.py (added):
+	* flumotion/component/decoders/generic/Makefile.am (added):
+	* flumotion/component/decoders/generic/generic.xml (added):
+	Add the generic decoder component (based on sebastien's branch) which
+	can decode audio and video from an encoded stream and is aware of
+	changes on upstream components.
+	* flumotion/component/feedcomponent.py:
+	Base class for the decoder component that contains the gstreamer bits
+
+2010-05-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/test/test_component_feedcomponent.py:
 	Fix the test for real (Remember to "make check" before each commit!!!)
 

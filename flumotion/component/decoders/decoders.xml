@@ -1,0 +1,15 @@
+<registry>
+  <bundles>
+    <bundle name="decoders-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/decoders">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+  </bundles>
+</registry>

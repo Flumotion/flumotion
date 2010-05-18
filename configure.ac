@@ -214,6 +214,8 @@ flumotion/component/consumers/shout2/Makefile
 flumotion/component/converters/Makefile
 flumotion/component/converters/pipeline/Makefile
 flumotion/component/converters/overlay/Makefile
+flumotion/component/decoders/Makefile
+flumotion/component/decoders/generic/Makefile
 flumotion/component/misc/Makefile
 flumotion/component/misc/httpserver/Makefile
 flumotion/component/misc/httpserver/httpcached/Makefile
