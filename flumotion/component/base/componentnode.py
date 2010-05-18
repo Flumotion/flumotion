@@ -87,6 +87,8 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         self._label_component_type = self.wtree.get_widget(
             'label-component-type')
 
+        self._label_resets = self.wtree.get_widget('label-resets')
+        self._label_resets_count = self.wtree.get_widget('label-resets-count')
         self.widget.show()
 
         self._prepareDebugging()
@@ -181,6 +183,12 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         else:
             self._label_vsize.set_text('%sB' % formatStorage(vsize))
 
+    def _updateResets(self, count):
+        if not self._label_resets.get_property('visible'):
+            self._label_resets.show()
+            self._label_resets_count.show()
+        self._label_resets_count.set_text('%d restarts' % count)
+
     def setUIState(self, uiState):
         BaseAdminGtkNode.setUIState(self, uiState)
 
@@ -197,10 +205,12 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
             self._updateCPU(value)
         elif key == 'virtual-size':
             self._updateVSize(value)
-        if key == 'start-time':
+        elif key == 'start-time':
             self._setStartTime(value)
         elif key == 'current-time':
             self._setCurrentTime(value)
+        elif key == 'reset-count':
+            self._updateResets(value)
 
     def stateAppend(self, object, key, value):
         pass

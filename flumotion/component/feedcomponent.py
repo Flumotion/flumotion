@@ -614,11 +614,268 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
         signalid = queue.connect("underrun", _underrun_cb)
 
 
-class MuxerComponent(MultiInputParseLaunchComponent):
+class ReconfigurableComponent(ParseLaunchComponent):
+
+    def init(self):
+        self.EATER_TMPL += ' ! queue name=input-%(name)s'
+        self._reset_count = 0
+
+        self.uiState.addKey('reset-count', 0)
+
+    def setup_completed(self):
+        ParseLaunchComponent.setup_completed(self)
+        self._install_changes_probes()
+
+    # Public methods
+
+    def get_output_elements(self):
+        return [self.get_element(f.elementName + '-pay')
+                for f in self.feeders.values()]
+
+    def get_input_elements(self):
+        return [self.get_element('input-' + f.elementName)
+                for f in self.eaters.values()]
+
+    def get_base_pipeline_string(self):
+        raise NotImplementedError('Subclasses should implement '
+                                  'get_base_pipeline_string')
+
+    def get_eater_srcpad(self, eaterAlias):
+        e = self.eaters[eaterAlias]
+        inputq = self.get_element('input-' + e.elementName)
+        return inputq.get_pad('src')
+
+    # Private methods
+
+    def _install_changes_probes(self):
+        """
+        Add the event probes that will check for the flumotion-reset event.
+
+        Those will trigger the pipeline's blocking and posterior reload
+        """
+        # FIXME: Add documentation
+
+        def input_reset_event(pad, event):
+            if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
+                return True
+            if event.get_structure().get_name() != 'flumotion-reset':
+                return True
+
+            self.log('RESET: in reset event received on input pad %r', pad)
+            self._reset_count = len(self.feeders)
+            # Block all the eaters and send an eos downstream the pipeline to
+            # drain all the elements. It will also unlink the pipeline from the
+            # input queues.
+            self._block_eaters()
+            # Do not propagate the event. It is sent from the other side of
+            # the pipeline after it has been drained.
+            return False
+
+        def output_reset_event(pad, event):
+            if event.type != gst.EVENT_EOS:
+                return True
+
+            self.log('RESET: out reset event received on output pad %r', pad)
+            # TODO: Can we use EVENT_FLUSH_{START,STOP} for the same purpose?
+            # The component only waits for the first eos to come. After that
+            # all the elements inside the pipeline will be down and won't
+            # process any more events.
+            # Pads cannot be blocked from the streaming thread. They have to be
+            # manipulated from outside according gstreamer's documentation
+            self._reset_count -= 1
+            if self._reset_count > 0:
+                return False
+
+            self._send_reset_event()
+            reactor.callFromThread(self._on_pipeline_drained)
+            # Do not let the eos pass.
+            return False
+
+        self.log('RESET: installing event probes for detecting changes')
+        # Listen for incoming flumotion-reset events on eaters
+        for elem in self.get_input_elements():
+            self.debug('RESET: adding event probe for %s', elem.get_name())
+            elem.get_pad('sink').add_event_probe(input_reset_event)
+
+        for elem in self.get_output_elements():
+            self.debug('RESET: adding event probe for %s', elem.get_name())
+            elem.get_pad('sink').add_event_probe(output_reset_event)
+
+    def _block_eaters(self):
+        """
+        Function that blocks all the identities of the eaters
+        """
+        for elem in self.get_input_elements():
+            pad = elem.get_pad('src')
+            self.debug("RESET: Blocking pad %s", pad)
+            pad.set_blocked_async(True, self._on_eater_blocked)
+
+    def _unblock_eaters(self):
+        for elem in self.get_input_elements():
+            pad = elem.get_pad('src')
+            self.debug("RESET: Unblocking pad %s", pad)
+            pad.set_blocked_async(False, self._on_eater_blocked)
+
+    def _send_reset_event(self):
+        event = gst.event_new_custom(gst.EVENT_CUSTOM_DOWNSTREAM,
+                                     gst.Structure('flumotion-reset'))
+
+        for elem in self.get_output_elements():
+            pad = elem.get_pad('sink')
+            pad.send_event(event)
+
+    def _unlink_pads(self, element, directions):
+        for pad in element.pads():
+            ppad = pad.get_peer()
+            if not ppad:
+                continue
+            if (pad.get_direction() in directions and
+                pad.get_direction() == gst.PAD_SINK):
+                self.debug('RESET: unlink %s with %s', pad, ppad)
+                ppad.unlink(pad)
+            elif (pad.get_direction() in directions and
+                  pad.get_direction() == gst.PAD_SRC):
+                self.debug('RESET: unlink %s with %s', pad, ppad)
+                pad.unlink(ppad)
+
+    def _remove_pipeline(self, pipeline, element, done, end):
+            if not element:
+                return
+            if element in done:
+                return
+            done.append(element)
+
+            self._unlink_pads(element, [gst.PAD_SRC])
+
+            if element in end:
+                return
+
+            for sink in element.sink_pads():
+                if not sink.get_peer():
+                    continue
+                peer = sink.get_peer().get_parent()
+                self._remove_pipeline(pipeline, peer, done, end)
+
+
+            self.log("RESET: removing old element %s from pipeline", element)
+            element.set_state(gst.STATE_NULL)
+            pipeline.remove(element)
+
+    def _rebuild_pipeline(self):
+        # TODO: Probably this would be easier and clearer if we used a bin to
+        # wrap the component's functionality.Then the component would only need
+        # to reset the bin and connect the resulting pads to the {eat,feed}ers.
+
+        self.log('RESET: Going to rebuild the pipeline')
+
+        base_pipe = self._get_base_pipeline_string()
+
+        # Place a fakesrc element so we can know from where to start
+        # rebuilding the pipeline.
+        fake_pipeline = 'fakesrc name=start ! %s' % base_pipe
+        pipeline = gst.parse_launch(fake_pipeline)
+
+        def move_element(element, orig, dest):
+            if not element:
+                return
+            if element in done:
+                return
+
+            to_link = []
+            done.append(element)
+            for src in element.src_pads():
+                if not src.get_peer():
+                    continue
+                peer = src.get_peer().get_parent()
+                to_link.append(peer)
+                self.log("RESET: got src pad element %s", src)
+                move_element(to_link[-1], orig, dest)
+
+            self._unlink_pads(element, [gst.PAD_SRC, gst.PAD_SINK])
+            orig.remove(element)
+            dest.add(element)
+
+            self.log("RESET: new element %s added to the pipeline", element)
+            for peer in to_link:
+                self.log("RESET: linking peers %s -> %s", element, peer)
+                element.link(peer)
+
+        done = []
+        start = pipeline.get_by_name('start').get_pad('src').get_peer()
+        move_element(start.get_parent(), pipeline, self.pipeline)
+
+        # Link eaters to the first element in the pipeline
+        # By now we there can only be two situations:
+        # 1. Encoders, where there is only one eater connected to the encoder
+        # 2. Muxers, where multiple eaters are connected directly to the muxer
+        # TODO: Probably we'd like the link process to check the caps
+        if len(self.get_input_elements()) == 1:
+            elem = self.get_input_elements()[0]
+            self.log("RESET: linking eater %r to %r", elem, done[0])
+            elem.link(done[0])
+
+        # Link the last element in the pipeline to the feeders.
+        if len(self.get_output_elements()) == 1:
+            elem = self.get_output_elements()[0]
+            self.log("RESET: linking %r to feeder %r", done[-1], elem)
+            done[-1].link(elem)
+
+        self.configure_pipeline(self.pipeline, self.config['properties'])
+        self.pipeline.set_state(gst.STATE_PLAYING)
+        self._unblock_eaters()
+
+        resets = self.uiState.get('reset-count')
+        self.uiState.set('reset-count', resets+1)
+
+    # Callbacks
+
+    def _on_pad_blocked(self, pad, blocked):
+        self.log("RESET: Pad %s %s", pad,
+                 (blocked and "blocked") or "unblocked")
+
+    def _on_eater_blocked(self, pad, blocked):
+        self._on_pad_blocked(pad, blocked)
+        if blocked:
+            peer = pad.get_peer()
+            peer.send_event(gst.event_new_eos())
+            #self._unlink_pads(pad.get_parent(), [gst.PAD_SRC])
+
+    def _on_pipeline_drained(self):
+        self.debug('RESET: Proceed to unlink pipeline')
+        out = self.get_output_elements()[0]
+        start = out.get_pad('sink').get_peer().get_parent()
+        self._remove_pipeline(self.pipeline, start, [],
+                              self.get_input_elements())
+        self._rebuild_pipeline()
+
+
+class EncoderComponent(ReconfigurableComponent):
+    """
+    Component that is reconfigured when new changes arrive through the
+    flumotion-reset event (sent by the fms producer).
+    """
+
+    def _get_base_pipeline_string(self):
+        return self.get_pipeline_string(self.config['properties'])
+
+
+class MuxerComponent(ReconfigurableComponent, MultiInputParseLaunchComponent):
+    """
+    This class provides for multi-input ParseLaunchComponents, such as muxers,
+    that handle flumotion-reset events for reconfiguration.
+    """
 
     LINK_MUXER = False
 
+    def _get_base_pipeline_string(self):
+        return self.get_muxer_string(self.config['properties'])
+
+    def _unblock_eaters(self):
+        # Let the eaters to be unblocked latter on, when they are linked
+        pass
+
     def configure_pipeline(self, pipeline, properties):
+        return
         """
         Method not overridable by muxer subclasses.
         """
@@ -652,7 +909,10 @@ class MuxerComponent(MultiInputParseLaunchComponent):
                 return True
             srcpad_to_link.link(linkpad)
             depay.get_pad("src").remove_buffer_probe(self._probes[depay])
-            srcpad_to_link.set_blocked_async(True, self.is_blocked_cb)
+            if srcpad_to_link.is_blocked():
+                self.is_blocked_cb(srcpad_to_link, True)
+            else:
+                srcpad_to_link.set_blocked_async(True, self.is_blocked_cb)
             return True
 
         for e in self.eaters:
