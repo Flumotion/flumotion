@@ -124,6 +124,6 @@ class TestMuxer(TestCase):
         self.assertEquals(pipeline,
             "fdsrc name=eater:eater1 ! "
             "queue name=eater:eater1-queue max-size-buffers=16 ! "
-            "gdpdepay name=eater:eater1-depay "
+            "gdpdepay name=eater:eater1-depay ! "
             "queue name=input-eater:eater1 "
             "identity name=muxer")
