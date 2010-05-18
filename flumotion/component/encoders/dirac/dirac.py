@@ -28,7 +28,7 @@ from flumotion.component import feedcomponent
 T_ = gettexter()
 
 
-class Dirac(feedcomponent.ParseLaunchComponent):
+class Dirac(feedcomponent.EncoderComponent):
     checkTimestamp = True
     checkOffset = True
 

@@ -26,7 +26,7 @@ import gst
 __version__ = "$Rev$"
 
 
-class JPEG(feedcomponent.ParseLaunchComponent):
+class JPEG(feedcomponent.EncoderComponent):
 
     def get_pipeline_string(self, properties):
         framerate = ''

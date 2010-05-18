@@ -28,7 +28,7 @@ from vorbisutils import get_max_sample_rate, get_preferred_sample_rate
 __version__ = "$Rev$"
 
 
-class Vorbis(feedcomponent.ParseLaunchComponent):
+class Vorbis(feedcomponent.EncoderComponent):
     checkTimestamp = True
     checkOffset = True
 

@@ -24,7 +24,7 @@ from flumotion.component import feedcomponent
 __version__ = "$Rev$"
 
 
-class Speex(feedcomponent.ParseLaunchComponent):
+class Speex(feedcomponent.EncoderComponent):
 
     def get_pipeline_string(self, properties):
         return 'speexenc name=encoder'

@@ -27,7 +27,7 @@ __version__ = "$Rev$"
 T_ = gettexter()
 
 
-class Smoke(feedcomponent.ParseLaunchComponent):
+class Smoke(feedcomponent.EncoderComponent):
 
     def get_pipeline_string(self, properties):
         return 'ffmpegcolorspace ! smokeenc name=encoder'

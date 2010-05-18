@@ -29,7 +29,7 @@ __version__ = "$Rev$"
 T_ = gettexter()
 
 
-class Theora(feedcomponent.ParseLaunchComponent):
+class Theora(feedcomponent.EncoderComponent):
     checkTimestamp = True
     checkOffset = True
 

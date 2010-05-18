@@ -2,6 +2,19 @@
 
 	reviewed by: Jan Urbanski and Zaheer Abbas Merali
 
+	* flumotion/component/encoders/dirac/dirac.py:
+	* flumotion/component/encoders/jpeg/jpeg.py:
+	* flumotion/component/encoders/mulaw/mulaw.py:
+	* flumotion/component/encoders/smoke/smoke.py:
+	* flumotion/component/encoders/speex/speex.py:
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/encoders/vorbis/vorbis010.py:
+	Make the encoders reconfigurable
+
+2010-05-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Jan Urbanski and Zaheer Abbas Merali
+
 	* flumotion/component/base/component.glade:
 	* flumotion/component/base/componentnode.py:
 	Show the reconfiguration count in admin UI if the component can
@@ -11,13 +24,11 @@
 	Those components will rebuild their inner pipeline when a
 	flumotion-reset event is received.
 
-
 2010-05-18  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
 	Allow to select multiple configuration files from the Import dialog
-	Remeber the last location of the dialogs
-
+	Remember the last location of the dialogs
 
 2010-05-17  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 

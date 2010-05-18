@@ -25,7 +25,7 @@ from flumotion.component import feedcomponent
 __version__ = "$Rev$"
 
 
-class Mulaw(feedcomponent.ParseLaunchComponent):
+class Mulaw(feedcomponent.EncoderComponent):
 
     def get_pipeline_string(self, properties):
         resampler = 'audioresample'
