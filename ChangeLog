@@ -1,5 +1,11 @@
 2010-05-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/component/feedcomponent.py:
+	We cannot link pads with this return statement here. Delete it and
+	remember to check the code before commiting.
+
+2010-05-19  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* Makefile.am:
 	Add .version to the tarball
 

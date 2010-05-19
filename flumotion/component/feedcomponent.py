@@ -875,7 +875,6 @@ class MuxerComponent(ReconfigurableComponent, MultiInputParseLaunchComponent):
         pass
 
     def configure_pipeline(self, pipeline, properties):
-        return
         """
         Method not overridable by muxer subclasses.
         """
