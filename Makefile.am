@@ -12,6 +12,7 @@ SUBDIRS = . bin conf data flumotion doc common pkgconfig tests po
 
 EXTRA_DIST = \
 	env.in \
+        .version \
 	RELEASE \
 	LICENSE.GPL \
 	LICENSE.Flumotion \
