@@ -936,7 +936,7 @@ class DecoderComponent(ReconfigurableComponent):
         # Handle decoder dynamic pads
         eater = self.eaters.values()[0]
         depay = self.get_element(eater.depayName)
-        depay.get_pad("src").add_event_probe(self._depay_reset_event)
+        depay.get_pad("src").add_event_probe(self._depay_reset_event, eater)
 
         decoder = self.pipeline.get_by_name("decoder")
         decoder.connect('new-decoded-pad', self._new_decoded_pad_cb)
