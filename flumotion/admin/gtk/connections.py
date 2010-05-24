@@ -79,8 +79,8 @@ class Connections(GladeWidget):
             self.emit('connections-cleared')
 
     def _searchEqual(self, model, column, key, iter):
-        connection = model.get(iter, column)[0]
-        if key in connection.name:
+        connection = model.get(iter, 0)[0]
+        if key in connection.manager:
             return False
 
         # True means doesn't match

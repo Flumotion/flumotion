@@ -1,3 +1,11 @@
+2010-05-23  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	* flumotion/admin/gtk/connections.py:
+	We have RecentConnection objects in the model containing the connection
+	information as attributes. Pick only the first column and compare the
+	text with the manager attribute.
+	Fixes #1421
+
 2010-05-20  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/component/feedcomponent.py:
