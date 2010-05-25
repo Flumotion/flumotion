@@ -111,7 +111,10 @@ class LocalPathCachedProvider(testsuite.TestCase):
         c = os.path.join(self.path, 'B', 'c')
         open(c, "w").write('test file c')
 
-        plugProps = {"properties": {"path": self.path}}
+        self.cache_path = tempfile.mkdtemp(suffix=".cache")
+
+        plugProps = {"properties": {"path": self.path,
+                                    "cache-dir": self.cache_path}}
         self.fileProviderPlug = \
             cachedprovider.FileProviderLocalCachedPlug(plugProps)
         return self.fileProviderPlug.start(component=None)
@@ -119,9 +122,10 @@ class LocalPathCachedProvider(testsuite.TestCase):
     def tearDown(self):
         d = defer.maybeDeferred(self.fileProviderPlug.stop, component=None)
 
-        def _rmTempDir(result):
+        def _rmTempDirs(result):
             shutil.rmtree(self.path, ignore_errors=True)
-        d.addBoth(_rmTempDir)
+            shutil.rmtree(self.cache_path, ignore_errors=True)
+        d.addBoth(_rmTempDirs)
         return d
 
     def testExistingPath(self):
@@ -168,26 +172,39 @@ class LocalPathCachedProvider(testsuite.TestCase):
 
     def testOpenExisting(self):
         child = self.fileProviderPlug.getRootPath().child('a')
-        child.open()
+        return child.open()
 
     def testOpenTraversingExistingDir(self):
         local = self.fileProviderPlug.getRootPath()
         child = local.child('B').child('c')
-        child.open()
+        return child.open()
 
     def testOpendir(self):
         local = self.fileProviderPlug.getRootPath()
-        self.assertRaises(CannotOpenError, local.open)
+        return self.assertFailure(local.open(), CannotOpenError)
 
     def testOpenNonExisting(self):
         local = self.fileProviderPlug.getRootPath()
         child = local.child('foo')
-        self.assertRaises(NotFoundError, child.open)
+        return self.assertFailure(child.open(), NotFoundError)
+
+    def testOpenNonExistingRemovesCachedFile(self):
+        local = self.fileProviderPlug.getRootPath()
+        child = local.child('foo')
+        cachedPath = self.fileProviderPlug.cache.getCachePath(child._path)
+        open(cachedPath, 'w').write('')
+        d = child.open()
+
+        def openFailed(failure):
+            failure.trap(NotFoundError)
+            self.assert_(not os.path.exists(cachedPath))
+        d.addErrback(openFailed)
+        return d
 
     def testOpenTraversingNonExistingDir(self):
         local = self.fileProviderPlug.getRootPath()
         child = local.child('foo').child('bar')
-        self.assertRaises(NotFoundError, child.open)
+        return self.assertFailure(child.open(), NotFoundError)
 
 
 class LocalPathLocalProvider(testsuite.TestCase):
@@ -266,21 +283,21 @@ class CachedProviderFileTest(testsuite.TestCase):
 
         d = self.openFile('a')
         d.addCallback(self.readFile, self.dataSize)
-        d.addCallback(pass_through, self.cachedFile.close)
+        d.addCallback(pass_through, self.close)
 
         d.addCallback(pass_through, self.createFile, 'a', newData)
         d.addCallback(lambda _: self.openFile('a'))
         d.addCallback(self.readFile, self.dataSize)
-        d.addCallback(pass_through, self.cachedFile.close)
+        d.addCallback(pass_through, self.close)
 
         d.addCallback(self.assertEqual, newData)
         return d
 
     def testSeekend(self):
         d = self.openFile('a')
-        d.addCallback(pass_through, self.cachedFile.seek, self.dataSize-5)
+        d.addCallback(lambda f: f.seek(self.dataSize-5))
         d.addCallback(self.readFile, 5)
-        d.addCallback(pass_through, self.cachedFile.close)
+        d.addCallback(pass_through, self.close)
 
         d.addCallback(self.assertEqual, self.data[-5:])
         return d
@@ -290,7 +307,7 @@ class CachedProviderFileTest(testsuite.TestCase):
         d = self.openFile('a')
         d.addCallback(self.readFile, self.dataSize)
         d.addCallback(delay, 1)
-        d.addCallback(pass_through, self.cachedFile.close)
+        d.addCallback(pass_through, self.close)
 
         d.addCallback(lambda _: self.getCachePath(self.testFileName))
         d.addCallback(self.checkPathExists)
@@ -299,7 +316,7 @@ class CachedProviderFileTest(testsuite.TestCase):
     def testSimpleIntegrity(self):
         d = self.openFile('a')
         d.addCallback(self.readFile, self.dataSize)
-        d.addCallback(pass_through, self.cachedFile.close)
+        d.addCallback(pass_through, self.close)
 
         d.addCallback(lambda data:
                           self.failUnlessEqual(self.data, data))
@@ -325,12 +342,19 @@ class CachedProviderFileTest(testsuite.TestCase):
         return testFileName
 
     def openFile(self, name):
-        self.cachedFile = \
-            self.fileProviderPlug.getRootPath().child(name).open()
-        return defer.succeed(self.cachedFile)
+        d = self.fileProviderPlug.getRootPath().child(name).open()
+
+        def setCachedFile(f):
+            self.cachedFile = f
+            return f
+        d.addCallback(setCachedFile)
+        return d
 
     def readFile(self, _, size):
         return self.cachedFile.read(size)
+
+    def close(self):
+        return self.cachedFile.close()
 
 
 def pass_through(result, fun, *args, **kwargs):

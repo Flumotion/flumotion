@@ -26,7 +26,7 @@ import tempfile
 import threading
 import time
 
-from twisted.internet import defer, reactor, abstract
+from twisted.internet import defer, reactor, threads, abstract
 
 from flumotion.common import log, format, common, python
 from flumotion.component.misc.httpserver import cachestats
@@ -126,11 +126,13 @@ class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug,
         self._thread = CopyThread(self)
 
     def start(self, component):
+        self.debug('Starting cachedprovider plug for component %r', component)
         d = self.cache.setUp()
         d.addCallback(lambda x: self._thread.start())
         return d
 
     def stop(self, component):
+        self.debug('Stopping cachedprovider plug for component %r', component)
         self._thread.stop()
         dl = []
         for s in self._index.values():
@@ -232,12 +234,8 @@ class LocalPath(localpath.LocalPath, log.Loggable):
         return LocalPath(self.plug, childpath)
 
     def open(self):
-        if not os.path.exists(self._path):
-            # Delete the cached file and outdate the copying session
-            self.plug.outdateCopySession(self._path)
-            self._removeCachedFile(self._path)
-            raise NotFoundError("Path '%s' not found" % self._path)
-        return CachedFile(self.plug, self._path, self.mimeType)
+        f = CachedFile(self.plug, self._path, self.mimeType)
+        return f.open()
 
 
     ## Private Methods ##
@@ -835,7 +833,27 @@ class CachedFile(fileprovider.File, log.Loggable):
         self._path = path
         self.mimeType = mimeType
         self.stats = cachestats.RequestStatistics(plug.stats)
-        self._delegate = self._selectDelegate()
+        self._delegate = None
+
+    def open(self):
+        # Opening source file in a separate thread, as it usually involves
+        # accessing a network filesystem (which would block the reactor)
+        d = threads.deferToThread(open_stat, self._path)
+        d.addCallbacks(self._selectDelegate, self._sourceOpenFailed)
+
+        def _setDelegate(delegate):
+            self._delegate = delegate
+        d.addCallback(_setDelegate)
+        d.addCallback(lambda _: self)
+        return d
+
+    def _sourceOpenFailed(self, failure):
+        failure.trap(NotFoundError)
+        self.debug("Source file %r not found", self._path)
+        self.plug.outdateCopySession(self._path)
+        cachedPath = self.plug.cache.getCachePath(self._path)
+        self._removeCachedFile(cachedPath)
+        raise failure
 
     def __str__(self):
         return "<CachedFile '%s'>" % self._path
@@ -897,21 +915,14 @@ class CachedFile(fileprovider.File, log.Loggable):
             self.warning("Failed to close source file: %s",
                          log.getExceptionMessage(e))
 
-    def _selectDelegate(self):
+    def _selectDelegate(self, (sourceFile, sourceInfo)):
         sourcePath = self._path
-        cachedPath = self.plug.cache.getCachePath(sourcePath)
-        # Opening source file
-        try:
-            sourceFile, sourceInfo = open_stat(sourcePath)
-            self.log("Opened source file [fd %d]", sourceFile.fileno())
-        except NotFoundError:
-            self.debug("Source file not found")
-            self.plug.outdateCopySession(sourcePath)
-            self._removeCachedFile(cachedPath)
-            raise
+        self.log("Selecting delegate for source file %r [fd %d]",
+                 sourcePath, sourceFile.fileno())
         # Update the log name
         self.logName = self.plug.getLogName(self._path, sourceFile.fileno())
         # Opening cached file
+        cachedPath = self.plug.cache.getCachePath(sourcePath)
         try:
             cachedFile, cachedInfo = open_stat(cachedPath)
             self.log("Opened cached file [fd %d]", cachedFile.fileno())
