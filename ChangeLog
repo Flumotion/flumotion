@@ -2,6 +2,14 @@
 
 	reviewed by: Jan Urbanski
 
+	* flumotion/twisted/compat.py:
+	* flumotion/twisted/pb.py:
+	Add compatibility code for Twisted 2.5.0 (reactor.seconds).
+
+2010-05-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
 	* flumotion/test/test_pb.py:
 	* flumotion/twisted/pb.py:
 	Add test cases for PingableAvatar.

@@ -22,8 +22,6 @@
 """
 Flumotion Twisted compatibility assistance
 
-All functions in this package are deprecated; do not use them. They no longer
-provide any backwards compatibility.
 """
 
 import warnings
@@ -31,6 +29,18 @@ import warnings
 import zope.interface as zi
 
 __version__ = "$Rev$"
+
+from twisted.internet import reactor
+
+try:
+    reactor.seconds  # Introduced in Twisted 8.0.0
+except AttributeError:
+    from twisted.python import runtime
+    reactor.seconds = runtime.seconds
+
+
+# The following functions are deprecated; do not use them. They no longer
+# provide any backwards compatibility.
 
 
 def implementsInterface(object, interface):
