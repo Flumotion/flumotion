@@ -765,24 +765,28 @@ class PingableAvatar(Avatar):
     _pingCheckInterval = (configure.heartbeatInterval *
                           configure.pingTimeoutMultiplier)
 
+    def __init__(self, avatarId, clock=reactor):
+        self._clock = clock
+        Avatar.__init__(self, avatarId)
+
     def perspective_ping(self):
-        self._lastPing = time.time()
+        self._lastPing = self._clock.seconds()
         return defer.succeed(True)
 
     def startPingChecking(self, disconnect):
-        self._lastPing = time.time()
+        self._lastPing = self._clock.seconds()
         self._pingCheckDisconnect = disconnect
         self._pingCheck()
 
     def _pingCheck(self):
         self._pingCheckDC = None
-        if time.time() - self._lastPing > self._pingCheckInterval:
+        if self._clock.seconds() - self._lastPing > self._pingCheckInterval:
             self.info('no ping in %f seconds, closing connection',
                       self._pingCheckInterval)
             self._pingCheckDisconnect()
         else:
-            self._pingCheckDC = reactor.callLater(self._pingCheckInterval,
-                                                  self._pingCheck)
+            self._pingCheckDC = self._clock.callLater(self._pingCheckInterval,
+                                                      self._pingCheck)
 
     def stopPingChecking(self):
         if self._pingCheckDC:

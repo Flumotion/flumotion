@@ -1,5 +1,16 @@
 2010-05-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
+	reviewed by: Jan Urbanski
+
+	* flumotion/test/test_pb.py:
+	* flumotion/twisted/pb.py:
+	Add test cases for PingableAvatar.
+
+	Use an explicit clock in PingableAvatar, so that timeouts can be
+	tested.
+
+2010-05-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
 	* flumotion/test/test_component_feed.py:
 	Marked slow test suite.
 

@@ -22,12 +22,13 @@
 import crypt
 
 from twisted.cred import portal
-from twisted.internet import defer, reactor
+from twisted.internet import defer, reactor, task
 from twisted.python import log as tlog
 from twisted.spread import pb as tpb
 from twisted.trial import unittest
 from zope.interface import implements
 
+from flumotion.configure import configure
 from flumotion.common import testsuite
 from flumotion.common import keycards, log, errors
 from flumotion.component.bouncers import htpasswdcrypt, saltsha256
@@ -645,6 +646,53 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
             d.addErrback(uacpccTamperErrback)
             return d
         d.addCallback(uacpccTamperCallback)
+        return d
+
+
+class TestPingableAvatar(testsuite.TestCase):
+
+    pingCheckInterval = (configure.heartbeatInterval *
+                         configure.pingTimeoutMultiplier)
+
+    def setUp(self):
+        self.disconnected = False
+
+    def disconnect(self):
+        self.disconnected = True
+
+    def testNoPing(self):
+        clock = task.Clock()
+
+        a = pb.PingableAvatar(avatarId=None, clock=clock)
+        a.startPingChecking(self.disconnect)
+        self.assert_(not self.disconnected)
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(not self.disconnected)
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(self.disconnected)
+
+    def testPingResetsTimeout(self):
+        clock = task.Clock()
+
+        a = pb.PingableAvatar(avatarId=None, clock=clock)
+        a.startPingChecking(self.disconnect)
+
+        clock.advance(self.pingCheckInterval)
+
+        d = a.perspective_ping()
+
+        def cb(result):
+            self.assertEquals(result, True)
+
+            clock.advance(self.pingCheckInterval)
+            self.assert_(not self.disconnected)
+
+            clock.advance(self.pingCheckInterval)
+            self.assert_(self.disconnected)
+        d.addCallback(cb)
+
         return d
 
 
