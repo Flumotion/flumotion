@@ -1,3 +1,8 @@
+2010-05-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	* flumotion/test/test_component_feed.py:
+	Marked slow test suite.
+
 2010-05-25  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	reviewed by: Sébastien Merle and Julien Le Goff

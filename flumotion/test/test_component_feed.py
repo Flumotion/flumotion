@@ -93,6 +93,8 @@ class FeedServer(feedserver.FeedServer):
 
 
 class FeedTestCase(testsuite.TestCase, log.Loggable):
+    slow = True
+
     bouncerconf = {'name': 'testbouncer',
                    'plugs': {},
                    # user:test
