@@ -240,6 +240,7 @@ class PingingMedium(BaseMedium):
     _pingCheckInterval = (configure.heartbeatInterval *
                           configure.pingTimeoutMultiplier)
     _pingDC = None
+    _clock = reactor
 
     def startPinging(self, disconnect):
         """
@@ -276,6 +277,21 @@ class PingingMedium(BaseMedium):
 
         self._pingDC = self._clock.callLater(self._pingInterval,
                                              self._ping)
+
+    def remoteMessageReceived(self, broker, message, args, kw):
+        self._lastPingback = self._clock.seconds()
+        return BaseMedium.remoteMessageReceived(
+            self, broker, message, args, kw)
+
+    def callRemoteLogging(self, level, stackDepth, name, *args, **kwargs):
+        d = BaseMedium.callRemoteLogging(
+            self, level, stackDepth, name, *args, **kwargs)
+
+        def cb(result):
+            self._lastPingback = self._clock.seconds()
+            return result
+        d.addCallback(cb)
+        return d
 
     def _pingCheck(self):
         self._pingCheckDC = None

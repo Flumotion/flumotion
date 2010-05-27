@@ -4,6 +4,18 @@
 
 	* flumotion/common/medium.py:
 	* flumotion/test/test_common_medium.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/twisted/pb.py:
+	Reset ping and pingback timeout on successful PB message
+	reception.
+	Closes #1415.
+
+2010-05-27  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/common/medium.py:
+	* flumotion/test/test_common_medium.py:
 	* flumotion/test/test_common_medium.py (added):
 	Add test cases for PingingMedium.
 

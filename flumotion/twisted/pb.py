@@ -768,9 +768,25 @@ class PingableAvatar(Avatar):
         self._clock = clock
         Avatar.__init__(self, avatarId)
 
-    def perspective_ping(self):
+    def perspectiveMessageReceivedUnserialised(self, broker, message,
+            args, kwargs):
         self._lastPing = self._clock.seconds()
+        return Avatar.perspectiveMessageReceivedUnserialised(
+            self, broker, message, args, kwargs)
+
+    def perspective_ping(self):
         return defer.succeed(True)
+
+    def mindCallRemoteLogging(self, level, stackDepth, name, *args,
+                              **kwargs):
+        d = Avatar.mindCallRemoteLogging(self, level, stackDepth, name, *args,
+                                         **kwargs)
+
+        def cb(result):
+            self._lastPing = self._clock.seconds()
+            return result
+        d.addCallback(cb)
+        return d
 
     def startPingChecking(self, disconnect):
         self._lastPing = self._clock.seconds()

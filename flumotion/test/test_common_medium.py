@@ -19,6 +19,7 @@
 # Headers in this file shall remain intact.
 
 from twisted.internet import defer, task
+from twisted.spread import pb
 from twisted.trial import unittest
 
 from flumotion.configure import configure
@@ -28,6 +29,7 @@ from flumotion.common import medium, testsuite
 class FakeRemote:
 
     disconnected = False
+    disconnectCallback = None
 
     def __init__(self):
         # mock self.broker.transport.loseConnection()
@@ -38,7 +40,8 @@ class FakeRemote:
         self.disconnectCallback = callback
 
     def disconnect(self):
-        self.disconnectCallback(self)
+        if self.disconnectCallback:
+            self.disconnectCallback(self)
         self.disconnected = True
 
     def callRemote(self, name, *args, **kw):
@@ -96,6 +99,57 @@ class TestPingingMedium(testsuite.TestCase):
         clock.advance(self.pingCheckInterval)
         self.assert_(self.remote.disconnected)
 
+    def testCallRemoteAnswerResetsTimeout(self):
+        clock = task.Clock()
+
+        m = medium.PingingMedium()
+        m.setRemoteReference(self.remote, clock=clock)
+
+        clock.advance(self.pingCheckInterval)
+
+        # answer to callRemote (should extend ping timeout)
+        m.callRemote('test')
+        self.assertEquals(self.remote.call, ('test', (), {}))
+        self.remote.callback(True)
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(not self.remote.disconnected)
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(self.remote.disconnected)
+
+    def testRemoteMessageResetsTimeout(self):
+        clock = task.Clock()
+
+        m = medium.PingingMedium()
+        m.remote_test = lambda: True
+        m.setRemoteReference(self.remote, clock=clock)
+
+        clock.advance(self.pingCheckInterval)
+
+        # received remote message from avatar (should extend ping timeout)
+        broker = pb.Broker()
+        m.remoteMessageReceived(
+            broker, 'test', broker.serialize(()), broker.serialize({}))
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(not self.remote.disconnected)
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(self.remote.disconnected)
+
+    def testRemoteMessageReceivedBeforeSettingRemoteReference(self):
+        m = medium.PingingMedium()
+        m.remote_test = lambda: True
+
+        broker = pb.Broker()
+        d = m.remoteMessageReceived(
+            broker, 'test', broker.serialize(()), broker.serialize({}))
+
+        def cb(result):
+            result = broker.unserialize(result)
+            self.assertEquals(result, True)
+        d.addCallback(cb)
 
 if __name__ == '__main__':
     unittest.main()

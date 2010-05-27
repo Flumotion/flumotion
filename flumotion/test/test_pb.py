@@ -649,51 +649,132 @@ class Test_FPBClientFactorySaltSha256(Test_FPBClientFactory):
         return d
 
 
+class FakeMindTransport:
+
+    disconnected = False
+    disconnectCallback = None
+
+    def __init__(self):
+        # mock self.mind.broker.transport
+        self.mind = self.broker = self.transport = self
+
+    def callRemote(self, name, *args, **kwargs):
+        self.d = defer.Deferred()
+        return self.d
+
+    def notifyOnDisconnect(self, callback):
+        self.disconnectCallback = callback
+
+    def callback(self, result):
+        self.d.callback(result)
+
+    # Transport methods
+
+    def getHost(self):
+        pass
+
+    def getPeer(self):
+        pass
+
+    def loseConnection(self):
+        if self.disconnectCallback:
+            self.disconnectCallback(self)
+        self.disconnected = True
+
+
 class TestPingableAvatar(testsuite.TestCase):
 
     pingCheckInterval = (configure.heartbeatInterval *
                          configure.pingTimeoutMultiplier)
 
     def setUp(self):
-        self.disconnected = False
+        self.mind = FakeMindTransport()
 
-    def disconnect(self):
-        self.disconnected = True
+    def tearDown(self):
+        self.mind.loseConnection()
 
     def testNoPing(self):
         clock = task.Clock()
 
         a = pb.PingableAvatar(avatarId=None, clock=clock)
-        a.startPingChecking(self.disconnect)
-        self.assert_(not self.disconnected)
+        a.setMind(self.mind)
+        self.assert_(not self.mind.disconnected)
 
         clock.advance(self.pingCheckInterval)
-        self.assert_(not self.disconnected)
+        self.assert_(not self.mind.disconnected)
 
         clock.advance(self.pingCheckInterval)
-        self.assert_(self.disconnected)
+        self.assert_(self.mind.disconnected)
 
     def testPingResetsTimeout(self):
         clock = task.Clock()
 
         a = pb.PingableAvatar(avatarId=None, clock=clock)
-        a.startPingChecking(self.disconnect)
+        a.setMind(self.mind)
 
         clock.advance(self.pingCheckInterval)
 
-        d = a.perspective_ping()
+        # ping
+        broker = tpb.Broker()
+        d = a.perspectiveMessageReceivedUnserialised(
+            broker, 'ping', (), {})
+        d.addCallback(broker.unserialize)
 
         def cb(result):
             self.assertEquals(result, True)
 
             clock.advance(self.pingCheckInterval)
-            self.assert_(not self.disconnected)
+            self.assert_(not self.mind.disconnected)
 
             clock.advance(self.pingCheckInterval)
-            self.assert_(self.disconnected)
+            self.assert_(self.mind.disconnected)
         d.addCallback(cb)
 
         return d
+
+    def testMessageReceivedUnserialisedResetsTimeout(self):
+        clock = task.Clock()
+
+        a = pb.PingableAvatar(avatarId=None, clock=clock)
+        a.perspective_test = lambda: True
+        a.setMind(self.mind)
+
+        clock.advance(self.pingCheckInterval)
+
+        # this should reset the ping timeout
+        d = a.perspectiveMessageReceivedUnserialised(
+            tpb.Broker(), 'test', (), {})
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(not self.mind.disconnected)
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(self.mind.disconnected)
+
+    def testSuccessfulMindRemoteAnswerResetsTimeout(self):
+        clock = task.Clock()
+
+        a = pb.PingableAvatar(avatarId=None, clock=clock)
+        a.setMind(self.mind)
+
+        clock.advance(self.pingCheckInterval)
+
+        d, remote_result = a.mindCallRemote('test'), [None]
+
+        def cb(result):
+            print 'asd'
+            remote_result[0] = result
+        d.addCallback(cb)
+
+        # this should reset the ping timeout
+        self.mind.callback(True)
+        self.assertEquals(remote_result, [True])
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(not self.mind.disconnected)
+
+        clock.advance(self.pingCheckInterval)
+        self.assert_(self.mind.disconnected)
 
 
 if __name__ == '__main__':
