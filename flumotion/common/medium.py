@@ -25,7 +25,7 @@
 import time
 
 from twisted.spread import pb
-from twisted.internet import defer, reactor
+from twisted.internet import defer
 from zope.interface import implements
 
 from flumotion.common import log, interfaces, bundleclient, errors
@@ -33,6 +33,7 @@ from flumotion.common import messages
 from flumotion.common.netutils import addressGetHost
 from flumotion.configure import configure
 from flumotion.twisted import pb as fpb
+from flumotion.twisted.compat import reactor
 
 __version__ = "$Rev$"
 
@@ -246,7 +247,7 @@ class PingingMedium(BaseMedium):
         @type  disconnect: callable
         """
         self.debug('startPinging')
-        self._lastPingback = time.time()
+        self._lastPingback = self._clock.seconds()
         if self._pingDC:
             self.debug("Cannot start pinging, already pinging")
             return
@@ -257,7 +258,7 @@ class PingingMedium(BaseMedium):
     def _ping(self):
 
         def pingback(result):
-            self._lastPingback = time.time()
+            self._lastPingback = self._clock.seconds()
             self.log('pinged, pingback at %r' % self._lastPingback)
 
         def pingFailed(failure):
@@ -273,19 +274,20 @@ class PingingMedium(BaseMedium):
         else:
             self.info('tried to ping, but disconnected yo')
 
-        self._pingDC = reactor.callLater(self._pingInterval,
-                                         self._ping)
+        self._pingDC = self._clock.callLater(self._pingInterval,
+                                             self._ping)
 
     def _pingCheck(self):
         self._pingCheckDC = None
         if (self.remote and
-            (time.time() - self._lastPingback > self._pingCheckInterval)):
+            ((self._clock.seconds() - self._lastPingback) >
+             self._pingCheckInterval)):
             self.info('no pingback in %f seconds, closing connection',
                       self._pingCheckInterval)
             self._pingDisconnect()
         else:
-            self._pingCheckDC = reactor.callLater(self._pingCheckInterval,
-                                                  self._pingCheck)
+            self._pingCheckDC = self._clock.callLater(self._pingCheckInterval,
+                                                      self._pingCheck)
 
     def stopPinging(self):
         if self._pingCheckDC:
@@ -300,7 +302,9 @@ class PingingMedium(BaseMedium):
         if self.remote:
             self.remote.broker.transport.loseConnection()
 
-    def setRemoteReference(self, remote):
+    def setRemoteReference(self, remote, clock=reactor):
+        self._clock = clock
+
         BaseMedium.setRemoteReference(self, remote)
 
         def stopPingingCb(x):

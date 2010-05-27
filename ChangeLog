@@ -1,3 +1,15 @@
+2010-05-27  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/common/medium.py:
+	* flumotion/test/test_common_medium.py:
+	* flumotion/test/test_common_medium.py (added):
+	Add test cases for PingingMedium.
+
+	Use an explicit clock in PingingMedium, so that timeouts can be
+	tested.
+
 2010-05-26  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	reviewed by: Jan Urbanski
