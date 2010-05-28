@@ -23,6 +23,7 @@ import gettext
 
 import gobject
 import gtk
+import pango
 from zope.interface import implements
 
 from flumotion.common.pygobject import gsignal
@@ -80,6 +81,8 @@ class WorkerList(gtk.HBox):
         a.show()
         vb.pack_start(a, True, False, 0)
         cell = gtk.CellRendererText()
+        cell.set_property('ellipsize', pango.ELLIPSIZE_MIDDLE)
+        cell.set_property('width', 100)
         self._combobox.pack_start(cell, True)
         self._combobox.add_attribute(cell, 'text', 0)
 

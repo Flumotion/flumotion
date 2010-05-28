@@ -1,3 +1,8 @@
+2010-05-28  Josep Joan Ribas  <jribas@flumotion.com>
+
+	* flumotion/admin/gtk/workerlist.py:
+	Fix wizzard issue when displaying long worker names.
+
 2010-05-28  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	* flumotion/test/test_pb.py:
