@@ -1,3 +1,8 @@
+2010-05-28  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
+
+	* flumotion/test/test_pb.py:
+	Removed debug print.
+
 2010-05-27  Xavier Martinez-Hidalgo  <xmartinez@flumotion.com>
 
 	reviewed by: Jan Urbanski

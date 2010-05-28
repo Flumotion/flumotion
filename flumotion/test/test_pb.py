@@ -762,7 +762,6 @@ class TestPingableAvatar(testsuite.TestCase):
         d, remote_result = a.mindCallRemote('test'), [None]
 
         def cb(result):
-            print 'asd'
             remote_result[0] = result
         d.addCallback(cb)
 
