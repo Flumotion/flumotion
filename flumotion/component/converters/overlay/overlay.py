@@ -78,7 +78,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
                 gst.RANK_MARGINAL)
             source_element = "fluoverlaysrc name=source "
         pipeline = (
-            '%s ! alphacolor ! '
+            '%s ! alphacolor ! video/x-raw-yuv, format=(fourcc)AYUV ! '
             'videomixer name=mix ! @feeder:default@ '
             '@eater:default@ ! ffmpegcolorspace ! '
             'video/x-raw-yuv,format=(fourcc)AYUV ! mix.' % source_element)
@@ -118,7 +118,8 @@ class Overlay(feedcomponent.ParseLaunchComponent):
             self.addMessage(m)
         self.capsStr = "video/x-raw-rgb,bpp=32,depth=32,width=%d,height=%d," \
             "red_mask=-16777216,green_mask=16711680,blue_mask=65280," \
-            "alpha_mask=255,framerate=0/1" % (p['width'], p['height'])
+            "alpha_mask=255,endianness=4321,framerate=0/1" % \
+            (p['width'], p['height'])
         padcaps = gst.caps_from_string(self.capsStr)
         source = self.get_element('source')
         if source.get_factory().get_name() == 'appsrc':

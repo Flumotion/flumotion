@@ -1,3 +1,13 @@
+2010-05-31  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/component/converters/overlay/overlay.py:
+	Force AYUV format in the 'alphacolor' source caps because videomixer needs
+	the same colorspace in all the sink pads. Also add 'endianness' to
+	the 'appsrc' source pad caps, needed by 'alphacolor' to negotiate caps
+	properly.
+
 2010-05-28  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/admin/gtk/workerlist.py:
