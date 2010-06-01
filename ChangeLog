@@ -1,5 +1,10 @@
 2010-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
+	* flumotion/component/muxers/muxers.xml:
+	Remove non-existent mkv.py from bundle.
+
+2010-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
 	reviewed by: Xavier Queralt
 
 	* flumotion/component/encoders/Makefile.am:

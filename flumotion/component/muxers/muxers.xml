@@ -82,7 +82,6 @@
             <directory name="flumotion/component/muxers">
                 <filename location="multipart.py" />
                 <filename location="ogg.py" />
-                <filename location="mkv.py" />
                 <filename location="webm.py" />
                 <filename location="checks.py" />
                 <filename location="wizard_gtk.py" />
