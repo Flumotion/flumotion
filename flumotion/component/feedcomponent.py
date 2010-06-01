@@ -874,6 +874,9 @@ class MuxerComponent(ReconfigurableComponent, MultiInputParseLaunchComponent):
         # Let the eaters to be unblocked latter on, when they are linked
         pass
 
+    def get_link_pad(self, muxer, srcpad, caps):
+        return muxer.get_compatible_pad(srcpad, caps)
+
     def configure_pipeline(self, pipeline, properties):
         """
         Method not overridable by muxer subclasses.
@@ -894,7 +897,7 @@ class MuxerComponent(ReconfigurableComponent, MultiInputParseLaunchComponent):
             muxer = self.pipeline.get_by_name("muxer")
             self.debug("Trying to get compatible pad for pad %r with caps %s",
                 srcpad_to_link, caps)
-            linkpad = muxer.get_compatible_pad(srcpad_to_link, caps)
+            linkpad = self.get_link_pad(muxer, srcpad_to_link, caps)
             self.debug("Got link pad %r", linkpad)
             if not linkpad:
                 m = messages.Error(T_(N_(
