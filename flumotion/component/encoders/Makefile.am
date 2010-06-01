@@ -69,6 +69,15 @@ vorbis_DATA = \
 	vorbis/vorbis.xml \
 	vorbis/wizard.glade
 
+vp8dir = $(componentdir)/vp8
+vp8_PYTHON = \
+	vp8/__init__.py \
+	vp8/vp8.py \
+	vp8/wizard_gtk.py
+vp8_DATA = \
+	vp8/vp8.xml \
+	vp8/wizard.glade
+
 clean-local:
 	rm -rf *.pyc *.pyo */*.pyc */*.pyo
 

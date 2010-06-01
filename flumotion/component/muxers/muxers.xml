@@ -19,6 +19,7 @@
         <accept-format media-type="theora" />
         <accept-format media-type="speex" />
         <accept-format media-type="vorbis" />
+        <accept-format media-type="vp8" />
         <provide-format media-type="ogg" />
       </wizard>
     </component>
@@ -43,6 +44,23 @@
       </wizard>
     </component>
 
+    <component type="webm-muxer" base="flumotion/component/muxers"
+               _description="Muxes encoded feeds into an WebM feed.">
+      <source location="flumotion.component.muxers.webm"/>
+      <feeder name="default"/>
+      <eater name="default" multiple="yes"/>
+      <entries>
+        <entry type="component" location="webm.py"
+               function="WebM"/>
+      </entries>
+      <wizard _description="WebM" type="muxer"
+              feeder="default" eater="default">
+        <accept-format media-type="vorbis"/>
+        <accept-format media-type="vp8"/>
+        <provide-format media-type="webm" />
+      </wizard>
+    </component>
+
   </components>
 
   <bundles>
@@ -64,6 +82,8 @@
             <directory name="flumotion/component/muxers">
                 <filename location="multipart.py" />
                 <filename location="ogg.py" />
+                <filename location="mkv.py" />
+                <filename location="webm.py" />
                 <filename location="checks.py" />
                 <filename location="wizard_gtk.py" />
             </directory>

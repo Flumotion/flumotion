@@ -1,0 +1,78 @@
+<registry>
+
+  <components>
+
+    <component type="vp8-encoder" base="flumotion/component/encoders/vp8"
+               _description="Encodes a raw video feed using vp8 codec." >
+      <source location="flumotion.component.encoders.vp8.vp8" />
+      <eater name="default" />
+      <feeder name="default" />
+      <entries>
+        <entry type="component" location="vp8.py"
+               function="VP8"/>
+        <entry type="wizard" location="wizard_gtk.py"
+               function="VP8WizardPlugin" />
+      </entries>
+
+      <wizard _description="vp8" type="video-encoder"
+              feeder="default" eater="default">
+        <provide-format media-type="vp8" />
+      </wizard>
+
+      <properties>
+        <property name="bitrate" type="int"
+                  _description="The bit rate to encode at (in bps)." />
+        <property name="quality" type="int"
+                  _description="Quality used to encode." />
+        <property name="keyframe-maxdistance" type="int"
+                  _description="The maximum distance between key frames (in frames)." />
+      </properties>
+    </component>
+
+  </components>
+
+  <bundles>
+
+    <bundle name="vp8-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/vp8">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="vp8-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="vp8-base" />
+            <dependency name="worker-checks" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/vp8">
+                <filename location="vp8.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="vp8-wizard">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="vp8-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/encoders/vp8">
+                <filename location="wizard_gtk.py" />
+                <filename location="wizard.glade" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry>

@@ -1,3 +1,26 @@
+2010-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/component/encoders/Makefile.am:
+	* flumotion/component/encoders/vp8/__init__.py:
+	* flumotion/component/encoders/vp8/vp8.py:
+	* flumotion/component/encoders/vp8/vp8.xml:
+	* flumotion/component/encoders/vp8/wizard.glade:
+	* flumotion/component/encoders/vp8/wizard_gtk.py:
+	* flumotion/component/muxers/Makefile.am:
+	* flumotion/component/muxers/muxers.xml:
+	* flumotion/component/muxers/webm.py:
+	* flumotion/component/muxers/wizard_gtk.py:
+	* flumotion/component/muxers/webm.py (added):
+	* flumotion/component/encoders/vp8 (added):
+	* flumotion/component/encoders/vp8/vp8.py (added):
+	* flumotion/component/encoders/vp8/__init__.py (added):
+	* flumotion/component/encoders/vp8/wizard.glade (added):
+	* flumotion/component/encoders/vp8/wizard_gtk.py (added):
+	* flumotion/component/encoders/vp8/vp8.xml (added):
+	WebM/VP8 support, yay!
+
 2010-06-01  Julien Le Goff  <jlegoff@flumotion.com>
 
 	reviewed by: Xavier Queralt
