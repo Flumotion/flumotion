@@ -7,6 +7,7 @@
 	the same colorspace in all the sink pads. Also add 'endianness' to
 	the 'appsrc' source pad caps, needed by 'alphacolor' to negotiate caps
 	properly.
+	Fixes #1423
 
 2010-05-28  Josep Joan Ribas  <jribas@flumotion.com>
 
