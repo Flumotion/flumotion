@@ -74,6 +74,14 @@ class _WalkableStack(object):
         else:
             return False
 
+    def clearToCurrent(self):
+        cleared = []
+        if self.pos < self.height:
+            cleared = self.l[self.pos+1:]
+            self.l = self.l[:self.pos+1]
+            self.height = self.pos
+        return cleared
+
     def current(self):
         return self.l[self.pos]
 
@@ -395,6 +403,10 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
         for i, oldSection in enumerate(oldSections):
             self.removeSection(oldSection.name)
             self._sections2.remove(oldSection)
+        cleared = self._stack.clearToCurrent()
+        for step in cleared:
+            self._steps.pop(step.name)
+        self._top = self._active
 
     def addStepSection(self, section):
         self.appendSection(section.section, section.name)

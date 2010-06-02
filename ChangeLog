@@ -1,3 +1,11 @@
+2010-06-02  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/ui/wizard.py:
+	Clean stack when cleaning future steps.
+	Fixes #1383
+
 2010-06-02  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/python.py:
