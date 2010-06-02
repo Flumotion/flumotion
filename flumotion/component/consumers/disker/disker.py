@@ -252,6 +252,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             raise errors.ComponentSetupHandledError()
 
         sink = self.get_element('fdsink')
+
+        if gstreamer.element_has_property(sink, 'resend-streamheader'):
+            sink.set_property('resend-streamheader', False)
+        else:
+            self.debug("resend-streamheader property not available, "
+                       "resending streamheader when it changes in the caps")
         sink.get_pad('sink').connect('notify::caps', self._notify_caps_cb)
         # connect to client-removed so we can detect errors in file writing
         sink.connect('client-removed', self._client_removed_cb)

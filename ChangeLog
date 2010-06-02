@@ -1,3 +1,13 @@
+2010-06-02  Julien Le Goff  <jlegoff@flumotion.com>
+
+	reviewed by: Josep Ribas 
+
+	* flumotion/common/gstreamer.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	Make disker not resend stream headers. Factor out property checks in
+	gstreamer elements.
+
 2010-06-01  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/muxers/muxers.xml:

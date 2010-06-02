@@ -71,6 +71,19 @@ def verbose_deep_notify_cb(object, orig, pspec, component):
     component.debug('%s: %s = %r', orig.get_path_string(), pspec.name, output)
 
 
+def element_has_property(element, property_name):
+    """
+    Check if the given element has the given property.
+
+    @rtype: boolean
+    """
+    try:
+        element.get_property(property_name)
+        return True
+    except TypeError:
+        return False
+
+
 def element_factory_has_property(element_factory, property_name):
     """
     Check if the given element factory has the given property.

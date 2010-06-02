@@ -354,23 +354,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 'gst-plugins-base', '0.10.10'))
             addMessage(m)
 
-    def time_bursting_supported(self, sink):
-        try:
-            sink.get_property('units-max')
-            return True
-        except TypeError:
-            return False
-
-    def resend_streamheader_supported(self, sink):
-        try:
-            sink.get_property('resend-streamheader')
-            return True
-        except TypeError:
-            return False
-
     def setup_burst_mode(self, sink):
         if self.burst_on_connect:
-            if self.burst_time and self.time_bursting_supported(sink):
+            if self.burst_time and \
+                    gstreamer.element_has_property(sink, 'units-max'):
                 self.debug("Configuring burst mode for %f second burst",
                     self.burst_time)
                 # Set a burst for configurable minimum time, plus extra to
@@ -472,7 +459,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.setup_burst_mode(sink)
 
-        if self.resend_streamheader_supported(sink):
+        if gstreamer.element_has_property(sink, 'resend-streamheader'):
             sink.set_property('resend-streamheader', False)
         else:
             self.debug("resend-streamheader property not available, "
