@@ -104,3 +104,14 @@ try:
     set = set
 except NameError:
     from sets import Set as set
+
+# itertools.chain.from_iterable appeared in python 2.6
+if sys.version_info[:2] < (2, 6):
+
+    def from_iterable(iterables):
+        for it in iterables:
+            for element in it:
+                yield element
+else:
+    from itertools import chain
+    from_iterable = chain.from_iterable

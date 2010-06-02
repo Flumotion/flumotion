@@ -1,3 +1,8 @@
+2010-06-02  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/python.py:
+	Add itertools.chain.from_iterable for python versions < 2.6
+
 2010-06-02  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/component/encoders/Makefile.am:
