@@ -84,4 +84,4 @@ clean-local:
 EXTRA_DIST = \
 	$(component_DATA) \
 	$(dirac_DATA) $(jpeg_DATA) $(mulaw_DATA) $(smoke_DATA) \
-	$(speex_DATA) $(theora_DATA) $(vorbis_DATA)
+	$(speex_DATA) $(theora_DATA) $(vorbis_DATA) $(vp8_DATA)
