@@ -1,0 +1,25 @@
+<registry>
+  <plugs>
+    <plug socket="flumotion.component.bouncers.plug.BouncerPlug"
+          type="bouncer-trivial-plug"
+          _description="A bouncer plug that always accepts authentication requests.">
+      <entry location="flumotion/component/bouncers/plug.py"
+             function="BouncerTrivialPlug"/>
+    </plug>
+  </plugs>
+
+  <bundles>
+    <bundle name="bouncer-plug-base">
+      <dependencies>
+        <dependency name="bouncer-base" />
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers">
+          <filename location="plug.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+
+</registry>

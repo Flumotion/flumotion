@@ -1,0 +1,28 @@
+<registry>
+  <components>
+    <component type="trivial-bouncer" base="flumotion/component/bouncers"
+               _description="A bouncer that accepts all requests.">
+      <source location="flumotion.component.bouncers.component"/>
+
+      <entries>
+	<entry type="component" location="component.py"
+		function="TrivialBouncer" />
+      </entries>
+    </component>
+  </components>
+
+  <bundles>
+    <bundle name="bouncer-component-base">
+      <dependencies>
+	<dependency name="bouncer-base" />
+	<dependency name="component-base" />
+	<dependency name="component" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers">
+          <filename location="component.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry>

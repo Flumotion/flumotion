@@ -1,0 +1,37 @@
+<registry>
+  <components>
+    <component type="multi-bouncer"
+               base="flumotion/component/bouncers"
+               _description="A bouncer that combines bouncer algorithms.">
+
+      <source location="flumotion.component.bouncers.multibouncer" />
+
+      <entries>
+        <entry type="component" location="multibouncer.py"
+               function="MultiBouncer" />
+      </entries>
+      <properties>
+	<property name="combination" type="string" required="no" multiple="no"
+		  _description="Combination specification for the used algorithms."/>
+      </properties>
+
+      <sockets>
+        <socket type="flumotion.component.bouncers.algorithms.BouncerAlgorithm" />
+      </sockets>
+
+    </component>
+  </components>
+
+  <bundles>
+    <bundle name="multi-bouncer">
+      <dependencies>
+        <dependency name="bouncer-component-base" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers">
+          <filename location="multibouncer.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry>

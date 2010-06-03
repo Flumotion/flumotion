@@ -1,3 +1,17 @@
+2010-06-03  Alvin Delagon <adelagon@flumotion.com>
+
+	patch by: jurbanski
+
+	* flumotion/component/bouncers/combinator.py (added):
+	* flumotion/component/bouncers/multibouncerplug.py (added):
+	* flumotion/component/bouncers/multibouncerplug.xml (added):
+	* flumotion/component/bouncers/multibouncer.py (added):
+	* flumotion/component/bouncers/component.xml (added):
+	* flumotion/component/bouncers/base.py (added):
+	* flumotion/component/bouncers/plug.xml (added):
+	* flumotion/component/bouncers/multibouncer.xml (added):
+	Added more missing files form multibouncer patch.
+
 2010-06-03  Alvin Delagon  <adelagon@flumotion.com>
 
 	patch by: jurbanski

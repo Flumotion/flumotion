@@ -1,0 +1,30 @@
+<registry>
+  <plugs>
+    <plug socket="flumotion.component.bouncers.plug.BouncerPlug"
+	  type="multibouncer-plug" _description="A bouncer plug that combines
+						 bouncer algorithms.">
+      <entries>
+      	<entry location="flumotion/component/bouncers/multibouncerplug.py"
+	       function="MultiBouncerPlug" />
+      </entries>
+      <properties>
+	<property name="combination" type="string" required="no" multiple="no"
+		  _description="Combination specification for the used algorithms."/>
+      </properties>
+    </plug>
+  </plugs>
+
+  <bundles>
+    <bundle name="multibouncer-plug">
+      <dependencies>
+        <dependency name="bouncer-plug-base" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers">
+          <filename location="multibouncerplug.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+
+</registry>
