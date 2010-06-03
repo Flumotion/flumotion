@@ -82,7 +82,7 @@
         <socket type="flumotion.component.misc.httpserver.fileprovider.FileProviderPlug" />
         <socket type="flumotion.component.misc.httpserver.metadataprovider.MetadataProviderPlug" />
         <socket type="flumotion.component.bouncers.plug.BouncerPlug" />
-        <socket type="flumotion.component.bouncers.algorithms.base.BouncerAlgorithm" />
+        <socket type="flumotion.component.bouncers.algorithms.BouncerAlgorithm" />
       </sockets>
 
       <properties>
