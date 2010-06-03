@@ -2,6 +2,18 @@
 
 	patch by: jurbanski
 
+	* flumotion/component/bouncers/base.xml (added):
+	* flumotion/test/test_component_bouncers_bouncer.py (deleted):
+	* flumotion/component/bouncers/bouncer.py (deleted):
+	* flumotion/component/bouncers/bouncer.xml (deleted):
+	* flumotion/component/bouncers/deprecated.xml (deleted):
+	* flumotion/component/bouncers/tokentest.py (deleted):
+	Added and deleted the files from the multibouncer backport patch.
+
+2010-06-03  Alvin Delagon  <adelagon@flumotion.com>
+
+	patch by: jurbanski
+
 	* flumotion/component/bouncers/algorithms (added):
 	* flumotion/component/bouncers/algorithms/tokentest.xml (added):
 	* flumotion/component/bouncers/algorithms/base.py (added):
