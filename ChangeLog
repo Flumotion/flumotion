@@ -1,5 +1,18 @@
 2010-06-03  Alvin Delagon  <adelagon@flumotion.com>
 
+	patch by: jurbanski
+
+	* flumotion/component/bouncers/algorithms/icalbouncer.xml:
+	* flumotion/component/bouncers/algorithms/ipbouncer.xml:
+	* flumotion/component/bouncers/algorithms/tokentest.xml:
+	* flumotion/component/bouncers/base.py:
+	* flumotion/component/bouncers/multibouncer.xml:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	Correct the BouncerAlgorithm socket path.
+
+2010-06-03  Alvin Delagon  <adelagon@flumotion.com>
+
 	* flumotion/component/bouncers/algorithms/icalbouncer.xml:
 	* flumotion/component/bouncers/algorithms/ipbouncer.xml:
 	* flumotion/component/bouncers/algorithms/tokentest.xml:

@@ -1,6 +1,6 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.bouncers.algorithms.BouncerAlgorithm"
+    <plug socket="flumotion.component.bouncers.algorithms.base.BouncerAlgorithm"
 	  type="tokentest-bouncer-plug" _description="A test bouncer that only allows one token.">
       <entries>
       	<entry location="flumotion/component/bouncers/algorithms/tokentest.py"
