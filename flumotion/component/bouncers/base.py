@@ -19,6 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-BOUNCER_ALGORITHM_SOCKET = 'flumotion.component.bouncers.algorithms' \
-                           '.BouncerAlgorithm'
+BOUNCER_ALGORITHM_SOCKET = ('flumotion.component.bouncers.'
+                            'algorithms.BouncerAlgorithm')
 BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'

@@ -1,3 +1,16 @@
+2010-06-03  Alvin Delagon  <adelagon@flumotion.com>
+
+
+	* common/validate-registry.py:
+	Remove the check where the plug type name should be the
+	same as its class name.
+
+	* flumotion/component/bouncers/base.py:
+	* flumotion/component/bouncers/multibouncer.xml:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	Fixed the source location of sockets.
+
 2010-06-03  Alvin Delagon <adelagon@flumotion.com>
 
 	patch by: jurbanski

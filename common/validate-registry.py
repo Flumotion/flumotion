@@ -114,14 +114,6 @@ for plug in registry.getPlugs():
     if not plug.description:
         plugError(plug, 'is missing a description')
 
-    # a plug type and its class name should match too
-    normalizedType = ''.join(plug.type.split('-')) + 'plug'
-    function = plug.entries['default'].function
-    normalizedClass = function.lower()
-    if normalizedType != normalizedClass:
-        plugError(plug, 'type %s does not match class %s' % (
-            plug.type, function))
-
     # a plug's socket should be creatable
     try:
         function = reflect.namedAny(plug.socket)

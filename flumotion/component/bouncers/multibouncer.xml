@@ -16,7 +16,7 @@
       </properties>
 
       <sockets>
-        <socket type="flumotion.component.bouncers.algorithms.BouncerAlgorithm" />
+        <socket type="flumotion.component.bouncers.algorithms.base.BouncerAlgorithm" />
       </sockets>
 
     </component>
