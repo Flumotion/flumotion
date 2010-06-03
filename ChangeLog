@@ -1,3 +1,12 @@
+2010-06-03  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Julien Le Goff
+
+	* flumotion/extern/log/log.py:
+	* flumotion/extern/log/test_log.py:
+	Add a way to integrate libraries using the standard Python logging
+	module with the Flumotion logging.
+
 2010-06-03  Alvin Delagon  <adelagon@flumotion.com>
 
 	patch by: jurbanski

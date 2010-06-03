@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+import logging
+
 from twisted.trial import unittest
 
 import log
@@ -69,13 +71,13 @@ class TestLog(unittest.TestCase):
         # test a function object
         (filename, line) = log.getFileLine(where=self.testGetFileLine)
         self.failUnless(filename.endswith('test_log.py'))
-        self.assertEquals(line, 68)
+        self.assertEquals(line, 70)
 
         # test a lambda
         f = lambda x: x + 1
         (filename, line) = log.getFileLine(where=f)
         self.failUnless(filename.endswith('test_log.py'))
-        self.assertEquals(line, 75)
+        self.assertEquals(line, 77)
 
         # test an eval
         f = eval("lambda x: x + 1")
@@ -176,6 +178,44 @@ class TestLog(unittest.TestCase):
 
     def testAddLogHandlerRaises(self):
         self.assertRaises(TypeError, log.addLogHandler, 1)
+
+    def testAdaptStandardLogging(self):
+        # create a standard logger
+        logger = logging.getLogger('standard.logger')
+
+        # set the debug level for the "test" category
+        log.setDebug("test:3")
+        log.addLimitedLogHandler(self.handler)
+
+        logger.warning('invisible')
+        # should not get anything, because the std module has not been adapted
+        assert not self.category
+        assert not self.level
+        assert not self.message
+
+        log.adaptStandardLogging('standard.logger', 'test', 'test_log')
+
+        logger.info('invisible')
+        # should not get anything, because INFO translates to Flu debug 4
+        assert not self.category
+        assert not self.level
+        assert not self.message
+
+        logger.warning('visible')
+        # WARNING translates to INFO, see log.stdLevelToFluLevel
+        assert self.category == 'test', self.category
+        assert self.level == log.INFO
+        assert self.message == 'visible'
+
+        self.message = self.level = self.category = None
+
+        # lower the debug level
+        log.setDebug("test:2")
+        logger.warning('visible')
+        # should not get anything now
+        assert not self.category
+        assert not self.level
+        assert not self.message
 
 
 class TestOwnLogHandler(unittest.TestCase):

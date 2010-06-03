@@ -22,6 +22,7 @@ import os
 import fnmatch
 import time
 import types
+import logging
 import traceback
 
 # environment variables controlling levels for each category
@@ -206,7 +207,7 @@ def scrubFilename(filename):
     return filename
 
 
-def getFileLine(where=-1):
+def getFileLine(where=-1, targetModule=None):
     """
     Return the filename and line number for the given location.
 
@@ -216,6 +217,9 @@ def getFileLine(where=-1):
 
     @param where: how many frames to go back up, or function
     @type  where: int (negative) or function
+
+    @param targetModule: continue going up the stack until that module is seen
+    @type  targetModule: str or None
 
     @return: tuple of (file, line)
     @rtype:  tuple of (str, int)
@@ -245,6 +249,14 @@ def getFileLine(where=-1):
 
     if not co:
         return "<unknown file>", 0
+
+    if targetModule:
+        while stackFrame:
+            co = stackFrame.f_code
+            lineno = stackFrame.f_lineno
+            if targetModule in co.co_filename:
+                break
+            stackFrame = stackFrame.f_back
 
     return scrubFilename(co.co_filename), lineno
 
@@ -977,3 +989,63 @@ class TwistedLogObserver(Loggable):
 
     def clearIgnores(self):
         self._ignoreErrors = []
+
+
+def fluLevelToStdLevel(fluLevel):
+    t = {ERROR : logging.CRITICAL,
+         WARN : logging.ERROR,
+         INFO : logging.WARNING,
+         DEBUG : logging.INFO,
+         LOG : logging.DEBUG}
+    return t.get(fluLevel, logging.NOTSET)
+
+
+def stdLevelToFluLevel(level):
+    t = {logging.CRITICAL: ERROR,
+         logging.ERROR: WARN,
+         logging.WARNING: INFO,
+         logging.INFO: DEBUG,
+         logging.DEBUG: LOG}
+    return t.get(level, None)
+
+
+def adaptStandardLogging(loggerName, logCategory, targetModule):
+    """
+    Make a logger from the standard library log through the Flumotion logging
+    system.
+
+    @param loggerName: The standard logger to adapt, e.g. 'library.module'
+    @type loggerName: str
+    @param logCategory: The Flumotion log category to use when reporting output
+                        from the standard logger, e.g. 'librarymodule'
+    @type logCategory: str
+    @param targetModule: The name of the module that the logging should look
+                         like it's coming from, e.g. 'flumotion'. Use this if
+                         you don't want to see the file names and line numbers
+                         of the library who's logger you are adapting.
+    @type targetModule: str or None
+    """
+    logger = logging.getLogger(loggerName)
+    logger.setLevel(fluLevelToStdLevel(getCategoryLevel(logCategory)))
+    logger.addHandler(FluHandler(logCategory, targetModule))
+
+
+class FluHandler(logging.Handler):
+    """
+    A standard library logging handler that logs through the Flumotion system.
+    """
+
+    def __init__(self, logCategory, targetModule):
+        logging.Handler.__init__(self)
+        self.logCategory = logCategory
+        self.targetModule = targetModule
+
+    def emit(self, record):
+        fluLevel = stdLevelToFluLevel(record.levelno)
+        if _canShortcutLogging(self.logCategory, fluLevel):
+            return
+
+        filename, lineno = getFileLine(-1, self.targetModule)
+        doLog(fluLevel, None, self.logCategory,
+              self.format(record), None, 0,
+              scrubFilename(filename), lineno)
