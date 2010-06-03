@@ -1,0 +1,29 @@
+<registry>
+  <plugs>
+    <plug socket="flumotion.component.bouncers.algorithms.BouncerAlgorithm"
+	  type="tokentest-bouncer-plug" _description="A test bouncer that only allows one token.">
+      <entries>
+      	<entry location="flumotion/component/bouncers/algorithms/tokentest.py"
+	       function="TokenTestAlgorithm" />
+      </entries>
+      <properties>
+        <property name="authorized-token" type="string" required="True"
+                  _description="The token that is authorized" />
+      </properties>
+    </plug>
+  </plugs>
+
+  <bundles>
+    <bundle name="tokentest-bouncer-algorithm">
+      <dependencies>
+        <dependency name="bouncer-algorithm-base" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers/algorithms">
+          <filename location="tokentest.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+
+</registry>

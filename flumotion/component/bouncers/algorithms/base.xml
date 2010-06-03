@@ -1,0 +1,17 @@
+<registry>
+
+  <bundles>
+    <bundle name="bouncer-algorithm-base">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers/algorithms">
+          <filename location="__init__.py" />
+          <filename location="base.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+
+</registry>

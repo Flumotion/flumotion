@@ -1,0 +1,32 @@
+<registry>
+  <plugs>
+    <plug socket="flumotion.component.bouncers.algorithms.BouncerAlgorithm"
+	  type="icalbouncer-plug" _description="A bouncer that allows access to
+						a stream when there is an event
+						in the iCalendar file.">
+      <entries>
+      	<entry location="flumotion/component/bouncers/algorithms/icalbouncer.py"
+	       function="IcalBouncerAlgorithm" />
+      </entries>
+      <properties>
+        <property name="file" type="string" required="yes"
+                  _description="The path to an iCalendar file to use." />
+      </properties>
+    </plug>
+  </plugs>
+
+  <bundles>
+    <bundle name="icalbouncer-algorithm">
+      <dependencies>
+	<dependency name="bouncer-algorithm-base" />
+	<dependency name="base-scheduler" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/bouncers/algorithms">
+          <filename location="icalbouncer.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry>
+
