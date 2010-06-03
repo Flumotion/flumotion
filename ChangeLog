@@ -1,3 +1,9 @@
+2010-06-04  Alvin Delagon  <adelagon@flumotion.com>
+
+	* flumotion/component/bouncers/algorithms/Makefile.am:
+	* flumotion/component/bouncers/algorithms (svn:ignore):
+	Add ignores and fix some syntax errors in the Makefile
+
 2010-06-03  Jan Urbanski  <jurbanski@flumotion.com>
 
 	reviewed by: Julien Le Goff
