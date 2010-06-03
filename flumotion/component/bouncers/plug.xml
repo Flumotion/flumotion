@@ -4,7 +4,7 @@
           type="bouncer-trivial-plug"
           _description="A bouncer plug that always accepts authentication requests.">
       <entry location="flumotion/component/bouncers/plug.py"
-             function="BouncerTrivialPlug"/>
+             function="TrivialBouncerPlug"/>
     </plug>
   </plugs>
 

@@ -1,6 +1,6 @@
 <registry>
   <plugs>
-    <plug socket="flumotion.component.bouncers.algorithms.BouncerAlgorithm"
+    <plug socket="flumotion.component.bouncers.algorithms.base.BouncerAlgorithm"
 	  type="icalbouncer-plug" _description="A bouncer that allows access to
 						a stream when there is an event
 						in the iCalendar file.">

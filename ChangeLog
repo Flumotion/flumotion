@@ -1,5 +1,13 @@
 2010-06-03  Alvin Delagon  <adelagon@flumotion.com>
 
+	* flumotion/component/bouncers/algorithms/icalbouncer.xml:
+	* flumotion/component/bouncers/algorithms/ipbouncer.xml:
+	* flumotion/component/bouncers/algorithms/tokentest.xml:
+	* flumotion/component/bouncers/plug.xml:
+	Fixed incorrect socket locations.
+
+2010-06-03  Alvin Delagon  <adelagon@flumotion.com>
+
 
 	* common/validate-registry.py:
 	Remove the check where the plug type name should be the
