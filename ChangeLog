@@ -1,3 +1,39 @@
+2010-06-03  Alvin Delagon <adelagon@flumotion.com>
+
+	patch by: jurbanski
+
+	* configure.ac:
+	* flumotion/common/watched.py:
+	* flumotion/component/base/http.py:
+	* flumotion/component/bouncers/Makefile.am:
+	* flumotion/component/bouncers/component.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/htpasswdcrypt.xml:
+	* flumotion/component/bouncers/icalbouncer.py:
+	* flumotion/component/bouncers/icalbouncer.xml:
+	* flumotion/component/bouncers/ipbouncer.py:
+	* flumotion/component/bouncers/ipbouncer.xml:
+	* flumotion/component/bouncers/plug.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	* flumotion/component/bouncers/saltsha256.xml:
+	* flumotion/component/bouncers/tokentest.xml:
+	* flumotion/component/bouncers/tokentestbouncer.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/plugs/base.py:
+	* flumotion/test/Makefile.am:
+	* flumotion/test/bouncertest.py:
+	* flumotion/test/test_component_bouncers_bouncer_authsession.py:
+	* flumotion/test/test_component_bouncers_component.py:
+	* flumotion/test/test_component_bouncers_plug.py:
+	* flumotion/test/test_icalbouncer.py:
+	* flumotion/test/test_manager_config.py:
+	* flumotion/test/test_manager_manager.py:
+	Add multi-bouncers. With this you can now combine different
+	bouncers into one generic bouncer. I also fixed some pep8
+	syntax violations.
+
 2010-06-02  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Xavier Queralt

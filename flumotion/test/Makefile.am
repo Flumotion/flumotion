@@ -42,7 +42,6 @@ EXTRA_DIST = 					\
 	test_common_xmlwriter.py		\
 	test_component_base_scheduler.py	\
 	test_component_base_watcher.py		\
-	test_component_bouncers_bouncer.py	\
 	test_component_bouncers_bouncer_authsession.py	\
 	test_component_bouncers_component.py	\
 	test_component_bouncers_plug.py		\

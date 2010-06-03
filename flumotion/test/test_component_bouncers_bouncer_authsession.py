@@ -15,13 +15,13 @@
 
 from flumotion.common import testsuite
 
-from flumotion.component.bouncers import bouncer
+from flumotion.component.bouncers import component
 
 from flumotion.common import keycards
 from twisted.spread import pb
 
 
-class DummyBouncer(bouncer.AuthSessionBouncer):
+class DummyBouncer(component.AuthSessionBouncer):
 
     def do_extractKeycardInfo(self, keycard, oldData):
         return keycard

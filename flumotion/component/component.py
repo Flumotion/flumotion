@@ -150,6 +150,8 @@ def _maybeDeferredChain(procs, *args, **kwargs):
     def call_proc(_, p):
         log.debug('', 'calling %r', p)
         return p(*args, **kwargs)
+    if not procs:
+        return defer.succeed(None)
     p, procs = procs[0], procs[1:]
     d = defer.maybeDeferred(call_proc, None, p)
     for p in procs:
@@ -478,6 +480,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         The return value may be a deferred.
         """
+        plug_starts = []
         for socket, plugs in self.config['plugs'].items():
             self.plugs[socket] = []
             for plug in plugs:
@@ -488,7 +491,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
                 self.plugs[socket].append(instance)
                 self.debug('Starting plug %r on socket %s',
                            instance, socket)
-                instance.start(self)
+                plug_starts.append(instance.start)
 
         # Call check methods, starting from the base class and working down to
         # subclasses.
@@ -505,7 +508,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
                 raise errors.ComponentSetupHandledError()
 
         checks.append(checkErrorCallback)
-        return _maybeDeferredChain(checks, self)
+
+        return _maybeDeferredChain(plug_starts + checks, self)
 
     def do_stop(self):
         """
@@ -515,10 +519,11 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         @Returns: L{twisted.internet.defer.Deferred}
         """
+        plug_stops = []
         for socket, plugs in self.plugs.items():
             for plug in plugs:
                 self.debug('Stopping plug %r on socket %s', plug, socket)
-                plug.stop(self)
+                plug_stops.append(plug.stop)
 
         for message in self.state.get('messages'):
             # FIXME: not necessary
@@ -542,6 +547,8 @@ class BaseComponent(common.InitMixin, log.Loggable):
         if self._shutdownHook:
             self.debug('_stoppedCallback: firing shutdown hook')
             self._shutdownHook()
+
+        return _maybeDeferredChain(plug_stops, self)
 
     ### BaseComponent implementation related to compoment protocol
 
@@ -623,6 +630,9 @@ class BaseComponent(common.InitMixin, log.Loggable):
         assert isinstance(medium, BaseComponentMedium)
         self.medium = medium
         self.medium.logName = self.getName()
+        for plugs in self.plugs.values():
+            for plug in plugs:
+                self._export_plug_interface(plug, medium)
 
     def setMood(self, mood):
         """
@@ -730,6 +740,24 @@ class BaseComponent(common.InitMixin, log.Loggable):
             self.debug('asked to adminCallRemote(%s, *%r, **%r), but '
                        'no manager.'
                        % (methodName, args, kwargs))
+
+    def _export_plug_interface(self, plug, medium):
+        try:
+            namespace = plug.get_namespace()
+        except AttributeError:
+            self.debug("Plug %r does not provide namespace, "
+                       "its interface will not be exposed", plug)
+            return
+
+        self.debug("Exposing plug's %r interface in namespace %r",
+                   plug, namespace)
+        for method in filter(callable,
+                             [getattr(plug, m) for m in dir(plug)
+                              if m.startswith('remote_')]):
+            name = "".join(("remote_", namespace, "_",
+                            method.__name__[len("remote_"):]))
+            self.debug("Exposing method %r as %r in %r", method, name, medium)
+            setattr(medium, name, method)
 
     def _pollCPU(self):
         self._cpuPollerDC = None

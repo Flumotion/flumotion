@@ -25,39 +25,92 @@
 __version__ = "$Rev$"
 
 
-def _make_watched(type, *mutators):
+class WatchedList(list):
 
-    class Watched(type):
+    def __init__(self):
+        list.__init__(self)
+        self.watch_id = 0
+        self.watch_procs = {}
 
-        def __init__(self):
-            type.__init__(self)
-            self.watch_id = 0
-            self.watch_procs = {} # id -> proc
+    def append(self, o):
+        list.append(self, o)
+        self.notify_changed(o)
 
-        def watch(self, proc):
-            self.watch_id += 1
-            self.watch_procs[self.watch_id] = proc
-            return self.watch_id
+    def insert(self, idx, o):
+        list.insert(self, ids, o)
+        self.notify_changed(o)
 
-        def unwatch(self, id):
-            del self.watch_procs[id]
+    def remove(self, o):
+        list.remove(self, o)
+        self.notify_changed(o)
 
-        def notify_changed(self):
-            for proc in self.watch_procs.values():
-                proc(self)
+    def pop(self, *args):
+        o = list.pop(self, *args)
+        self.notify_changed(o)
+        return o
 
-    def mutate(method):
+    def sort(self, *args, **kwargs):
+        list.sort(self, *args, **kwargs)
+        self.notify_changed(self)
 
-        def do_mutate(self, *args, **kwargs):
-            method(self, *args, **kwargs)
-            self.notify_changed()
-        setattr(Watched, method.__name__, do_mutate)
-    for i in mutators:
-        mutate(getattr(type, i))
+    def reverse(self):
+        list.reverse(self)
+        self.notify_changed(self)
 
-    return Watched
+    def notify_changed(self, obj):
+        for proc in self.watch_procs.values():
+            proc(obj)
 
-WatchedList = _make_watched(list, 'append', 'insert', 'remove', 'pop',
-                            'sort', 'reverse')
-WatchedDict = _make_watched(dict, '__setitem__', '__delitem__', 'pop',
-                            'popitem', 'update')
+    def watch(self, proc):
+        self.watch_id += 1
+        self.watch_procs[self.watch_id] = proc
+        return self.watch_id
+
+    def unwatch(self, proc_id):
+        del self.watch_procs[proc_id]
+
+
+class WatchedDict(dict):
+
+    def __init__(self):
+        dict.__init__(self)
+        self.watch_id = 0
+        self.watch_procs = {}
+
+    def __setitem__(self, key, val):
+        dict.__setitem__(self, key, val)
+        self.notify_changed((key, val))
+
+    def __delitem__(self, key):
+        val = self[key]
+        dict.__delitem__(self, key)
+        self.notify_changed((key, val))
+
+    def pop(self, key, *args):
+        try:
+            val = dict.pop(key)
+        except KeyError:
+            if not len(args):
+                raise
+        self.notify_changed((key, val))
+
+    def popitem(self):
+        ret = dict.popitem()
+        self.notify_changed(ret)
+        return ret
+
+    def update(self, *args, **kwargs):
+        dict.update(self, *args, **kwargs)
+        self.notify_changed(self)
+
+    def notify_changed(self, obj):
+        for proc in self.watch_procs.values():
+            proc(obj)
+
+    def watch(self, proc):
+        self.watch_id += 1
+        self.watch_procs[self.watch_id] = proc
+        return self.watch_id
+
+    def unwatch(self, proc_id):
+        del self.watch_procs[proc_id]

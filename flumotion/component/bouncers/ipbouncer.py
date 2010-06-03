@@ -24,67 +24,13 @@ A bouncer that authenticates based on the IP address of the remote side,
 as seen by the bouncer.
 """
 
-from twisted.internet import defer
-
-from flumotion.common import keycards, messages, errors, log, netutils
-from flumotion.common.i18n import N_, gettexter
-from flumotion.common.keycards import KeycardUACPP
-from flumotion.component.bouncers import bouncer
+from flumotion.component.bouncers import multibouncer
+from flumotion.component.bouncers.algorithms import ipbouncer
 
 __all__ = ['IPBouncer']
 __version__ = "$Rev$"
-T_ = gettexter()
 
 
-class IPBouncer(bouncer.Bouncer):
+class IPBouncer(multibouncer.StaticMultiBouncer):
 
-    logCategory = 'ip-bouncer'
-    keycardClasses = (keycards.KeycardUACPCC, keycards.KeycardUACPP)
-
-    def do_setup(self):
-        conf = self.config
-        props = conf['properties']
-
-        self.deny_default = props.get('deny-default', True)
-
-        self.allows = netutils.RoutingTable()
-        self.denies = netutils.RoutingTable()
-        for p, t in (('allow', self.allows), ('deny', self.denies)):
-            for s in props.get(p, []):
-                try:
-                    ip, mask = s.split('/')
-                    t.addSubnet(True, ip, int(mask))
-                except Exception, e:
-                    m = messages.Error(
-                        T_(N_("Invalid value for property %r: %s"), p, s),
-                        log.getExceptionMessage(e),
-                        mid='match-type')
-                    self.addMessage(m)
-                    raise errors.ComponentSetupHandledError()
-
-        return defer.succeed(None)
-
-    def do_authenticate(self, keycard):
-        ip = keycard.getData()['address']
-        self.debug('authenticating keycard from requester %s', ip)
-
-        if ip is None:
-            self.warning('could not get address of remote')
-            allowed = False
-        elif self.deny_default:
-            allowed = (self.allows.route(ip)
-                       and not self.denies.route(ip))
-        else:
-            allowed = (self.allows.route(ip)
-                       or not self.denies.route(ip))
-
-        if not allowed:
-            self.info('denied login from ip address %s',
-                      keycard.address)
-            return None
-        else:
-            keycard.state = keycards.AUTHENTICATED
-            self.addKeycard(keycard)
-            self.debug('allowed login from ip address %s',
-                       keycard.address)
-            return keycard
+    algorithmClasses = ipbouncer.IPBouncerAlgorithm

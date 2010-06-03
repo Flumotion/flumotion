@@ -39,6 +39,8 @@ from twisted.internet import defer
 from flumotion.common import keycards
 from flumotion.common.planet import moods
 from flumotion.component.bouncers import icalbouncer
+from flumotion.component.bouncers.algorithms import icalbouncer as \
+    icalbounceralgorithm
 from flumotion.component.base import scheduler
 
 from flumotion.common import eventcalendar
@@ -52,6 +54,10 @@ def _get_config(path=None):
         props['properties']['file'] = path
 
     return props
+
+
+def get_iCalScheduler(bouncer):
+    return bouncer.get_main_algorithm().iCalScheduler
 
 
 class RequiredModulesMixin(object):
@@ -327,7 +333,7 @@ class TestIcalBouncerOverlap(testsuite.TestCase, RequiredModulesMixin):
     def setUp(self):
         self.bouncer = None
         self.now = datetime.now(eventcalendar.UTC)
-        td = icalbouncer.IcalBouncer.maxKeyCardDuration
+        td = icalbounceralgorithm.IcalBouncerAlgorithm.maxKeyCardDuration
         self.maxKeyCardDuration = max(td.days * 24 * 60 * 60 + td.seconds + \
                                             td.microseconds / 1e6, 0)
         self.ical_template = """
@@ -463,7 +469,7 @@ class TestIcalBouncerCalSwitch(TestIcalBouncerRunning, RequiredModulesMixin):
                                     '', self.in_half_an_hour)
 
         calendar = self._getCalendarFromString(data)
-        self.bouncer.iCalScheduler.setCalendar(calendar)
+        self.bouncer.get_main_algorithm().iCalScheduler.setCalendar(calendar)
         self.failUnless(self.bouncer.hasKeycard(keycard))
 
     def testRevoke(self):
@@ -477,5 +483,5 @@ class TestIcalBouncerCalSwitch(TestIcalBouncerRunning, RequiredModulesMixin):
                                     '', self.half_an_hour_ago)
 
         calendar = self._getCalendarFromString(data)
-        self.bouncer.iCalScheduler.setCalendar(calendar)
+        self.bouncer.get_main_algorithm().iCalScheduler.setCalendar(calendar)
         self.failIf(self.bouncer.hasKeycard(keycard))

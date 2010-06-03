@@ -80,13 +80,14 @@ class TestManagerConfigParser(testsuite.TestCase):
         self.assertRaises(ConfigError, ManagerConfigParser, f)
 
     def testParseBouncerComponent(self):
-        f = self._buildManager("""<component name="foobar" type="bouncer"/>""")
+        f = self._buildManager("""<component name="foobar"
+                           type="trivial-bouncer"/>""")
         config = ManagerConfigParser(f)
         self.failIf(config.bouncer)
         config.parseBouncerAndPlugs()
         self.failUnless(config.bouncer)
         self.failUnless(isinstance(config.bouncer, ConfigEntryComponent))
-        self.assertEquals(config.bouncer.type, 'bouncer')
+        self.assertEquals(config.bouncer.type, 'trivial-bouncer')
         self.assertEquals(config.bouncer.name, 'foobar')
 
     def testParsePlugs(self):

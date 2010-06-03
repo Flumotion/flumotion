@@ -23,16 +23,13 @@
 A test token bouncer.
 """
 
-from twisted.internet import defer
-
-from flumotion.component.bouncers import bouncer, tokentest
+from flumotion.component.bouncers import multibouncer
+from flumotion.component.bouncers.algorithms import tokentest
 
 __all__ = ['TokenTestBouncer']
 __version__ = "$Rev$"
 
 
-class TokenTestBouncer(tokentest.TokenTestBase, bouncer.Bouncer):
+class TokenTestBouncer(multibouncer.StaticMultiBouncer):
 
-    def do_setup(self):
-        self.haveProperties(self.config['properties'])
-        return defer.succeed(None)
+    algorithmClasses = tokentest.TokenTestAlgorithm

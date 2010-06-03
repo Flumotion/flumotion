@@ -495,7 +495,7 @@ class TestVishnu(testsuite.TestCase):
             compId = common.componentId("testflow", "streamer-ogg-theora")
             compLabel = "Streamer OGG-Theora/Vorbis"
             compEaters = [("default", "converter-ogg-theora")]
-            compProps = [("port", 8800)]
+            compProps = [("port", "8800")]
             compState = self.vishnu.loadComponent(
                 manager.LOCAL_IDENTITY, compType, compId, compLabel,
                 compProps, "streamer", [], compEaters, False, [])

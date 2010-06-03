@@ -198,6 +198,7 @@ flumotion/common/Makefile
 flumotion/component/Makefile
 flumotion/component/base/Makefile
 flumotion/component/bouncers/Makefile
+flumotion/component/bouncers/algorithms/Makefile
 flumotion/component/effects/Makefile
 flumotion/component/effects/colorbalance/Makefile
 flumotion/component/effects/volume/Makefile

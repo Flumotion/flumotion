@@ -23,8 +23,7 @@
   <bundles>
     <bundle name="saltsha256-component">
       <dependencies>
-        <dependency name="component-base" />
-        <dependency name="deprecated-bouncer-base" />
+        <dependency name="bouncer-component-base" />
       </dependencies>
 
       <directories>

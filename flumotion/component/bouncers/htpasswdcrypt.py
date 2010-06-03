@@ -30,14 +30,14 @@ from twisted.internet import defer
 
 from flumotion.common import interfaces, keycards, log, errors
 from flumotion.component import component
-from flumotion.component.bouncers import bouncer
+from flumotion.component.bouncers import component as bcomponent
 from flumotion.twisted import credentials, checkers
 
 __all__ = ['HTPasswdCrypt']
 __version__ = "$Rev$"
 
 
-class HTPasswdCrypt(bouncer.ChallengeResponseBouncer):
+class HTPasswdCrypt(bcomponent.ChallengeResponseBouncer):
 
     logCategory = 'htpasswdcrypt'
     # challenger type first, because it's more secure thus preferable

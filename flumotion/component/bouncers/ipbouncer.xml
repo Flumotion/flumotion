@@ -27,8 +27,8 @@ This uses the same syntax as the allow rules."/>
 
     <bundle name="ipbouncer-component">
         <dependencies>
-            <dependency name="component-base" />
-            <dependency name="deprecated-bouncer-base" />
+            <dependency name="multi-bouncer" />
+	    <dependency name="ipbouncer-algorithm" />
         </dependencies>
 
         <directories>

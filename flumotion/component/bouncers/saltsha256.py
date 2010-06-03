@@ -30,14 +30,14 @@ from twisted.internet import defer
 
 from flumotion.common import interfaces, keycards, log, errors
 from flumotion.component import component
-from flumotion.component.bouncers import bouncer
+from flumotion.component.bouncers import component as bcomponent
 from flumotion.twisted import credentials, checkers
 
 __all__ = ['SaltSha256']
 __version__ = "$Rev$"
 
 
-class SaltSha256(bouncer.ChallengeResponseBouncer):
+class SaltSha256(bcomponent.ChallengeResponseBouncer):
     """
     I am a bouncer that stores usernames, salts, and SHA-256 data
     to authenticate against.

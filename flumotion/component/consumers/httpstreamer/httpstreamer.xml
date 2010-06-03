@@ -23,6 +23,7 @@
         <socket type="flumotion.component.plugs.rrd.ComponentRRDPlug" />
         <socket type="flumotion.component.plugs.requestmodifier.RequestModifierPlug"/>
         <socket type="flumotion.component.bouncers.plug.BouncerPlug" />
+        <socket type="flumotion.component.bouncers.algorithms.BouncerAlgorithm" />
       </sockets>
 
       <properties>

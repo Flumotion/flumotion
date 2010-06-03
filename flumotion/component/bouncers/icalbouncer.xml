@@ -18,11 +18,10 @@
     </component>
   </components>
   <bundles>
-    <bundle name="icalbouncer-base">
+    <bundle name="icalbouncer-component">
       <dependencies>
-        <dependency name="component" />
-	<dependency name="base-scheduler" />
-        <dependency name="deprecated-bouncer-base" />
+        <dependency name="multi-bouncer" />
+	<dependency name="icalbouncer-algorithm" />
       </dependencies>
       <directories>
         <directory name="flumotion/component/bouncers">

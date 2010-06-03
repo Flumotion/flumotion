@@ -24,7 +24,7 @@ from flumotion.common import log
 __version__ = "$Rev$"
 
 
-class Plug(log.Loggable):
+class Plug(object, log.Loggable):
     """
     Base class for plugs. Provides an __init__ method that receives the
     plug args and sets them to the 'args' attribute.
@@ -44,7 +44,7 @@ class ComponentPlug(Plug):
     """
     Base class for plugs that live in a component. Subclasses can
     implement the start and stop vmethods, which will be called with the
-    component as an argument.
+    component as an argument. Both of them can return a deferred.
     """
 
     def start(self, component):
@@ -54,8 +54,8 @@ class ComponentPlug(Plug):
         pass
 
     def restart(self, component):
-        self.stop(component)
-        self.start(component)
+        d = defer.maybeDeferred(self.stop, component)
+        return d.addCallback(lambda _: self.start(component))
 
 
 class ManagerPlug(Plug):

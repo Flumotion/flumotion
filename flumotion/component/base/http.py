@@ -32,6 +32,7 @@ from flumotion.common import errors
 from flumotion.twisted.credentials import cryptChallenge
 
 from flumotion.common import common, log, keycards
+from flumotion.component.bouncers import base
 
 #__all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
 __version__ = "$Rev$"
@@ -136,7 +137,7 @@ class HTTPGetArgumentsIssuer(Issuer):
         return keycards.KeycardHTTPGetArguments(arguments, address, path)
 
 
-BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'
+BOUNCER_SOCKET = base.BOUNCER_SOCKET
 
 
 class HTTPAuthentication(log.Loggable):
@@ -170,6 +171,7 @@ class HTTPAuthentication(log.Loggable):
             and self.component.plugs[BOUNCER_SOCKET]):
             assert len(self.component.plugs[BOUNCER_SOCKET]) == 1
             self.plug = self.component.plugs[BOUNCER_SOCKET][0]
+            self.plug.set_expire_function(self.expireKeycards)
         else:
             self.plug = None
 
@@ -312,7 +314,7 @@ class HTTPAuthentication(log.Loggable):
         self._removeKeycard(fd)
 
     def _removeKeycard(self, fd):
-        if self.bouncerName and fd in self._fdToKeycard:
+        if (self.bouncerName or self.plug) and fd in self._fdToKeycard:
             keycard = self._fdToKeycard[fd]
             del self._fdToKeycard[fd]
             del self._idToKeycard[keycard.id]
@@ -382,7 +384,7 @@ class HTTPAuthentication(log.Loggable):
         if request.method == 'GET':
             fd = request.transport.fileno()
 
-            if self.bouncerName:
+            if self.bouncerName or self.plug:
                 # the request was finished before the callback was executed
                 if fd == -1:
                     self.debug('Request interrupted before authentification '
