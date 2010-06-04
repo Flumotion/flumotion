@@ -29,6 +29,7 @@ Requires:       pygtk2 >= %{pygtk_minver}
 Requires:       python-imaging
 Requires:       pyOpenSSL
 Requires:       pkgconfig
+Requires:       pyparsing
 Requires:       python-crypto
 Requires:       python-kiwi >= %{kiwi_minver}
 

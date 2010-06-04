@@ -1,3 +1,10 @@
+2010-06-05  Alvin Delagon  <adelagon@flumotion.com>
+
+	patch by: jurbanski
+
+	* flumotion.spec.in:
+	Add pyparsing to requires.
+
 2010-06-04  Alvin Delagon  <adelagon@flumotion.com>
 
 	* flumotion/component/bouncers/algorithms/Makefile.am:
