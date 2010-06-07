@@ -754,8 +754,11 @@ class BaseComponent(common.InitMixin, log.Loggable):
         for method in filter(callable,
                              [getattr(plug, m) for m in dir(plug)
                               if m.startswith('remote_')]):
-            name = "".join(("remote_", namespace, "_",
-                            method.__name__[len("remote_"):]))
+            if namespace:
+                name = "".join(("remote_", namespace, "_",
+                                method.__name__[len("remote_"):]))
+            else:
+                name = method.__name__
             self.debug("Exposing method %r as %r in %r", method, name, medium)
             setattr(medium, name, method)
 
