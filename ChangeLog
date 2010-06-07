@@ -2,6 +2,15 @@
 
 	reviewed by: Josep Ribas
 
+	* pkg/ubuntu-gutsy (deleted):
+	* pkg/ubuntu-gutsy/changelog (deleted):
+	* pkg/ubuntu-gutsy/control (deleted):
+	Remove gutsy package, not supported anymore by ubuntu.
+
+2010-06-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Josep Ribas
+
 	* pkg/debian-common/control:
 	* pkg/ubuntu-gutsy/control:
 	* pkg/ubuntu-hardy/control:
