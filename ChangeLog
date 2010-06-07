@@ -2,6 +2,18 @@
 
 	reviewed by: Josep Ribas
 
+	* pkg/debian-common/control:
+	* pkg/ubuntu-gutsy/control:
+	* pkg/ubuntu-hardy/control:
+	* pkg/ubuntu-intrepid/control:
+	* pkg/ubuntu-jaunty/control:
+	* pkg/ubuntu-karmic/control:
+	Update debian packages to switch the dependency between PIL and cairo
+
+2010-06-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Josep Ribas
+
 	* README:
 	* configure.ac:
 	* flumotion.spec.in:
