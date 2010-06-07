@@ -26,7 +26,7 @@ Requires:       python-twisted-conch
 Requires:       python-dateutil
 Requires:       pygtk2-libglade
 Requires:       pygtk2 >= %{pygtk_minver}
-Requires:       python-imaging
+Requires:       pycairo
 Requires:       pyOpenSSL
 Requires:       pkgconfig
 Requires:       pyparsing
@@ -272,6 +272,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Thu Jun 03 2010 Andoni Morales Alastruey <amorales at flumotion dot com>
+- Replace PIL dependency with pycairo.
+
 * Thu Oct 30 2008 Thomas Vander Stichele <thomas at apestaart dot org>
 - Add directory for rrd databases now that we have a plug for it.
 

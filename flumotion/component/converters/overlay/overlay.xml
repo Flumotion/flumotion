@@ -15,6 +15,8 @@
                   _description="Whether to show text." />
         <property name="text" type="string"
                   _description="Text to show" />
+        <property name="font" type="string"
+                  _description="Pango font description." />
 
         <property name="fluendo-logo" type="bool"
                   _description="Whether to show a Fluendo logo." />
@@ -62,7 +64,6 @@
                 <filename location="fluendo.36x36.png" />
                 <filename location="xiph.24x24.png" />
                 <filename location="xiph.36x36.png" />
-                <filename location="Vera.ttf" />
             </directory>
         </directories>
     </bundle>

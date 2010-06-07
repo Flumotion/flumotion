@@ -99,6 +99,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         self.imgBuf, imagesOverflowed, textOverflowed = \
             genimg.generateOverlay(
                 text=text,
+                font=p.get('font', None),
                 showFlumotion=p.get('fluendo-logo', False),
                 showCC=p.get('cc-logo', False),
                 showXiph=p.get('xiph-logo', False),

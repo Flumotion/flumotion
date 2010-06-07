@@ -1,3 +1,21 @@
+2010-06-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Josep Ribas
+
+	* README:
+	* configure.ac:
+	* flumotion.spec.in:
+	* flumotion/admin/gtk/overlaystep.py:
+	* flumotion/component/converters/overlay/Makefile.am:
+	* flumotion/component/converters/overlay/genimg.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/component/converters/overlay/overlay.xml:
+	* flumotion/component/converters/overlay/Vera.ttf (deleted):
+	Replace PIL by Cairo to render the overlayed image. The font is now
+	configurable with a property and there is no need to distrubute it
+	with the sources.
+	Fixes #1386
+
 2010-06-05  Alvin Delagon  <adelagon@flumotion.com>
 
 	patch by: jurbanski

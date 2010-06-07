@@ -114,20 +114,20 @@ class OverlayStep(WorkerWizardStep):
         self.model.can_overlay = False
 
         def importError(error):
-            self.info('could not import PIL')
+            self.info('could not import cairo')
             message = messages.Warning(
                 T_(N_("Worker '%s' cannot import module '%s'."),
-                   self.worker, 'PIL'))
+                   self.worker, 'cairo'))
             message.add(
                 T_(N_("\nThis module is part of '%s'."),
-                   'Python Imaging Library'))
+                   'Pycairo'))
             message.add(
                 T_(N_("\nThe project's homepage is %s"),
-                   'http://www.pythonware.com/products/pil/'))
+                   'http://www.cairographics.org/pycairo/'))
             message.add(
                 T_(N_("\n\nClick \"Forward\" to proceed without overlay.")))
-            message.id = 'module-PIL'
-            documentation.messageAddPythonInstall(message, 'PIL')
+            message.id = 'module-cairo'
+            documentation.messageAddPythonInstall(message, 'cairo')
             self.wizard.add_msg(message)
             self.wizard.taskFinished()
             self._setSensitive(False)
@@ -155,7 +155,7 @@ class OverlayStep(WorkerWizardStep):
                 self.wizard.clear_msg('overlay')
 
             # now check import
-            d = self.wizard.checkImport(self.worker, 'PIL')
+            d = self.wizard.checkImport(self.worker, 'cairo')
             d.addCallback(checkImport)
             d.addErrback(importError)
 

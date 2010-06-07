@@ -3,7 +3,6 @@ include $(top_srcdir)/common/python.mk
 component_PYTHON = __init__.py genimg.py overlay.py
 componentdir = $(libdir)/flumotion/python/flumotion/component/converters/overlay
 component_DATA = \
-	Vera.ttf 		\
 	overlay.xml 		\
 	cc.24x24.png 		\
 	fluendo.24x24.png 	\

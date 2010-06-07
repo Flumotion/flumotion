@@ -36,7 +36,7 @@ PyGTK - 2.8.3 or higher
 Python - 2.4 or higher
 Twisted - 2.5.0 or higher
 Kiwi - 1.9.13 or higher
-Python Imaging Library
+PyCairo- 1.2.0 or higher
 
 And depending on what codecs you want to use:
 

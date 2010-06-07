@@ -21,6 +21,7 @@ AUTHORS=$srcdir/AUTHORS
 dnl keep in sync with flumotion/common/boot.py and
 # FIXME: Change this requirement to 2.10.0 when buildbot is upgraded
 AC_SUBST(PYGTK_010_REQ, 2.8.4)
+AC_SUBST(PYCAIRO_010_REQ, 1.2.0)
 AC_SUBST(PYGST_010_REQ, 0.10.4)
 # FIXME: Change this requirement to 0.10.11 when buildbot is upgraded
 AC_SUBST(GST_010_REQ, 0.10.10)
@@ -78,6 +79,10 @@ export PYTHONPATH
 
 dnl check for pygtk
 AS_PYTHON_IMPORT(pygtk,,AC_MSG_ERROR([pygtk not found or too old]),,
+    [from flumotion.common import boot; boot.init_gobject()])
+
+dnl check for pycairo
+AS_PYTHON_IMPORT(cairo,,AC_MSG_ERROR([pycairo not found or too old]),,
     [from flumotion.common import boot; boot.init_gobject()])
 
 dnl check for gstreamer and gst-python
