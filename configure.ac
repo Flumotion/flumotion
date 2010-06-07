@@ -81,10 +81,6 @@ dnl check for pygtk
 AS_PYTHON_IMPORT(pygtk,,AC_MSG_ERROR([pygtk not found or too old]),,
     [from flumotion.common import boot; boot.init_gobject()])
 
-dnl check for pycairo
-AS_PYTHON_IMPORT(cairo,,AC_MSG_ERROR([pycairo not found or too old]),,
-    [from flumotion.common import boot; boot.init_gobject()])
-
 dnl check for gstreamer and gst-python
 AS_PYTHON_IMPORT(pygst,,AC_MSG_ERROR([gst-python not found or too old]),,
     [from flumotion.common import boot; boot.init_gobject(); boot.init_gst()])

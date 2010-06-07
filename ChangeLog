@@ -1,3 +1,11 @@
+2010-06-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* configure.ac:
+	Remove pycairo check from configure. It's a runtime dependency and
+	should be handled by packagers, as it was done for PIL.
+
 2010-06-07  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/component.py:
