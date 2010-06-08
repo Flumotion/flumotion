@@ -252,6 +252,21 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
         return self.comp.updatePorterDetails(path, username, password)
 
 
+def element_has_property(element, property_name):
+    """
+    Check if the given element has the given property.
+
+    @rtype: boolean
+    """
+    # Verbose copy from common.gstreamer, but since that's not bundled it has
+    # to go here
+    try:
+        element.get_property(property_name)
+        return True
+    except TypeError:
+        return False
+
+
 ### the actual component is a streamer using multifdsink
 
 
@@ -357,7 +372,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def setup_burst_mode(self, sink):
         if self.burst_on_connect:
             if self.burst_time and \
-                    gstreamer.element_has_property(sink, 'units-max'):
+                    element_has_property(sink, 'units-max'):
                 self.debug("Configuring burst mode for %f second burst",
                     self.burst_time)
                 # Set a burst for configurable minimum time, plus extra to
@@ -459,7 +474,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.setup_burst_mode(sink)
 
-        if gstreamer.element_has_property(sink, 'resend-streamheader'):
+        if element_has_property(sink, 'resend-streamheader'):
             sink.set_property('resend-streamheader', False)
         else:
             self.debug("resend-streamheader property not available, "

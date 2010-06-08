@@ -1,5 +1,10 @@
 2010-06-08  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	Can't use a function from the common module in a bundled module.
+
+2010-06-08  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/base/http.py:
 	Move the BOUNCER_SOCKET constant to the base module to avoid having to
 	put flumotion.component.bouncers.component in the bundles for
