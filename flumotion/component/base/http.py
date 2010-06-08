@@ -32,7 +32,6 @@ from flumotion.common import errors
 from flumotion.twisted.credentials import cryptChallenge
 
 from flumotion.common import common, log, keycards
-from flumotion.component.bouncers import base
 
 #__all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
 __version__ = "$Rev$"
@@ -137,7 +136,7 @@ class HTTPGetArgumentsIssuer(Issuer):
         return keycards.KeycardHTTPGetArguments(arguments, address, path)
 
 
-BOUNCER_SOCKET = base.BOUNCER_SOCKET
+BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'
 
 
 class HTTPAuthentication(log.Loggable):

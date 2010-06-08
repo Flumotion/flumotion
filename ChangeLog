@@ -1,3 +1,10 @@
+2010-06-08  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/base/http.py:
+	Move the BOUNCER_SOCKET constant to the base module to avoid having to
+	put flumotion.component.bouncers.component in the bundles for
+	http-server and http-streamer.
+
 2010-06-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Xavier Queralt
