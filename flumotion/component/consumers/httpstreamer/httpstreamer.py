@@ -460,7 +460,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.setup_burst_mode(sink)
 
-        if element_factory_has_property('multifdsink', 'resend-streamheader'):
+        if gstreamer.element_factory_has_property('multifdsink',
+                                                  'resend-streamheader'):
             sink.set_property('resend-streamheader', False)
         else:
             self.debug("resend-streamheader property not available, "

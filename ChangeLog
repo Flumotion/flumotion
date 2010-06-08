@@ -1,5 +1,19 @@
 2010-06-08  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/bouncers/algorithms/icalbouncer.xml:
+	* flumotion/component/bouncers/algorithms/ipbouncer.xml:
+	* flumotion/component/bouncers/algorithms/tokentest.xml:
+	* flumotion/component/bouncers/base.py:
+	* flumotion/component/bouncers/multibouncer.xml:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	Fix the socket name.
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+        Use the function from the correct module.
+
+2010-06-08  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/consumers/disker/disker.py:
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
 	Don't use the newly added element_has_property, but the older
