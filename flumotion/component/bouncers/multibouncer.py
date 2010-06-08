@@ -193,11 +193,11 @@ class StaticMultiBouncer(MultiBouncer):
             raise NotImplementedError("Subclass did not choose algorithm")
 
         def start_algorithm(d, algorithm, name):
+            self.algorithms[name] = algorithm
             d.addCallback(lambda _: defer.maybeDeferred(algorithm.start, self))
             d.addCallback(algorithm_started, algorithm, name)
 
         def algorithm_started(_, algorithm, name):
-            self.algorithms[name] = algorithm
             algorithm.set_keycard_store(self.watchable_keycards)
 
             expire = lambda ids: self.algorithm_expire_keycard_ids(ids, name)

@@ -1,5 +1,12 @@
 2010-06-08  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/bouncers/multibouncer.py:
+	Register the algorithm plugs in the static bouncer before starting them,
+	otherwise if the setup of the plug takes a long time, setMedium
+	can get called before that and then its remote interface will not get exposed.
+
+2010-06-08  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/bouncers/algorithms/icalbouncer.xml:
 	* flumotion/component/bouncers/algorithms/ipbouncer.xml:
 	* flumotion/component/bouncers/algorithms/tokentest.xml:
