@@ -942,6 +942,7 @@ class MuxerComponent(ReconfigurableComponent, MultiInputParseLaunchComponent):
 class DecoderComponent(ReconfigurableComponent):
 
     disconnectedPads = True
+    keepStreamheaderForLater = True
 
     def configure_pipeline(self, pipeline, properties):
         # Handle decoder dynamic pads
@@ -962,10 +963,8 @@ class DecoderComponent(ReconfigurableComponent):
         if event.get_structure().get_name() != 'flumotion-reset':
             return True
         self.info("Received flumotion-reset, not droping buffers anymore")
-        if eater.streamheaderBufferProbeHandler:
-            pad.remove_buffer_probe(eater.streamheaderBufferProbeHandler)
-            eater.streamheaderBufferProbeHandler = None
 
+        self.dropStreamheaders = False
         if self.disconnectedPads:
             return False
         return True
@@ -973,6 +972,7 @@ class DecoderComponent(ReconfigurableComponent):
     def _new_decoded_pad_cb(self, decoder, pad, last):
         self.log("Decoder %s got new decoded pad %s", decoder, pad)
 
+        self.dropStreamheaders = True
         new_caps = pad.get_caps()
 
         # Select a compatible output element

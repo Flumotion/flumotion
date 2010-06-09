@@ -47,6 +47,7 @@ class Eater:
         self.depayName = self.elementName + '-depay'
         # for use to detect duplicate streamheader buffers
         self.streamheaderBufferProbeHandler = None
+        self.streamheader = []
         self.setPadMonitor(None)
         self.uiState = componentui.WorkerComponentUIState()
         self.uiState.addKey('eater-alias')

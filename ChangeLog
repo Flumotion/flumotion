@@ -2,6 +2,17 @@
 
 	reviewed by: Zaheer Abbas Merali
 
+	* flumotion/component/eater.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	The decoder component needs the streamheader after at start and after
+	each reset. Now it will keep track of the IN_CAPS buffers which would be
+	dropped otherwise and send them downstream if needed after a reset.
+
+2010-06-09  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali
+
 	* flumotion/component/feedcomponent.py:
 	Don't pass the reset event downstream when the component has the pads
 	disconnected.
