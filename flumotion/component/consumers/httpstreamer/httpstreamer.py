@@ -251,6 +251,8 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     def remote_updatePorterDetails(self, path, username, password):
         return self.comp.updatePorterDetails(path, username, password)
 
+    def remote_removeAllClients(self):
+        return self.comp.remove_all_clients()
 
 ### the actual component is a streamer using multifdsink
 

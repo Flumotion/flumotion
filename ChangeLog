@@ -1,3 +1,8 @@
+2010-06-09  Zaheer Abbas Merali  <zaheerabbas@merali.org>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	Add remote call to remove all clients.
+
 2010-06-09  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* common/validate-registry.py:
