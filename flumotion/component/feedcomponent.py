@@ -616,6 +616,8 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
 
 class ReconfigurableComponent(ParseLaunchComponent):
 
+    disconnectedPads = False
+
     def init(self):
         self.EATER_TMPL += ' ! queue name=input-%(name)s'
         self._reset_count = 0
@@ -660,6 +662,8 @@ class ReconfigurableComponent(ParseLaunchComponent):
                 return True
             if event.get_structure().get_name() != 'flumotion-reset':
                 return True
+            if self.disconnectedPads:
+                return False
 
             self.log('RESET: in reset event received on input pad %r', pad)
             self._reset_count = len(self.feeders)
@@ -866,6 +870,7 @@ class MuxerComponent(ReconfigurableComponent, MultiInputParseLaunchComponent):
     """
 
     LINK_MUXER = False
+    disconnectedPads = True
 
     def _get_base_pipeline_string(self):
         return self.get_muxer_string(self.config['properties'])
@@ -928,12 +933,15 @@ class MuxerComponent(ReconfigurableComponent, MultiInputParseLaunchComponent):
             self.fired_eaters = self.fired_eaters + 1
             if self.fired_eaters == len(self.eaters):
                 self.debug("All pads are now blocked")
+                self.disconnectedPads = False
                 for e in self.eaters:
                     srcpad = self.get_eater_srcpad(e)
                     srcpad.set_blocked_async(False, self.is_blocked_cb)
 
 
 class DecoderComponent(ReconfigurableComponent):
+
+    disconnectedPads = True
 
     def configure_pipeline(self, pipeline, properties):
         # Handle decoder dynamic pads
@@ -953,11 +961,13 @@ class DecoderComponent(ReconfigurableComponent):
             return True
         if event.get_structure().get_name() != 'flumotion-reset':
             return True
-        self.info("Received flumotion-reset, not droping buffers anymore "
-                  "%s", pad.get_parent().get_name())
+        self.info("Received flumotion-reset, not droping buffers anymore")
         if eater.streamheaderBufferProbeHandler:
             pad.remove_buffer_probe(eater.streamheaderBufferProbeHandler)
             eater.streamheaderBufferProbeHandler = None
+
+        if self.disconnectedPads:
+            return False
         return True
 
     def _new_decoded_pad_cb(self, decoder, pad, last):
@@ -978,6 +988,7 @@ class DecoderComponent(ReconfigurableComponent):
             self.log("Linking decoded pad %s with caps %s to feeder %s",
                        pad, new_caps.to_string(), outelem.get_name())
             pad.link(output_pad)
+            self.disconnectedPads = False
             return
 
         self.info("No feeder found for decoded pad %s with caps %s",
