@@ -1,3 +1,12 @@
+2010-06-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/manager/admin.py:
+	* flumotion/manager/manager.py:
+	Add new remote method: invokeOnComponents to invoke a method on
+	all components of a specified type.
+
 2010-06-09  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: Zaheer Abbas Merali

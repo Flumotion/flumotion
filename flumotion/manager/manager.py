@@ -1282,3 +1282,43 @@ class Vishnu(log.Loggable):
             return self._componentMappers[object].state
 
         return None
+
+    def invokeOnComponents(self, componentType, methodName, *args, **kwargs):
+        """
+        Invokes method on all components of a certain type
+        """
+
+        def invokeOnOneComponent(component, methodName, *args, **kwargs):
+            m = self.getComponentMapper(component)
+            if not m:
+                self.warning('Component %s not mapped. Maybe deleted.',
+                    component.get('name'))
+                raise errors.UnknownComponentError(component)
+
+            avatar = m.avatar
+            if not avatar:
+                self.warning('No avatar for %s, cannot call remote',
+                    component.get('name'))
+                raise errors.SleepingComponentError(component)
+
+            try:
+                return avatar.mindCallRemote(methodName, *args, **kwargs)
+            except Exception, e:
+                log_message = log.getExceptionMessage(e)
+                msg = "exception on remote call %s: %s" % (methodName,
+                    log_message)
+                self.warning(msg)
+                raise errors.RemoteMethodError(methodName,
+                    log_message)
+
+        # only do this on happy or hungry components of type componentType
+        dl_array = []
+        for c in self.getComponentStates():
+            if c.get('type') == componentType and \
+               (c.get('mood') is moods.happy.value or
+                c.get('mood') is moods.hungry.value):
+                self.info("component %r to have %s run", c, methodName)
+                d = invokeOnOneComponent(c, methodName, *args, **kwargs)
+                dl_array.append(d)
+        dl = defer.DeferredList(dl_array)
+        return dl

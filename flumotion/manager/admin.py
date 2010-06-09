@@ -504,6 +504,11 @@ class AdminAvatar(base.ManagerAvatar):
             return None
         return componentRegistryEntry
 
+    def perspective_invokeOnComponents(self, componentType, methodName,
+        *args, **kwargs):
+        return self.vishnu.invokeOnComponents(componentType, methodName,
+            *args, **kwargs)
+
 
 class AdminHeaven(base.ManagerHeaven):
     """
