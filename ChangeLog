@@ -1,3 +1,9 @@
+2010-06-09  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* common/validate-registry.py:
+	There is no reason why sockets should be instantiable. There once was,
+	when the sockets were something more than just an identifier.
+
 2010-06-08  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/bouncers/multibouncer.py:

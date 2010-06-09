@@ -75,12 +75,6 @@ for c in registry.getComponents():
     if not c.description:
         componentError(c, 'is missing a description')
 
-    for s in c.sockets:
-        try:
-            function = reflect.namedAny(s)
-        except AttributeError:
-            componentError(c, 'could not import socket %s' % s)
-
     def propertyError(c, p, msg):
         global exitCode
         sys.stderr.write("Property %s on component %s from %s %s.\n" %(
@@ -113,12 +107,6 @@ for plug in registry.getPlugs():
         plugError(plug, 'contains underscores')
     if not plug.description:
         plugError(plug, 'is missing a description')
-
-    # a plug's socket should be creatable
-    try:
-        function = reflect.namedAny(plug.socket)
-    except AttributeError:
-        plugError(plug, 'could not import socket %s' % plug.socket)
 
 
     # a plug should be creatable
