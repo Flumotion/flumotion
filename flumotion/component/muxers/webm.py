@@ -44,5 +44,5 @@ class WebM(feedcomponent.MuxerComponent):
             self.addMessage(m)
 
     def get_muxer_string(self, properties):
-        muxer = 'webmmux name=muxer indexed=false'
+        muxer = 'webmmux name=muxer streamable=true'
         return muxer

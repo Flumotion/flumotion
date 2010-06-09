@@ -1,3 +1,9 @@
+2010-06-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/muxers/webm.py:
+	Use streamable property not indexed as it has changed in upstream
+	git.
+
 2010-06-09  Zaheer Abbas Merali  <zaheerabbas@merali.org>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
