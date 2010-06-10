@@ -22,6 +22,8 @@ Requires:       %{gstreamer} >= %{gst_minver}
 Requires:       %{gstreamer}-plugins-base >= %{gstpb_minver}
 Requires:       %{gstreamer}-python >= %{gstpy_minver}
 Requires:       python-twisted-core >= 2.5.0
+Requires:       python-twisted-names
+Requires:       python-twisted-web
 Requires:       python-twisted-conch
 Requires:       python-dateutil
 Requires:       pygtk2-libglade
