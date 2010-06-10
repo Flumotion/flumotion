@@ -98,6 +98,10 @@ def checkWebcam(device, mid):
                 proc(struct, vals.high)
             elif isinstance(vals, gst.FractionRange):
                 # hack :)
+                val = vals.low
+                while float(val) < float(vals.high):
+                    proc(struct, val)
+                    val.num += 5
                 proc(struct, vals.high)
             else:
                 # scalar
@@ -108,6 +112,8 @@ def checkWebcam(device, mid):
             def addRatesForHeight(struct, height):
 
                 def addRate(struct, rate):
+                    if not rate.num:
+                        return
                     if (width, height) not in sizes:
                         sizes[(width, height)] = []
                     d = {'framerate': (rate.num, rate.denom),

@@ -1,3 +1,13 @@
+2010-06-10  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Josep Ribas
+
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	* flumotion/worker/checks/video.py:
+	Parse the FractionRange with the available framerates in the webcam
+	check instead of just offering the high value which can quite annoying
+	sometimes. Fixes #1425
+
 2010-06-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	reviewed by: Jan Urbanski

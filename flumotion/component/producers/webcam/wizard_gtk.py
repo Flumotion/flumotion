@@ -22,6 +22,7 @@
 import gettext
 import os
 
+from twisted.python import util
 from zope.interface import implements
 
 from flumotion.admin.assistant.interfaces import IProducerPlugin
@@ -157,11 +158,11 @@ class WebcamStep(VideoProducerStep):
         self.size.prefill(values)
 
     def _populateFramerates(self, size):
-        values = []
+        values = util.OrderedDict()
         for d in self._sizes[size]:
             num, denom = d['framerate']
-            values.append(('%.2f fps' % (1.0*num/denom), d))
-        self.framerate.prefill(values)
+            values['%.2f fps' % (1.0*num/denom)] = d
+        self.framerate.prefill(values.items())
 
     def _updateSize(self):
         size = self.size.get_selected()
