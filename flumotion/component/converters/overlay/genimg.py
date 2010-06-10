@@ -115,7 +115,10 @@ def generateOverlay(text,
         if textWidth > width:
             textOverflowed = True
 
-    buf = image.get_data()
+    if cairo.version < '1.2.6':
+        buf = image.get_data_as_rgba()
+    else:
+        buf = image.get_data()
 
     return buf, imagesOverflowed, textOverflowed
 
