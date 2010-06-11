@@ -274,6 +274,9 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
         self.debug("effect: result: %r" % result)
         return result
 
+    def remote_dumpGstreamerDotFile(self, filename):
+        self.comp.dump_gstreamer_debug_dot_file(filename)
+
 from feedcomponent010 import FeedComponent
 
 FeedComponent.componentMediumClass = FeedComponentMedium

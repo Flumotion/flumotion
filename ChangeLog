@@ -1,3 +1,10 @@
+2010-06-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent.py:
+	Add remote method to trigger dumping a graphviz dot file of the
+	GStreamer pipeline. The job still needs to run with the
+	GST_DEBUG_DUMP_DOT_DIR environment variable set.
+
 2010-06-11  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion.doap:
