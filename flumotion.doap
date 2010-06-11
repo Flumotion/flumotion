@@ -318,4 +318,29 @@ mu-law audio in multipart.
 
   </Version>
  </release>
+ <release>
+  <Version>
+   <revision>0.6.2</revision>
+   <branch>0.6</branch>
+   <name>Fantastico</name>
+   <created>2010-06-11</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.6.2.tar.bz2" />
+   <dc:description>
+After some time since the last update to the 0.6 stable series we though it
+would be nice to fix a bunch of bugs that have annoyed the users for the last
+nine months and make Flumotion even more stable.
+
+This update includes a more user friendly wizard with less navigation problems
+and better device detection/configuration: webcam, firewire and soundcard steps
+have been improved and now report properly the information from the devices.
+
+For packagers, be aware we have bumped twisted's requirements to version 2.5.0.
+
+Apart from that, this release includes some minor bugfixes and cosmetic
+differences that were added after 0.6.1.
+   </dc:description>
+
+  </Version>
+ </release>
+
 </Project>
