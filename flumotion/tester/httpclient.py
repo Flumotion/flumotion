@@ -67,7 +67,7 @@ class HTTPClient(gobject.GObject, log.Loggable):
         @rtype: float
         @returns: next read time in seconds since epoch.
         """
-        raise "next_read_time needs to be implemented by a subclass"
+        raise Exception("next_read_time needs to be implemented by a subclass")
 
     def read_size(self):
         """
