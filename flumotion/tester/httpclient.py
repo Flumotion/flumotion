@@ -56,10 +56,6 @@ class HTTPClient(gobject.GObject, log.Loggable):
         self._stop_time = 0 # delta to start time
         self._stop_size = 0
 
-    # if we have it then we can't test when we don't, FIXME
-    #def verify(self, data):
-    #    raise "verify needs to be handed to me by the application"
-
     def next_read_time(self):
         """
         Calculate the next time to read.
@@ -72,7 +68,6 @@ class HTTPClient(gobject.GObject, log.Loggable):
     def read_size(self):
         """
         calculate and return the size of the current read'
-        raise "read_size needs to be implemented by a subclass"
         """
 
     def set_stop_time(self, stop_time):
