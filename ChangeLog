@@ -1,3 +1,10 @@
+2010-06-11  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Add method to dump a graphviz dot file.
+	Run it on state change.
+	Only gets run if GST_DEBUG_DUMP_DOT_DIR environment is set.
+
 2010-06-11  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/dialogs.py:

@@ -235,6 +235,10 @@ class FeedComponent(basecomponent.BaseComponent):
             if src == self.pipeline:
                 old, new, pending = message.parse_state_changed()
                 self._change_monitor.state_changed(old, new)
+                dump_filename = "%s.%s_%s" % (self.name,
+                    gst.element_state_get_name(old),
+                    gst.element_state_get_name(new))
+                self.dump_gstreamer_debug_dot_file(dump_filename, True)
 
         def error():
             gerror, debug = message.parse_error()
@@ -526,6 +530,21 @@ class FeedComponent(basecomponent.BaseComponent):
             return defer.succeed(self.get_master_clock())
         else:
             return defer.maybeDeferred(pipelinePaused, None)
+
+    def dump_gstreamer_debug_dot_file(self, filename, with_timestamp=False):
+        """
+        Dumps a graphviz dot file of the pipeline's current state to disk.
+        This will only actually do anything if the environment variable
+        GST_DEBUG_DUMP_DOT_DIR is set.
+
+        @param filename: filename to store
+        @param with_timestamp: if True, then timestamp will be prepended to
+                               filename
+        """
+        method = gst.DEBUG_BIN_TO_DOT_FILE
+        if with_timestamp:
+            method = gst.DEBUG_BIN_TO_DOT_FILE_WITH_TS
+        method(self.pipeline, gst.DEBUG_GRAPH_SHOW_ALL, filename)
 
     ### BaseComponent interface implementation
 
