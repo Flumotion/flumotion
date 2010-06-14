@@ -1,5 +1,12 @@
 2010-06-14  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/misc/porter/porter.xml:
+	Revert previous patch, octal values are being interpreted as integer
+	when read from the configuration.
+
+2010-06-14  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/misc/porter/porter.xml:
 	Add a socket-mode property that specifies the permissions of the porter
 	socket (in octal), defaulting to 0666.
