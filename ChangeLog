@@ -1,3 +1,12 @@
+2010-06-14  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Josep Joan Ribas
+
+	* flumotion/component/decoders/generic/generic.py:
+	* flumotion/component/decoders/generic/generic.xml:
+	Add a blacklist property to forbid the use of GStreamer elements when
+	decoding.
+
 2010-06-11  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/tester/httpclient.py:

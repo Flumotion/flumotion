@@ -17,6 +17,8 @@
       <properties>
 	<property name="media-type" type="string" required="yes"
 		  _description="Decides whether the component decodes an audio or a video stream. Should be set to either &quot;audio&quot; or &quot;video&quot;." />
+        <property name="blacklist" type="string" multiple="true"
+                  _description="Forbid the decoder from using some elements." />
       </properties>
     </component>
 
@@ -33,6 +35,11 @@
         <entry type="component" location="generic.py"
                function="AVGenericDecoder" />
       </entries>
+
+      <properties>
+        <property name="blacklist" type="string" multiple="true"
+                  _description="Forbid the decoder from using some elements." />
+      </properties>
     </component>
 
   </components>

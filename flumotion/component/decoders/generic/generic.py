@@ -34,6 +34,12 @@ __version__ = "$Rev: 7162 $"
 BASIC_AUDIO_CAPS = "audio/x-raw-int;audio/x-raw-float"
 BASIC_VIDEO_CAPS = "video/x-raw-yuv;video/x-raw-rgb"
 
+# FIXME: The GstAutoplugSelectResult enum has no bindings in gst-python.
+# Replace this when the enum is exposed in the bindings.
+
+GST_AUTOPLUG_SELECT_TRY = 0
+GST_AUTOPLUG_SELECT_SKIP = 2
+
 
 class FeederInfo(object):
 
@@ -85,7 +91,16 @@ class GenericDecoder(feedcomponent.DecoderComponent):
         pipeline_str = " ".join(pipeline_parts)
         self.log("Decoder pipeline: %s", pipeline_str)
 
+        self._blacklist = properties.get('blacklist')
+
         return pipeline_str
+
+    def configure_pipeline(self, pipeline, properties):
+        feedcomponent.DecoderComponent.configure_pipeline(self, pipeline,
+                                                          properties)
+
+        decoder = self.pipeline.get_by_name("decoder")
+        decoder.connect('autoplug-select', self._autoplug_select_cb)
 
     ### Protected Methods ##
 
@@ -102,6 +117,15 @@ class GenericDecoder(feedcomponent.DecoderComponent):
 
     def _get_output_element_name(self, feed_name):
         return "%s-output" % feed_name
+
+    ### Callbacks ###
+
+    def _autoplug_select_cb(self, decoder, pad, caps, factory):
+        if factory.get_name() in self._blacklist:
+            self.log("Skipping element %s because it's in the blacklist",
+                     factory.get_name())
+            return GST_AUTOPLUG_SELECT_SKIP
+        return GST_AUTOPLUG_SELECT_TRY
 
 
 class SingleGenericDecoder(GenericDecoder):
