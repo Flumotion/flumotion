@@ -1,3 +1,22 @@
+2010-06-14  Jan Urbanski  <jurbanski@flumotion.com>
+
+	patch by: Alvin Delagon
+
+	* bin/flumotion-admin-text.in:
+	* bin/flumotion-admin.in:
+	* bin/flumotion-command.in:
+	* bin/flumotion-inspect.in:
+	* bin/flumotion-job.in:
+	* bin/flumotion-launch.in:
+	* bin/flumotion-manager.in:
+	* bin/flumotion-nagios.in:
+	* bin/flumotion-rrdmon.in:
+	* bin/flumotion-tester.in:
+	* bin/flumotion-worker.in:
+	* bin/flumotion.in:
+	Check for .git in addition to .svn to run uninstalled Flumotion from a
+	git clone.
+
 2010-06-14  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: Josep Joan Ribas
