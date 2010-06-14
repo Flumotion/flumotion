@@ -286,6 +286,7 @@ class Porter(component.BaseComponent, log.Loggable):
             self._password = self.generateRandomString(12)
             self._socketPath = self.generateSocketPath()
 
+        self._socketMode = props.get('socket-mode', 0666)
         self._port = int(props['port'])
         self._iptablesPort = int(props.get('iptables-port', self._port))
         self._porterProtocol = props.get('protocol',
@@ -325,7 +326,8 @@ class Porter(component.BaseComponent, log.Loggable):
                 pass
 
             self._socketlistener = reactor.listenWith(
-                fdserver.FDPort, self._socketPath, serverfactory)
+                fdserver.FDPort, self._socketPath,
+                serverfactory, mode=self._socketMode)
             self.info("Now listening on socketPath %s", self._socketPath)
         except error.CannotListenError, e:
             self.warning("Failed to create socket %s" % self._socketPath)

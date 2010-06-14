@@ -1,5 +1,13 @@
 2010-06-14  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/component/misc/porter/porter.xml:
+	Add a socket-mode property that specifies the permissions of the porter
+	socket (in octal), defaulting to 0666.
+	* flumotion/component/misc/porter/porter.py:
+	Use the socket-mode property.
+
+2010-06-14  Jan Urbanski  <jurbanski@flumotion.com>
+
 	patch by: Alvin Delagon
 
 	* bin/flumotion-admin-text.in:
