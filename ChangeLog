@@ -1,3 +1,10 @@
+2010-06-14  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Jan Urbanski
+	* flumotion/monitor/nagios/stream.py:
+	Check for errors fetching a segment and raise the appropiate nagios
+	warning/error.
+
 2010-06-14  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/config.py:

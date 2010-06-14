@@ -240,7 +240,15 @@ class CheckBase(util.LogCommand):
             if p[2][-4:] == "m3u8":
                 self._url = getURLFromPlaylist(self._url)
             self.options.playlist = True
-            segment = urlOpenWithCookies(self._url)
+            try:
+                segment = urlOpenWithCookies(self._url)
+            except urllib2.HTTPError, e:
+                # For fragmented streams, a 404 is not critical
+                if e.code == 404:
+                    raise util.NagiosWarning("Fetching segment '%s' returned "
+                        "\"%s\". The stream might be out of sync." %
+                        (self._url, e))
+                raise
             c = segment.read()
             tmp.write(c)
             tmp.close()
