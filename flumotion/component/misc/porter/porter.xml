@@ -18,6 +18,8 @@
                   _description="The password to authenticate to the porter." />
         <property name="socket-path" type="string"
                   _description="The socket path to use to connect to the porter." />
+        <property name="socket-mode" type="int"
+                  _description="The permissions on the socket (octal). Defaults to 0666." />
         <property name="port" type="int"
                   _description="The network port for the porter to listen on." />
         <!-- when an admin asks, via getPorterDetails, what our port is, we will

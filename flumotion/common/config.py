@@ -56,11 +56,14 @@ def parsePropertyValue(propName, type, value):
             return v
         return common.strToBool(v)
 
+    def pythonInt(i):
+        return int(i, 0)
+
     try:
         # yay!
         return {'string': strWithoutNewlines,
                 'rawstring': tryStr,
-                'int': int,
+                'int': pythonInt,
                 'long': long,
                 'bool': boolean,
                 'float': float,

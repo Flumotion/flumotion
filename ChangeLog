@@ -1,5 +1,14 @@
 2010-06-14  Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/common/config.py:
+	Make integer properties be interpreted taking the radix into account
+	using normal Python integer literal rules.
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/misc/porter/porter.xml:
+	Re-add socket-mode, as it now gets interpreted correctly.
+
+2010-06-14  Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/misc/porter/porter.py:
 	* flumotion/component/misc/porter/porter.xml:
 	Revert previous patch, octal values are being interpreted as integer
