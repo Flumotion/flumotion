@@ -91,7 +91,7 @@ class GenericDecoder(feedcomponent.DecoderComponent):
         pipeline_str = " ".join(pipeline_parts)
         self.log("Decoder pipeline: %s", pipeline_str)
 
-        self._blacklist = properties.get('blacklist')
+        self._blacklist = properties.get('blacklist', [])
 
         return pipeline_str
 
