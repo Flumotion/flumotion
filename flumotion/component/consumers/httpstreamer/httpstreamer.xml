@@ -7,6 +7,9 @@
       <source location="flumotion.component.consumers.httpstreamer.httpstreamer" />
 
       <eater name="default" />
+      
+      <wizard type="consumer" feeder="default"
+              _description="S_tream over HTTP"/>
 
       <!-- entry points for distributable code bundles -->
       <entries>
@@ -14,6 +17,8 @@
                function="MultifdSinkStreamer" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
+        <entry type="wizard" location="wizard_gtk.py"
+               function="HTTPStreamerWizardPlugin" />
       </entries>
 
       <sockets>
@@ -119,6 +124,19 @@
         <directory name="flumotion/component/consumers/httpstreamer">
           <filename location="httpstreamer.glade" />
           <filename location="admin_gtk.py" />
+        </directory>
+      </directories>
+    </bundle>
+    
+    <bundle name="httpstreamer-wizard">
+      <dependencies>
+        <dependency name="httpstreamer-base" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/consumers/httpstreamer">
+          <filename location="wizard.glade" />
+          <filename location="wizard_gtk.py" />
         </directory>
       </directories>
     </bundle>

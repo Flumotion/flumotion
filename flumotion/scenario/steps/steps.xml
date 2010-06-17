@@ -8,13 +8,10 @@
                 <directory name="flumotion/scenario/steps">
                     <filename location="consumptionsteps.py"/>
                     <filename location="conversionsteps.py"/>
-                    <filename location="diskersteps.py"/>
-                    <filename location="httpstreamersteps.py"/>
                     <filename location="__init__.py"/>
                     <filename location="ondemandstep.py"/>
                     <filename location="loadflowstep.py"/>
                     <filename location="productionsteps.py"/>
-                    <filename location="shout2steps.py"/>
                     <filename location="summarysteps.py"/>
                     <filename location="licensestep.py"/>
                 </directory>

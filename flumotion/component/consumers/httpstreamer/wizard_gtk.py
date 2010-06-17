@@ -37,12 +37,20 @@ On the http-server the applet will be provided with help of a plug.
 
 import gettext
 import re
+import os
 
+import gobject
+from kiwi.utils import gsignal
+import gtk
+from twisted.internet import defer
+from zope.interface import implements
+
+from flumotion.admin.assistant.interfaces import IConsumerPlugin
 from flumotion.admin.assistant.models import Consumer, Porter
 from flumotion.admin.gtk.basesteps import ConsumerStep
 from flumotion.configure import configure
 from flumotion.common import errors, log, messages
-from flumotion.common.i18n import N_, gettexter
+from flumotion.common.i18n import N_, gettexter, ngettext
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -150,7 +158,8 @@ class HTTPSpecificStep(ConsumerStep):
     to configure a stream to be served over HTTP.
     """
     section = _('Consumption')
-    gladeFile = 'httpstreamer-wizard.glade'
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              'wizard.glade')
 
     def __init__(self, wizard):
         self.model = HTTPStreamer()
@@ -216,10 +225,14 @@ class HTTPSpecificStep(ConsumerStep):
         return d
 
     def getNext(self):
-        next = ConsumerStep.getNext(self)
-        if next and next.model.componentType == self.model.componentType:
-            next.updateModel(self.model)
-        return next
+
+        def setModel(next):
+            if next and next.model.componentType == self.model.componentType:
+                next.updateModel(self.model)
+            return next
+        d = defer.maybeDeferred(ConsumerStep.getNext, self)
+        d.addCallback(setModel)
+        return d
 
     # Private
 
@@ -497,3 +510,20 @@ class HTTPGenericStep(HTTPSpecificStep):
 
     def getConsumerType(self):
         return self._consumertype
+
+
+class HTTPStreamerWizardPlugin(object):
+    implements(IConsumerPlugin)
+
+    def __init__(self, wizard):
+        self.wizard = wizard
+
+    def getConsumptionStep(self, type):
+        if type == 'video':
+            return HTTPVideoStep(self.wizard)
+        elif type == 'audio':
+            return HTTPAudioStep(self.wizard)
+        elif type == 'audio-video':
+            return HTTPBothStep(self.wizard)
+        else:
+            return HTTPGenericStep(self.wizard, type)

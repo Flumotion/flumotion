@@ -6,10 +6,15 @@
       <source location="flumotion.component.consumers.shout2.shout2"/>
 
       <eater name="default" />
+      
+      <wizard type="consumer" feeder="default"
+	      _description="Stream to _Icecast2"/>
 
       <entries>
         <entry type="component" location="shout2.py"
                function="Shout2Consumer"/>
+        <entry type="wizard" location="wizard_gtk.py"
+               function="Shout2ConsumerWizardPlugin" />
       </entries>
 
       <properties>
@@ -42,6 +47,19 @@
                 <filename location="__init__.py" />
             </directory>
         </directories>
+    </bundle>
+
+    <bundle name="shout2-wizard">
+      <dependencies>
+        <dependency name="shout2-base" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/consumers/shout2">
+          <filename location="wizard.glade" />
+          <filename location="wizard_gtk.py" />
+        </directory>
+      </directories>
     </bundle>
 
     <bundle name="shout2-component">

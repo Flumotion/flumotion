@@ -17,9 +17,7 @@ glade_DATA =					\
 	sectionwizard.glade			\
 	audio-encoder-wizard.glade		\
 	consumption-wizard.glade		\
-	disker-wizard.glade			\
 	encoding-wizard.glade			\
-	httpstreamer-wizard.glade		\
 	license-wizard.glade			\
 	loadflow-wizard.glade			\
 	ondemand-wizard.glade			\
@@ -28,7 +26,6 @@ glade_DATA =					\
 	production-wizard.glade			\
 	scenario-wizard.glade			\
 	select-producers-wizard.glade		\
-	shout2-wizard.glade			\
 	summary-wizard.glade			\
 	welcome-wizard.glade
 

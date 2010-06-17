@@ -391,22 +391,22 @@ class SelectFormatStep(WizardStep):
 
     def getNext(self):
         # Return audio/video/audio-video http streamer page
-        from flumotion.scenario.steps.httpstreamersteps import HTTPBothStep, \
-                HTTPAudioStep, HTTPVideoStep, HTTPGenericStep
         self.wizard.cleanFutureSteps()
         muxer = self.muxer.get_selected()
 
-        if muxer.type == 'audio-video':
-            self.wizard.addStepSection(HTTPBothStep(self.wizard))
-        elif muxer.type == 'video':
-            self.wizard.addStepSection(HTTPVideoStep(self.wizard))
-        elif muxer.type == 'audio':
-            self.wizard.addStepSection(HTTPAudioStep(self.wizard))
-        else:
-            self.wizard.addStepSection(HTTPGenericStep(self.wizard,
-                                                       muxer.type))
+        def gotFactory(factory):
+            plugin = factory(self.wizard)
+            step = plugin.getConsumptionStep(muxer.type)
+            self.wizard.addStepSection(step)
+            self.wizard.addStepSection(LiveSummaryStep)
 
-        self.wizard.addStepSection(LiveSummaryStep)
+        def noBundle(failure):
+            failure.trap(NoBundleError)
+
+        d = self.wizard.getWizardEntry('http-streamer')
+        d.addCallback(gotFactory)
+        d.addErrback(noBundle)
+        return d
 
     # Callbacks
 

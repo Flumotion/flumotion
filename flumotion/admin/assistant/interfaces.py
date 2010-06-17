@@ -74,6 +74,30 @@ class IEncoderPlugin(Interface):
         """
 
 
+class IConsumerPlugin(Interface):
+    """A consumer plugin is how you extend the production assistant page.
+    The main purpose of the plugin is to get a assistant step specific
+    to the plugin.
+    This entry point should be defined in the xml for the component
+    under the entry type "wizard".
+    """
+
+    def __call__(assistant):
+        """Creates producer plugins
+        @param assistant: the assistant
+        @type assistant: L{ConfigurationAssistant}
+        """
+
+    def getConsumptionStep(type):
+        """Asks the plugin for a step.
+        type is the kind of plugin.
+        @param type: audio or video or audio-video
+        @type type: string
+        @returns: the assistant step
+        @rtype: a L{WorkerWizardStep} subclass
+        """
+
+
 class IHTTPConsumerPlugin(Interface):
     """A http consumer plugin is how you extend the HTTP consumer page.
     The main purpose of the plugin is to get a consumer model

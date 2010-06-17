@@ -20,9 +20,12 @@
 # Headers in this file shall remain intact.
 
 import gettext
+import os
 
+from zope.interface import implements
 import gtk
 
+from flumotion.admin.assistant.interfaces import IConsumerPlugin
 from flumotion.admin.assistant.models import Consumer
 from flumotion.admin.gtk.basesteps import ConsumerStep
 from flumotion.ui.fileselector import FileSelectorDialog
@@ -88,7 +91,8 @@ class Disker(Consumer):
 
 
 class DiskStep(ConsumerStep):
-    gladeFile = 'disker-wizard.glade'
+    gladeFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              'wizard.glade')
     icon = 'kcmdevices.png'
 
     def __init__(self, wizard):
@@ -223,3 +227,18 @@ class DiskVideoStep(DiskStep):
 
     def getConsumerType(self):
         return 'video'
+
+
+class DiskConsumerWizardPlugin(object):
+    implements(IConsumerPlugin)
+
+    def __init__(self, wizard):
+        self.wizard = wizard
+
+    def getConsumptionStep(self, type):
+        if type == 'video':
+            return DiskVideoStep(self.wizard)
+        elif type == 'audio':
+            return DiskAudioStep(self.wizard)
+        elif type == 'audio-video':
+            return DiskBothStep(self.wizard)

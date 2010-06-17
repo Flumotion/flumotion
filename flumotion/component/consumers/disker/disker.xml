@@ -6,6 +6,9 @@
       <source location="flumotion.component.consumers.disker.disker" />
 
       <eater name="default" />
+      
+      <wizard type="consumer" feeder="default"
+              _description="S_ave to disk"/>
 
       <entries>
         <entry type="component" location="disker.py"
@@ -14,6 +17,8 @@
                function="GUIClass" />
         <entry type="admin/text" location="admin_text.py"
               function="UIClass" />
+        <entry type="wizard" location="wizard_gtk.py"
+               function="DiskConsumerWizardPlugin" />
       </entries>
 
       <sockets>
@@ -111,6 +116,19 @@
       <directories>
         <directory name="flumotion/component/consumers/disker">
           <filename location="disker_plug.py"/>
+        </directory>
+      </directories>
+    </bundle>
+    
+    <bundle name="disker-wizard">
+      <dependencies>
+        <dependency name="disker-base" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/consumers/disker">
+          <filename location="wizard.glade" />
+          <filename location="wizard_gtk.py" />
         </directory>
       </directories>
     </bundle>

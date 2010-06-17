@@ -50,6 +50,7 @@ _VALID_WIZARD_COMPONENT_TYPES = [
     'muxer',
     'audio-encoder',
     'video-encoder',
+    'consumer',
     ]
 
 _VALID_WIZARD_PLUG_TYPES = [

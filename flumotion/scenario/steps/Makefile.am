@@ -5,13 +5,10 @@ component_PYTHON = \
 	__init__.py \
 	consumptionsteps.py \
 	conversionsteps.py \
-	diskersteps.py \
-	httpstreamersteps.py \
 	loadflowstep.py \
 	licensestep.py \
 	ondemandstep.py \
 	productionsteps.py \
-	shout2steps.py \
 	summarysteps.py
 
 component_DATA = \
