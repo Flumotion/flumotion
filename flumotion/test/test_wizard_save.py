@@ -30,7 +30,7 @@ from flumotion.admin.assistant.save import AssistantSaver
 from flumotion.common import testsuite
 from flumotion.configure import configure
 from flumotion.component.producers.firewire.wizard_gtk import FireWireProducer
-from flumotion.scenario.steps.httpstreamersteps import HTTPStreamer
+from flumotion.component.consumers.httpstreamer.wizard_gtk import HTTPStreamer
 from flumotion.component.encoders.vorbis.wizard_gtk import VorbisAudioEncoder
 from flumotion.component.encoders.theora.wizard_gtk import TheoraVideoEncoder
 from flumotion.component.producers.videotest.wizard_gtk import \

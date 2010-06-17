@@ -1,5 +1,10 @@
 2010-06-17  Josep Joan Ribas  <jribas@flumotion.com>
 
+	* flumotion/test/test_wizard_save.py:
+	Fix tests.
+
+2010-06-17  Josep Joan Ribas  <jribas@flumotion.com>
+
 	reviewed by: Julien Le Goff
 
 	* data/glade/Makefile.am:
