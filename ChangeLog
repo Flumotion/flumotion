@@ -1,3 +1,9 @@
+2010-06-18  Julien Le Goff  <jlegoff@flumotion.com>
+
+	* flumotion/admin/command/component.py:
+	Add a command to get the components list along with their types
+	and the host they are running on.
+
 2010-06-17  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/test/test_wizard_save.py:

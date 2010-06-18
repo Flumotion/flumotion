@@ -132,6 +132,47 @@ class List(common.AdminCommand):
                     self.stdout.write('    ' + c.get('name') + '\n')
 
 
+class DetailedList(common.AdminCommand):
+    description = "List components with types and worker hosts."
+
+    def pprint(self, comps):
+        tab = 4
+        cols = [[c[i] for c in comps] for i in xrange(len(comps[0]))]
+        max_widths = [max(map(len, c)) for c in cols]
+        for c in comps:
+            s = "    "
+            for i in xrange(len(c)):
+                width = "%d" % (max_widths[i] + tab)
+                s += ('%-' + width + "s") % c[i]
+            self.stdout.write(s + "\n")
+
+    def print_components(self, place, workers):
+        comps = []
+        for c in place.get('components'):
+            workerName = c.get('workerName')
+            host = "unknown"
+            for w in workers:
+                if workerName == w.get('name'):
+                    host = w.get('host')
+                    break
+            comps.append((c.get('name'), c.get('type'), host))
+        self.pprint(comps)
+
+    def doCallback(self, args):
+        p = self.parentCommand
+        a = p.planetState.get('atmosphere')
+        s = self.parentCommand.workerHeavenState
+        workers = s.get('workers')
+        if a.get('components'):
+            self.stdout.write('atmosphere:\n')
+            self.print_components(a, workers)
+
+        for f in p.planetState.get('flows'):
+            if f.get('components'):
+                self.stdout.write('%s flow:\n' % f.get('name'))
+                self.print_components(f, workers)
+
+
 class Mood(common.AdminCommand):
     description = "Check the mood of a component."
 
@@ -299,11 +340,13 @@ class Component(util.LogCommand):
     description = "Act on a component."
     usage = "-i [component id]"
 
-    subCommandClasses = [Delete, Invoke, List, Mood, Property, Start, Stop]
+    subCommandClasses = [Delete, Invoke, List, DetailedList,
+                         Mood, Property, Start, Stop]
 
     componentId = None
     componentState = None
     planetState = None
+    workerHeavenState = None
 
     def addOptions(self):
         self.parser.add_option('-i', '--component-id',
@@ -338,5 +381,14 @@ class Component(util.LogCommand):
                 common.errorRaise('Could not find component %s' %
                     self.componentId)
 
+        def getWorkerHeavenStateCb(result):
+            d = self.parentCommand.medium.callRemote('getWorkerHeavenState')
+            return d
+
+        def gotWorkerHeavenStateCb(result):
+            self.workerHeavenState = result
+
         d.addCallback(gotPlanetStateCb)
+        d.addCallback(getWorkerHeavenStateCb)
+        d.addCallback(gotWorkerHeavenStateCb)
         return d
