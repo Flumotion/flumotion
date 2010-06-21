@@ -1525,6 +1525,7 @@ class ComponentRegistry(log.Loggable):
         self.filename = cachePath
         self.seconds = seconds
         self.mtime = None
+        self._modmtime = _getMTime(__file__)
 
         self._parser = RegistryParser()
 
@@ -1785,6 +1786,9 @@ class ComponentRegistry(log.Loggable):
             self.mtime = mtime
             self.save(True)
 
+    def isUptodate(self):
+        return self._modmtime >= _getMTime(__file__)
+
 
 class RegistrySubsetWriter(RegistryWriter):
 
@@ -1936,6 +1940,13 @@ def getRegistry():
 
     if not __registry:
         log.debug('registry', 'instantiating registry')
+        __registry = ComponentRegistry()
+    elif not __registry.isUptodate():
+        # When a new version of flumotion gets installed, running managers will
+        # reread the xml files. Reloading the registry module is required to
+        # avoid inconsistencies.
+        log.debug('registry', 'registry module updated, reloading')
+        reload(sys.modules[__registry.__module__])
         __registry = ComponentRegistry()
 
     return __registry

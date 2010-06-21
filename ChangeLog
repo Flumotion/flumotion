@@ -1,3 +1,13 @@
+2010-06-21  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/common/registry.py:
+	When a new version of flumotion gets installed, running managers
+	reread the xml files but old code is used for parsing.
+	Reload registry module is required to avoid inconsistencies between
+	the reread registry xmls and the python module.
+
 2010-06-21  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/extern/log/log.py:
