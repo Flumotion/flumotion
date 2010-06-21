@@ -1,3 +1,9 @@
+2010-06-21  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/extern/log/log.py:
+	* flumotion/extern/log/test_log.py:
+	Make adapting the same logger multiple times a noop.
+
 2010-06-18  Julien Le Goff  <jlegoff@flumotion.com>
 
 	* flumotion/admin/command/component.py:

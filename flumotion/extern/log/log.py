@@ -1026,6 +1026,9 @@ def adaptStandardLogging(loggerName, logCategory, targetModule):
     @type targetModule: str or None
     """
     logger = logging.getLogger(loggerName)
+    # if there is already a FluHandler, exit
+    if map(lambda h: isinstance(h, FluHandler), logger.handlers):
+        return
     logger.setLevel(fluLevelToStdLevel(getCategoryLevel(logCategory)))
     logger.addHandler(FluHandler(logCategory, targetModule))
 

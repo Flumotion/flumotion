@@ -194,6 +194,11 @@ class TestLog(unittest.TestCase):
         assert not self.message
 
         log.adaptStandardLogging('standard.logger', 'test', 'test_log')
+        self.assertEquals(len(logger.handlers), 1)
+
+        # trying to adapt it again should be a noop
+        log.adaptStandardLogging('standard.logger', 'test', 'test_log')
+        self.assertEquals(len(logger.handlers), 1)
 
         logger.info('invisible')
         # should not get anything, because INFO translates to Flu debug 4
