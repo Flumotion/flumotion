@@ -625,6 +625,7 @@ class TestRegistryUpdate(testsuite.TestCase):
         self.mtime = {}
         self._getMTime = registry._getMTime
         registry._getMTime = self.mtime.__getitem__
+        self.mtime[registry.__file__] = self._getMTime(registry.__file__)
 
     def tearDown(self):
         registry._getMTime = self._getMTime

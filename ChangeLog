@@ -1,5 +1,10 @@
 2010-06-21  Josep Joan Ribas  <jribas@flumotion.com>
 
+	* flumotion/test/test_registry.py:
+	Fix tests.
+
+2010-06-21  Josep Joan Ribas  <jribas@flumotion.com>
+
 	reviewed by: Jan Urbanski
 
 	* flumotion/common/registry.py:
