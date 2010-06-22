@@ -12,6 +12,8 @@
       </entries>
 
       <properties>
+	<property name="require-password" type="bool"
+		  _description="Require valid username and password for components connecting on the socket. Defaults to True. If set to False the username and password properties are not used. " />
         <property name="username" type="string"
                   _description="The username to authenticate to the porter." />
         <property name="password" type="string"

@@ -1,3 +1,13 @@
+2010-06-22  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Alvin Delagon
+
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/misc/porter/porter.xml:
+	Add a new porter property, require-password. If set to False the porter
+	does not perform user/password checking on component socket
+	connections. Defaults to True.
+
 2010-06-21  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/test/test_registry.py:

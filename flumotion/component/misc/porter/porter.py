@@ -286,6 +286,7 @@ class Porter(component.BaseComponent, log.Loggable):
             self._password = self.generateRandomString(12)
             self._socketPath = self.generateSocketPath()
 
+        self._requirePassword = props.get('require-password', True)
         self._socketMode = props.get('socket-mode', 0666)
         self._port = int(props['port'])
         self._iptablesPort = int(props.get('iptables-port', self._port))
@@ -312,6 +313,8 @@ class Porter(component.BaseComponent, log.Loggable):
         realm = PorterRealm(self)
         checker = checkers.FlexibleCredentialsChecker()
         checker.addUser(self._username, self._password)
+        if not self._requirePassword:
+            checker.allowPasswordless(True)
 
         p = portal.Portal(realm, [checker])
         serverfactory = pb.PBServerFactory(p)
