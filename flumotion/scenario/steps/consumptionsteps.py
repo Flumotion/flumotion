@@ -33,7 +33,6 @@ from flumotion.ui.wizard import WizardStep
 __version__ = "$Rev$"
 _ = gettext.gettext
 
-PREFERRED_CONSUMER = 'http-streamer'
 CONSUMER_BOTH = [('audio-video', _('Audio & Video'))]
 CONSUMER_VIDEO = [('video', _('Video only'))]
 CONSUMER_AUDIO = [('audio', _('Audio only'))]
@@ -70,10 +69,14 @@ class ConsumptionStep(WizardStep):
         self._populateField()
 
     def _gotEntries(self, entries):
+        encodingStep = self.wizard.getStep('Encoding')
+        format = encodingStep.getMuxerFormat()
+        entries = filter(lambda entry: (len(entry.getAcceptedMediaTypes()) == 0
+                         or format in entry.getAcceptedMediaTypes()),
+                         entries)
+        entries.sort(key=lambda entry: entry.getRank(), reverse=True)
+
         for entry in entries:
-            if (entry.componentType == 'shout2-consumer' and
-                not self._canEmbedShout()):
-                continue
             hbox = gtk.HBox()
             vbox = gtk.VBox()
             for type, desc in self._consumers:
@@ -91,10 +94,7 @@ class ConsumptionStep(WizardStep):
             vbox.pack_start(hbox)
             self.consumers.pack_start(vbox)
 
-            if entry.componentType == PREFERRED_CONSUMER:
-                self._consumerTypes.insert(0, self._consumerTypes.pop())
-                self.consumers.reorder_child(vbox, 0)
-                self._buttons[entry.componentType].set_active(True)
+        self._buttons[entries[0].componentType].set_active(True)
 
         self.consumers.show_all()
         self._verify()
@@ -173,14 +173,6 @@ class ConsumptionStep(WizardStep):
             blockNext = False
 
         self.wizard.blockNext(blockNext)
-
-    def _canEmbedShout(self):
-        encodingStep = self.wizard.getStep('Encoding')
-        # Shoutcast supports only mp3 and ogg
-        if (encodingStep.getAudioFormat() == 'mp3' or
-            encodingStep.getMuxerFormat() == 'ogg'):
-            return True
-        return False
 
     # Callback
 

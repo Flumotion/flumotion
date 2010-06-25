@@ -43,6 +43,8 @@ __version__ = "$Rev$"
 # Re-enable when reading the registry cache is lighter-weight, or we
 # decide that it's a good idea, or something. See #799.
 READ_CACHE = False
+# Rank used when no rank is defined in the wizard entry
+FLU_RANK_NONE = 0
 
 _VALID_WIZARD_COMPONENT_TYPES = [
     'audio-producer',
@@ -498,7 +500,7 @@ class RegistryEntryWizard(pb.Copyable):
     "This class represents a <wizard> entry in the registry"
 
     def __init__(self, componentType, type, description, feeder,
-                 eater, accepts, provides):
+                 eater, accepts, provides, rank=FLU_RANK_NONE):
         self.componentType = componentType
         self.type = type
         self.description = description
@@ -506,6 +508,7 @@ class RegistryEntryWizard(pb.Copyable):
         self.eater = eater
         self.accepts = accepts
         self.provides = provides
+        self.rank = rank
 
     def __repr__(self):
         return '<wizard %s type=%s, feeder=%s>' % (self.componentType,
@@ -1169,8 +1172,8 @@ class RegistryParser(fxml.Parser):
         #       tool so we can avoid underscores in our xml schema.
         attrs = self.parseAttributes(node,
                                      ('type', '_description'),
-                                     ('feeder', 'eater'))
-        wizardType, description, feeder, eater = attrs
+                                     ('feeder', 'eater', 'rank'))
+        wizardType, description, feeder, eater, rank = attrs
 
         accepts = []
         provides = []
@@ -1189,7 +1192,7 @@ class RegistryParser(fxml.Parser):
                 "<wizard>'s type attribute is %s must be one of %s" % (
                 parent_type,
                 ', '.join(validTypes)))
-
+        rank = int(rank or FLU_RANK_NONE)
         isProducer = wizardType.endswith('-producer')
         isEncoder = wizardType.endswith('-encoder')
         isMuxer = (wizardType == 'muxer')
@@ -1217,7 +1220,7 @@ class RegistryParser(fxml.Parser):
             raise fxml.ParserError(err)
 
         return RegistryEntryWizard(parent_type, wizardType, description,
-                                   feeder, eater, accepts, provides)
+                                   feeder, eater, accepts, provides, rank)
 
     def _parseAcceptFormat(self, node):
         # <accept-format media-type="..."/>
@@ -1419,10 +1422,14 @@ class RegistryWriter(log.Loggable):
             w(6, '</properties>')
 
             for wizard in component.wizards:
-                w(6, '<wizard type="%s" _description="%s" feeder="%s">' % (
+                rank = ''
+                if wizard.rank:
+                    rank = ' rank="%d"' % wizard.rank
+                w(6, '<wizard type="%s" _description="%s" feeder="%s"%s>' % (
                         wizard.type,
                         e(wizard.description),
-                        wizard.feeder))
+                        wizard.feeder,
+                        rank))
                 for accept in wizard.accepts:
                     w(8, '<accept-format media-type="%s"/>' % (
                             accept.media_type))

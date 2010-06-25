@@ -1,3 +1,16 @@
+2010-06-25  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/common/componentui.py:
+	* flumotion/common/registry.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/shout2/shout2.xml:
+	* flumotion/scenario/steps/consumptionsteps.py:
+	Add rank to wizard entries to set preferred consumers.
+	Use accepted-format in consumers wizard entries to know if the
+	consumer can be shown in the assistant.
+
 2010-06-22  Jan Urbanski  <jurbanski@flumotion.com>
 
 	reviewed by: Alvin Delagon

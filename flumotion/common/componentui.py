@@ -75,6 +75,9 @@ class WizardEntryState(pb.RemoteCopy):
         """
         return [format.media_type for format in self.provides]
 
+    def getRank(self):
+        return self.rank
+
 pb.setUnjellyableForClass(registry.RegistryEntryWizard, WizardEntryState)
 
 

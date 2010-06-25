@@ -8,7 +8,10 @@
       <eater name="default" />
       
       <wizard type="consumer" feeder="default"
-	      _description="Stream to _Icecast2"/>
+              _description="Stream to _Icecast2">
+        <accept-format media-type="ogg"/>
+        <accept-format media-type="mp3"/>
+      </wizard>
 
       <entries>
         <entry type="component" location="shout2.py"
