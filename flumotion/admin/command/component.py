@@ -135,42 +135,62 @@ class List(common.AdminCommand):
 class DetailedList(common.AdminCommand):
     description = "List components with types and worker hosts."
 
-    def pprint(self, comps):
-        tab = 4
-        cols = [[c[i] for c in comps] for i in xrange(len(comps[0]))]
-        max_widths = [max(map(len, c)) for c in cols]
-        for c in comps:
-            s = "    "
-            for i in xrange(len(c)):
-                width = "%d" % (max_widths[i] + tab)
-                s += ('%-' + width + "s") % c[i]
-            self.stdout.write(s + "\n")
-
-    def print_components(self, place, workers):
-        comps = []
-        for c in place.get('components'):
-            workerName = c.get('workerName')
-            host = "unknown"
-            for w in workers:
-                if workerName == w.get('name'):
-                    host = w.get('host')
-                    break
-            comps.append((c.get('name'), c.get('type'), host))
-        self.pprint(comps)
-
     def doCallback(self, args):
         p = self.parentCommand
         a = p.planetState.get('atmosphere')
-        s = self.parentCommand.workerHeavenState
+        s = p.workerHeavenState
         workers = s.get('workers')
-        if a.get('components'):
+        a_comps = a.get('components')
+        if a_comps:
             self.stdout.write('atmosphere:\n')
-            self.print_components(a, workers)
+            self.parentCommand.print_components(a_comps, workers)
 
         for f in p.planetState.get('flows'):
-            if f.get('components'):
+            f_comps = f.get('components')
+            if f_comps:
                 self.stdout.write('%s flow:\n' % f.get('name'))
-                self.print_components(f, workers)
+                self.parentCommand.print_components(f_comps, workers)
+
+
+class UpstreamList(common.AdminCommand):
+    description = """List a component and its upstream components along
+with types and worker hosts."""
+
+    def get_eaters_ids(self, eaters_dic):
+        avatars = []
+        for flow in eaters_dic.keys():
+            comps = eaters_dic[flow]
+            for c in comps:
+                (name, what) = c[0].split(':')
+                avatars.append('/%s/%s' % (flow, name))
+        return avatars
+
+    def doCallback(self, args):
+        p = self.parentCommand
+        s = p.workerHeavenState
+        workers = s.get('workers')
+
+        if not p.componentId:
+            common.errorRaise("Please specify a component id "
+                "with 'component -i [component-id]'")
+
+        eaters = p.componentState.get('config').get('eater', {})
+        eaters_id = self.get_eaters_ids(eaters)
+        comps = [p.componentState]
+        while len(eaters_id) > 0:
+            eaters = {}
+            for i in eaters_id:
+                try:
+                    compState = util.findComponent(p.planetState, i)
+                    comps.append(compState)
+                    eaters.update(compState.get('config').get('eater', {}))
+                except Exception, e:
+                    self.debug(log.getExceptionMessage(e))
+                    common.errorRaise("Error retrieving component '%s'" % i)
+            eaters_id = self.get_eaters_ids(eaters)
+
+        self.stdout.write('Upstream Components:\n')
+        self.parentCommand.print_components(comps, workers)
 
 
 class Mood(common.AdminCommand):
@@ -341,7 +361,7 @@ class Component(util.LogCommand):
     usage = "-i [component id]"
 
     subCommandClasses = [Delete, Invoke, List, DetailedList,
-                         Mood, Property, Start, Stop]
+                         UpstreamList, Mood, Property, Start, Stop]
 
     componentId = None
     componentState = None
@@ -392,3 +412,26 @@ class Component(util.LogCommand):
         d.addCallback(getWorkerHeavenStateCb)
         d.addCallback(gotWorkerHeavenStateCb)
         return d
+
+    def pprint(self, comps):
+        tab = 4
+        cols = [[c[i] for c in comps] for i in xrange(len(comps[0]))]
+        max_widths = [max(map(len, c)) for c in cols]
+        for c in comps:
+            s = "    "
+            for i in xrange(len(c)):
+                width = "%d" % (max_widths[i] + tab)
+                s += ('%-' + width + "s") % c[i]
+            self.stdout.write(s + "\n")
+
+    def print_components(self, components, workers):
+        comps = []
+        for c in components:
+            workerName = c.get('workerName')
+            host = "unknown"
+            for w in workers:
+                if workerName == w.get('name'):
+                    host = w.get('host')
+                    break
+            comps.append((c.get('name'), c.get('type'), host))
+        self.pprint(comps)
