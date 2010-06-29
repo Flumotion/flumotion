@@ -1,3 +1,8 @@
+2010-06-29  Aitor Guevara Escalante  <aitor@flumotion.com>
+
+	* flumotion/manager/admin.py:
+	Added component method invocation through managers pb remote call.
+
 2010-06-28  Julien Le Goff  <jlegoff@flumotion.com>
 
 	* flumotion/admin/command/component.py:

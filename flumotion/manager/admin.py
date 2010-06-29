@@ -36,6 +36,7 @@ from zope.interface import implements
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, planet, registry, debug
 from flumotion.common.python import makedirs
+from flumotion.monitor.nagios import util
 
 # make Result and Message proxyable
 from flumotion.common import messages
@@ -171,6 +172,29 @@ class AdminAvatar(base.ManagerAvatar):
             self.warning(msg)
             raise errors.RemoteMethodError(methodName,
                 log.getExceptionMessage(e))
+
+    def perspective_componentsList(self):
+        """
+        List components in the planet. Returns a list of component names.
+        """
+        componentStates = self.vishnu.state.getComponents()
+        components = ['/%s/%s' % (c.get('parent').get('name'), c.get('name'))
+                        for c in componentStates]
+        return components
+
+    def perspective_componentInvoke(self, avatarId, methodName,
+                                    *args, **kwargs):
+        """
+        Call a remote method on the component.
+
+        @param avatarId: the component avatar id
+        @type  avatarId: str
+        @param methodName: name of the method to call
+        @type  methodName: str
+        """
+        component = util.findComponent(self.vishnu.state, avatarId)
+        return self.perspective_componentCallRemote(component, methodName,
+                                                    *args, **kwargs)
 
     def perspective_workerCallRemote(self, workerName, methodName,
                                      *args, **kwargs):
