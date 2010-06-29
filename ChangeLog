@@ -1,6 +1,12 @@
 2010-06-29  Aitor Guevara Escalante  <aitor@flumotion.com>
 
 	* flumotion/manager/admin.py:
+	Reusing code to build avatarIds. Component method invocation
+	through pb now checks if the component exists first.
+
+2010-06-29  Aitor Guevara Escalante  <aitor@flumotion.com>
+
+	* flumotion/manager/admin.py:
 	Added component method invocation through managers pb remote call.
 
 2010-06-28  Julien Le Goff  <jlegoff@flumotion.com>

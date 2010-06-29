@@ -35,6 +35,7 @@ from zope.interface import implements
 
 from flumotion.manager import base
 from flumotion.common import errors, interfaces, log, planet, registry, debug
+from flumotion.common import common
 from flumotion.common.python import makedirs
 from flumotion.monitor.nagios import util
 
@@ -175,12 +176,13 @@ class AdminAvatar(base.ManagerAvatar):
 
     def perspective_componentsList(self):
         """
-        List components in the planet. Returns a list of component names.
+        List components in the planet. Returns a list of avatar ids.
         """
         componentStates = self.vishnu.state.getComponents()
-        components = ['/%s/%s' % (c.get('parent').get('name'), c.get('name'))
-                        for c in componentStates]
-        return components
+        avatar_ids = [common.componentId(c.get('parent').get('name'),
+                                         c.get('name'))
+                      for c in componentStates]
+        return avatar_ids
 
     def perspective_componentInvoke(self, avatarId, methodName,
                                     *args, **kwargs):
@@ -193,6 +195,9 @@ class AdminAvatar(base.ManagerAvatar):
         @type  methodName: str
         """
         component = util.findComponent(self.vishnu.state, avatarId)
+        if not component:
+            self.warning('No component with avatar id %s' % avatarId)
+            raise errors.UnknownComponentError(avatarId)
         return self.perspective_componentCallRemote(component, methodName,
                                                     *args, **kwargs)
 
