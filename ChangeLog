@@ -1,3 +1,10 @@
+2010-06-30  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Jan Urbanski
+
+	* flumotion/monitor/nagios/stream.py:
+	Print errors fetching a segment in stdout instead of stderr.
+
 2010-06-29  Aitor Guevara Escalante  <aitor@flumotion.com>
 
 	* flumotion/manager/admin.py:

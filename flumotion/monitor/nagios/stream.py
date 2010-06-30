@@ -245,9 +245,8 @@ class CheckBase(util.LogCommand):
             except urllib2.HTTPError, e:
                 # For fragmented streams, a 404 is not critical
                 if e.code == 404:
-                    raise util.NagiosWarning("Fetching segment '%s' returned "
-                        "\"%s\". The stream might be out of sync." %
-                        (self._url, e))
+                    return self.warning("Fetching segment returned "
+                        "\"%s\". The stream might be out of sync." % e)
                 raise
             c = segment.read()
             tmp.write(c)
@@ -304,6 +303,10 @@ class CheckBase(util.LogCommand):
     def critical(self, message):
         return util.critical('%s: %s [dump at %s]' %
             (self._url, message, self._tmpfile))
+
+    def warning(self, message):
+        os.remove(self._tmpfile)
+        return util.warning('%s: %s' % (self._url, message))
 
     def ok(self, message):
         # remove tempfile with the stream if all goes ok
