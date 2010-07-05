@@ -73,6 +73,14 @@ and its remote_* methods.
 
 Examples: getConfig, setFluDebug""" % common.ARGUMENTS_DESCRIPTION
 
+    def addOptions(self):
+        self.parser.add_option('-r', '--raw-output',
+                               action="store_true", dest="rawOutput",
+                               help="do not pretty print the output")
+
+    def handleOptions(self, options):
+        self.rawOutput = options.rawOutput
+
     def doCallback(self, args):
         if not self.parentCommand.componentId:
             common.errorRaise("Please specify a component id "
@@ -94,9 +102,12 @@ Examples: getConfig, setFluDebug""" % common.ARGUMENTS_DESCRIPTION
             self.parentCommand.componentState, methodName, *args)
 
         def cb(result):
-            import pprint
-            self.stdout.write("Invoking '%s' on '%s' returned:\n%s\n" % (
-                methodName, p.componentId, pprint.pformat(result)))
+            if self.rawOutput:
+                self.stdout.write(str(result))
+            else:
+                import pprint
+                self.stdout.write("Invoking '%s' on '%s' returned:\n%s\n" % (
+                        methodName, p.componentId, pprint.pformat(result)))
 
         def eb(failure):
             if failure.check(errors.NoMethodError):

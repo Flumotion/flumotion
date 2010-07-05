@@ -1,3 +1,12 @@
+2010-07-05  Jan Urbanski  <jurbanski@flumotion.com>
+
+	reviewed by: Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/admin/command/component.py:
+	Add a -r/--raw-output option to flumotion-command component
+	invoke. When passed, it will prevent decorating and pretty-printing of
+	the output. Useful if the invoked method returns binary data.
+
 2010-06-30  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Jan Urbanski
