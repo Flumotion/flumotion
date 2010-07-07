@@ -1,0 +1,44 @@
+<registry>
+  <bundles>
+
+    <bundle name="videoscale-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/videoscale">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="videoscale-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk" />
+            <dependency name="videoscale-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/videoscale">
+                <filename location="admin_gtk.py" />
+                <filename location="videoscale.glade" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="videoscale-effect">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="videoscale-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/videoscale">
+                <filename location="videoscale.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry>

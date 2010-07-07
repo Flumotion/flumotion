@@ -1,3 +1,32 @@
+2010-07-02  Marc-André Lureau  <mlureau@flumotion.com>
+
+	reviewed by: Andoni Morales
+
+	* configure.ac:
+	* flumotion/component/effects/Makefile.am:
+	* flumotion/component/effects/videoscale/Makefile.am (added):
+	* flumotion/component/effects/videoscale/__init__.py (added):
+	* flumotion/component/effects/videoscale/admin_gtk.py (added):
+	* flumotion/component/effects/videoscale/videoscale.glade (added):
+	* flumotion/component/effects/videoscale/videoscale.py (added):
+	* flumotion/component/effects/videoscale/videoscale.xml (added):
+	effects: add videoscale effect
+
+	The videoscale effect allow resizing a video, while keeping
+	aspect-ratio. It also ensures video width is a multiple of 8.
+
+	If you use "is-square" 1/1 aspect-ratio, you should only
+	specify either width or height.
+
+	The admin UI is not well tested, in particular when applying
+	changes while running, the downstream elements don't react
+	very well (they become hungry or may crash). It is advised not
+	show it in the admin UI for now.
+
+	Calculate scale correction on each videoscale source caps
+	change.
+	Closes #1437
+
 2010-07-01  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Marc-Andre Lureau
@@ -585,7 +614,7 @@
 
 2010-06-02  Julien Le Goff  <jlegoff@flumotion.com>
 
-	reviewed by: Josep Ribas 
+	reviewed by: Josep Ribas
 
 	* flumotion/common/gstreamer.py:
 	* flumotion/component/consumers/disker/disker.py:
