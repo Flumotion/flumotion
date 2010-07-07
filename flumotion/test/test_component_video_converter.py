@@ -29,10 +29,14 @@ from flumotion.common import testsuite
 from flumotion.common import log, errors
 from flumotion.common.planet import moods
 from flumotion.component.converters.video import video
+from flumotion.common import gstreamer
 
 from flumotion.test import comptest
 
 attr = testsuite.attr
+
+if not gstreamer.element_factory_has_property('deinterlace', 'method'):
+    skip="GStreamer element 'deinterlace' is too old"
 
 
 class TestVideoConverter(comptest.CompTestTestCase, log.Loggable):

@@ -1,3 +1,9 @@
+2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	* flumotion/test/test_component_video_converter.py:
+	Skip video-converter tests if the version of the 'deinterlace' element
+	is too old and doesn't have the method property.
+
 2010-07-07  Marc-André Lureau  <mlureau@flumotion.com>
 
 	* flumotion/test/Makefile.am:
