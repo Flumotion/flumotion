@@ -3,6 +3,14 @@
 	reviewed by: Pepe Ribas
 
 	* flumotion/component/producers/firewire/wizard_gtk.py:
+	Display the real output width which is different from the 'width'
+	argument passed to the scaller
+
+2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Pepe Ribas
+
+	* flumotion/component/producers/firewire/wizard_gtk.py:
 	Don't update the scale correction when one of the options is toggled,
 	only if 'height' or 'is-square' changed.
 	Closes #1442

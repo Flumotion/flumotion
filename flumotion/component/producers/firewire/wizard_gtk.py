@@ -147,11 +147,14 @@ class _FireWireCommon:
             # => DAR can be destroyed
             # we ensure multiple of 8 to avoid videobox padding, and stretch
             self.model.properties.width = (d['ow'] + 8) - d['ow'] % 8
-        if self._width_correction == 'pad':
+            out_width = self.model.properties.width
+        elif self._width_correction == 'pad':
             # only specify height, to let videobox compute the width
             self.model.properties.height = d['oh']
+            out_width = (d['ow'] + 8) - d['ow'] % 8
         else:
             self.model.properties.width = d['ow']
+            out_width = d['ow']
             # if is_square, height can be managed automatically by videoscale
             if self.model.properties.is_square:
                 self.model.properties.height = 0
@@ -160,7 +163,7 @@ class _FireWireCommon:
             num, den = self._par[0], self._par[1]
 
         msg = _('%dx%d, %d/%d pixel aspect ratio') % (
-                   d['ow'], d['oh'], num, den)
+                   out_width, d['oh'], num, den)
         self.label_output_format.set_markup(msg)
 
         if update_correction:
