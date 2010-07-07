@@ -62,28 +62,6 @@ class StreamerTestCase(testsuite.TestCase):
         return self.config.copy()
 
 
-class TestOldProperties(StreamerTestCase):
-    "Test that old properties with underscores in the name get converted."
-    properties = {
-        u'user_limit': 1024,
-        u'mount_point': '/',
-        u'bandwidth_limit': 10,
-        u'port': 8800,
-        u'burst_on_connect': True,
-    }
-
-    def testPropertiesConverted(self):
-        # test that the old-style properties were renamed to new-style
-        props = self.component.config['properties']
-        for key in ('user_limit', 'mount_point', 'bandwidth_limit',
-            'burst_on_connect'):
-            self.failIf(key in props)
-        self.assertEquals(props['client-limit'], 1024)
-        self.assertEquals(props['bandwidth-limit'], 10)
-        self.assertEquals(props['mount-point'], '/')
-        self.assertEquals(props['burst-on-connect'], True)
-
-
 class TestStreamDataNoPlug(StreamerTestCase):
 
     def testGetStreamData(self):
