@@ -1,5 +1,13 @@
 2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
+	* flumotion/component/effects/videorate (svn:ignore):
+	* flumotion/component/effects/deinterlace (svn:ignore):
+	* flumotion/component/converters/video (svn:ignore):
+	* flumotion/component/effects/videoscale (svn:ignore):
+	Add missing files to svn:ignore
+
+2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
 	* flumotion/component/effects/videorate/videorate.py:
 	Use 2 parameters in gst.Fraction to be compatible with older versions
 
