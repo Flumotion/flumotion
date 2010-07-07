@@ -23,6 +23,7 @@
 parsing of manager configuration files
 """
 
+import operator
 import warnings
 
 from flumotion.common import log, errors, common, registry
@@ -801,16 +802,9 @@ class PlanetXMLWriter(XMLWriter):
         attrs = [('name', flow.get('name'))]
         self.pushTag('flow', attrs)
 
-        # FIXME: When we can depend on Python 2.4, use
-        #        sorted(flow.get('components'),
-        #               cmp=cmpComponentType,
-        #               key=operator.attrgetter('type'))
-        #
-
-        def componentSort(a, b):
-            return cmpComponentType(a.get('type'), b.get('type'))
-        components = list(flow.get('components'))
-        components.sort(cmp=componentSort)
+        component = sorted(flow.get('components'),
+                           cmp=cmpComponentType,
+                           key=operator.attrgetter('type'))
         for component in components:
             self._writeComponent(component)
         self.popTag()

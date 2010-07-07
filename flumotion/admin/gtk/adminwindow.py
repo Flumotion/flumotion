@@ -895,9 +895,9 @@ class AdminWindow(Loggable, GladeDelegate):
         if self._adminModel is None:
             return
 
-        self._adminModel.disconnect_by_func(self._admin_connected_cb)
-        self._adminModel.disconnect_by_func(self._admin_disconnected_cb)
-        self._adminModel.disconnect_by_func(self._admin_update_cb)
+        self._adminModel.disconnectByFunction(self._admin_connected_cb)
+        self._adminModel.disconnectByFunction(self._admin_disconnected_cb)
+        self._adminModel.disconnectByFunction(self._admin_update_cb)
         self._adminModel = None
 
         self._addFormatAction.set_sensitive(False)

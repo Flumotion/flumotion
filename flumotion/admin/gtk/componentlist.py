@@ -28,6 +28,7 @@ It contains:
 """
 
 import gettext
+import operator
 import os
 
 import gobject
@@ -297,19 +298,11 @@ class ComponentList(log.Loggable, gobject.GObject):
         self._model.clear()
         self._iters = {}
 
-        # FIXME: When we can depend on Python 2.4, use
-        #        sorted(components.values(),
-        #               cmp=cmpComponentType,
-        #               key=operator.attrgetter('type'))
-        #
+        components = sorted(components.values(),
+                            cmp=cmpComponentType,
+                            key=operator.methodcaller('get', 'type'))
 
-        def componentSort(a, b):
-            return cmpComponentType(a.get('type'),
-                                    b.get('type'))
-        componentsSorted = components.values()
-        componentsSorted.sort(cmp=componentSort)
-
-        for component in componentsSorted:
+        for component in components:
             self.appendComponent(component, componentNameToSelect)
 
         self.debug('updated components view')

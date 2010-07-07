@@ -30,18 +30,6 @@ __version__ = "$Rev$"
 # we're possibly redefining some builtins, so don't warn
 __pychecker__ = 'no-shadowbuiltin'
 
-# sorted() was introduced in 2.4
-if sys.version_info[:2] < (2, 4):
-
-    def sorted(seq, reverse=False):
-        seq = seq[:]
-        seq.sort()
-        if reversed:
-            seq = seq[::-1]
-        return seq
-else:
-    sorted = sorted
-
 # any() was introduced in 2.5
 if sys.version_info[:2] < (2, 5):
 

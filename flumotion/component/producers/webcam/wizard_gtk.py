@@ -31,12 +31,6 @@ from flumotion.common import errors
 from flumotion.common.fraction import fractionAsFloat
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.messages import Info
-# FIXME: make pychecker able to suppress shadowed builtins like these
-# at the defining site, not caller site
-# P2.4
-__pychecker__ = 'no-shadowbuiltin'
-from flumotion.common.python import sorted
-__pychecker__ = ''
 from flumotion.admin.gtk.basesteps import VideoProducerStep
 
 __version__ = "$Rev$"

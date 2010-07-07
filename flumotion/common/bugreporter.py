@@ -26,7 +26,6 @@ import webbrowser
 
 from flumotion.common.common import pathToModuleName
 from flumotion.common.debug import getVersions
-from flumotion.common.python import sorted as STUPID_PYCHECKER_sorted
 from flumotion.configure import configure
 
 _BUG_COMPONENT = 'flumotion'
@@ -73,7 +72,7 @@ class BugReporter(object):
         filenames = self._collectFilenames(filenames)
 
         extra = ' * Filename revisions:\n'
-        for filename in STUPID_PYCHECKER_sorted(filenames.keys()):
+        for filename in sorted(filenames.keys()):
             rev = filenames[filename]
             link = '[source:flumotion/%s/%s#%s r%s]' % (
                 configure.branchName, filename, rev, rev)

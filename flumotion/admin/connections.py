@@ -29,12 +29,6 @@ from xml.dom import minidom, Node
 from flumotion.common import log, common, xdg
 from flumotion.common.connection import PBConnectionInfo, parsePBConnectionInfo
 from flumotion.common.errors import OptionError
-# FIXME: make pychecker able to suppress shadowed builtins like these
-# at the defining site, not caller site
-# P2.4
-__pychecker__ = 'no-shadowbuiltin'
-from flumotion.common.python import sorted
-__pychecker__ = ''
 from flumotion.configure import configure
 from flumotion.twisted.pb import Authenticator
 

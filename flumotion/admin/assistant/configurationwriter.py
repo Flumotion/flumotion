@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+import operator
 from cStringIO import StringIO
 from xml.sax.saxutils import quoteattr
 
@@ -69,17 +70,9 @@ class ConfigurationWriter(XMLWriter):
         self.popTag()
 
     def _writeComponents(self, components):
-        # FIXME: When we can depend on Python 2.4, use
-        #        sorted(flow.get('components'),
-        #               cmp=cmpComponentType,
-        #               key=operator.attrgetter('componentType'))
-        #
-
-        def componentSort(a, b):
-            return cmpComponentType(a.componentType,
-                                    b.componentType)
-        components = list(components)
-        components.sort(cmp=componentSort)
+        components = sorted(components,
+                            cmp=cmpComponentType,
+                            key=operator.attrgetter('componentType'))
         for component in components:
             self._writeComponent(component)
 
