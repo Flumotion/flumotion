@@ -2,6 +2,17 @@
 
 	reviewed by: Marc-Andre Lureau
 
+	* flumotion/component/producers/firewire/admin_gtk.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/firewire.xml:
+	Add deinterlacer effect to the firewire producer
+	Removed all the scalling tricks used to reduce the interlace
+	artifacts, no needed anymore with the deinterlacer.
+
+2010-07-01  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-Andre Lureau
+
 	* configure.ac:
 	* flumotion/component/effects/Makefile.am:
 	* flumotion/component/effects/deinterlace/Makefile.am:

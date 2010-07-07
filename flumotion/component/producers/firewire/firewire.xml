@@ -29,13 +29,17 @@
         <property name="width" type="int"
                   _description="The final width, including correction." />
         <property name="scaled-width" type="int"
-                  _description="The width to scale to before correcting." />
+                  _description="The width to scale to before correcting.(Deprecated)" />
         <property name="is-square" type="bool"
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
         <property name="framerate" type="fraction"
                   _description="The framerate (in fps)."/>
         <property name="guid" type="string"
                   _description="The GUID of the device (a hexadecimal such as 0xhhhhhhhhhhhhhhhh)." />
+        <property name="deinterlace-mode" type="string"
+                  _description="The deinterlacing mode to use.(default=auto)" />
+        <property name="deinterlace-method" type="string"
+                  _description="The deinterlacing method to use.(default=ffmpeg)" />
       </properties>
     </component>
   </components>
@@ -57,6 +61,7 @@
            <dependency name="firewire-base" />
            <dependency name="base-admin-gtk" />
            <dependency name="volume-admin-gtk" />
+           <dependency name="deinterlace-admin-gtk" />
        </dependencies>
 
        <directories>
@@ -70,6 +75,7 @@
        <dependencies>
            <dependency name="component" />
            <dependency name="firewire-base" />
+           <dependency name="deinterlace-effect" />
            <dependency name="volume-effect" />
            <dependency name="producer-checks" />
        </dependencies>

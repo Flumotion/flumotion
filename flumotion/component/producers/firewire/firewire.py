@@ -25,6 +25,7 @@ from twisted.internet import defer
 from flumotion.common import errors, messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
+from flumotion.component.effects.deinterlace import deinterlace
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -35,12 +36,34 @@ T_ = gettexter()
 
 class Firewire(feedcomponent.ParseLaunchComponent):
 
+    def checkDeinterlaceProps(self):
+        props = self.config['properties']
+        deintMode = props.get('deinterlace-mode', 'auto')
+        deintMethod = props.get('deinterlace-method', 'ffmpeg')
+
+        result = messages.Result()
+        if deintMode not in deinterlace.DEINTERLACE_MODE:
+            msg = messages.Error(T_(N_("Configuration error: '%s' " \
+                "is not a valid deinterlace mode." % deintMode)))
+            self.debug("'%s' is not a valid deinterlace mode", deintMode)
+            result.add(msg)
+            result.succeed(False)
+        if deintMethod not in deinterlace.DEINTERLACE_METHOD:
+            msg = messages.Error(T_(N_("Configuration error: '%s' " \
+                "is not a valid deinterlace method." % deintMethod)))
+            self.debug("'%s' is not a valid deinterlace method",
+                deintMethod)
+            result.add(msg)
+            result.succeed(False)
+        return defer.succeed(result)
+
     def do_check(self):
-        self.debug('running PyGTK/PyGST checks')
+        self.debug('running PyGTK/PyGST and configuration checks')
         from flumotion.component.producers import checks
         d1 = checks.checkTicket347()
         d2 = checks.checkTicket348()
-        dl = defer.DeferredList([d1, d2])
+        d3 = self.checkDeinterlaceProps()
+        dl = defer.DeferredList([d1, d2, d3])
         dl.addCallback(self._checkCallback)
         return dl
 
@@ -53,18 +76,19 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         width = props.get('width', 240)
         height = props.get('height', int(576 * width/720.)) # assuming PAL :-/
         guid = props.get('guid', None)
+        self.deintMode = props.get('deinterlace-mode', 'ato')
+        self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
 
         # F0.6: remove backwards-compatible properties
         self.fixRenamedProperties(props, [
-            ('scaled_width', 'scaled-width'),
             ('is_square', 'is-square'),
             ])
-        scaled_width = props.get('scaled-width', width)
+        if props.get('scaled-width', None) is not None:
+            self.warnDeprecatedProperties(['scaled-width'])
+
         is_square = props.get('is-square', False)
         framerate = props.get('framerate', (30, 2))
         framerate_float = float(framerate[0]) / framerate[1]
-
-        scale_correction = width - scaled_width
 
         if 12.5 < framerate_float:
             drop_factor = 1
@@ -83,6 +107,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         # the point of width correction is to get to a multiple of 8 for width
         # so codecs are happy; it's unrelated to the aspect ratio correction
         # to get to 4:3 or 16:9
+        scale_correction = width % 8
         if scale_correction > 0:
             # videobox in 0.8.8 has a stride problem outputting AYUV with odd
             # width I420 works fine, but is slower when overlay is used
@@ -93,10 +118,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         else:
             pad_pipe = ''
 
-        # Always scale down to half size to lose interlacing artifacts.
-        # FIXME: handle this better when GStreamer provides facilities for it.
-        interlaced_height = 288
-
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can
         # replace it with videotestsrc of the same size and PAR, so we can
         # unittest the pipeline
@@ -106,12 +127,11 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '    ! queue leaky=2 max-size-time=1000000000'
                     '    ! dvdemux name=demux'
                     '  demux. ! queue ! dvdec drop-factor=%(df)d'
-                    '    ! video/x-raw-yuv,format=(fourcc)YUY2'
-                    '    ! videorate ! videoscale'
-                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(ih)s%(sq)s'
+                    '    ! videorate ! capsfilter name=ratefilter'
+                    '      caps="video/x-raw-yuv,framerate=%(fr)s" '
                     '    ! videoscale'
-                    '    ! video/x-raw-yuv,width=%(sw)s,height=%(h)s,'
-                    '      framerate=%(fr)s,format=(fourcc)YUY2'
+                    '    ! video/x-raw-yuv,width=%(w)s,height=%(h)s%(sq)s,'
+                    '      framerate=%(fr)s'
                     '    %(pp)s'
                     '    ! @feeder:video@'
                     '  demux. ! queue ! audio/x-raw-int '
@@ -119,9 +139,8 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '    ! level name=volumelevel message=true ! audiorate'
                     '    ! @feeder:audio@'
                     '    t. ! queue ! @feeder:dv@'
-                    % dict(df=drop_factor, ih=interlaced_height,
-                           sq=square_pipe, pp=pad_pipe,
-                           sw=scaled_width, h=height,
+                    % dict(df=drop_factor, sq=square_pipe, pp=pad_pipe,
+                           w=width, h=height,
                            guid=(guid and ('guid=%s' % guid) or ''),
                            fr=('%d/%d' % (framerate[0], framerate[1]))))
 
@@ -136,8 +155,14 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         bus = pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect('message::element', self._bus_message_received_cb)
-
         self.addEffect(vol)
+
+        ratefilter = pipeline.get_by_name("ratefilter")
+        deinterlacer = deinterlace.Deinterlace('deinterlace',
+            ratefilter.get_pad("src"), pipeline,
+            self.deintMode, self.deintMethod)
+        self.addEffect(deinterlacer)
+        deinterlacer.plug()
 
     def getVolume(self):
         return self.volume.get_property('volume')

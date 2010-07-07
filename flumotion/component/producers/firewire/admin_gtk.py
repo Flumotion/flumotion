@@ -21,6 +21,8 @@
 
 from flumotion.component.base import admin_gtk
 from flumotion.component.effects.volume.admin_gtk import VolumeAdminGtkNode
+from flumotion.component.effects.deinterlace.admin_gtk \
+    import DeinterlaceAdminGtkNode
 
 __version__ = "$Rev$"
 
@@ -31,6 +33,9 @@ class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
         volume = VolumeAdminGtkNode(self.state, self.admin,
                                     'inputVolume', 'Input Volume')
         self.nodes['Volume'] = volume
+        deinterlace = DeinterlaceAdminGtkNode(self.state, self.admin,
+                                    'deinterlace', 'Deinterlacing')
+        self.nodes['Deinterlace'] = deinterlace
         return admin_gtk.BaseAdminGtk.setup(self)
 
     def component_volumeChanged(self, channel, rms, peak, decay):
@@ -47,5 +52,27 @@ class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
             return
         v = self.nodes['Volume']
         v.volumeSet(volume)
+
+    def component_effectModeSet(self, effect, mode):
+        """
+        @param mode: deinterlace mode
+        @type  volume: string
+        """
+        if effect != 'deinterlace':
+            self.warning('Unknown effect %s in %r' % (effect, self))
+            return
+        v = self.nodes['Deinterlace']
+        v.modeSet(mode)
+
+    def component_effectMethodSet(self, effect, mode):
+        """
+        @param mode: deinterlace method
+        @type  volume: string
+        """
+        if effect != 'deinterlace':
+            self.warning('Unknown effect %s in %r' % (effect, self))
+            return
+        v = self.nodes['Deinterlace']
+        v.methodSet(mode)
 
 GUIClass = FirewireAdminGtk
