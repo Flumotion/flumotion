@@ -1,3 +1,10 @@
+2010-07-01  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-Andre Lureau
+
+	* flumotion/component/feedcomponent.py:
+	Add a new class for pluggable post processing effect
+
 2010-07-05  Jan Urbanski  <jurbanski@flumotion.com>
 
 	reviewed by: Sébastien Merle  <sebastien@flumotion.com>

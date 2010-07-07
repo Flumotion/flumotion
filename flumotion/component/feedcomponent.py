@@ -540,6 +540,61 @@ class Effect(log.Loggable):
         return self.component
 
 
+class PostProcEffect (Effect):
+    """
+    I am an effect that is plugged in the pipeline to do a post processing
+    job and can be chained to other effect of the same class.
+
+    @ivar name:      name of the effect
+    @type name:      string
+    @ivar component: component owning the effect
+    @type component: L{FeedComponent}
+    @ivar sourcePad: pad of the source after which I'm plugged
+    @type sourcePad: L{GstPad}
+    @ivar effectBin: gstreamer bin doing the post processing effect
+    @type source:    L{GstBin}
+    @ivar pipeline:  pipeline holding the gstreamer elements
+    @type pipeline:  L{GstPipeline}
+
+    """
+    logCategory = "effect"
+
+    def __init__(self, name, sourcePad, effectBin, pipeline):
+        """
+        @param name:      the name of the effect
+        @param sourcePad: pad of the source after which I'm plugged
+        @param effectBin: gstreamer bin doing the post processing effect
+        @param pipeline:  pipeline holding the gstreamer elements
+        """
+        Effect.__init__(self, name)
+        self.sourcePad = sourcePad
+        self.effectBin = effectBin
+        self.pipeline = pipeline
+        self.plugged = False
+
+    def plug(self):
+        """
+        Plug the effect in the pipeline unlinking the source element with it's
+        downstream peer
+        """
+        if self.plugged == True:
+            return
+        # Unlink the source pad of the source element after which we need
+        # are going to be plugged
+        peerSinkPad = self.sourcePad
+        peerSrcPad = peerSinkPad.get_peer()
+        peerSinkPad.unlink(peerSrcPad)
+
+        # Add the deinterlacer bin to the pipeline
+        self.effectBin.set_state(self.pipeline.get_state()[1])
+        self.pipeline.add(self.effectBin)
+
+        # link it with the element src pad and its peer's sink pad
+        peerSinkPad.link(self.effectBin.get_pad('sink'))
+        self.effectBin.get_pad('src').link(peerSrcPad)
+        self.plugged = True
+
+
 class MultiInputParseLaunchComponent(ParseLaunchComponent):
     """
     This class provides for multi-input ParseLaunchComponents, such as muxers,
