@@ -25,10 +25,10 @@
         <property name="xiph-logo" type="bool"
                   _description="Whether to show a Xiph logo." />
 
-        <property name="width" type="int" required="yes"
-                  _description="The width of the overlaid image." />
-        <property name="height" type="int" required="yes"
-                  _description="The height of the overlaid image." />
+        <property name="width" type="int" required="no"
+                  _description="Deprecated" />
+        <property name="height" type="int" required="no"
+                  _description="Deprecated" />
       </properties>
     </component>
 

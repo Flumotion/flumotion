@@ -2,6 +2,26 @@
 
 	reviewed by: Marc-Andre Lureau
 
+	* flumotion/admin/gtk/overlaystep.py:
+	* flumotion/component/converters/overlay/overlay.py:
+	* flumotion/component/converters/overlay/overlay.xml:
+	overlay: add suport for dynamic changes using the input stream
+	caps.
+
+	Former overlay component needs to know beforehand both the
+	width and height of the imput stream to generate the image to
+	overlay. The new implementation uses the caps of the input stream
+	and generates a new image on each change, pushing buffer at the
+	input framerate.
+
+	admin: don't set width and height in the overlay component,
+	it's now deprecated.
+	Closes #1441
+
+2010-07-02  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-Andre Lureau
+
 	* flumotion/component/producers/firewire/firewire.py:
 	Check properties in class method check_properites()
 

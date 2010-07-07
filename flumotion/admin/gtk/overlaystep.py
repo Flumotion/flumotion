@@ -58,9 +58,6 @@ class Overlay(VideoConverter):
         if not self.properties.show_text:
             del p.text
 
-        p.width = self._videoProducer.getWidth()
-        p.height = self._videoProducer.getHeight()
-
         return p
 
 
