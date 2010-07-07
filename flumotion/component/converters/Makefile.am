@@ -9,6 +9,8 @@ TAGS_FILES = $(component_PYTHON)
 clean-local:
 	rm -rf *.pyc *.pyo
 
-SUBDIRS = \
+SUBDIRS = 	\
 	overlay \
-	pipeline
+	pipeline\
+	video
+

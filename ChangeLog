@@ -2,6 +2,19 @@
 
 	reviewed by: Marc-Andre Lureau
 
+	* configure.ac:
+	* flumotion/component/converters/Makefile.am:
+	* flumotion/component/converters/video/Makefile.am (added):
+	* flumotion/component/converters/video/__init__.py (added):
+	* flumotion/component/converters/video/video.py (added):
+	* flumotion/component/converters/video/video.xml (added):
+	Add video-converter element.
+	Closes #1440
+
+2010-07-02  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-Andre Lureau
+
 	* flumotion/component/producers/firewire/firewire.py:
 	* flumotion/component/producers/firewire/firewire.xml:
 	Add videorate effect to firewire producer.
