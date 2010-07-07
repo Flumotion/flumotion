@@ -55,6 +55,7 @@ EXTRA_DIST = 					\
 	test_component_init.py			\
 	test_component_padmonitor.py		\
 	test_component_playlist.py		\
+	test_component_video_converter.py	\
 	test_component.py			\
 	test_comptest.py			\
 	test_config.py				\

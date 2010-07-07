@@ -1,3 +1,9 @@
+2010-07-07  Marc-André Lureau  <mlureau@flumotion.com>
+
+	* flumotion/test/Makefile.am:
+	* flumotion/test/test_component_video_converter.py (added):
+	Simple tests for video-converter and effects.
+
 2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	* flumotion/component/converters/video/video.py:
