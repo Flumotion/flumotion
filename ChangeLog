@@ -1,5 +1,14 @@
 2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
+	reviewed by: Pepe Ribas
+
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	Don't update the scale correction when one of the options is toggled,
+	only if 'height' or 'is-square' changed.
+	Closes #1442
+
+2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
 	* flumotion/component/effects/videorate (svn:ignore):
 	* flumotion/component/effects/deinterlace (svn:ignore):
 	* flumotion/component/converters/video (svn:ignore):

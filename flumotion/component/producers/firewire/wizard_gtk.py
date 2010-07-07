@@ -97,7 +97,7 @@ class _FireWireCommon:
         self.vbox_controls.set_sensitive(is_sensitive)
         self.wizard.blockNext(not is_sensitive)
 
-    def _update_output_format(self):
+    def _update_output_format(self, update_correction=False):
         self._update_label_camera_settings()
 
         # factor is a double
@@ -105,7 +105,7 @@ class _FireWireCommon:
             self._factor_i = self.combobox_scaled_height.get_selected()
 
         self._update_width_correction()
-        self._update_label_output_format()
+        self._update_label_output_format(update_correction)
 
     def _update_label_camera_settings(self):
         # update label_camera_settings
@@ -140,7 +140,7 @@ class _FireWireCommon:
                 break
         assert self._width_correction
 
-    def _update_label_output_format(self):
+    def _update_label_output_format(self, update_correction):
         d = self._get_width_height()
         if self._width_correction == 'stretch':
             # is_square is True in this case (otherwise PAR is recomputed)
@@ -163,6 +163,13 @@ class _FireWireCommon:
                    d['ow'], d['oh'], num, den)
         self.label_output_format.set_markup(msg)
 
+        if update_correction:
+            # if scaled width (after squaring) is not multiple of 8, present
+            # width correction and select padding as default.
+            self.frame_width_correction.set_sensitive(d['ow'] % 8 != 0)
+            self.radiobutton_width_none.set_active(d['ow'] % 8 == 0)
+            self.radiobutton_width_pad.set_active(d['ow'] % 8 != 0)
+
     def _get_width_height(self):
         # returns dict with sw, sh, ow, oh
         # which are scaled width and height, and output width and height
@@ -175,15 +182,6 @@ class _FireWireCommon:
             # for GStreamer element sanity, make ow an even number
             # FIXME: check if this can now be removed
             # ow = ow + (2 - (ow % 2)) % 2
-
-        # if scaled width (after squaring) is not multiple of 8, present
-        # width correction and select padding as default.
-        self.frame_width_correction.set_sensitive(ow % 8 != 0
-        # if not is_square, par is recomputed by videoscale
-            and self.model.properties.is_square)
-        self.radiobutton_width_none.set_active(ow % 8 == 0)
-        self.radiobutton_width_pad.set_active(ow % 8 != 0)
-
         return dict(ow=ow, oh=oh)
 
     def _populateDevices(self):
@@ -232,7 +230,7 @@ class _FireWireCommon:
             if len(values) > 2:
                 self.combobox_scaled_height.set_active(1)
             self._setSensitive(True)
-            self._update_output_format()
+            self._update_output_format(True)
 
         def trapRemoteFailure(failure):
             failure.trap(errors.RemoteRunFailure)
@@ -248,13 +246,13 @@ class _FireWireCommon:
     # Callbacks
 
     def on_is_square_toggled(self, radio):
-        self._update_output_format()
+        self._update_output_format(True)
 
     def on_guid_changed(self, combo):
         self._runChecks()
 
     def on_combobox_scaled_height_changed(self, combo):
-        self._update_output_format()
+        self._update_output_format(True)
 
     def on_radiobutton_width_none_toggled(self, radio):
         self._update_output_format()
