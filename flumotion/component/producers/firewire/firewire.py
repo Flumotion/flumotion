@@ -26,6 +26,8 @@ from flumotion.common import errors, messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.effects.deinterlace import deinterlace
+from flumotion.component.effects.videorate import videorate
+from flumotion.component.effects.videoscale import videoscale
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -100,17 +102,22 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.deintMode = props.get('deinterlace-mode', 'auto')
         self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
 
-        framerate = props.get('framerate', (30, 2))
-        framerate_float = float(framerate[0]) / framerate[1]
-
-        if 12.5 < framerate_float:
+        fr = props.get('framerate', None)
+        if fr is not None:
+            self.framerate = gst.Fraction(fr[0], fr[1])
+            framerate_float = float(fr[0]) / fr[1]
+            if 12.5 < framerate_float:
+                drop_factor = 1
+            elif 6.3 < framerate_float <= 12.5:
+                drop_factor = 2
+            elif 3.2 < framerate_float <= 6.3:
+                drop_factor = 4
+            elif framerate_float <= 3.2:
+                drop_factor = 8
+        else:
+            self.framerate = None
             drop_factor = 1
-        elif 6.3 < framerate_float <= 12.5:
-            drop_factor = 2
-        elif 3.2 < framerate_float <= 6.3:
-            drop_factor = 4
-        elif framerate_float <= 3.2:
-            drop_factor = 8
+
 
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can
         # replace it with videotestsrc of the same size and PAR, so we can
@@ -120,9 +127,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '    ! tee name=t'
                     '    ! queue leaky=2 max-size-time=1000000000'
                     '    ! dvdemux name=demux'
-                    '  demux. ! queue ! dvdec drop-factor=%(df)d'
-                    '    ! videorate ! capsfilter name=ratefilter'
-                    '      caps="video/x-raw-yuv,framerate=%(fr)s" '
+                    '  demux. ! queue ! dvdec name=decoder drop-factor=%(df)d'
                     '    ! @feeder:video@'
                     '  demux. ! queue ! audio/x-raw-int '
                     '    ! volume name=setvolume'
@@ -130,8 +135,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '    ! @feeder:audio@'
                     '    t. ! queue ! @feeder:dv@'
                     % dict(df=drop_factor,
-                           guid=(guid and ('guid=%s' % guid) or ''),
-                           fr=('%d/%d' % (framerate[0], framerate[1]))))
+                           guid=(guid and ('guid=%s' % guid) or '')))
 
         return template
 
@@ -146,13 +150,18 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         bus.connect('message::element', self._bus_message_received_cb)
         self.addEffect(vol)
 
-        ratefilter = pipeline.get_by_name("ratefilter")
+        decoder = pipeline.get_by_name("decoder")
+        vr = videorate.Videorate('videorate',
+            decoder.get_pad("src"), pipeline, self.framerate)
+        self.addEffect(vr)
+        vr.plug()
+
         deinterlacer = deinterlace.Deinterlace('deinterlace',
-            ratefilter.get_pad("src"), pipeline,
+            vr.effectBin.get_pad("src"), pipeline,
             self.deintMode, self.deintMethod)
         self.addEffect(deinterlacer)
         deinterlacer.plug()
-        from flumotion.component.effects.videoscale import videoscale
+
         videoscaler = videoscale.Videoscale('videoscale', self,
             deinterlacer.effectBin.get_pad("src"), pipeline,
             self.width, self.height, self.is_square)

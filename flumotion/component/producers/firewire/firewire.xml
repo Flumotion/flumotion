@@ -78,6 +78,7 @@
            <dependency name="firewire-base" />
            <dependency name="deinterlace-effect" />
            <dependency name="videoscale-effect" />
+           <dependency name="videorate-effect" />
            <dependency name="volume-effect" />
            <dependency name="producer-checks" />
        </dependencies>
