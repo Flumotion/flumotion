@@ -2,6 +2,21 @@
 
 	reviewed by: Marc-Andre Lureau
 
+	* configure.ac:
+	* flumotion/component/effects/Makefile.am:
+	* flumotion/component/effects/deinterlace/Makefile.am:
+	* flumotion/component/effects/deinterlace/__init__.py:
+	* flumotion/component/effects/deinterlace/admin_gtk.py:
+	* flumotion/component/effects/deinterlace/deinterlace.glade:
+	* flumotion/component/effects/deinterlace/deinterlace.py:
+	* flumotion/component/effects/deinterlace/deinterlace.xml:
+	Add deinterlace effect
+	Closes #1436
+
+2010-07-01  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-Andre Lureau
+
 	* flumotion/component/component.py:
 	Add new API to warn about deprecated properites
 

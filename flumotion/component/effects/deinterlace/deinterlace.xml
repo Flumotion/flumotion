@@ -1,0 +1,44 @@
+<registry>
+  <bundles>
+
+    <bundle name="deinterlace-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/deinterlace">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="deinterlace-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk" />
+            <dependency name="deinterlace-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/deinterlace">
+                <filename location="admin_gtk.py" />
+                <filename location="deinterlace.glade" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="deinterlace-effect">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="deinterlace-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/deinterlace">
+                <filename location="deinterlace.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry>

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<glade-interface>
+  <!-- interface-requires gtk+ 2.6 -->
+  <!-- interface-naming-policy toplevel-contextual -->
+  <widget class="GtkWindow" id="window1">
+    <property name="title" translatable="yes">window1</property>
+    <child>
+      <widget class="GtkTable" id="deinterlace-widget">
+        <property name="visible">True</property>
+        <property name="n_rows">2</property>
+        <property name="n_columns">2</property>
+        <property name="homogeneous">True</property>
+        <child>
+          <widget class="GtkLabel" id="deint-mode-label">
+            <property name="visible">True</property>
+            <property name="label" translatable="yes">Deinterlace mode:</property>
+          </widget>
+          <packing>
+            <property name="x_options">GTK_FILL</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkLabel" id="deint-method-label">
+            <property name="visible">True</property>
+            <property name="label" translatable="yes">Deinterlace method:</property>
+          </widget>
+          <packing>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+            <property name="x_options">GTK_EXPAND</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkComboBox" id="deinterlace-mode-combobox">
+            <property name="visible">True</property>
+          </widget>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkComboBox" id="deinterlace-method-combobox">
+            <property name="visible">True</property>
+          </widget>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+</glade-interface>
