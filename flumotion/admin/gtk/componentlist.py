@@ -300,7 +300,7 @@ class ComponentList(log.Loggable, gobject.GObject):
 
         components = sorted(components.values(),
                             cmp=cmpComponentType,
-                            key=operator.methodcaller('get', 'type'))
+                            key=operator.itemgetter('type'))
 
         for component in components:
             self.appendComponent(component, componentNameToSelect)

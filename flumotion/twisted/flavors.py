@@ -304,6 +304,9 @@ class StateRemoteCache(pb.RemoteCache):
         # no constructor
         # pb.RemoteCache.__init__(self)
 
+    def __getitem__(self, key):
+        return self.get(key)
+
     # our methods
 
     def hasKey(self, key):

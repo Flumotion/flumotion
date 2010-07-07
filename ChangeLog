@@ -1,5 +1,12 @@
 2010-07-07  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/admin/gtk/componentlist.py:
+	* flumotion/twisted/flavors.py:
+	operator.methodcaller doesn't appear till python2.6, use itemgetter
+	instead and a getter method to pb.RemoteCache
+
+2010-07-07  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	reviewed by: Jan
 
 	* flumotion/admin/assistant/configurationwriter.py:
