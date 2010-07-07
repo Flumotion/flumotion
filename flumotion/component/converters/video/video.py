@@ -71,13 +71,13 @@ class Converter(feedcomponent.ParseLaunchComponent):
         # Add deinterlace effect. Deinterlacing must always be done
         # before scaling.
         deinterlacer = deinterlace.Deinterlace('deinterlace',
-            vr.getEffectBin().get_pad("src"),
+            vr.effectBin.get_pad("src"),
             pipeline, self.deintMode, self.deintMethod)
         self.addEffect(deinterlacer)
         deinterlacer.plug()
         # Add videoscale effect
         videoscaler = videoscale.Videoscale('videoscale', self,
-            deinterlacer.getEffectBin().get_pad("src"), pipeline,
+            deinterlacer.effectBin.get_pad("src"), pipeline,
             self.width, self.height, self.is_square)
         self.addEffect(videoscaler)
         videoscaler.plug()

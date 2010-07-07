@@ -1,5 +1,11 @@
 2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
+	* flumotion/component/converters/video/video.py:
+	Use the the public member effectBin, instead of the method call which
+	was finally removed.
+
+2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
 	reviewed by: Pepe Ribas
 
 	* flumotion/component/producers/firewire/wizard_gtk.py:
