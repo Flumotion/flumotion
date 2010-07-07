@@ -40,6 +40,9 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         props = self.config['properties']
         deintMode = props.get('deinterlace-mode', 'auto')
         deintMethod = props.get('deinterlace-method', 'ffmpeg')
+        is_square = props.get('is-square', False)
+        width = props.get('width', None)
+        height = props.get('height', None)
 
         result = messages.Result()
         if deintMode not in deinterlace.DEINTERLACE_MODE:
@@ -55,6 +58,13 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                 deintMethod)
             result.add(msg)
             result.succeed(False)
+        if is_square and width and height:
+            msg = messages.Error(T_(N_("Configuration error: " \
+                "is-square cannot be set with width and height.")))
+            self.debug("is-square cannot be set with width and height!")
+            result.add(msg)
+            result.succeed(False)
+
         return defer.succeed(result)
 
     def do_check(self):
@@ -73,12 +83,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                 self.addMessage(m)
 
     def get_pipeline_string(self, props):
-        width = props.get('width', 240)
-        height = props.get('height', int(576 * width/720.)) # assuming PAL :-/
-        guid = props.get('guid', None)
-        self.deintMode = props.get('deinterlace-mode', 'ato')
-        self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
-
         # F0.6: remove backwards-compatible properties
         self.fixRenamedProperties(props, [
             ('is_square', 'is-square'),
@@ -86,7 +90,16 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         if props.get('scaled-width', None) is not None:
             self.warnDeprecatedProperties(['scaled-width'])
 
-        is_square = props.get('is-square', False)
+        self.is_square = props.get('is-square', False)
+        self.width = props.get('width', 0)
+        self.height = props.get('height', 0)
+        if not self.is_square and not self.height:
+            self.height = int(576 * self.width/720.) # assuming PAL
+
+        guid = props.get('guid', None)
+        self.deintMode = props.get('deinterlace-mode', 'auto')
+        self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
+
         framerate = props.get('framerate', (30, 2))
         framerate_float = float(framerate[0]) / framerate[1]
 
@@ -99,25 +112,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         elif framerate_float <= 3.2:
             drop_factor = 8
 
-        if is_square:
-            square_pipe = ',pixel-aspect-ratio=(fraction)1/1'
-        else:
-            square_pipe = ''
-
-        # the point of width correction is to get to a multiple of 8 for width
-        # so codecs are happy; it's unrelated to the aspect ratio correction
-        # to get to 4:3 or 16:9
-        scale_correction = width % 8
-        if scale_correction > 0:
-            # videobox in 0.8.8 has a stride problem outputting AYUV with odd
-            # width I420 works fine, but is slower when overlay is used
-
-            pad_pipe = ('! ffmpegcolorspace ! videobox right=-%d ! '
-                        'video/x-raw-yuv,format=(fourcc)I420 ' %
-                        (scale_correction, ))
-        else:
-            pad_pipe = ''
-
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can
         # replace it with videotestsrc of the same size and PAR, so we can
         # unittest the pipeline
@@ -129,18 +123,13 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '  demux. ! queue ! dvdec drop-factor=%(df)d'
                     '    ! videorate ! capsfilter name=ratefilter'
                     '      caps="video/x-raw-yuv,framerate=%(fr)s" '
-                    '    ! videoscale'
-                    '    ! video/x-raw-yuv,width=%(w)s,height=%(h)s%(sq)s,'
-                    '      framerate=%(fr)s'
-                    '    %(pp)s'
                     '    ! @feeder:video@'
                     '  demux. ! queue ! audio/x-raw-int '
                     '    ! volume name=setvolume'
                     '    ! level name=volumelevel message=true ! audiorate'
                     '    ! @feeder:audio@'
                     '    t. ! queue ! @feeder:dv@'
-                    % dict(df=drop_factor, sq=square_pipe, pp=pad_pipe,
-                           w=width, h=height,
+                    % dict(df=drop_factor,
                            guid=(guid and ('guid=%s' % guid) or ''),
                            fr=('%d/%d' % (framerate[0], framerate[1]))))
 
@@ -163,6 +152,12 @@ class Firewire(feedcomponent.ParseLaunchComponent):
             self.deintMode, self.deintMethod)
         self.addEffect(deinterlacer)
         deinterlacer.plug()
+        from flumotion.component.effects.videoscale import videoscale
+        videoscaler = videoscale.Videoscale('videoscale', self,
+            deinterlacer.effectBin.get_pad("src"), pipeline,
+            self.width, self.height, self.is_square)
+        self.addEffect(videoscaler)
+        videoscaler.plug()
 
     def getVolume(self):
         return self.volume.get_property('volume')

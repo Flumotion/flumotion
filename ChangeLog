@@ -2,6 +2,23 @@
 
 	reviewed by: Andoni Morales
 
+	* flumotion/component/producers/firewire/admin_gtk.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/firewire.xml:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	firewire: add videoscale effect
+
+	The admin GTK Node is disabled, because live changes causes
+	some troubles even with the usage of "flumotion-reset" signal.
+	It can still be enabled with FLU_VIDEOSCALE_DEBUG.
+
+	Don't force any output size to allow passthrough, if no width and
+	no height given.
+
+2010-07-02  Marc-André Lureau  <mlureau@flumotion.com>
+
+	reviewed by: Andoni Morales
+
 	* configure.ac:
 	* flumotion/component/effects/Makefile.am:
 	* flumotion/component/effects/videoscale/Makefile.am (added):

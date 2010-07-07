@@ -62,6 +62,7 @@
            <dependency name="base-admin-gtk" />
            <dependency name="volume-admin-gtk" />
            <dependency name="deinterlace-admin-gtk" />
+           <dependency name="videoscale-admin-gtk" />
        </dependencies>
 
        <directories>
@@ -76,6 +77,7 @@
            <dependency name="component" />
            <dependency name="firewire-base" />
            <dependency name="deinterlace-effect" />
+           <dependency name="videoscale-effect" />
            <dependency name="volume-effect" />
            <dependency name="producer-checks" />
        </dependencies>

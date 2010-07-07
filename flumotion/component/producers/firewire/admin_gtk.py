@@ -19,10 +19,14 @@
 
 # Headers in this file shall remain intact.
 
+import os
+
 from flumotion.component.base import admin_gtk
 from flumotion.component.effects.volume.admin_gtk import VolumeAdminGtkNode
 from flumotion.component.effects.deinterlace.admin_gtk \
     import DeinterlaceAdminGtkNode
+from flumotion.component.effects.videoscale.admin_gtk \
+    import VideoscaleAdminGtkNode
 
 __version__ = "$Rev$"
 
@@ -36,6 +40,10 @@ class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
         deinterlace = DeinterlaceAdminGtkNode(self.state, self.admin,
                                     'deinterlace', 'Deinterlacing')
         self.nodes['Deinterlace'] = deinterlace
+        if 'FLU_VIDEOSCALE_DEBUG' in os.environ:
+            videoscale = VideoscaleAdminGtkNode(self.state, self.admin,
+                'videoscale', 'Video scaling')
+            self.nodes['Videoscale'] = videoscale
         return admin_gtk.BaseAdminGtk.setup(self)
 
     def component_volumeChanged(self, channel, rms, peak, decay):
@@ -74,5 +82,12 @@ class FirewireAdminGtk(admin_gtk.BaseAdminGtk):
             return
         v = self.nodes['Deinterlace']
         v.methodSet(mode)
+
+    def component_effectWidthSet(self, effect, width):
+        if effect != 'videoscale':
+            self.warning('Unknown effect %s in %r' % (effect, self))
+            return
+        v = self.nodes['Videoscale']
+        v.widthSet(width)
 
 GUIClass = FirewireAdminGtk

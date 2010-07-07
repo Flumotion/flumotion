@@ -142,9 +142,19 @@ class _FireWireCommon:
 
     def _update_label_output_format(self):
         d = self._get_width_height()
-        self.model.properties.width = d['ow']
-        self.model.properties.height = d['oh']
-        self.model.properties.scaled_width = d['sw']
+        if self._width_correction == 'stretch':
+            # is_square is True in this case (otherwise PAR is recomputed)
+            # => DAR can be destroyed
+            # we ensure multiple of 8 to avoid videobox padding, and stretch
+            self.model.properties.width = (d['ow'] + 8) - d['ow'] % 8
+        if self._width_correction == 'pad':
+            # only specify height, to let videobox compute the width
+            self.model.properties.height = d['oh']
+        else:
+            self.model.properties.width = d['ow']
+            # if is_square, height can be managed automatically by videoscale
+            if self.model.properties.is_square:
+                self.model.properties.height = 0
         num, den = 1, 1
         if not self.model.properties.is_square:
             num, den = self._par[0], self._par[1]
@@ -156,33 +166,25 @@ class _FireWireCommon:
     def _get_width_height(self):
         # returns dict with sw, sh, ow, oh
         # which are scaled width and height, and output width and height
-        sh = self._input_heights[self._factor_i]
-        sw = self._input_widths[self._factor_i]
+        oh = self._input_heights[self._factor_i]
+        ow = self._input_widths[self._factor_i]
         par = 1. * self._par[0] / self._par[1]
 
         if self.model.properties.is_square:
-            sw = int(math.ceil(sw * par))
-            # for GStreamer element sanity, make sw an even number
+            ow = int(math.ceil(ow * par))
+            # for GStreamer element sanity, make ow an even number
             # FIXME: check if this can now be removed
-            # sw = sw + (2 - (sw % 2)) % 2
+            # ow = ow + (2 - (ow % 2)) % 2
 
         # if scaled width (after squaring) is not multiple of 8, present
         # width correction and select padding as default.
-        self.frame_width_correction.set_sensitive(sw % 8 != 0)
-        self.radiobutton_width_none.set_active(sw % 8 == 0)
-        self.radiobutton_width_pad.set_active(sw % 8 != 0)
+        self.frame_width_correction.set_sensitive(ow % 8 != 0
+        # if not is_square, par is recomputed by videoscale
+            and self.model.properties.is_square)
+        self.radiobutton_width_none.set_active(ow % 8 == 0)
+        self.radiobutton_width_pad.set_active(ow % 8 != 0)
 
-        # actual output
-        ow = sw
-        oh = sh
-
-        if self._width_correction == 'pad':
-            ow = sw + (8 - (sw % 8)) % 8
-        elif self._width_correction == 'stretch':
-            ow = sw + (8 - (sw % 8)) % 8
-            sw = ow
-
-        return dict(sw=sw, sh=sh, ow=ow, oh=oh)
+        return dict(ow=ow, oh=oh)
 
     def _populateDevices(self):
         self._setSensitive(False)
