@@ -1,3 +1,8 @@
+2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	* flumotion/component/effects/videorate/videorate.py:
+	Use 2 parameters in gst.Fraction to be compatible with older versions
+
 2010-07-02  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Marc-Andre Lureau

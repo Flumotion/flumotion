@@ -43,7 +43,7 @@ class VideorateBin(gst.Bin):
         'framerate': (gobject.TYPE_OBJECT, 'framerate',
                    'Video framerate', gobject.PARAM_READWRITE)}
 
-    def __init__(self, framerate=gst.Fraction(25)):
+    def __init__(self, framerate=gst.Fraction(25, 1)):
         gst.Bin.__init__(self)
         self._framerate = framerate
 
