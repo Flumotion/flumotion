@@ -12,5 +12,6 @@ clean-local:
 SUBDIRS = \
 	colorbalance \
 	deinterlace  \
+	videorate \
 	videoscale \
 	volume

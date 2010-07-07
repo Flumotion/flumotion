@@ -203,6 +203,7 @@ flumotion/component/bouncers/algorithms/Makefile
 flumotion/component/effects/Makefile
 flumotion/component/effects/colorbalance/Makefile
 flumotion/component/effects/deinterlace/Makefile
+flumotion/component/effects/videorate/Makefile
 flumotion/component/effects/videoscale/Makefile
 flumotion/component/effects/volume/Makefile
 flumotion/component/encoders/Makefile

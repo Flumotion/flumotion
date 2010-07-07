@@ -1,3 +1,16 @@
+2010-07-02  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-Andre Lureau
+
+	* configure.ac:
+	* flumotion/component/effects/Makefile.am:
+	* flumotion/component/effects/videorate/Makefile.am (added):
+	* flumotion/component/effects/videorate/__init__.py (added):
+	* flumotion/component/effects/videorate/videorate.py (added):
+	* flumotion/component/effects/videorate/videorate.xml (added):
+	Add videorate effect.
+	Closes #1438
+
 2010-07-02  Marc-André Lureau  <mlureau@flumotion.com>
 
 	reviewed by: Andoni Morales

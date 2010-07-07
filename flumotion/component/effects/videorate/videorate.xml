@@ -1,0 +1,30 @@
+<registry>
+  <bundles>
+
+    <bundle name="videorate-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/videorate">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="videorate-effect">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="videorate-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/videorate">
+                <filename location="videorate.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry>
