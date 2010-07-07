@@ -38,7 +38,16 @@ T_ = gettexter()
 
 class Firewire(feedcomponent.ParseLaunchComponent):
 
-    def checkDeinterlaceProps(self):
+    def do_check(self):
+        self.debug('running PyGTK/PyGST and configuration checks')
+        from flumotion.component.producers import checks
+        d1 = checks.checkTicket347()
+        d2 = checks.checkTicket348()
+        dl = defer.DeferredList([d1, d2])
+        dl.addCallback(self._checkCallback)
+        return dl
+
+    def check_properties(self, props, addMessage):
         props = self.config['properties']
         deintMode = props.get('deinterlace-mode', 'auto')
         deintMethod = props.get('deinterlace-method', 'ffmpeg')
@@ -46,38 +55,19 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         width = props.get('width', None)
         height = props.get('height', None)
 
-        result = messages.Result()
         if deintMode not in deinterlace.DEINTERLACE_MODE:
             msg = messages.Error(T_(N_("Configuration error: '%s' " \
                 "is not a valid deinterlace mode." % deintMode)))
-            self.debug("'%s' is not a valid deinterlace mode", deintMode)
-            result.add(msg)
-            result.succeed(False)
+            addMessage(msg)
+            raise errors.ConfigError(msg)
+
         if deintMethod not in deinterlace.DEINTERLACE_METHOD:
             msg = messages.Error(T_(N_("Configuration error: '%s' " \
                 "is not a valid deinterlace method." % deintMethod)))
             self.debug("'%s' is not a valid deinterlace method",
                 deintMethod)
-            result.add(msg)
-            result.succeed(False)
-        if is_square and width and height:
-            msg = messages.Error(T_(N_("Configuration error: " \
-                "is-square cannot be set with width and height.")))
-            self.debug("is-square cannot be set with width and height!")
-            result.add(msg)
-            result.succeed(False)
-
-        return defer.succeed(result)
-
-    def do_check(self):
-        self.debug('running PyGTK/PyGST and configuration checks')
-        from flumotion.component.producers import checks
-        d1 = checks.checkTicket347()
-        d2 = checks.checkTicket348()
-        d3 = self.checkDeinterlaceProps()
-        dl = defer.DeferredList([d1, d2, d3])
-        dl.addCallback(self._checkCallback)
-        return dl
+            addMessage(msg)
+            raise errors.ConfigError(msg)
 
     def _checkCallback(self, results):
         for (state, result) in results:

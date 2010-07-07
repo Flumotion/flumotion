@@ -2,6 +2,13 @@
 
 	reviewed by: Marc-Andre Lureau
 
+	* flumotion/component/producers/firewire/firewire.py:
+	Check properties in class method check_properites()
+
+2010-07-02  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-Andre Lureau
+
 	* configure.ac:
 	* flumotion/component/converters/Makefile.am:
 	* flumotion/component/converters/video/Makefile.am (added):
