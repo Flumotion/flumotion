@@ -35,8 +35,9 @@ from flumotion.test import comptest
 
 attr = testsuite.attr
 
-if not gstreamer.element_factory_has_property('deinterlace', 'method'):
-    skip="GStreamer element 'deinterlace' is too old"
+if not gstreamer.element_factory_exists('deinterlace')\
+    or not gstreamer.element_factory_has_property('deinterlace', 'method'):
+    skip="GStreamer element 'deinterlace' is too old or doesn't exists"
 
 
 class TestVideoConverter(comptest.CompTestTestCase, log.Loggable):

@@ -1,6 +1,11 @@
 2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	* flumotion/test/test_component_video_converter.py:
+	Add more checks to make the buildbot happy
+
+2010-07-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	* flumotion/test/test_component_video_converter.py:
 	Skip video-converter tests if the version of the 'deinterlace' element
 	is too old and doesn't have the method property.
 
