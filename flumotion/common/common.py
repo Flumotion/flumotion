@@ -75,17 +75,6 @@ def ensureDir(directory, description):
                 description, directory, str(e)))
 
 
-def componentPath(componentName, parentName):
-    # FIXME: fix epydoc to correctly spell deprecated
-    # F0.6
-    """
-    Create a path string out of the name of a component and its parent.
-
-    @depreciated: Use @componentId instead
-    """
-    return '/%s/%s' % (parentName, componentName)
-
-
 def componentId(parentName, componentName):
     """
     Create a C{componentId} based on the C{parentName} and C{componentName}.

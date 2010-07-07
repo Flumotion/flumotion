@@ -1,5 +1,16 @@
 2010-07-07  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	reviewed by: Jan
+
+	* flumotion/common/common.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/encoders/theora/theora.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/twisted/flavors.py:
+	Remove deprecated code from Flumotion 0.5
+
+2010-07-07  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/admin/gtk/componentlist.py:
 	* flumotion/twisted/flavors.py:
 	operator.methodcaller doesn't appear till python2.6, use itemgetter

@@ -75,10 +75,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                 self.addMessage(m)
 
     def get_pipeline_string(self, props):
-        # F0.6: remove backwards-compatible properties
-        self.fixRenamedProperties(props, [
-            ('is_square', 'is-square'),
-            ])
         if props.get('scaled-width', None) is not None:
             self.warnDeprecatedProperties(['scaled-width'])
 

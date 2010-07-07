@@ -53,20 +53,6 @@ class Theora(feedcomponent.EncoderComponent):
                  'noise-sensitivity',
                  'sharpness')
 
-        # F0.6: remove this code
-        # before 0.3.2, bitrate was interpreted as kbps, inconsistent
-        # with other flumotion components
-        # safe to assume that nobody will want less than 10 kbit/sec
-        # also, MikeS *requires* a kbit/sec to be seen as 1000 bit/sec
-        if 'bitrate' in properties:
-            if properties['bitrate'] < 10000:
-                self.addMessage(
-                    messages.Warning(T_(N_(
-                        "Your configuration uses 'bitrate' expressed in "
-                        "kbit/sec.  Please convert it to a value in bit/sec by"
-                        " multiplying the value by 1000.")), mid='bitrate'))
-                properties['bitrate'] *= 1000
-
         for p in props:
             if isinstance(p, tuple):
                 pproperty, eproperty = p

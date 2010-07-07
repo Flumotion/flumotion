@@ -385,15 +385,7 @@ class StateRemoteCache(pb.RemoteCache):
             set_ = set
 
         if not (set_ or append or remove or setitem or delitem or invalidate):
-            # FIXME: remove this behavior in F0.6
-            import sys
-            log.safeprintf(sys.stderr,
-                           "Warning: Use of deprecated %r.addListener(%r)"
-                           " without explicit event handlers\n", self,
-                           listener)
-            set_ = listener.stateSet
-            append = listener.stateAppend
-            remove = listener.stateRemove
+            raise ValueError("At least one event handler has to be specified")
 
         self._ensureListeners()
         if listener in self._listeners:

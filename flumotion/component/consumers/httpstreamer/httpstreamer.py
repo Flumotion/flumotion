@@ -323,19 +323,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def check_properties(self, props, addMessage):
 
-        # F0.6: remove backwards-compatible properties
-        self.fixRenamedProperties(props, [
-            ('issuer', 'issuer-class'),
-            ('mount_point', 'mount-point'),
-            ('porter_socket_path', 'porter-socket-path'),
-            ('porter_username', 'porter-username'),
-            ('porter_password', 'porter-password'),
-            ('user_limit', 'client-limit'),
-            ('bandwidth_limit', 'bandwidth-limit'),
-            ('burst_on_connect', 'burst-on-connect'),
-            ('burst_size', 'burst-size'),
-            ])
-
         if props.get('type', 'master') == 'slave':
             for k in 'socket-path', 'username', 'password':
                 if not 'porter-' + k in props:
