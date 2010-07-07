@@ -2,6 +2,13 @@
 
 	reviewed by: Marc-Andre Lureau
 
+	* flumotion/component/component.py:
+	Add new API to warn about deprecated properites
+
+2010-07-01  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-Andre Lureau
+
 	* flumotion/component/feedcomponent.py:
 	Add a new class for pluggable post processing effect
 

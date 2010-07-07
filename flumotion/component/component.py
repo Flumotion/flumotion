@@ -691,6 +691,22 @@ class BaseComponent(common.InitMixin, log.Loggable):
             if self._haveError:
                 self._haveError(message)
 
+    def warnDeprecatedProperties(self, list):
+        """
+        Add a warning messages for deprecated properties.
+
+        @param list:       list of property names.
+        @type  list:       list of str
+        """
+        m = messages.Warning(T_(N_(
+            "Your configuration uses deprecated properties.  "
+            "Please update your configuration and correct them.\n")),
+            mid="deprecated")
+        for prop in list:
+            m.add(T_(N_(
+            "Please remove '%s' property.\n"), prop))
+        self.addMessage(m)
+
     def fixRenamedProperties(self, properties, list):
         """
         Fix properties that have been renamed from a previous version,
