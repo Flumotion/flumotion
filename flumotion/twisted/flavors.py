@@ -114,6 +114,9 @@ class StateCacheable(pb.Cacheable):
         self._hooks = []
         self._dict = {}
 
+    def __getitem__(self, key):
+        return self.get(key)
+
     # our methods
 
     def addKey(self, key, value=None):

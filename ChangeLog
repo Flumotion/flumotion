@@ -1,5 +1,12 @@
 2010-07-08  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
+	* flumotion/manager/config.py:
+	* flumotion/twisted/flavors.py:
+	flavours.ManagerComponentState has the type as a value in a dict so we
+	need the itemgetter instead of the attrgetter.
+
+2010-07-08  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
 	* flumotion/component/combiners/composite/composite.xml:
 	* flumotion/manager/config.py:
 	* flumotion/test/test.xml:

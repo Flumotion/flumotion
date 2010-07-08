@@ -802,9 +802,9 @@ class PlanetXMLWriter(XMLWriter):
         attrs = [('name', flow.get('name'))]
         self.pushTag('flow', attrs)
 
-        component = sorted(flow.get('components'),
-                           cmp=cmpComponentType,
-                           key=operator.attrgetter('type'))
+        components = sorted(flow.get('components'),
+                            cmp=cmpComponentType,
+                            key=operator.itemgetter('type'))
         for component in components:
             self._writeComponent(component)
         self.popTag()
