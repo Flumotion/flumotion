@@ -864,8 +864,7 @@ class PlanetXMLWriter(XMLWriter):
         self.popTag()
 
     def _writePlug(self, plug, socket):
-        attrs = [('socket', socket),
-                 ('type', plug['type'])]
+        attrs = [('type', plug['type'])]
         self.pushTag('plug', attrs)
         self._writeProperties(plug['properties'].items())
         self.popTag()

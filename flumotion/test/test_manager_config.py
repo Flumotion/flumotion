@@ -93,8 +93,7 @@ class TestManagerConfigParser(testsuite.TestCase):
     def testParsePlugs(self):
         f = self._buildManager(
             """<plugs>
-  <plug socket="flumotion.component.plugs.adminaction.AdminActionPlug"
-          type="adminaction-loggerfile">
+  <plug type="adminaction-loggerfile">
     <property name="logfile">/dev/stdout</property>
   </plug>
 </plugs>""")
@@ -233,9 +232,7 @@ class TestXMLWriter(testsuite.TestCase):
             '               version="1.0.0">\n'
             '      <property name="type">slave</property>\n'
             '      <plugs>\n'
-            '        <plug socket='
-            '"flumotion.component.plugs.request.RequestLoggerPlug"\n'
-            '              type="requestlogger-file">\n'
+            '        <plug type="requestlogger-file">\n'
             '          <property name="logfile">foobar</property>\n'
             '        </plug>\n'
             '      </plugs>\n'

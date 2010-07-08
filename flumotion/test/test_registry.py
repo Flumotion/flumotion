@@ -72,9 +72,9 @@ class TestRegistry(testsuite.TestCase):
         self.reg.addFromString("""
 <registry>
   <components>
-    <component type="bar" base="/">
+    <component type="bar" base="/" _description="A bar component">
     </component>
-    <component type="baz" base="/">
+    <component type="baz" base="/" _description="A baz component">
     </component>
   </components>
 </registry>""")
@@ -100,7 +100,7 @@ class TestRegistry(testsuite.TestCase):
         self.reg.addFromString("""
 <registry>
   <components>
-    <component type="component" base="/">
+    <component type="component" base="/" _description="A component">
       <properties>
         <property name="source" type="string" required="yes"
                   multiple="yes" _description="a source property" />
@@ -125,7 +125,7 @@ class TestRegistry(testsuite.TestCase):
         self.reg.addFromString("""
 <registry>
   <components>
-    <component type="component" base="/">
+    <component type="component" base="/" _description="A component">
       <properties>
         <property name="source" type="string" required="yes" multiple="no"
                   _description="a source property" />
@@ -196,7 +196,7 @@ class TestRegistry(testsuite.TestCase):
         template = """
 <registry>
   <components>
-    <component type="component" base="/">
+    <component type="component" base="/" _description="A component">
       <properties>
         %s
       </properties>
@@ -220,7 +220,7 @@ class TestRegistry(testsuite.TestCase):
         xml = """
 <registry>
   <components>
-    <component type="bar" base="/">
+    <component type="bar" base="/" _description="A bar component">
     </component>
   </components>
 </registry>"""
@@ -234,7 +234,8 @@ class TestRegistry(testsuite.TestCase):
         xml = """
 <registry>
   <components>
-    <component type="bar" base="/"></component>
+    <component type="bar" base="/" _description="A bar component">
+    </component>
   </components>
 </registry>"""
         reg.addFromString(xml)
@@ -244,7 +245,7 @@ class TestRegistry(testsuite.TestCase):
         xml = """
 <registry>
   <components>
-    <component></component>
+    <component _description="An unnamed component"></component>
   </components>
 </registry>"""
         self.assertRaises(fxml.ParserError, reg.addFromString, xml)
@@ -565,7 +566,7 @@ def writeComponent(filename, name):
     open(filename, 'w').write("""
 <registry>
   <components>
-    <component type="%s" base="/">
+    <component type="%s" base="/" _description="A component">
       <properties>
       </properties>
     </component>

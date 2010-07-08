@@ -20,8 +20,10 @@
           <property name="feeder-alias" type="string" required="yes"
                     _description="The alias of the feeder providing the input."
                     />
-          <property name="position-left" type="int" />
-          <property name="position-top" type="int" />
+          <property name="position-left" type="int"
+                    _description="The pixels from the left the input is going to be placed." />
+          <property name="position-top" type="int"
+                    _description="The pixels from top the input is going to be placed." />
           <property name="z-order" type="int"
                     _description="A non-negative integer specifying the z-order of the input (with 0 meaning the input will be drawn below all others). Each input must have a unique z-order value." />
           <property name="alpha" type="float"

@@ -64,7 +64,7 @@ class AdminConfigTest(testsuite.TestCase):
     def testUnknownPlug(self):
         doc = ('<admin>'
                '<plugs>'
-               '<plug type="plugdoesnotexist" socket="foo.bar">'
+               '<plug type="plugdoesnotexist">'
                '</plug>'
                '</plugs>'
                '</admin>')
@@ -74,7 +74,7 @@ class AdminConfigTest(testsuite.TestCase):
     def testUnknownSocket(self):
         doc = ('<admin>'
                '<plugs>'
-               '<plug type="frobulator" socket="baz">'
+               '<plug type="frobulator">'
                '</plug>'
                '</plugs>'
                '</admin>')

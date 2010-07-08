@@ -30,87 +30,105 @@ from flumotion.manager import config
 regchunk = """
 <registry>
   <components>
-    <component type="test-component" base="/">
+    <component type="test-component" base="/" _description="A component">
       <properties>
-        <property name="one" type="string"/>
-        <property name="two" type="int"/>
-        <property name="three" type="float"/>
+        <property name="one" type="string" _description="A property"/>
+        <property name="two" type="int" _description="A property"/>
+        <property name="three" type="float" _description="A property"/>
         <!-- four elided -->
-        <property name="five" type="bool"/>
-        <property name="six" type="long"/>
-        <property name="seven" type="fraction"/>
-        <property name="eight" type="int" multiple="yes" />
+        <property name="five" type="bool" _description="A property"/>
+        <property name="six" type="long" _description="A property"/>
+        <property name="seven" type="fraction" _description="A property"/>
+        <property name="eight" type="int" multiple="yes"
+                  _description="A property"/>
       </properties>
       <sockets>
         <socket type="foo.bar"/>
       </sockets>
     </component>
-    <component type="test-component-sync" base="/">
+    <component type="test-component-sync" base="/" _description="A component">
       <synchronization required="true" />
     </component>
-    <component type="test-component-sync-provider" base="/">
+    <component type="test-component-sync-provider"
+               base="/" _description="A component">
       <synchronization required="true" clock-priority="130"/>
     </component>
-    <component type="test-component-with-feeder" base="/">
+    <component type="test-component-with-feeder"
+               base="/" _description="A component">
       <feeder name="default" />
     </component>
-    <component type="test-component-with-one-eater" base="/">
+    <component type="test-component-with-one-eater"
+               base="/" _description="A component">
       <eater name="default" required="true" />
     </component>
-    <component type="test-component-with-two-eaters" base="/">
+    <component type="test-component-with-two-eaters"
+               base="/" _description="A component">
       <eater name="video" required="true" />
       <eater name="audio" required="true" />
     </component>
-    <component type="test-component-with-multiple-eater" base="/">
+    <component type="test-component-with-multiple-eater"
+               base="/" _description="A component">
       <eater name="default" multiple="true" />
     </component>
-    <component type="test-component-with-compound-properties" base="/">
+    <component type="test-component-with-compound-properties"
+               base="/" _description="A component">
       <properties>
-        <compound-property name="one">
-          <property name="one" type="string" />
-          <property name="two" type="int" />
+        <compound-property name="one" _description="A property">
+          <property name="one" type="string" _description="A property"/>
+          <property name="two" type="int" _description="A property"/>
         </compound-property>
-        <compound-property name="two" multiple="true" required="true">
-          <property name="one" type="string" required="true" />
-          <property name="two" type="int" />
-          <property name="three" type="float" />
+        <compound-property name="two" multiple="true"
+                           required="true" _description="A property">
+          <property name="one" type="string"
+                    required="true" _description="A property"/>
+          <property name="two" type="int" _description="A property"/>
+          <property name="three" type="float" _description="A property"/>
         </compound-property>
-        <compound-property name="three" multiple="true">
-          <property name="one" type="string" />
-          <property name="two" type="int" />
-          <property name="three" type="float" />
-          <compound-property name="four" multiple="no">
-            <property name="one" type="string" />
-            <property name="two" type="int" />
+        <compound-property name="three" multiple="true"
+                           _description="A property">
+          <property name="one" type="string" _description="A property"/>
+          <property name="two" type="int" _description="A property"/>
+          <property name="three" type="float" _description="A property"/>
+          <compound-property name="four" multiple="no"
+                             _description="A property">
+            <property name="one" type="string" _description="A property"/>
+            <property name="two" type="int" _description="A property"/>
           </compound-property>
         </compound-property>
-        <property name="five" type="bool"/>
+        <property name="five" type="bool" _description="A property"/>
       </properties>
     </component>
   </components>
   <plugs>
-    <plug socket="foo.bar" type="frobulator">
+    <plug socket="foo.bar" type="frobulator" _description="A plug">
       <entry location="bar/baz.py" function="Frobulator"/>
       <properties>
-        <property name="rate" type="fraction" required="true"/>
+        <property name="rate" type="fraction" required="true"
+                  _description="A property"/>
       </properties>
     </plug>
     <plug socket="flumotion.component.plugs.adminaction.AdminActionPlug"
-          type="test-adminaction">
+          _description="A plug" type="test-adminaction">
       <entry location="qux/baz.py" function="Quxulator"/>
       <properties>
-        <property name="foo" type="string" required="true"/>
+        <property name="foo" type="string" required="true"
+                  _description="A property"/>
       </properties>
     </plug>
-    <plug socket="foo.bar" type="compoundulator">
+    <plug socket="foo.bar" type="compoundulator" _description="A plug">
       <entry location="xom/baz.py" function="Xombulator"/>
       <properties>
-        <property name="act" type="bool" required="true" />
-        <compound-property name="cp1" multiple="true" required="true">
-          <property name="one" type="string" required="true" />
+        <property name="act" type="bool" required="true"
+                  _description="A property"/>
+        <compound-property name="cp1" multiple="true" required="true"
+                           _description="A property">
+          <property name="one" type="string" required="true"
+                    _description="A property"/>
         </compound-property>
-        <compound-property name="cp2" multiple="false" required="false">
-          <property name="two" type="int" required="false" />
+        <compound-property name="cp2" multiple="false"
+                           required="false" _description="A property">
+          <property name="two" type="int"
+                    required="false" _description="A property"/>
         </compound-property>
       </properties>
     </plug>
@@ -181,7 +199,8 @@ class TestConfig(testsuite.TestCase):
              """
              <planet>
                <atmosphere>
-                 <component name="component-name" type="test-component"/>
+                 <component name="component-name" type="test-component"
+                            _description="A component"/>
                </atmosphere>
              </planet>""")
         self.assertRaises(errors.ConfigError, conf.parse)
@@ -190,7 +209,7 @@ class TestConfig(testsuite.TestCase):
              <planet>
                <atmosphere>
                  <component name="component-name" type="test-component"
-                            worker=""/>
+                            _description="A component" worker=""/>
                </atmosphere>
              </planet>""")
         self.assertRaises(errors.ConfigError, conf.parse)
@@ -349,8 +368,7 @@ class TestConfig(testsuite.TestCase):
 <planet>
   <manager name="aname">
     <plugs>
-      <plug socket="flumotion.component.plugs.adminaction.AdminActionPlug"
-            type="test-adminaction">
+      <plug type="test-adminaction">
         <property name="foo">bar</property>
       </plug>
     </plugs>
@@ -381,8 +399,7 @@ class TestConfig(testsuite.TestCase):
              <planet>
                <manager name="aname">
                  <plugs>
-                   <plug socket="doesnotexist"
-                         type="frob">
+                   <plug type="frob">
                    </plug>
                  </plugs>
                </manager>
@@ -418,7 +435,8 @@ class TestConfig(testsuite.TestCase):
 
         xml = """<planet>
               <flow name="default">
-                <component name="not-typed" worker="foo"/>
+                <component name="not-typed" worker="foo"
+                           _description="A component"/>
               </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -428,7 +446,8 @@ class TestConfig(testsuite.TestCase):
         # Specify a source for a component with no eaters
         xml = """<planet>
               <flow name="default">
-                <component name="test-component" worker="foo">
+                <component name="test-component" worker="foo"
+                           _description="A component">
                   <source>foo:bar</source>
                 </component>
               </flow>
@@ -440,7 +459,8 @@ class TestConfig(testsuite.TestCase):
     def testParseFlowError(self):
         xml = """<planet>
             <flow>
-            <component name="unused" type="not-existing" worker="foo"/>
+            <component name="unused" type="not-existing" worker="foo"
+                       _description="A component"/>
             </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -449,7 +469,8 @@ class TestConfig(testsuite.TestCase):
 
         xml = """<planet>
               <flow name="manager">
-                <component name="unused" type="not-existing" worker="foo"/>
+                <component name="unused" type="not-existing"
+                           worker="foo" _description="A component"/>
               </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -458,7 +479,8 @@ class TestConfig(testsuite.TestCase):
 
         xml = """<planet>
               <flow name="atmosphere">
-                <component name="unused" type="not-existing" worker="foo"/>
+                <component name="unused" type="not-existing"
+                           worker="foo" _description="A component"/>
               </flow>
             </planet>"""
         conf = ConfigXML(xml)
@@ -476,8 +498,10 @@ class TestConfig(testsuite.TestCase):
 
     def testParseManagerError(self):
         xml = """<planet><manager>
-            <component name="first" type="test-component" worker="foo"/>
-            <component name="second" type="test-component" worker="foo"/>
+            <component name="first" type="test-component"
+                       worker="foo" _description="A component"/>
+            <component name="second" type="test-component"
+                       worker="foo" _description="A component"/>
             </manager></planet>"""
         conf = ManagerConfigXML(xml)
         self.failUnless(conf)
@@ -592,7 +616,7 @@ class TestConfig(testsuite.TestCase):
 
     def testParseCompoundPropertiesError(self):
         xml = """<planet><flow name="default">
-              <component name="component-name"
+              <component name="component-name" _description="A component"
                          type="test-component-with-compound-properties"
                          worker="foo">
               </component>
@@ -603,10 +627,10 @@ class TestConfig(testsuite.TestCase):
         self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet><flow name="default">
-              <component name="component-name"
+              <component name="component-name" _description="A component"
                          type="test-component-with-compound-properties"
                          worker="foo">
-                <compound-property name="two">
+                <compound-property name="two" _description="A property">
                 </compound-property>
               </component>
             </flow></planet>"""
@@ -616,7 +640,7 @@ class TestConfig(testsuite.TestCase):
         self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet><flow name="default">
-              <component name="component-name"
+              <component name="component-name" _description="A component"
                          type="test-component-with-compound-properties"
                          worker="foo">
                 <property name="two" />
@@ -628,10 +652,10 @@ class TestConfig(testsuite.TestCase):
         self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet><flow name="default">
-              <component name="component-name"
+              <component name="component-name" _description="A component"
                          type="test-component-with-compound-properties"
                          worker="foo">
-                <compound-property name="five">
+                <compound-property name="five" _description="A property">
                   <property name="foo">bar</property>
                 </compound-property>
               </component>
@@ -642,13 +666,13 @@ class TestConfig(testsuite.TestCase):
         self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet><flow name="default">
-              <component name="component-name"
+              <component name="component-name" _description="A component"
                          type="test-component-with-compound-properties"
                          worker="foo">
-                <compound-property name="one">
+                <compound-property name="one" _description="A property">
                   <property name="one">foo</property>
                 </compound-property>
-                <compound-property name="one">
+                <compound-property name="one" _description="A property">
                   <property name="one">bar</property>
                 </compound-property>
               </component>
@@ -659,14 +683,14 @@ class TestConfig(testsuite.TestCase):
         self.assertRaises(errors.ConfigError, conf.parse)
 
         xml = """<planet><flow name="default">
-              <component name="component-name"
+              <component name="component-name" _description="A component"
                          type="test-component-with-compound-properties"
                          worker="foo">
-                <compound-property name="three">
-                  <compound-property name="four">
+                <compound-property name="three" _description="A property">
+                  <compound-property name="four" _description="A property">
                     <property name="one">string</property>
                   </compound-property>
-                  <compound-property name="four">
+                  <compound-property name="four" _description="A property">
                     <property name="one">string</property>
                   </compound-property>
                 </compound-property>
@@ -683,7 +707,7 @@ class TestConfig(testsuite.TestCase):
              <component name="component-name" type="test-component"
                         worker="foo">
                <plugs>
-                 <plug socket="foo.bar" type="frobulator">
+                 <plug type="frobulator">
                    <property name="rate">3/4</property>
                  </plug>
                </plugs>
@@ -700,8 +724,8 @@ class TestConfig(testsuite.TestCase):
         foobars = plugs['foo.bar']
         self.assertEquals(len(foobars), 1)
         self.assertEquals(foobars[0],
-                          {'socket': 'foo.bar',
-                           'type': 'frobulator',
+                          {'type': 'frobulator',
+                           'socket': 'foo.bar',
                            'entries': {'default': {
             'function-name': 'Frobulator',
             'module-name': 'bar.baz'}},
@@ -713,7 +737,7 @@ class TestConfig(testsuite.TestCase):
              <component name="component-name" type="test-component"
                         worker="foo">
                <plugs>
-                 <plug socket="foo.bar" type="compoundulator">
+                 <plug type="compoundulator">
                    <property name="act">true</property>
                    <compound-property name="cp1">
                      <property name="one">a string</property>
@@ -739,9 +763,10 @@ class TestConfig(testsuite.TestCase):
         foobars = plugs['foo.bar']
         self.assertEquals(len(foobars), 1)
         self.assertEquals(foobars[0],
-                          {'socket': 'foo.bar',
-                           'type': 'compoundulator',
+                          {'type': 'compoundulator',
+                           'socket': 'foo.bar',
                            'entries': {'default': {
+
             'function-name': 'Xombulator',
             'module-name': 'xom.baz'}},
                            'properties': {
@@ -895,7 +920,9 @@ class TestConfig(testsuite.TestCase):
                            worker="foo"/>
                 <component name="cons" type="test-component-with-one-eater"
                            worker="foo">
-                  <source>prod:default</source>
+                  <eater name="default">
+                    <feed alias="default">prod:default</feed>
+                  </eater>
                 </component>
               </flow>
             </planet>
@@ -1039,8 +1066,10 @@ class TestConfig(testsuite.TestCase):
                 <component name="cons"
                            type="test-component-with-multiple-eater"
                            worker="foo">
-                  <source>prod:default</source>
-                  <source>prod2:default</source>
+                  <eater name="default">
+                    <feed alias="default">prod:default</feed>
+                    <feed alias="default-bis">prod2:default</feed>
+                  </eater>
                 </component>
               </flow>
             </planet>
@@ -1063,7 +1092,7 @@ class TestConfig(testsuite.TestCase):
              <planet>
                <flow name="atmosphere">
                  <component name="flowcomp" type="test-component"
-                            worker="foo"/>
+                            worker="foo" _description="A component" />
                </flow>
              </planet>
              """
