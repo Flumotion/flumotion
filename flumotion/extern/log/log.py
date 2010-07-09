@@ -991,16 +991,16 @@ class TwistedLogObserver(Loggable):
         self._ignoreErrors = []
 
 
-def fluLevelToStdLevel(fluLevel):
+def logLevelToStdLevel(level):
     t = {ERROR : logging.CRITICAL,
          WARN : logging.ERROR,
          INFO : logging.WARNING,
          DEBUG : logging.INFO,
          LOG : logging.DEBUG}
-    return t.get(fluLevel, logging.NOTSET)
+    return t.get(level, logging.NOTSET)
 
 
-def stdLevelToFluLevel(level):
+def stdLevelToLogLevel(level):
     t = {logging.CRITICAL: ERROR,
          logging.ERROR: WARN,
          logging.WARNING: INFO,
@@ -1020,22 +1020,23 @@ def adaptStandardLogging(loggerName, logCategory, targetModule):
                         from the standard logger, e.g. 'librarymodule'
     @type logCategory: str
     @param targetModule: The name of the module that the logging should look
-                         like it's coming from, e.g. 'flumotion'. Use this if
-                         you don't want to see the file names and line numbers
-                         of the library who's logger you are adapting.
+                         like it's coming from. Use this if you don't want to
+                         see the file names and line numbers of the library
+                         who's logger you are adapting.
     @type targetModule: str or None
     """
     logger = logging.getLogger(loggerName)
     # if there is already a FluHandler, exit
-    if map(lambda h: isinstance(h, FluHandler), logger.handlers):
+    if map(lambda h: isinstance(h, LogHandler), logger.handlers):
         return
-    logger.setLevel(fluLevelToStdLevel(getCategoryLevel(logCategory)))
-    logger.addHandler(FluHandler(logCategory, targetModule))
+    logger.setLevel(logLevelToStdLevel(getCategoryLevel(logCategory)))
+    logger.addHandler(LogHandler(logCategory, targetModule))
 
 
-class FluHandler(logging.Handler):
+class LogHandler(logging.Handler):
     """
-    A standard library logging handler that logs through the Flumotion system.
+    A standard library logging handler that logs through the log system of this
+    module.
     """
 
     def __init__(self, logCategory, targetModule):
@@ -1044,11 +1045,11 @@ class FluHandler(logging.Handler):
         self.targetModule = targetModule
 
     def emit(self, record):
-        fluLevel = stdLevelToFluLevel(record.levelno)
-        if _canShortcutLogging(self.logCategory, fluLevel):
+        level = stdLevelToLogLevel(record.levelno)
+        if _canShortcutLogging(self.logCategory, level):
             return
 
         filename, lineno = getFileLine(-1, self.targetModule)
-        doLog(fluLevel, None, self.logCategory,
+        doLog(level, None, self.logCategory,
               self.format(record), None, 0,
               scrubFilename(filename), lineno)
