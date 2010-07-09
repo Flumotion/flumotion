@@ -1,6 +1,11 @@
 2010-07-09  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/extern/log/log.py:
+	Add comments about keeping the logging module generic.
+
+2010-07-09  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/extern/log/log.py:
 	Remove mentions of Flumotion from log.py, it should be left as a
 	generic module.
 

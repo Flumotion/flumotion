@@ -11,7 +11,8 @@ These are, in order of decreasing verbosity: log, debug, info, warning, error.
 
 This module provides a Loggable class for objects, as well as various
 convenience methods for logging in general, and for logging with Twisted
-and failures in particular.
+and failures in particular. It is written such a way that it can be reused in
+different projects to provide a controllable logging mechanism.
 
 Maintainer: U{Thomas Vander Stichele <thomas at apestaart dot org>}
 """
