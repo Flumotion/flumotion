@@ -541,10 +541,11 @@ class FeedComponent(basecomponent.BaseComponent):
         @param with_timestamp: if True, then timestamp will be prepended to
                                filename
         """
-        method = gst.DEBUG_BIN_TO_DOT_FILE
-        if with_timestamp:
-            method = gst.DEBUG_BIN_TO_DOT_FILE_WITH_TS
-        method(self.pipeline, gst.DEBUG_GRAPH_SHOW_ALL, filename)
+        if hasattr(gst, "DEBUG_BIN_TO_DOT_FILE"):
+            method = gst.DEBUG_BIN_TO_DOT_FILE
+            if with_timestamp:
+                method = gst.DEBUG_BIN_TO_DOT_FILE_WITH_TS
+            method(self.pipeline, gst.DEBUG_GRAPH_SHOW_ALL, filename)
 
     ### BaseComponent interface implementation
 

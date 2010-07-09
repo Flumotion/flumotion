@@ -1,3 +1,8 @@
+2010-07-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/feedcomponent010.py:
+	Don't throw an exception when DEBUG_BIN_TO_DOT_FILE is not found.
+
 2010-07-08  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* flumotion/manager/config.py:
