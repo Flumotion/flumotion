@@ -409,8 +409,9 @@ class ICalSchedulerURGentTest(testsuite.TestCase):
         # verify that it is in a Brussels timezone
         s = str(point.dt.tzinfo)
         event = point.eventInstance.event
-        self.failUnless('tzfile' in s)
         self.failUnless('Brussels' in s)
+        self.failUnless(point.dt.utcoffset() == datetime.timedelta(hours=1))
+        self.failUnless(point.dt.dst() == datetime.timedelta(hours=0))
         self.failUnless(event.content.startswith('Farkli Bir Gece'),
             'next change is not to Farkli Bir Gece but to %s' % event.content)
         self.assertEquals(point.which, 'start')
@@ -612,6 +613,55 @@ class ICalendarTest(testsuite.TestCase):
         events = eventSets.values()[0].getEvents()
         self.assertEquals(events[0].content, contentExpected)
         self.assertEquals(events[0].uid, uidExpected)
+
+    def testParseTimezones(self):
+        # Create a calendar in Europe/Brussels timezone,
+        # with an event starting at 1:00 on 26/10, and ending at 4:00 on 26/10
+        # this event should be 4 hours long since there is a daylight
+        # savings time switch from 3:00 to 2:00 during the night
+        data = '''
+BEGIN:VCALENDAR
+PRODID:-//My calendar product//mxm.dk//
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:my_location
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0400
+TZOFFSETTO:+0500
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0500
+TZOFFSETTO:+0400
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=my_location:20080926T010000
+DTEND;TZID=my_location:20081126T040000
+SUMMARY:4 hour event due to time zone
+UID:uid
+END:VEVENT
+END:VCALENDAR
+        '''
+        ical = icalendar.Calendar.from_string(data)
+        cal = eventcalendar.fromICalendar(ical)
+        dateTime = datetime.datetime(2008, 9, 25, 19, 0, 0, tzinfo=UTC)
+        points = cal.getPoints(dateTime, datetime.timedelta(weeks=15))
+        point1 = points[0].dt
+        point2 = points[1].dt
+        self.failUnless(str(point1.tzinfo == 'my_location'))
+        self.failUnless(point1.utcoffset() == datetime.timedelta(hours=5))
+        self.failUnless(point1.dst() == datetime.timedelta(hours=1))
+        self.failUnless(point1.tzname() == 'CEST')
+        self.failUnless(str(point2.tzinfo == 'my_location'))
+        self.failUnless(point2.utcoffset() == datetime.timedelta(hours=4))
+        self.failUnless(point2.dst() == datetime.timedelta(hours=0))
+        self.failUnless(point2.tzname() == 'CET')
 
 
 class FunctionsTest(testsuite.TestCase):
@@ -955,7 +1005,7 @@ END:VCALENDAR
 
     def testDaylightSavingsChange(self):
         # Create a calendar in Europe/Brussels timezone,
-        # with an event starting at 1:00 on 25/10, and ending at 4:00 on 25/10
+        # with an event starting at 1:00 on 26/10, and ending at 4:00 on 26/10
         # this event should be 4 hours long since there is a daylight
         # savings time switch from 3:00 to 2:00 during the night
         data = '''

@@ -68,6 +68,121 @@ def _toDateTime(d):
     return d
 
 
+def _first_sunday_on_or_after(dt):
+    """
+    Looks for the closest last sunday in the month
+
+    @param dt:  Reference date
+    @type  dt:  L{datetime.datetime}
+
+    @rtype:     L{datetime.datetime} or None
+    @returns:   Last sunday of the month
+    """
+
+    days_to_go = 6 - dt.weekday()
+    if days_to_go:
+        dt += datetime.timedelta(days_to_go)
+    return dt
+
+
+class DSTTimezone(datetime.tzinfo):
+    """ A tzinfo class representing a DST timezone """
+
+    ZERO = datetime.timedelta(0)
+
+    def __init__(self, tzid, stdname, dstname, stdoffset, dstoffset,
+            stdoffsetfrom, dstoffsetfrom, dststart, dstend):
+        '''
+        @param tzid:            Timezone unique ID
+        @type  tzid:            str
+        @param stdname:         Name of the Standard observance
+        @type  stdname:         str
+        @param dstname:         Name of the DST observance
+        @type  dstname:         str
+        @param stdoffset:       UTC offset for the standard observance
+        @type  stdoffset:       L{datetime.timedelta}
+        @param dstoffset:       UTC offset for the DST observance
+        @type  dstoffset:       L{datetime.timedelta}
+        @param stdoffsetfrom:   UTC offset which is in use when the onset of
+                                Standard observance begins
+        @type  stdoffsetfrom:   l{datetime.timedelta}
+        @param dstoffsetfrom:   UTC offset which is in use when the onset of
+                                DST observance begins
+        @type  stdoffsetfrom:   L{datetime.timedelta}
+        @param dststart:        Start of the DST observance
+        @type  dststart:        L{datetime.datetime}
+        @param dstend:          End of the DST observance
+        @type  dstend:          L{datetime.datetime}
+        '''
+
+        self._tzid = str(tzid)
+        self._stdname = str(stdname)
+        self._dstname = str(dstname)
+        self._stdoffset = stdoffset
+        self._dstoffset = dstoffset
+        self._stdoffsetfrom = stdoffsetfrom
+        self._dstoffsetfrom = dstoffsetfrom
+        self._dststart = dststart
+        self._dstend = dstend
+
+    def __str__(self):
+        return self._tzid
+
+    def tzname(self, dt):
+        return self._isdst(dt) and self._dstname or self._stdname
+
+    def utcoffset(self, dt):
+        return self._isdst(dt) and self._dstoffset or self._stdoffset
+
+    def fromutc(self, dt):
+        dt = dt.replace(tzinfo=None)
+        return self._isdst(dt) and \
+                dt + self._dstoffsetfrom or dt + self._stdoffsetfrom
+
+    def dst(self, dt):
+        # The substraction is done converting the datetime values to UTC and
+        # adding the utcoffset of each one (see 9.1.4 datetime Objects)
+        # which is done only if both datetime are 'aware' and have different
+        # tzinfo member.
+        if dt is None or dt.tzinfo is None:
+            return self.ZERO
+        assert dt.tzinfo is self
+        return self._isdst(dt) and self._dstoffset - self._stdoffset or \
+                self.ZERO
+
+    def copy(self):
+        return DSTTimezone(self._tzid, self._stdname, self._dstname,
+                self._stdoffset, self._dstoffset, self._stdoffsetfrom,
+                self._dstoffsetfrom, self._dststart, self._dstend)
+
+    def _isdst(self, dt):
+        if self._dstoffset is None or dt.year < self._dststart.year:
+            return False
+        start = _first_sunday_on_or_after(self._dststart.replace(year=dt.year))
+        end = _first_sunday_on_or_after(self._dstend.replace(year=dt.year))
+        return start <= dt.replace(tzinfo=None) < end
+
+
+class FixedOffsetTimezone(datetime.tzinfo):
+    """Fixed offset in hours from UTC."""
+
+    def __init__(self, offset, name):
+        self.__offset = offset
+        self.__name = name
+
+    def utcoffset(self, dt):
+        return self.__offset
+
+    def tzname(self, dt):
+        return self.__name
+
+    def dst(self, dt):
+        return datetime.deltatime(0)
+
+    def copy(self):
+        return FixedOffsetTimezone(self.__offset, self.__name)
+
+
 class LocalTimezone(datetime.tzinfo):
     """A tzinfo class representing the system's idea of the local timezone"""
     STDOFFSET = datetime.timedelta(seconds=-time.timezone)
@@ -609,29 +724,23 @@ class Calendar(log.Loggable):
         return result
 
 
-def _timezoneFromTZID(timezoneInfo):
-    """
-    Returns a valid timezone from a TZID component
-    If timezoneInfo is None, return a tzinfo object representing
-    the local time, which is the Right Thing
+class NotCompilantError(Exception):
 
-    @param timezoneInfo: A string representation of the timezone
+    def __init__(self, value):
+        self.value = value
 
-    @rtype: L{tz.tzinfo}
-    """
-    # We only care about the last 2 values in blabla/obscure/Europe/Madrid
-    # to get the time zone with tz.gettz('Europe/Madrid')
-    return timezoneInfo and \
-            tz.gettz('/'.join(timezoneInfo.split('/')[-2:])) or\
-            tz.gettz(None)
+    def __str__(self):
+        return "The calendar is not compilant. " + repr(self.value)
 
 
-def vDDDToDatetime(v):
+def vDDDToDatetime(v, timezones):
     """
     Convert a vDDDType to a datetime, respecting timezones.
 
     @param v: the time to convert
     @type  v: L{icalendar.prop.vDDDTypes}
+
+    @param timezones: Defined timezones in the calendar
 
     """
     if v is None:
@@ -641,11 +750,36 @@ def vDDDToDatetime(v):
         # We might have a "floating" DATE-TIME value here, in
         # which case we will not have a TZID parameter; see
         # 4.3.5, FORM #3
-        tzinfo = _timezoneFromTZID(v.params.get('TZID'))
+        tzid = v.params.get('TZID')
+        if tzid is None:
+            timezone = tz.gettz(None)
+        else:
+            # If the timezone is not in the calendar, try one last time
+            # with the system's timezones
+            timezone = timezones.get(tzid, tz.gettz(tzid))
+            if timezone is None:
+                raise NotCompilantError("You are trying to use a timezone\
+                    that is not defined in this calendar")
+            elif timezone != UTC:
+                timezone = timezone.copy()
         dt = datetime.datetime(dt.year, dt.month, dt.day,
                                dt.hour, dt.minute, dt.second,
-                               dt.microsecond, tzinfo)
+                               dt.microsecond, timezone)
     return dt
+
+
+def vDDDToTimedelta(v):
+    """
+    Convert a vDDDType (vDuration) to a timedelta.
+
+    @param v: the duration to convert
+    @type  v: L{icalendar.prop.vDDDTypes}
+
+    @rtype  : L{datetime.timedelta}
+    """
+    if v is None or not isinstance(v.dt, datetime.timedelta):
+        return None
+    return v.dt
 
 
 def fromICalendar(iCalendar):
@@ -658,14 +792,46 @@ def fromICalendar(iCalendar):
     @rtype: L{Calendar}
     """
     calendar = Calendar()
+    timezones = {'UTC': UTC}
+
+    for vtimezone in iCalendar.walk('vtimezone'):
+
+        def parseObservance(observance):
+            try:
+                return (observance['TZNAME'], observance['TZOFFSETFROM'],
+                        observance['TZOFFSETTO'], observance['DTSTART'])
+            except:
+                raise NotCompilantError(
+                    "VTIMEZONE does not define one of the following required "
+                    "elements: TZNAME, TZOFFSETFROM, TZOFFSETTO or DTSTART")
+
+        # We need to parse all the timezone defined for the current iCalendar
+        tzid = vtimezone.get('tzid')
+        standard = vtimezone.walk('standard')[0]
+        stdname, stdoffsetfrom, stdoffset, dstend = parseObservance(standard)
+        try:
+            daylight = vtimezone.walk('daylight')[0]
+        except:
+            timezone = FixedOffsetTimezone(stdoffset.td, stdname)
+        else:
+            dstname, dstoffsetfrom, dstoffset, dststart = parseObservance(
+                    daylight)
+            timezone = DSTTimezone(tzid, stdname, dstname,
+                                    stdoffset.td, dstoffset.td,
+                                    stdoffsetfrom.td, dstoffsetfrom.td,
+                                    dststart.dt, dstend.dt)
+        if tzid not in timezones:
+            timezones[tzid] = timezone
+        else:
+            raise NotCompilantError("Timezones must have a unique TZID")
 
     for event in iCalendar.walk('vevent'):
         # extract to function ?
 
         # DTSTART is REQUIRED in VEVENT; see 4.8.2.4
-        start = vDDDToDatetime(event.get('dtstart'))
+        start = vDDDToDatetime(event.get('dtstart'), timezones)
         # DTEND is optional; see 4.8.2.3
-        end = vDDDToDatetime(event.get('dtend', None))
+        end = vDDDToDatetime(event.get('dtend', None), timezones)
         # FIXME: this implementation does not yet handle DURATION, which
         # is an alternative to DTEND
 
@@ -691,7 +857,7 @@ def fromICalendar(iCalendar):
 
         recurrenceid = event.get('RECURRENCE-ID', None)
         if recurrenceid:
-            recurrenceid = vDDDToDatetime(recurrenceid)
+            recurrenceid = vDDDToDatetime(recurrenceid, timezones)
 
         exdates = event.get('EXDATE', [])
         # When there is only one exdate, we don't get a list, but the
@@ -701,7 +867,7 @@ def fromICalendar(iCalendar):
 
         # this is a list of icalendar.propvDDDTypes on which we can call
         # .dt() or .ical()
-        exdates = [vDDDToDatetime(i) for i in exdates]
+        exdates = [vDDDToDatetime(i, timezones) for i in exdates]
 
         if event.get('RDATE'):
             raise NotImplementedError("We don't handle RDATE yet")

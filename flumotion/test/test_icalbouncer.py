@@ -109,6 +109,26 @@ class TestIcalBouncerRunning(testsuite.TestCase, RequiredModulesMixin):
 BEGIN:VCALENDAR
 PRODID:-//Flumotion Fake Calendar Creator//flumotion.com//
 VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:Asia/Shanghai
+BEGIN:STANDARD
+TZOFFSETFROM:+0800
+TZOFFSETTO:+0800
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VTIMEZONE
+TZID:America/Guatemala
+BEGIN:STANDARD
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0600
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
 BEGIN:VEVENT
 DTSTART%(dtstart-tzid)s:%(dtstart)s
 DTEND%(dtend-tzid)s:%(dtend)s
@@ -205,49 +225,28 @@ class TestIcalBouncerTZID(TestIcalBouncerRunning, RequiredModulesMixin):
         d.addCallback(self._denied_callback)
         return d
 
-    def testDeniedLongTZID(self):
+    def testDeniedIfNotDefinedTZID(self):
         new_end = self.half_an_hour_ago.astimezone(self.beijing_tz)
         naive_new_end = new_end.replace(tzinfo=None)
 
         data = self.ical_from_specs('', self.a_day_ago,
                                     ';TZID=/some/obscure/path/Asia/Shanghai',
                                     naive_new_end)
-        self.bouncer = self.bouncer_from_ical(data)
-
-        keycard = keycards.KeycardGeneric()
-        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
-        d.addCallback(self._denied_callback)
-        return d
+        try:
+            self.bouncer = self.bouncer_from_ical(data)
+        except NotCompilantError:
+            pass
+        else:
+            self.assert_(True)
 
     def testApprovedBothTZID(self):
         new_start = self.half_an_hour_ago.astimezone(self.beijing_tz)
         naive_new_start = new_start.replace(tzinfo=None)
         new_end = self.in_half_an_hour.astimezone(self.guatemala_tz)
         naive_new_end = new_end.replace(tzinfo=None)
-
         data = self.ical_from_specs(';TZID=Asia/Shanghai', naive_new_start,
                                     ';TZID=America/Guatemala', naive_new_end)
         self.bouncer = self.bouncer_from_ical(data)
-
-        keycard = keycards.KeycardGeneric()
-        d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
-        d.addCallback(self._approved_callback)
-        return d
-
-    def testLongTZID(self):
-        # Some calendars prepend to TZID their local path
-        # e.g: TZID:/mozilla.org/200700129_1/Europe/Madrid
-        # Check that we parse it correctly as 'Europe/Madrid'
-        new_start = self.half_an_hour_ago.astimezone(self.guatemala_tz)
-        naive_new_start = new_start.replace(tzinfo=None)
-        new_end = self.in_half_an_hour.astimezone(self.guatemala_tz)
-        naive_new_end = new_end.replace(tzinfo=None)
-
-        data = self.ical_from_specs(';TZID=/mozilla.org/20070129_1/\
-                Asia/Guatemala', naive_new_start,
-                ';TZID=/some/strange/path/America/Guatemala', naive_new_end)
-        self.bouncer = self.bouncer_from_ical(data)
-
         keycard = keycards.KeycardGeneric()
         d = defer.maybeDeferred(self.bouncer.authenticate, keycard)
         d.addCallback(self._approved_callback)

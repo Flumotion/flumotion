@@ -1,5 +1,15 @@
 2010-07-12  Josep Joan Ribas  <jribas@flumotion.com>
 
+	reviewed by: Marc-Andre Lureau
+	patch by: Andoni Morales
+
+	* flumotion/common/eventcalendar.py:
+	* flumotion/test/test_common_eventcalendar.py:
+	* flumotion/test/test_icalbouncer.py:
+	Add ical VTIMEZONE definition parsing. Closes #1377
+
+2010-07-12  Josep Joan Ribas  <jribas@flumotion.com>
+
 	reviewed by: Xavier Queralt
 
 	* flumotion/admin/assistant/models.py:
