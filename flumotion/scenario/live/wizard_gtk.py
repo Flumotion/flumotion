@@ -103,7 +103,7 @@ class LiveAssistantPlugin(object):
         for step in steps:
             consumerType = step.getConsumerType()
             consumer = step.getConsumerModel()
-            if consumer.componentType == 'http-streamer':
+            if consumer.requiresPorter:
                 porter = self._obtainPorter(httpPorters, consumer.getPorter())
 
                 if porter not in httpPorters:

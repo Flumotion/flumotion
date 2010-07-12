@@ -168,18 +168,8 @@ class AssistantSaver(object):
           audio/video/audio-video
         @type consumerType: string
         """
-        if consumer.componentType == 'http-streamer':
-            prefix = 'http'
-        elif consumer.componentType == 'disk-consumer':
-            prefix = 'disk'
-        elif consumer.componentType == 'shout2-consumer':
-            prefix = 'shout2'
-        else:
-            raise AssertionError("unknown component: %s" % (
-                consumer.componentType))
-
         # [disk,http,shout2]-[audio,video,audio-video]
-        consumer.name = prefix + '-' + consumerType
+        consumer.name = consumer.prefix + '-' + consumerType
 
         self._getMuxer(consumerType).link(consumer)
         self._flowComponents.append(consumer)

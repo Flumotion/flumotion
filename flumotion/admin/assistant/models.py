@@ -301,6 +301,8 @@ class Muxer(Component):
 
 class Consumer(Component):
     eaterType = Muxer
+    requiresPorter = False
+    prefix = "consumer"
 
     def __init__(self, worker=None):
         Component.__init__(self, worker)

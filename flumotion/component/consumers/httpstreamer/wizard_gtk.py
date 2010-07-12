@@ -69,6 +69,8 @@ class HTTPStreamer(Consumer):
     @ivar port: The port this server will be listening to
     """
     componentType = 'http-streamer'
+    requiresPorter = True
+    prefix = 'http'
 
     def __init__(self):
         super(HTTPStreamer, self).__init__()

@@ -33,6 +33,7 @@ _ = gettext.gettext
 
 class Shout2Consumer(Consumer):
     componentType = 'shout2-consumer'
+    prefix = 'shout2'
 
     def __init__(self):
         super(Shout2Consumer, self).__init__()

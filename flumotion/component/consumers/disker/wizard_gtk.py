@@ -56,6 +56,7 @@ class Disker(Consumer):
       time will be multiplied by this value when saved
     """
     componentType = 'disk-consumer'
+    prefix = 'disk'
 
     def __init__(self):
         super(Disker, self).__init__()
