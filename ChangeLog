@@ -1,5 +1,10 @@
 2010-07-13  Josep Joan Ribas  <jribas@flumotion.com>
 
+	* data/image/36x36 (svn:ignore):
+	Add Makefile to svn ignore
+
+2010-07-13  Josep Joan Ribas  <jribas@flumotion.com>
+
 	reviewed by: Xavier Queralt
 
 	* configure.ac:
