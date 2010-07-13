@@ -1,3 +1,11 @@
+2010-07-12  David Gay i Tello  <dgay@flumotion.com>
+
+	reviewed by: Zaheer Abbas Merali
+
+	* flumotion/manager/admin.py:
+	Add remote call to list a component and its upstream components along with
+	types and worker hosts.
+
 2010-07-12  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Marc-Andre Lureau

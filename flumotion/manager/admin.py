@@ -201,6 +201,60 @@ class AdminAvatar(base.ManagerAvatar):
         return self.perspective_componentCallRemote(component, methodName,
                                                     *args, **kwargs)
 
+    def perspective_upstreamList(self, avatarId):
+        """
+        List a component and its upstream components along with
+        types and worker hosts.
+
+        @param avatarId: the component avatar id
+        @type  avatarId: str
+        """
+
+        def get_eaters_ids(eaters_dic):
+            avatars = []
+            for flow in eaters_dic.keys():
+                comps = eaters_dic[flow]
+                for c in comps:
+                    (name, what) = c[0].split(':')
+                    avatars.append('/%s/%s' % (flow, name))
+            return avatars
+
+        def create_response(components, workers):
+            comps = []
+            for c in components:
+                workerName = c.get('workerName')
+                host = "unknown"
+                for w in workers:
+                    if workerName == w.get('name'):
+                        host = w.get('host')
+                        break
+                comps.append((c.get('name'), c.get('type'), host))
+            return comps
+
+        component = util.findComponent(self.vishnu.state, avatarId)
+        if not component:
+            self.warning('No component with avatar id %s' % avatarId)
+            raise errors.UnknownComponentError(avatarId)
+
+        eaters = component.get('config').get('eater', {})
+        eaters_id = get_eaters_ids(eaters)
+        comps = [component]
+        while len(eaters_id) > 0:
+            eaters = {}
+            for i in eaters_id:
+                try:
+                    compState = util.findComponent(self.vishnu.state, i)
+                    comps.append(compState)
+                    eaters.update(compState.get('config').get('eater', {}))
+                except Exception, e:
+                    self.debug(log.getExceptionMessage(e))
+                    emsg = "Error retrieving component '%s'" % i
+                    raise errors.UnknownComponentError(emsg)
+            eaters_id = get_eaters_ids(eaters)
+
+        workers = self.vishnu.workerHeaven.state.get('workers')
+        return create_response(comps, workers)
+
     def perspective_workerCallRemote(self, workerName, methodName,
                                      *args, **kwargs):
         """
