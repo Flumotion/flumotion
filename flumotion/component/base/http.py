@@ -163,6 +163,9 @@ class HTTPAuthentication(log.Loggable):
         self.setRequesterId(component.getName())
         self._defaultDuration = None   # default duration to use if the keycard
                                        # doesn't specify one.
+        self._allowDefault = False     # whether failures communicating with
+                                       # the bouncer should result in HTTP 500
+                                       # or with allowing the connection
         self._pendingCleanups = []
         self._keepAlive = None
 
@@ -229,6 +232,9 @@ class HTTPAuthentication(log.Loggable):
 
     def setDefaultDuration(self, defaultDuration):
         self._defaultDuration = defaultDuration
+
+    def setAllowDefault(self, allowDefault):
+        self._allowDefault = allowDefault
 
     def setIssuerClass(self, issuerClass):
         # FIXME: in the future, we want to make this pluggable and have it
@@ -409,16 +415,20 @@ class HTTPAuthentication(log.Loggable):
         return None
 
     def _authenticatedErrback(self, failure, request):
-        failure.trap(errors.UnknownComponentError,
-                     errors.NotAuthenticatedError)
+        failure.trap(errors.NotAuthenticatedError)
         self._handleUnauthorized(request, http.UNAUTHORIZED)
         return failure
 
     def _defaultErrback(self, failure, request):
-        if failure.check(errors.UnknownComponentError,
-                errors.NotAuthenticatedError) is None:
-            # If something else went wrong, we want to disconnect the client
-            # and give them a 500 Internal Server Error.
+        if failure.check(errors.NotAuthenticatedError) is None:
+            # If something else went wrong, we want to either disconnect the
+            # client and give them a 500 Internal Server Error or just allow
+            # them, depending on the configuration.
+            self.debug("Authorization request failed: %s",
+                       log.getFailureMessage(failure))
+            if self._allowDefault:
+                self.debug("Authorization failed, but allowing anyway")
+                return None
             self._handleUnauthorized(request, http.INTERNAL_SERVER_ERROR)
         return failure
 

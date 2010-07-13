@@ -141,6 +141,18 @@ class FakeTokenMedium:
         return defer.succeed(None)
 
 
+class FakeAuthFailingMedium(FakeAuthMedium):
+    # this medium fakes suffering from a failure if you give it one
+
+    def __init__(self):
+        self.failure = None
+
+    def authenticate(self, bouncerName, keycard):
+        if self.failure:
+            return defer.fail(self.failure)
+        return FakeAuthMedium.authenticate(self, bouncerName, keycard)
+
+
 class FakeStreamer:
     caps = None
     mime = 'application/octet-stream'
@@ -201,6 +213,17 @@ class TestHTTPStreamingResource(testsuite.TestCase):
 
         def checkResult(res):
             self.assertEquals(request.response, http.OK)
+
+        d = httpauth.startAuthentication(request)
+        d.addCallbacks(checkResult, checkResult)
+        return d
+
+    def deferAssertInternalServerError(self, httpauth, request):
+        # make the resource authenticate the request, and verify
+        # that you get a HTTP 500
+
+        def checkResult(res):
+            self.assertEquals(request.response, http.INTERNAL_SERVER_ERROR)
 
         d = httpauth.startAuthentication(request)
         d.addCallbacks(checkResult, checkResult)
@@ -312,6 +335,41 @@ class TestHTTPStreamingResource(testsuite.TestCase):
 
         d.addCallback(rightToken)
         d.addCallback(rightTokenTwice)
+
+        d.callback(None)
+        return d
+
+    def testRenderHTTPAllowDefault(self):
+        streamer = FakeStreamer(mediumClass=FakeAuthFailingMedium)
+        httpauth = HTTPAuthentication(streamer)
+        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        httpauth.setBouncerName('fakebouncer')
+
+        streamer.caps = True
+        self.failUnless(resource.isReady())
+
+        d = defer.Deferred()
+
+        def wrongToken(_):
+            request = FakeRequest(user='wronguser')
+            return self.deferAssertUnauthorized(httpauth, request)
+
+        def errorDisallowDefault(_, error):
+            streamer.medium.failure = error
+            request = FakeRequest(user='wronguser')
+            return self.deferAssertInternalServerError(httpauth, request)
+
+        def errorAllowDefault(_, error):
+            streamer.medium.failure = error
+            httpauth.setAllowDefault(True)
+            request = FakeRequest(user='wronguser')
+            return self.deferAssertAuthorized(httpauth, request)
+
+        d.addCallback(wrongToken)
+        d.addCallback(errorDisallowDefault, errors.NotConnectedError())
+        d.addCallback(errorDisallowDefault, errors.UnknownComponentError())
+        d.addCallback(errorAllowDefault, errors.NotConnectedError())
+        d.addCallback(errorAllowDefault, errors.UnknownComponentError())
 
         d.callback(None)
         return d
