@@ -227,6 +227,7 @@ This mode is only useful for testing Flumotion.
         self._timeout_id = gobject.timeout_add(200, pulse)
 
         self._startManager(state)
+        self.button_prev.set_sensitive(False)
         return '*signaled*'
 
     # Private
@@ -264,6 +265,7 @@ This mode is only useful for testing Flumotion.
         state.update(dict(confDir=spawner.getConfDir(),
                           logDir=spawner.getLogDir(),
                           runDir=spawner.getRunDir()))
+        state['managerSpawner'] = spawner
         self._finished('start_new_success')
 
     def _finished(self, result):
@@ -374,7 +376,7 @@ class Greeter(SimpleWizard):
             d.addCallback(errorMessageDisplayed)
             return d
 
-        d = self._adminWindow.openConnection(info)
+        d = self._adminWindow.openConnection(info, state.get('managerSpawner'))
         d.addCallbacks(connected, connectionFailed)
         self.set_sensitive(False)
         return d

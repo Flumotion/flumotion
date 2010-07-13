@@ -212,6 +212,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self._trayicon = None
         self._configurationAssistantIsRunning = False
         self._currentDir = None
+        self._managerSpawner = None
 
         self._createUI()
         self._appendRecentConnections()
@@ -317,13 +318,14 @@ class AdminWindow(Loggable, GladeDelegate):
         """
         return self._window
 
-    def openConnection(self, info):
+    def openConnection(self, info, managerSpawner=None):
         """Connects to a manager given a connection info.
 
         @param info: connection info
         @type  info: L{PBConnectionInfo}
         """
         assert isinstance(info, PBConnectionInfo), info
+        self._managerSpawner = managerSpawner
         return self._openConnection(info)
 
     # Private
@@ -648,7 +650,14 @@ class AdminWindow(Loggable, GladeDelegate):
     def _quit(self):
         """Quitting the application in a controlled manner"""
         self._clearAdmin()
-        self._close()
+
+        def clearAndClose(unused):
+            self._close()
+        if self._managerSpawner and self._promptForShutdown():
+            r = self._managerSpawner.stop(True)
+            r.addCallback(clearAndClose)
+        else:
+            clearAndClose('')
 
     def _close(self, *args):
         reactor.stop()
@@ -1513,6 +1522,16 @@ You can do remote component calls using:
             return
         gobject.spawn_async([executable,
                              'ghelp:%s' % (configure.PACKAGE, )])
+
+    def _promptForShutdown(self):
+        d = gtk.MessageDialog(
+                        self._window, gtk.DIALOG_MODAL,
+                        gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+                        _("Do you want to shutdown manager and worker "
+                         "before exiting?"))
+        response = d.run()
+        d.destroy()
+        return response == gtk.RESPONSE_YES
 
     ### admin model callbacks
 
