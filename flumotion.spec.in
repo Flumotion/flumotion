@@ -38,17 +38,8 @@ Requires:       python-kiwi >= %{kiwi_minver}
 # for make-dummy-cert to work
 Requires(post): openssl
 
-BuildRequires:  %{gstreamer}-devel >= %{gst_minver}
-BuildRequires:  %{gstreamer}-python >= %{gstpy_minver}
-BuildRequires:  python-twisted-core >= 2.5.0
-BuildRequires:  python-twisted-names
-BuildRequires:  python-twisted-web
-BuildRequires:  python-twisted-conch
-BuildRequires:  python-dateutil
-BuildRequires:  pygtk2-libglade
 BuildRequires:  python-devel >= 2.4
-BuildRequires:  pygtk2-devel >= %{pygtk_minver}
-BuildRequires:  python-kiwi >= %{kiwi_minver}
+BuildRequires:  python >= 2.4
 
 # docs
 BuildRequires:  epydoc
@@ -61,7 +52,7 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  gettext
 BuildRequires:  intltool
 
-# since we compile pytrayicon, we're no longer noarch
+# since we compile fdpass, we're no longer noarch
 # BuildArch:    noarch
 
 %description

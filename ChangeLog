@@ -1,3 +1,13 @@
+2010-07-13  Xavier Queralt Mateu  <xqueralt@flumotion.com>
+
+	reviewed by: Jan
+
+	* configure.ac:
+	* flumotion.spec.in:
+	* flumotion/common/boot.py:
+	Remove stupid configuration time checks that are not needed to build
+	flumotion. We already check them at run-time.
+
 2010-07-13  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Xavier Queralt

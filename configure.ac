@@ -19,12 +19,10 @@ AC_SUBST_FILE(AUTHORS)
 AUTHORS=$srcdir/AUTHORS
 
 dnl keep in sync with flumotion/common/boot.py and
-# FIXME: Change this requirement to 2.10.0 when buildbot is upgraded
-AC_SUBST(PYGTK_010_REQ, 2.8.4)
+AC_SUBST(PYGTK_010_REQ, 2.10.0)
 AC_SUBST(PYCAIRO_010_REQ, 1.2.0)
 AC_SUBST(PYGST_010_REQ, 0.10.4)
-# FIXME: Change this requirement to 0.10.11 when buildbot is upgraded
-AC_SUBST(GST_010_REQ, 0.10.10)
+AC_SUBST(GST_010_REQ, 0.10.11)
 
 GST_010_SUPPORTED=true
 
@@ -77,18 +75,6 @@ as_save_PYTHONPATH=$PYTHONPATH
 PYTHONPATH=$srcdir:$PYTHONPATH
 export PYTHONPATH
 
-dnl check for pygtk
-AS_PYTHON_IMPORT(pygtk,,AC_MSG_ERROR([pygtk not found or too old]),,
-    [from flumotion.common import boot; boot.init_gobject()])
-
-dnl check for gstreamer and gst-python
-AS_PYTHON_IMPORT(pygst,,AC_MSG_ERROR([gst-python not found or too old]),,
-    [from flumotion.common import boot; boot.init_gobject(); boot.init_gst()])
-
-dnl check for kiwi
-AS_PYTHON_IMPORT(kiwi,,AC_MSG_ERROR([kiwi not found or too old]),,
-    [from flumotion.common import boot; boot.init_kiwi()])
-
 PYTHONPATH=$as_save_PYTHONPATH
 export PYTHONPATH
 
@@ -120,38 +106,6 @@ AM_CONDITIONAL(BUILD_DOCS, test "x$enable_docs" = "xyes")
 dnl check for pychecker
 AC_CHECK_PROG(PYCHECKER, pychecker, yes, no)
 AM_CONDITIONAL(HAVE_PYCHECKER, test "x$PYCHECKER" = "xyes")
-
-dnl check for Twisted
-AS_PYTHON_IMPORT(twisted,
-  [
-  AC_MSG_CHECKING(for Twisted >= 2.5.0)
-  prog="
-import sys
-from twisted import __version__
-if __version__ == 'SVN-Trunk':
-   sys.exit(0)
-
-from twisted import version as v
-minver = (2, 5, 0)
-curver = (v.major, v.minor, v.micro)
-if curver < minver:
-    sys.exit(1)
-sys.exit(0)
-"
-  if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
-  then
-    AC_MSG_RESULT(found)
-  else
-    AC_MSG_RESULT(too old)
-    AC_MSG_ERROR([You need at least version 2.5.0 of Twisted])
-  fi
-  ]
-  ,
-  AC_MSG_ERROR([You need at least version 2.5.0 of Twisted])
-)
-
-TWISTED_MODULE([twisted.names])
-TWISTED_MODULE([twisted.web])
 
 dnl Cortado
 AC_ARG_WITH(cortado_prefix,

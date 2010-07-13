@@ -28,10 +28,10 @@ from flumotion.common.log import safeprintf
 
 __version__ = "$Rev$"
 # Keep in sync with configure.ac
-PYGTK_REQ = (2, 8, 4)
+PYGTK_REQ = (2, 10, 0)
 KIWI_REQ = (1, 9, 13)
-GST_REQ = {'0.10': {'gstreamer': (0, 10, 0, 1),
-                    'gst-python': (0, 10, 0, 1)}}
+GST_REQ = {'0.10': {'gstreamer': (0, 10, 10),
+                    'gst-python': (0, 10, 4)}}
 USE_GOPTION_PARSER = False
 USE_GTK = False
 USE_GST = True
