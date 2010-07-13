@@ -1,3 +1,13 @@
+2010-07-13  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Josep Ribas
+	patch by: Andoni Morales
+
+	* flumotion/common/eventcalendar.py:
+	* flumotion/test/test_common_eventcalendar.py:
+	Handle events with DTSTART+DURATION instead of DTSTART+DTEND.
+	Closes #1150
+
 2010-07-13  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/component/base/http.py:

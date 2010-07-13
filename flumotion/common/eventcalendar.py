@@ -832,8 +832,10 @@ def fromICalendar(iCalendar):
         start = vDDDToDatetime(event.get('dtstart'), timezones)
         # DTEND is optional; see 4.8.2.3
         end = vDDDToDatetime(event.get('dtend', None), timezones)
-        # FIXME: this implementation does not yet handle DURATION, which
-        # is an alternative to DTEND
+        # DURATION can replace DTEND; see 4.8.2.5
+        if not end:
+            duration = vDDDToTimedelta(event.get('duration', None))
+            end = duration and start + duration or None
 
         # an event without DURATION or DTEND is defined to not consume any
         # time; see 6; so we skip it

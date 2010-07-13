@@ -554,6 +554,24 @@ class ICalendarTest(testsuite.TestCase):
 
         self.assertOneEventExpected(startExpected, endExpected)
 
+    def testParseCalendarWithStartDateTimeAndDuration(self):
+        event = icalendar.Event()
+        startExpected = datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
+        duration = datetime.timedelta(hours=1, minutes=38, seconds=23)
+        endExpected = startExpected + duration
+        event['summary'] = 'Test calendar'
+        event['uid'] = '42'
+        event.set('dtstart',
+                datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
+        event.set('duration',
+                datetime.timedelta(hours=1, minutes=38, seconds=23))
+
+        self._icalendar.add_component(event)
+
+        self._calendar = eventcalendar.fromICalendar(self._icalendar)
+
+        self.assertOneEventExpected(startExpected, endExpected)
+
     def testParseCalendar(self):
         event = icalendar.Event()
         startExpected = datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
