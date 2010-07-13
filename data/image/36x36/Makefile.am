@@ -1,9 +1,8 @@
-imagedir = $(pkgdatadir)/image/24x24
+imagedir = $(pkgdatadir)/image/36x36
 
 image_DATA = \
 	cc.png		\
 	fluendo.png	\
-	wizard.png	\
 	xiph.png
 
 EXTRA_DIST = $(image_DATA)

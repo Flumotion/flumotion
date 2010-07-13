@@ -24,9 +24,9 @@ import cairo
 import pango
 import pangocairo
 
+from flumotion.configure import configure
+
 __version__ = "$Rev$"
-directory = os.path.split(os.path.abspath(__file__))[0]
-logopath = directory
 FONT = 'sans'
 FONT_PROPS = 'normal 22'
 TEXT_XOFFSET = 6
@@ -68,11 +68,12 @@ def generateOverlay(text,
 
     subImages = []
     if showXiph:
-        subImages.append(os.path.join(logopath, 'xiph.36x36.png'))
+        subImages.append(os.path.join(configure.imagedir, '36x36', 'xiph.png'))
     if showCC:
-        subImages.append(os.path.join(logopath, 'cc.36x36.png'))
+        subImages.append(os.path.join(configure.imagedir, '36x36', 'cc.png'))
     if showFlumotion:
-        subImages.append(os.path.join(logopath, 'fluendo.36x36.png'))
+        subImages.append(os.path.join(configure.imagedir, '36x36',
+                                      'fluendo.png'))
 
     imagesOverflowed = False
 

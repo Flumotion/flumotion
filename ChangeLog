@@ -1,3 +1,31 @@
+2010-07-13  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* configure.ac:
+	* data/image/24x24/Makefile.am:
+	* data/image/36x36/Makefile.am:
+	* data/image/Makefile.am:
+	* flumotion/component/converters/overlay/Makefile.am:
+	* flumotion/component/converters/overlay/genimg.py:
+	* flumotion/component/converters/overlay/overlay.xml:
+	* data/image/24x24/fluendo.png (added):
+	* data/image/24x24/cc.png (added):
+	* data/image/24x24/xiph.png (added):
+	* data/image/36x36 (added):
+	* data/image/36x36/fluendo.png (added):
+	* data/image/36x36/cc.png (added):
+	* data/image/36x36/Makefile.am (added):
+	* data/image/36x36/xiph.png (added):
+	* flumotion/component/converters/overlay/cc.36x36.png (deleted):
+	* flumotion/component/converters/overlay/fluendo.24x24.png (deleted):
+	* flumotion/component/converters/overlay/xiph.36x36.png (deleted):
+	* flumotion/component/converters/overlay/fluendo.36x36.png (deleted):
+	* flumotion/component/converters/overlay/cc.24x24.png (deleted):
+	* flumotion/component/converters/overlay/xiph.24x24.png (deleted):
+	Move images from the overlay bundle to the shared image directory.
+	Closes #1360
+
 2010-07-13  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	reviewed by: Jan

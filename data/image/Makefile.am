@@ -1,4 +1,4 @@
-SUBDIRS = wizard 16x16 24x24
+SUBDIRS = wizard 16x16 24x24 36x36
 
 image_DATA = \
 	flumotion.png 		\

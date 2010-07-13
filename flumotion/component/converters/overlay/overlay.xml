@@ -58,12 +58,6 @@
             <directory name="flumotion/component/converters/overlay">
                 <filename location="overlay.py" />
                 <filename location="genimg.py" />
-                <filename location="cc.24x24.png" />
-                <filename location="cc.36x36.png" />
-                <filename location="fluendo.24x24.png" />
-                <filename location="fluendo.36x36.png" />
-                <filename location="xiph.24x24.png" />
-                <filename location="xiph.36x36.png" />
             </directory>
         </directories>
     </bundle>
