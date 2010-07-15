@@ -1,4 +1,9 @@
-2009-12-02  Xavier Queralt Mateu,,,  <xqueralt@flumotion.com>
+2010-04-14  Marc-André Lureau  <mlureau@flumotion.com>
+
+	* POTFILES.in:
+	Update translatables files.
+
+2009-12-02  Xavier Queralt Mateu  <xqueralt@flumotion.com>
 
 	* POTFILES.in:
 	Delete pytrayicon from POTFILES.in
@@ -8,11 +13,45 @@
 	* ca.po:
 	Fix a typo in catalan translation
 
+2009-08-14  Jan Urbanski  <jurbanski@flumotion.com>
+
+	patch by: Xavier Queralt  <xqueralt@flumotion.com>
+
+	* POTFILES.in:
+	Update with new files containing strings for translation.
+	Sort the entries.
+
 2009-08-12  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* ca.po:
 	* es.po:
 	Updated catalan and spanish translations
+
+2009-08-12  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	* fr.po:
+	continuing french translation.
+
+2009-08-11  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	* fr.po:
+	adding a few '\n' so the .po file is valid
+
+2009-08-11  Guillaume Quintard  <guillaume.quintard@flumotion.com>
+
+	* fr.po:
+	Refine the first 200 french strings.
+
+2009-08-05  Guillaume Quintard  <guillaume.quintard@gmail.com>
+
+	* fr.po:
+	Last batch of translations, 11  left.
+
+2009-08-05  Guillaume Quintard  <guillaume.quintard@gmail.com>
+
+	* fr.po:
+	Untranslated strings now down to less than 100 (doesn't mean the
+	translated ones are all good, but it's an enhancement).
 
 2009-08-01  Thomas Vander Stichele  <thomas at apestaart dot org>
 
@@ -49,13 +88,128 @@
 	* no.po (deleted): rename the norwegian bokmål translation from no.po
 	to nb.po. Fixes #1152
 
+2008-11-24  Pedro Gracia  <pedro@flumotion.com>
+
+	* es.po:
+	Spanish translation updated.
+
+2008-11-14  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
+
+	* POTFILES.in:
+	* ca.po:
+	* de.po:
+	* es.po:
+	* fr.po:
+	* nl.po:
+	* no.po:
+	* pt_BR.po:
+	* sv.po:
+	Catalan and spanish translations updated.
+
+2008-11-05  Pedro Gracia  <pedro@flumotion.com>
+
+	* es.po:
+	Spanish translation syncronized.
+
+2008-10-15  Pedro Gracia  <pedro@flumotion.com>
+
+	* es.po:
+	Update Spanish translation.
+
+2008-09-04  Pedro Gracia  <pedro@flumotion.com>
+
+	* POTFILES.in:
+	Deleted "flumotion/component/plugs/lifecycle.py" entry.
+	Removed in r7354.
+
+2008-09-02  Pedro Gracia  <pedro@flumotion.com>
+
+	* es.po:
+	Spanish translation sync again.
+
+2008-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* nl.po:
+	  Update Spanish translation.
+
+2008-09-01  Pedro Gracia  <pedro@flumotion.com>
+
+	* es.po:
+	Spanish translation sync again.
+
+2008-08-27  Pedro Gracia  <pedro@flumotion.com>
+
+	* es.po:
+	Spanish translation sync now.
+
+2008-08-25  Pedro Gracia  <pedro@flumotion.com>
+
+	* es.po:
+	  Translated fuzzy new messages to Spanish.
+
+2008-08-22  Pedro Gracia  <pedro@flumotion.com>
+
+	* POTFILES.in:
+	Deleted "flumotion/admin/command/commands.py" entry. Removed in r7227.
+
+2008-07-24  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* ca.po:
+	Translations updated.
+
+2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* POTFILES.in:
+	  Fix up for file->httpfile rename.
+
+2008-06-26  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* ca.po:
+	Updated.
+
+2008-05-19  Jordi Massaguer i Pla  <jordi@flumotion.com>
+
+	* ca.po:
+	Reviewed and translated all the string according to TERMCAT and
+	Softcatala.
+
 2008-05-08  Johan Dahlin  <johan@gnome.org>
 
 	* POTFILES.in: Add a couple of missing files, mentioned in #957
 
+2008-05-06  Pedro Gracia <pedro@flumotion.com>
+
+	* es.po:
+	New spanish strings translated.
+
+2008-05-06  Pedro Gracia <pedro@flumotion.com>
+
+	* es.po:
+	Spanish translation up to date.
+
+2008-05-05  Arek Korbik  <arkadini@gmail.com>
+
+	* POTFILES.in:
+	Update filename: test_bundle.py -> test_common_bundle.py.
+
 2008-04-15  Johan Dahlin  <johan@gnome.org>
 
 	* POTFILES.in: Update, add dirac files
+
+2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* nl.po:
+	  Update translation.
+
+2008-04-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* es.po:
+	  Fix argument count mismatch.
+
+2008-04-01  Pedro Gracia  <pgracia@flumotion.com>
+
+	* es.po:
+	  Spanish translation up to date.
 
 2008-02-28  Johan Dahlin  <johan@gnome.org>
 

@@ -1406,11 +1406,6 @@
 	* flumotion/test/test_import.py:
 	Do not try to import everything from external.
 
-2010-04-14  Marc-André Lureau  <mlureau@flumotion.com>
-
-	* po/POTFILES.in:
-	Update translatables files.
-
 2010-04-08  Marc-André Lureau  <mlureau@flumotion.com>
 
 	reviewed by: Sébastien Merle
@@ -2884,14 +2879,6 @@
 	* flumotion/component/consumers/disker/disker.xml:
 	Have the disker overwrite the file if the file exists. Fixes #1339.
 
-2009-08-14  Jan Urbanski  <jurbanski@flumotion.com>
-
-	patch by: Xavier Queralt  <xqueralt@flumotion.com>
-
-	* po/POTFILES.in:
-	Update with new files containing strings for translation.
-	Sort the entries.
-
 2009-08-12  Guillaume Quintard  <guillaume.quintard@flumotion.com>
 
 	* po/fr.po:
@@ -2921,27 +2908,12 @@
 	bash as their system shell, e.g. recent Ubuntus and Debians that use
 	dash as the system shell.
 
-2009-08-12  Guillaume Quintard  <guillaume.quintard@flumotion.com>
-
-	* po/fr.po:
-	continuing french translation.
-
 2009-08-12  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* README:
 	* configure.ac:
 	* flumotion.spec.in:
 	Bump the required version of Python to 2.4.
-
-2009-08-11  Guillaume Quintard  <guillaume.quintard@flumotion.com>
-
-	* po/fr.po:
-	adding a few '\n' so the .po file is valid
-
-2009-08-11  Guillaume Quintard  <guillaume.quintard@flumotion.com>
-
-	* po/fr.po:
-	Refine the first 200 french strings.
 
 2009-08-11  Jan Urbanski  <jurbanski@flumotion.com>
 
@@ -2977,17 +2949,6 @@
 	* flumotion/worker/checks/gst010.py:
 	Minor improvements to user-visible strings after a review at the
 	request of Thomas Vander Stichele.
-
-2009-08-05  Guillaume Quintard  <guillaume.quintard@gmail.com>
-
-	* po/fr.po:
-	Last batch of translations, 11  left.
-
-2009-08-05  Guillaume Quintard  <guillaume.quintard@gmail.com>
-
-	* po/fr.po:
-	Untranslated strings now down to less than 100 (doesn't mean the
-	translated ones are all good, but it's an enhancement).
 
 2009-08-04  Guillaume Quintard  <guillaume.quintard@gmail.com>
 
@@ -4900,10 +4861,6 @@
 	* flumotion/common/vfsgio.py (GIODirectory.getFiles):
 	Lower log levels - that info is not that important.
 
-2008-11-24  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/es.po:
-	Spanish translation updated.
 
 2008-11-24  Pedro Gracia  <pedro@flumotion.com>
 
@@ -4955,19 +4912,6 @@
 	* bin/flumotion-admin-command (deleted):
 	Complete the transition between flumotion-admin-command and
 	flumotion-command by removing the obsoleted one. Fixes #725.
-
-2008-11-14  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
-
-	* po/POTFILES.in:
-	* po/ca.po:
-	* po/de.po:
-	* po/es.po:
-	* po/fr.po:
-	* po/nl.po:
-	* po/no.po:
-	* po/pt_BR.po:
-	* po/sv.po:
-	Catalan and spanish translations updated.
 
 2008-11-13  Xavier Queralt Mateu  <xqueralt at flumotion dot com>
 
@@ -5163,11 +5107,6 @@
 	* common/show-coverage.py:
 	Upgrade the algorithm that determines which lines were covered and
 	which lines could be covered, but where not.
-
-2008-11-05  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/es.po:
-	Spanish translation syncronized.
 
 2008-11-04  Jan Urbanski  <jurbanski@flumotion.com>
 
@@ -5542,11 +5481,6 @@
 	* flumotion/monitor/nagios/stream.py:
 	Fixed an error that makes this script fail with playlists.
 
-2008-10-15  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/es.po:
-	Update Spanish translation.
-
 2008-10-14  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* Makefile.am:
@@ -5897,12 +5831,6 @@
 	* flumotion/test/test_component_httpstreamer.py:
 	  Add a test for getStreamData.
 
-2008-09-04  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/POTFILES.in:
-	Deleted "flumotion/component/plugs/lifecycle.py" entry.
-	Removed in r7354.
-
 2008-09-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/plugs/manhole.py:
@@ -6033,11 +5961,6 @@
 	* flumotion/component/plugs/rrd.py:
 	  Fix header.
 
-2008-09-02  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/es.po:
-	Spanish translation sync again.
-
 2008-09-02  Sebastien Merle  <sebastien@fluendo.com>
 
 	* flumotion/component/misc/httpserver/Makefile.am:
@@ -6088,16 +6011,6 @@
 	Added statistics gathering to the httpserver component.
 	Added a local caching plug for the httpserver component.
 	Fixed the source to pass pep8.py.
-
-2008-09-01  Thomas Vander Stichele  <thomas at apestaart dot org>
-
-	* po/nl.po:
-	  Update Spanish translation.
-
-2008-09-01  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/es.po:
-	Spanish translation sync again.
 
 2008-09-01  Johan Dahlin  <johan@gnome.org>
 
@@ -6245,11 +6158,6 @@
 	* data/glade/shout2-wizard.glade: Changed some labels and added some
 	tooltips to make this slightly less confusing.
 
-2008-08-27  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/es.po:
-        Spanish translation sync now.
-
 2008-08-27  Johan Dahlin  <johan@flumotion.com>
 
 	* flumotion/ui/fileselector.py (FileSelector._rowActivated):
@@ -6286,11 +6194,6 @@
 
 	* data/glade/sectionwizard.glade:
 	Add left,right & bottom padding to the message view.
-
-2008-08-25  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/es.po:
-	  Translated fuzzy new messages to Spanish.
 
 2008-08-25  Johan Dahlin  <johan@flumotion>
 
@@ -6440,11 +6343,6 @@
 	* flumotion/monitor/nagios/stream.py:
         More complete streams checking for flumotion-nagios.
         See #2058 (pt)
-
-2008-08-22  Pedro Gracia  <pedro@flumotion.com>
-
-	* po/POTFILES.in:
-	Deleted "flumotion/admin/command/commands.py" entry. Removed in r7227.
 
 2008-08-22  Johan Dahlin  <johan@flumotion.com>
 
@@ -7396,11 +7294,6 @@
 	* flumotion/wizard/scenarios.py:
 	  Rephrase the scenario page a little.
 
-2008-07-24  Jordi Massaguer i Pla  <jordi@flumotion.com>
-
-	* po/ca.po:
-	Translations updated.
-
 2008-07-24  Johan Dahlin  <johan@gnome.org>
 
 	* flumotion/admin/gtk/main.py:
@@ -7563,11 +7456,6 @@
 	  Add for translation.
 	* po/POTFILES.skip (added):
 	  Don't scan i18n.py
-
-2008-07-18  Thomas Vander Stichele  <thomas at apestaart dot org>
-
-	* po/POTFILES.in:
-	  Fix up for file->httpfile rename.
 
 2008-07-18  Johan Dahlin  <johan@gnome.org>
 
@@ -8070,11 +7958,6 @@
 
 	* flumotion/admin/gtk/adminwindow.py (AdminWindow._runWizard): Add
 	missing space in error message.
-
-2008-06-26  Jordi Massaguer i Pla  <jordi@flumotion.com>
-
-	* po/ca.po:
-	Updated.
 
 2008-06-26  Johan Dahlin  <johan@flumotion.com>
 
@@ -9015,12 +8898,6 @@
 	Move the checking if a port is open to here.
 	(tryPort): Avoid using python 2.5 specific syntax
 
-2008-05-19  Jordi Massaguer i Pla  <jordi@flumotion.com>
-
-	* po/ca.po:
-	Reviewed and translated all the string according to TERMCAT and
-	Softcatala.
-
 2008-05-16  Arek Korbik  <arkadini@gmail.com>
 
 	* flumotion/component/misc/httpserver/ratecontrol.py
@@ -9433,16 +9310,6 @@
 	* flumotion/wizard/conversionsteps.py:
 	  Added theora and vorbis as default encoders. Fixes #926.
 
-2008-05-06  Pedro Gracia <pedro@flumotion.com>
-
-	* po/es.po:
-	New spanish strings translated.
-
-2008-05-06  Pedro Gracia <pedro@flumotion.com>
-
-	* po/es.po:
-	Spanish translation up to date.
-
 2008-05-06  Johan Dahlin  <johan@flumotion.com>
 
 	* data/glade/ondemand-wizard.glade:
@@ -9556,11 +9423,6 @@
 	  Document more.  Add original document on versioning of .py files
 	  (which shows the URL bit is missing to know whether it's trunk or
 	  not)
-
-2008-05-05  Arek Korbik  <arkadini@gmail.com>
-
-	* po/POTFILES.in:
-	Update filename: test_bundle.py -> test_common_bundle.py.
 
 2008-05-05  Arek Korbik  <arkadini@gmail.com>
 
@@ -10255,11 +10117,6 @@
 	* flumotion/configure/configure.py:
 	  Give programs more time to react to a TERM before getting KILLed.
 
-2008-04-09  Thomas Vander Stichele  <thomas at apestaart dot org>
-
-	* po/nl.po:
-	  Update translation.
-
 2008-04-09  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/combiners/switch/basicwatchdog.py:
@@ -10323,11 +10180,6 @@
 
 2008-04-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
-	* po/es.po:
-	  Fix argument count mismatch.
-
-2008-04-03  Thomas Vander Stichele  <thomas at apestaart dot org>
-
 	* flumotion/wizard/overlaystep.py:
 	  Click Forward, not Next.
 
@@ -10353,11 +10205,6 @@
 
 	* flumotion.spec.in:
 	  Add intltool buildrequires
-
-2008-04-01  Pedro Gracia  <pgracia@flumotion.com>
-
-	* po/es.po:
-	  Spanish translation up to date.
 
 2008-04-01  Pedro Gracia  <pgracia@flumotion.com>
 
