@@ -57,7 +57,12 @@ def parsePropertyValue(propName, type, value):
         return common.strToBool(v)
 
     def pythonInt(i):
-        return int(i, 0)
+        try:
+            return int(i, 0)
+        except TypeError:
+            # sometimes the passed value might trip up automatic radix
+            # detection
+            return int(i)
 
     try:
         # yay!

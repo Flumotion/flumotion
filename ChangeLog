@@ -1,3 +1,9 @@
+2010-07-15  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/config.py:
+	Sometimes the config parser gets passed ints, which breaks automatic
+	radix detection.
+
 2010-07-15  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Jan
