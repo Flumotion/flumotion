@@ -30,12 +30,15 @@ __version__ = "$Rev$"
 
 class XMLWriter(object):
 
+    encoding = '<?xml version="1.0" encoding="UTF-8"?>\n'
+
     def __init__(self):
         self._data = StringIO()
         self._tagStack = []
         self._indent = 0
         self._indentChar = ' '
         self._indentUnit = 2
+        self._data.write(self.encoding)
 
     # Private
 
@@ -92,7 +95,8 @@ class XMLWriter(object):
         """Write a line to the xml.
         This method honors the current indentation.
         """
-        self._data.write('%s%s\n' % (self._indentChar * self._indent, line))
+        self._data.write('%s%s\n' % (self._indentChar * self._indent,
+                                     line.encode('utf8')))
 
     def writeTag(self, tagName, attributes=None, data=None):
         """Writes out and closes a tag. Optionally writes data as a child node.

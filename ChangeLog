@@ -1,3 +1,13 @@
+2010-07-15  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Jan
+
+	* flumotion/common/xmlwriter.py:
+	Use utf-8 encoding for writing xml files.
+	* flumotion/test/test_common_xmlwriter.py:
+	Add new test case for unicode encoding and adapt the old tests.
+	Fixes #1443
+
 2010-07-13  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* data/image/36x36 (svn:ignore):
