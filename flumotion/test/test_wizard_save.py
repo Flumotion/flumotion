@@ -28,6 +28,7 @@ from flumotion.admin.assistant.models import Component, Plug, Porter, \
      AudioProducer, VideoProducer, AudioEncoder, VideoEncoder, HTTPServer
 from flumotion.admin.assistant.save import AssistantSaver
 from flumotion.common import testsuite
+from flumotion.common.xmlwriter import XMLWriter
 from flumotion.configure import configure
 from flumotion.component.producers.firewire.wizard_gtk import FireWireProducer
 from flumotion.component.consumers.httpstreamer.wizard_gtk import HTTPStreamer
@@ -45,6 +46,7 @@ class TestXMLWriter(testsuite.TestCase):
     def testEmpty(self):
         writer = ConfigurationWriter('', [], [])
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ("<planet>\n"
              "</planet>\n"),
             writer.getXML())
@@ -56,6 +58,7 @@ class TestXMLWriter(testsuite.TestCase):
         c.worker = 'worker'
         writer = ConfigurationWriter('flow', [c], [])
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <flow name="flow">\n'
              '    <component name="name"\n'
@@ -76,6 +79,7 @@ class TestXMLWriter(testsuite.TestCase):
         c.properties.foo = 'bar'
         writer = ConfigurationWriter('', [], [c])
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="name"\n'
@@ -101,6 +105,7 @@ class TestXMLWriter(testsuite.TestCase):
         c.plugs.append(plug)
         writer = ConfigurationWriter('flow', [c], [])
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <flow name="flow">\n'
              '    <component name="name"\n'
@@ -133,6 +138,7 @@ class TestXMLWriter(testsuite.TestCase):
 
         writer = ConfigurationWriter('flow', [c1, c2], [])
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <flow name="flow">\n'
              '    <component name="name"\n'
@@ -236,6 +242,7 @@ class TestWizardSave(testsuite.TestCase):
 
         configuration = save.getXML()
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="http-server-audio-video"\n'
@@ -362,6 +369,7 @@ class TestWizardSave(testsuite.TestCase):
 
         configuration = save.getXML()
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="porter-audio-video"\n'
@@ -467,6 +475,7 @@ class TestWizardSave(testsuite.TestCase):
 
         configuration = save.getXML()
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="porter-audio-video"\n'
@@ -596,6 +605,7 @@ class TestWizardSave(testsuite.TestCase):
 
         configuration = save.getXML()
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="porter-audio-video"\n'
@@ -686,6 +696,7 @@ class TestWizardSave(testsuite.TestCase):
 
         configuration = save.getXML()
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="http-server-audio-video"\n'
@@ -814,6 +825,7 @@ class TestWizardSave(testsuite.TestCase):
 
         configuration = save.getXML()
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="http-server-audio-video"\n'
@@ -931,6 +943,7 @@ class TestWizardSave(testsuite.TestCase):
 
         configuration = save.getXML()
         testsuite.diffStrings(
+            XMLWriter.encoding + \
             ('<planet>\n'
              '  <atmosphere>\n'
              '    <component name="http-server-ondemand"\n'

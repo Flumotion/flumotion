@@ -1,3 +1,9 @@
+2010-07-15  Josep Joan Ribas  <jribas@flumotion.com>
+
+	* flumotion/test/test_manager_config.py:
+	* flumotion/test/test_wizard_save.py:
+	Fix tests.
+
 2010-07-15  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/config.py:

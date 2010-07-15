@@ -23,6 +23,7 @@ from cStringIO import StringIO
 
 from flumotion.common import testsuite
 from flumotion.common.errors import ConfigError
+from flumotion.common.xmlwriter import XMLWriter
 from flumotion.manager.config import ConfigEntryComponent, \
      ConfigEntryManager, ManagerConfigParser, PlanetConfigParser, \
      PlanetXMLWriter
@@ -243,7 +244,8 @@ class TestXMLWriter(testsuite.TestCase):
             '</planet>\n')
         vishnu = Vishnu('planet-name')
         vishnu.loadComponentConfigurationXML(StringIO(xml), 'foo')
-        testsuite.diffStrings(xml, vishnu.getConfiguration())
+        testsuite.diffStrings(XMLWriter.encoding + xml,
+                              vishnu.getConfiguration())
 
     def testMultiple(self):
         xml = (
@@ -265,4 +267,5 @@ class TestXMLWriter(testsuite.TestCase):
             '</planet>\n')
         vishnu = Vishnu('planet-name')
         vishnu.loadComponentConfigurationXML(StringIO(xml), 'foo')
-        testsuite.diffStrings(xml, vishnu.getConfiguration())
+        testsuite.diffStrings(XMLWriter.encoding + xml,
+                              vishnu.getConfiguration())
