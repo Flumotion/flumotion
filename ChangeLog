@@ -1,3 +1,8 @@
+2010-07-15  Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion.spec.in:
+	Add BuildRequires necessary for docs building.
+
 2010-07-15  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/test/test_manager_config.py:

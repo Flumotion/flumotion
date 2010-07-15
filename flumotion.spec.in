@@ -44,6 +44,9 @@ BuildRequires:  python >= 2.4
 # docs
 BuildRequires:  epydoc
 BuildRequires:  xorg-x11-server-Xvfb
+BuildRequires:  pygtk2
+BuildRequires:  %{gstreamer}-python
+BuildRequires:  python-twisted-core
 
 # sigh, libtool
 BuildRequires:  gcc-c++
@@ -265,6 +268,9 @@ fi
 %{_sysconfdir}/rc.d/init.d/flumotion
 
 %changelog
+* Thu Jul 15 2010 Jan Urbanski <jurbanski at flumotion dot com>
+- Add BuildRequires necessary for docs building.
+
 * Thu Jun 03 2010 Andoni Morales Alastruey <amorales at flumotion dot com>
 - Replace PIL dependency with pycairo.
 
