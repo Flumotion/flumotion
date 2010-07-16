@@ -1,3 +1,15 @@
+2010-07-16  Josep Joan Ribas  <jribas@flumotion.com>
+
+	* POTFILES.in:
+	* ca.po:
+	* es.po:
+	* fr.po:
+	* nb.po:
+	* nl.po:
+	* pt_BR.po:
+	* sv.po:
+	Update translatables files.
+
 2010-04-14  Marc-André Lureau  <mlureau@flumotion.com>
 
 	* POTFILES.in:
