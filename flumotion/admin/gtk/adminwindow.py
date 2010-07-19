@@ -1236,7 +1236,7 @@ class AdminWindow(Loggable, GladeDelegate):
         if self._currentComponentStates:
             for currentComponentState in self._currentComponentStates:
                 currentComponentState.addListener(
-                self, set=compSet, append=compAppend, remove=compRemove)
+                self, set_=compSet, append=compAppend, remove=compRemove)
 
         self._updateComponentActions()
         self._clearMessages()

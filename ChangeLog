@@ -1,3 +1,8 @@
+2010-07-19  Xavier Queralt,,,  <xqueralt@flumotion.com>
+
+	* flumotion/admin/gtk/adminwindow.py:
+	Use "set_" instead of "set" when adding a listener
+
 2010-07-19  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/common/config.py:
