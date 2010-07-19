@@ -69,14 +69,12 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
     compareAttributes = ["level", "translatables", "debug", "mid", "priority",
         "timestamp"]
 
-    # F0.8: remove id= in favor of mid=
-
-    def __init__(self, level, translatable, debug=None, id=None, priority=50,
-        timestamp=None, mid=None):
+    def __init__(self, level, translatable, debug=None, mid=None, priority=50,
+        timestamp=None):
         """
         Create a new message.
 
-        The id identifies this kind of message, and serves two purposes.
+        The mid identifies this kind of message, and serves two purposes.
 
         The first purpose is to serve as a key by which a kind of
         message might be removed from a set of messages. For example, a
@@ -108,11 +106,6 @@ class Message(pb.Copyable, pb.RemoteCopy, FancyEqMixin):
         self.level = level
         self.translatables = []
         self.debug = debug
-        if id:
-            import warnings
-            warnings.warn('Please use the mid kwarg instead',
-                DeprecationWarning, stacklevel=3)
-            mid = id
 
         # FIXME: untranslated is a really poor choice of id
         self.id = mid or translatable.untranslated()
@@ -218,63 +211,3 @@ class Result(pb.Copyable, pb.RemoteCopy):
             self.failed = True
             self.value = None
 pb.setUnjellyableForClass(Result, Result)
-
-
-# F0.8: remove; only here to be able to receive platform-3 translatables
-# in trunk code, because they need to be in exactly the same module
-# this is a straight copy from flumotion.common.i18n for these two classes
-
-
-class TranslatableSingular(Translatable, FancyEqMixin):
-    """
-    I represent a translatable gettext msg in the singular form.
-    """
-
-    compareAttributes = ["domain", "format", "args"]
-
-    def __init__(self, domain, format, *args):
-        """
-        @param domain: the text domain for translations of this message
-        @param format: a format string
-        @param args:   any arguments to the format string
-        """
-        self.domain = domain
-        self.format = format
-        self.args = args
-
-    def untranslated(self):
-        if self.args:
-            result = self.format % self.args
-        else:
-            result = self.format
-        return result
-pb.setUnjellyableForClass(TranslatableSingular, TranslatableSingular)
-
-
-class TranslatablePlural(Translatable, FancyEqMixin):
-    """
-    I represent a translatable gettext msg in the plural form.
-    """
-
-    compareAttributes = ["domain", "singular", "plural", "count", "args"]
-
-    def __init__(self, domain, format, *args):
-        """
-        @param domain: the text domain for translations of this message
-        @param format: a (singular, plural, count) tuple
-        @param args:   any arguments to the format string
-        """
-        singular, plural, count = format
-        self.domain = domain
-        self.singular = singular
-        self.plural = plural
-        self.count = count
-        self.args = args
-
-    def untranslated(self):
-        if self.args:
-            result = self.singular % self.args
-        else:
-            result = self.singular
-        return result
-pb.setUnjellyableForClass(TranslatablePlural, TranslatablePlural)

@@ -4,13 +4,7 @@
 import commands
 import time
 
-# F0.8
-# makes for an easier backport to platform-3
-try:
-    from flumotion.common.format import formatTime
-except ImportError:
-    from flumotion.common.common import formatTime
-
+from flumotion.common.format import formatTime
 from flumotion.monitor.nagios import util
 
 __version__ = "$Rev: 6687 $"

@@ -343,15 +343,13 @@ class StateRemoteCache(pb.RemoteCache):
             # Use twisted.python.util.OrderedDict instead
             self._listeners = {}
 
-    #F0.8: remove set=None and move set_=None there
-
-    def addListener(self, listener, set=None, append=None, remove=None,
-                    setitem=None, delitem=None, invalidate=None, set_=None):
+    def addListener(self, listener, set_=None, append=None, remove=None,
+                    setitem=None, delitem=None, invalidate=None):
         """
         Adds a listener to the remote cache.
 
         The caller will be notified of state events via the functions
-        given as the 'set', 'append', and 'remove', 'setitem', and
+        given as the 'set_', 'append', and 'remove', 'setitem', and
         'delitem' keyword arguments.
 
         Always call this method using keyword arguments for the functions;
@@ -380,13 +378,6 @@ class StateRemoteCache(pb.RemoteCache):
                            invalidated.
         @type  invalidate: procedure(object) -> None
         """
-        # F0.8: remove set
-        if set:
-            import warnings
-            warnings.warn('Please use the set_ kwarg instead',
-                DeprecationWarning, stacklevel=2)
-            set_ = set
-
         if not (set_ or append or remove or setitem or delitem or invalidate):
             raise ValueError("At least one event handler has to be specified")
 

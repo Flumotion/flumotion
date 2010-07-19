@@ -604,21 +604,9 @@ class RegistryParser(fxml.Parser):
         #   <wizard>
         # </component>
 
-        # F0.8: remove description, require _description
-        componentType, baseDir, description, _description = \
+        componentType, baseDir, description = \
             self.parseAttributes(node,
-                required=('type', 'base'),
-                optional=('description', '_description'))
-
-        # intltool-extract only translates attributes starting with _
-        if description:
-            import warnings
-            warnings.warn(
-                "Please change '<component description=...'"
-                " to '<component _description=...' for %s" % componentType,
-                DeprecationWarning)
-        if _description:
-            description = _description
+                required=('type', 'base', '_description'))
 
         files = []
         source = fxml.Box(None)
@@ -706,17 +694,11 @@ class RegistryParser(fxml.Parser):
         # <property name="..." type="" required="yes/no" multiple="yes/no"/>
         # returns: RegistryEntryProperty
 
-        # F0.8: remove description, require _description
-        attrs = self.parseAttributes(node, required=('name', 'type'),
-            optional=('required', 'multiple', 'description', '_description'))
-        name, propertyType, required, multiple, description, _d = attrs
-        if description:
-            import warnings
-            warnings.warn("Please change '<property description=...'"
-                " to '<property _description=...' for %s" % name,
-                DeprecationWarning)
-        if _d:
-            description = _d
+        attrs = self.parseAttributes(node,
+            required=('name', 'type', '_description'),
+            optional=('required', 'multiple'))
+        name, propertyType, description, required, multiple = attrs
+
         # see flumotion.common.config.parsePropertyValue
         allowed = ('string', 'rawstring', 'int', 'long', 'bool',
             'float', 'fraction')
@@ -736,17 +718,11 @@ class RegistryParser(fxml.Parser):
         # </compound-property>
         # returns: RegistryEntryCompoundProperty
 
-        # F0.8: remove description, require _description
-        attrs = self.parseAttributes(node, required=('name', ),
-            optional=('required', 'multiple', 'description', '_description'))
-        name, required, multiple, description, _description = attrs
-        if description:
-            import warnings
-            warnings.warn("Please change '<compound-property description=...'"
-                " to '<compound-property _description=...' for %s" % name,
-                DeprecationWarning)
-        if _description:
-            description = _description
+        attrs = self.parseAttributes(node,
+            required=('name', '_description'),
+            optional=('required', 'multiple'))
+        name, description, required, multiple = attrs
+
         # see flumotion.common.config.parsePropertyValue
         required = common.strToBool(required)
         multiple = common.strToBool(multiple)
@@ -911,18 +887,8 @@ class RegistryParser(fxml.Parser):
         #   <wizard>
         # </plug>
 
-        # F0.8: make _description be required
-        plugType, socket, description = \
-            self.parseAttributes(node, required=('type', 'socket'),
-                optional=('_description', ))
-
-        if not description:
-            import warnings
-            warnings.warn(
-                "Please add '_description=...' attribute to plug '%s'" %
-                    plugType,
-                DeprecationWarning)
-            description = 'TODO'
+        plugType, socket, description = self.parseAttributes(node,
+            required=('type', 'socket', '_description', ))
 
         entries = {}
         properties = {}

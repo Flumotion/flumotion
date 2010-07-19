@@ -3,13 +3,7 @@
 
 import os
 
-# F0.8
-# makes for an easier backport to platform-3
-try:
-    from flumotion.common.format import formatStorage
-except ImportError:
-    from flumotion.common.common import formatStorage
-
+from flumotion.common.format import formatStorage
 from flumotion.monitor.nagios import util
 
 __version__ = "$Rev: 6687 $"

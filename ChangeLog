@@ -1,3 +1,19 @@
+2010-07-19  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/common/config.py:
+	* flumotion/common/keycards.py:
+	* flumotion/common/messages.py:
+	* flumotion/common/registry.py:
+	* flumotion/common/signals.py:
+	* flumotion/component/base/baseadminnode.py:
+	* flumotion/manager/config.py:
+	* flumotion/monitor/nagios/log.py:
+	* flumotion/monitor/nagios/process.py:
+	* flumotion/test/test_keycards.py:
+	* flumotion/twisted/flavors.py:
+	Remove deprecated code and support of deprecated configuration
+	parameters for Flumotion 0.8
+
 2010-07-15  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion.spec.in:

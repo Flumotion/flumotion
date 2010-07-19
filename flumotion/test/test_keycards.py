@@ -72,17 +72,6 @@ class TestKeycardHTTPDigest(testsuite.TestCase):
 
         repr(keycard)
 
-# F0.8
-
-
-class TestHTTPDigestKeycard(testsuite.TestCase):
-
-    def testInit(self):
-        keycard = keycards.HTTPDigestKeycard('username')
-        self.assertEquals(keycard.state, keycards.REQUESTING)
-
-    testInit.suppress = [util.suppress(
-        message='Use KeycardHTTPDigest instead.', category=DeprecationWarning)]
 
 # test the base class repr
 

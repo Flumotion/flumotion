@@ -70,20 +70,6 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         self.domain = None
         self.state = REQUESTING
 
-    # F0.8
-
-    def setDomain(self, domain):
-        """
-        Set the domain of the requester on the keycard.
-
-        @type domain: string
-        """
-        import warnings
-        warnings.warn('Set the domain on the keycard directly.',
-            DeprecationWarning, stacklevel=2)
-
-        self.domain = domain
-
     def getData(self):
         """
         Return a dictionary of the viewable data on the keycard that can be
@@ -274,17 +260,3 @@ class KeycardHTTPDigest(Keycard, credentials.HTTPDigestChallenger):
             self.requesterId, _statesEnum[self.state])
 
 pb.setUnjellyableForClass(KeycardHTTPDigest, KeycardHTTPDigest)
-
-
-# F0.8
-
-
-class HTTPDigestKeycard(KeycardHTTPDigest):
-
-    def __init__(self, username):
-        import warnings
-        warnings.warn('Use KeycardHTTPDigest instead.', DeprecationWarning,
-            stacklevel=2)
-        KeycardHTTPDigest.__init__(self, username)
-
-pb.setUnjellyableForClass(HTTPDigestKeycard, HTTPDigestKeycard)
