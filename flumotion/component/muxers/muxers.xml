@@ -52,6 +52,8 @@
       <entries>
         <entry type="component" location="webm.py"
                function="WebM"/>
+        <entry type="wizard" location="wizard_gtk.py"
+               function="WebMWizardPlugin"/>
       </entries>
       <wizard _description="WebM" type="muxer"
               feeder="default" eater="default">

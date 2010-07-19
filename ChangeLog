@@ -1,5 +1,12 @@
 2010-07-19  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/component/muxers/muxers.xml:
+	Specify the wizard entry for webm-muxer so the checks are run
+	* flumotion/component/muxers/webm.py:
+	Require gst-plugins-good version 0.10.24 for the webm-muxer
+
+2010-07-19  Xavier Queralt  <xqueralt@flumotion.com>
+
 	reviewed by: zaheer
 
 	* flumotion/admin/assistant/models.py:

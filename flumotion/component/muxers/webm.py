@@ -19,9 +19,10 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import gstreamer, messages
+from flumotion.common import messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
+from flumotion.worker.checks import check
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -31,17 +32,8 @@ class WebM(feedcomponent.MuxerComponent):
     checkTimestamp = True
 
     def do_check(self):
-        self.debug('running WebM check')
-        if gstreamer.get_plugin_version('matroska') <= (0, 10, 23, 1):
-            m = messages.Warning(
-                T_(N_("Versions up to and including %s of the '%s' "
-                      "GStreamer plug-in are not suitable for streaming.\n"),
-                   '0.10.23', 'matroska'))
-            m.add(T_(N_("The stream served by the streamer component "
-                        "will probably be unplayable.\n")))
-            m.add(T_(N_("The issue will be addressed in version %s of '%s'."),
-                     '0.10.24', 'gst-plugins-good'))
-            self.addMessage(m)
+        return check.do_check(self, check.checkPlugin, 'matroska',
+                              'gst-plugins-good', (0, 10, 24))
 
     def get_muxer_string(self, properties):
         muxer = 'webmmux name=muxer streamable=true'
