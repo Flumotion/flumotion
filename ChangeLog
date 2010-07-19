@@ -1,4 +1,24 @@
-2010-07-19  Xavier Queralt,,,  <xqueralt@flumotion.com>
+2010-07-19  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: zaheer
+
+	* flumotion/admin/assistant/models.py:
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	* flumotion/component/producers/webcam/wizard.glade:
+	* flumotion/component/producers/webcam/wizard_gtk.py:
+	Fetch the devices in the worker to not have to hardcode them into the
+	code. Also do not select the max resolution available by default.
+	* flumotion/worker/checks/Makefile.am:
+	* flumotion/worker/checks/package.xml:
+	* flumotion/worker/checks/video.py:
+	* flumotion/worker/checks/gst010.py:
+	* flumotion/worker/checks/device.py (added):
+	Generalize the fetch devices method to support any kind of GStreamer
+	element that has a device probe available to fetch the devices (for
+	now it is used by firewire and webcam producers).
+	Closes #1024
+
+2010-07-19  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/admin/gtk/adminwindow.py:
 	Use "set_" instead of "set" when adding a listener

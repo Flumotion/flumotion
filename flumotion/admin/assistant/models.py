@@ -342,21 +342,21 @@ class VideoProducer(Producer):
         @returns: the framerate
         @rtype: fraction: 2 sized tuple of two integers
         """
-        return fractionFromValue(self.properties.framerate)
+        return fractionFromValue(self.getProperties().framerate)
 
     def getWidth(self):
         """Get the width of the video producer
         @returns: the width
         @rtype: integer
         """
-        return self.properties.width
+        return self.getProperties().width
 
     def getHeight(self):
         """Get the height of the video producer
         @returns: the height
         @rtype: integer
         """
-        return self.properties.height
+        return self.getProperties().height
 
 
 class VideoConverter(Component):

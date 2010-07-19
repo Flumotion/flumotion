@@ -165,7 +165,7 @@ def check1394(mid, guid):
     def do_check(demux):
         pad = demux.get_pad('video')
 
-        if pad.get_negotiated_caps() == None:
+        if not pad or pad.get_negotiated_caps() == None:
             raise errors.GStreamerError('Pipeline failed to negotiate?')
 
         caps = pad.get_negotiated_caps()
@@ -221,59 +221,3 @@ def check1394(mid, guid):
     d.addErrback(errbackResult)
 
     return d
-
-
-def check1394devices(mid):
-    """
-    Fetch the available firewire devices.
-
-    Return a deferred firing a result.
-
-    The result is either:
-     - succesful, with a list of tuples of guid and device-name
-     - failed
-
-    @param mid: the id to set on the message.
-
-    @rtype: L{twisted.internet.defer.Deferred} of
-            L{flumotion.common.messages.Result}
-    """
-    result = messages.Result()
-
-    element = gst.element_factory_make('dv1394src')
-    if not element:
-        m = messages.Error(T_(
-            N_("GStreamer error, dv1394src factory could not be found.\n"
-               "Maybe gstreamer-plugins-good is not properly installed.")))
-        m.id = mid
-        result.add(m)
-        return defer.succeed(result)
-
-    guids = element.probe_get_values_name('guid')
-
-    pipeline_str = 'dv1394src name=source guid=%s ! fakesink'
-
-    devices = []
-
-    for guid in guids:
-        pipeline = gst.parse_launch(pipeline_str % guid)
-        pipeline.set_state(gst.STATE_READY)
-        source = pipeline.get_by_name('source')
-        name = source.get_property('device-name')
-        log.debug('check', 'New firewire device found: %s with guid=%s',
-                  name, guid)
-        devices.append((name, guid))
-        pipeline.set_state(gst.STATE_NULL)
-
-    if devices:
-        result.succeed(devices)
-        return defer.succeed(result)
-    else:
-        m = messages.Error(T_(
-            N_("Could not find any Firewire device on the system.\n"
-               "Please check whether the device is correctly plugged in "
-               "and whether the modules are correctly loaded.")))
-
-        m.id = mid
-        result.add(m)
-        return defer.succeed(result)

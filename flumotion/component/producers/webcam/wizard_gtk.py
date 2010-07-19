@@ -28,7 +28,7 @@ from zope.interface import implements
 from flumotion.admin.assistant.interfaces import IProducerPlugin
 from flumotion.admin.assistant.models import VideoProducer
 from flumotion.common import errors
-from flumotion.common.fraction import fractionAsFloat
+from flumotion.common.fraction import fractionAsString
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.messages import Info
 from flumotion.admin.gtk.basesteps import VideoProducerStep
@@ -44,7 +44,18 @@ class WebcamProducer(VideoProducer):
     def __init__(self):
         super(WebcamProducer, self).__init__()
 
-        self.properties.device = '/dev/video0'
+    def getProperties(self):
+        p = super(WebcamProducer, self).getProperties()
+
+        p.width, p.height = self.size
+
+        p.mime = self.framerate['mime']
+        p.format = self.framerate.get('format', None)
+        p.framerate = fractionAsString(self.framerate['framerate'])
+
+        self.properties = p
+
+        return p
 
 
 class WebcamStep(VideoProducerStep):
@@ -59,30 +70,23 @@ class WebcamStep(VideoProducerStep):
 
     def __init__(self, wizard, model):
         VideoProducerStep.__init__(self, wizard, model)
-        self._inSetup = False
         # _sizes is probed, not set from the UI
         self._sizes = None
 
     # WizardStep
 
     def setup(self):
-        self._inSetup = True
         self.device.data_type = str
         self.framerate.data_type = object
-
-        self.device.prefill(['/dev/video0',
-                             '/dev/video1',
-                             '/dev/video2',
-                             '/dev/video3'])
+        self.size.data_type = object
 
         self.add_proxy(self.model.properties, ['device'])
-
-        self._inSetup = False
+        self.add_proxy(self.model, ['size', 'framerate'])
 
     def workerChanged(self, worker):
         self.model.worker = worker
         self._clear()
-        self._runChecks()
+        self._populateDevices()
 
     # Private
 
@@ -92,12 +96,32 @@ class WebcamStep(VideoProducerStep):
         # - after probing a device, if none found
         self.size.set_sensitive(False)
         self.framerate.set_sensitive(False)
-        self.label_name.set_label("")
+
+    def _populateDevices(self):
+        msg = Info(T_(N_('Checking for Webcam devices...')),
+            mid='webcam-check')
+        self.wizard.add_msg(msg)
+        d = self.runInWorker('flumotion.worker.checks.device',
+                             'fetchDevices', 'webcam-check',
+                             ['v4l2src', 'v4lsrc'], 'device')
+
+        def webcamCheckDone(devices):
+            self.wizard.clear_msg('webcam-check')
+            self.device.prefill(devices)
+
+        def trapRemoteFailure(failure):
+            failure.trap(errors.RemoteRunFailure)
+
+        def trapRemoteError(failure):
+            failure.trap(errors.RemoteRunError)
+
+        d.addCallback(webcamCheckDone)
+        d.addErrback(trapRemoteError)
+        d.addErrback(trapRemoteFailure)
+
+        return d
 
     def _runChecks(self):
-        if self._inSetup:
-            return None
-
         self.wizard.waitForTask('webcam checks')
 
         device = self.device.get_selected()
@@ -122,16 +146,15 @@ class WebcamStep(VideoProducerStep):
 
         def deviceFound(result):
             if not result:
-                self.debug('no device %s' % device)
+                self.debug('Could not detect the device\'s configuration.')
                 self._clear()
                 self.wizard.taskFinished(blockNext=True)
                 return None
 
-            deviceName, factoryName, sizes = result
+            factoryName, sizes = result
             self.model.properties.element_factory = factoryName
             self._populateSizes(sizes)
             self.wizard.clear_msg('webcam-check')
-            self.label_name.set_label(deviceName)
             self.wizard.taskFinished()
             self.size.set_sensitive(True)
             self.framerate.set_sensitive(True)
@@ -150,6 +173,8 @@ class WebcamStep(VideoProducerStep):
         for w, h in sorted(sizes.keys(), reverse=True):
             values.append(['%d x %d' % (w, h), (w, h)])
         self.size.prefill(values)
+        if len(values) > 1:
+            self.size.set_active(1)
 
     def _populateFramerates(self, size):
         values = util.OrderedDict()
@@ -158,48 +183,16 @@ class WebcamStep(VideoProducerStep):
             values['%.2f fps' % (1.0*num/denom)] = d
         self.framerate.prefill(values.items())
 
-    def _updateSize(self):
-        size = self.size.get_selected()
-        if size:
-            self._populateFramerates(size)
-            width, height = size
-        else:
-            self.warning('something bad happened: no height/width selected?')
-            width, height = 320, 240
-
-        self.model.properties.width = width
-        self.model.properties.height = height
-
-    def _updateFramerate(self):
-        if self._inSetup:
-            return None
-
-        framerate = self.framerate.get_selected()
-        if framerate:
-            num, denom = framerate['framerate']
-            mime = framerate['mime']
-            format = framerate.get('format', None)
-        else:
-            self.warning('something bad happened: no framerate selected?')
-            num, denom = 15, 2
-            mime = 'video/x-raw-yuv'
-            format = None
-
-        self.model.properties.mime = mime
-        self.model.properties.framerate = fractionAsFloat((num, denom))
-        if format:
-            self.model.properties.format = format
-
     # Callbacks
 
     def on_device_changed(self, combo):
         self._runChecks()
 
     def on_size_changed(self, combo):
-        self._updateSize()
-
-    def on_framerate_changed(self, combo):
-        self._updateFramerate()
+        size = self.size.get_selected()
+        if size:
+            self._populateFramerates(size)
+            self.model.properties.width, self.model.properties.height = size
 
 
 class WebcamWizardPlugin(object):

@@ -192,8 +192,9 @@ class _FireWireCommon:
         msg = messages.Info(T_(N_('Checking for Firewire devices...')),
             mid='firewire-check')
         self.wizard.add_msg(msg)
-        d = self.runInWorker('flumotion.worker.checks.gst010',
-                             'check1394devices', mid='firewire-check')
+        d = self.runInWorker('flumotion.worker.checks.device',
+                             'fetchDevices', 'firewire-check',
+                             ['dv1394src'], 'guid')
 
         def firewireCheckDone(devices):
             self.wizard.clear_msg('firewire-check')

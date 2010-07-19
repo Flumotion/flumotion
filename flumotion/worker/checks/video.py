@@ -128,7 +128,7 @@ def checkWebcam(device, mid):
                 continue
             forAllStructValues(struct, 'width', addRatesForWidth)
 
-        return (name, element.get_factory().get_name(), sizes)
+        return (element.get_factory().get_name(), sizes)
 
     def tryV4L2():
         log.debug('webcam', 'trying v4l2')
