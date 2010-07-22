@@ -947,7 +947,7 @@ class RegistryParser(fxml.Parser):
         if node.nodeName != 'registry':
             # ignore silently, since this function is used to parse all
             # .xml files encountered
-            self.debug('%s does not have registry as root tag' % self.filename)
+            self.debug('%s does not have registry as root tag', self.filename)
             return
 
         # shouldn't have <directories> elements in registry fragments
@@ -1505,7 +1505,7 @@ class ComponentRegistry(log.Loggable):
         if (READ_CACHE and
             os.path.exists(self.filename) and
             os.access(self.filename, os.R_OK)):
-            self.info('Parsing registry: %s' % self.filename)
+            self.info('Parsing registry: %s', self.filename)
             try:
                 self._parser.parseRegistry(self.filename)
             except fxml.ParserError, e:
@@ -1513,8 +1513,8 @@ class ComponentRegistry(log.Loggable):
                 # ran, then downgraded again; the registry can then contain
                 # XML keys that are not understood by this version.
                 # This is non-fatal, and gets fixed due to a re-scan
-                self.warning('Could not parse registry %s.' % self.filename)
-                self.debug('fxml.ParserError: %s' % log.getExceptionMessage(e))
+                self.warning('Could not parse registry %s.', self.filename)
+                self.debug('fxml.ParserError: %s', log.getExceptionMessage(e))
 
         self.verify(force=not READ_CACHE)
 
@@ -1549,22 +1549,22 @@ class ComponentRegistry(log.Loggable):
         @returns: whether the path could be added
         """
         prefix = prefix or self.prefix
-        self.debug('path %s, prefix %s' % (path, prefix))
+        self.debug('path %s, prefix %s', path, prefix)
         if not os.path.exists(path):
             self.warning(
-                "Cannot add non-existent path '%s' to registry" % path)
+                "Cannot add non-existent path '%s' to registry", path)
             return False
         if not os.path.exists(os.path.join(path, prefix)):
             self.warning("Cannot add path '%s' to registry "
-                "since it does not contain prefix '%s'" % (path, prefix))
+                "since it does not contain prefix '%s'", path, prefix)
             return False
 
         # registry path was either not watched or updated, or a force was
         # asked, so reparse
-        self.info('Scanning registry path %s' % path)
+        self.info('Scanning registry path %s', path)
         registryPath = RegistryDirectory(path, prefix=prefix)
         files = registryPath.getFiles()
-        self.debug('Found %d possible registry files' % len(files))
+        self.debug('Found %d possible registry files', len(files))
         map(self.addFile, files)
 
         self._parser.addDirectory(registryPath)
@@ -1621,45 +1621,45 @@ class ComponentRegistry(log.Loggable):
             ret = BundlerBasket()
             for b in self.getBundles():
                 bundleName = b.getName()
-                self.debug('Adding bundle %s' % bundleName)
+                self.debug('Adding bundle %s', bundleName)
                 for d in b.getDirectories():
                     directory = d.getName()
                     for bundleFilename in d.getFiles():
                         try:
                             basedir = b.getBaseDir()
                         except errors.NoProjectError, e:
-                            self.warning("Could not load project %s" % e.args)
+                            self.warning("Could not load project %s", e.args)
                             raise
                         fullpath = os.path.join(basedir, directory,
                                                 bundleFilename.getLocation())
                         relative = bundleFilename.getRelative()
-                        self.log('Adding path %s as %s to bundle %s' % (
-                            fullpath, relative, bundleName))
+                        self.log('Adding path %s as %s to bundle %s',
+                                 fullpath, relative, bundleName)
                         try:
                             ret.add(bundleName, fullpath, relative)
                         except Exception, e:
-                            self.debug("Reason: %r" % e)
+                            self.debug("Reason: %r", e)
                             raise RuntimeError(
                                 'Could not add %s to bundle %s (%s)'
                                 % (fullpath, bundleName, e))
                 for d in b.getDependencies():
-                    self.log('Adding dependency of %s on %s' % (bundleName, d))
+                    self.log('Adding dependency of %s on %s', bundleName, d)
                     ret.depend(bundleName, d)
             return ret
 
         try:
             return load()
         except Exception, e:
-            self.debug("Could not register bundles the first time: %s" %
-                log.getExceptionMessage(e))
+            self.debug("Could not register bundles the first time: %s",
+                       log.getExceptionMessage(e))
             self.warning("Bundle problem, rebuilding registry")
             self.verify(force=True)
             try:
                 return load()
             except Exception, e:
-                self.debug("Could not register bundles the second time: %s" %
+                self.debug("Could not register bundles the second time: %s",
                     log.getExceptionMessage(e))
-                self.error("Could not not register bundles (%s)" %
+                self.error("Could not not register bundles (%s)",
                     log.getExceptionMessage(e))
 
     def dump(self, fd):
@@ -1705,7 +1705,7 @@ class ComponentRegistry(log.Loggable):
         if not force and not self.rebuildNeeded():
             return
 
-        self.info('Saving registry to %s' % self.filename)
+        self.info('Saving registry to %s', self.filename)
 
         # create parent directory
         directory = os.path.split(self.filename)[0]

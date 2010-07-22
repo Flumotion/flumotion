@@ -1,3 +1,9 @@
+2009-11-04  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/common/registry.py:
+	Don't use string interpolation in log methods.
+	See #1384
+
 2010-07-19  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/component/muxers/muxers.xml:
