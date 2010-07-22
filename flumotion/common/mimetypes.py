@@ -36,6 +36,7 @@ _EXTENSIONS = {
     'video/x-matroska': 'mkv',
     'video/x-ms-asf': 'asf',
     'video/x-msvideo': 'avi',
+    'video/webm': 'webm',
 }
 
 
