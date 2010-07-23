@@ -3,6 +3,14 @@
 	patch by: Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/keycards.py:
+	Same issue as in r8769, the constructor of the Keycard class was
+	overwriting parametersset by the other constructor.
+
+2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
+
+	patch by: Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/common/keycards.py:
 	Reverse the order of constructors, because the credentials.Token
 	constructors sets the token property and the Keycard constructor
 	overwrites it with None.

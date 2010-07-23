@@ -217,8 +217,8 @@ class KeycardHTTPGetArguments(Keycard, credentials.HTTPGetArguments):
     """
 
     def __init__(self, arguments, address, path=None):
-        credentials.HTTPGetArguments.__init__(self, arguments)
         Keycard.__init__(self)
+        credentials.HTTPGetArguments.__init__(self, arguments)
         self.address = address
         self.path = path
 
