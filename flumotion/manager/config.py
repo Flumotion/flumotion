@@ -424,12 +424,15 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
         """
         # <component name="..." type="..." label="..."? worker="..."?
         #            project="..."? version="..."?>
+        #   <source>...</source>*
         #   <eater name="...">...</eater>*
         #   <property name="name">value</property>*
         #   <clock-master>...</clock-master>?
         #   <plugs>...</plugs>*
         #   <virtual-feed name="foo" real="bar"/>*
         # </component>
+        # F0.10
+        # source tag is deprecated
 
         attrs = self.parseAttributes(node, ('name', 'type'),
                 ('label', 'worker', 'project', 'version', ))
@@ -446,6 +449,7 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
         plugs = []
         eaters = []
         clockmasters = []
+        sources = []
         virtual_feeds = []
 
         def parseBool(node):
@@ -458,6 +462,7 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
         if isFeedComponent:
             parsers.update({'eater': (self._parseEater, eaters.extend),
                             'clock-master': (parseBool, clockmasters.append),
+                            'source': (self._parseSource, sources.append),
                             'virtual-feed': (self._parseVirtualFeed,
                                              virtual_feeds.append)})
 
@@ -469,6 +474,16 @@ class FlumotionConfigParser(fluconfig.BaseConfigParser):
             isClockMaster = clockmasters[0]
         else:
             raise errors.ConfigError("Only one <clock-master> node allowed")
+
+        if sources:
+            msg = ('"source" tag has been deprecated in favor of "eater",'
+                   ' please update your configuration file (found in'
+                   ' component %r)' % name)
+            warnings.warn(msg, DeprecationWarning)
+
+        for feedId in sources:
+            # map old <source> nodes to new <eater> nodes
+            eaters.append((None, feedId))
 
         return ConfigEntryComponent(name, parent, componentType, label,
                                     properties, plugs, worker, eaters,

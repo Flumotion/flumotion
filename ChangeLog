@@ -1,3 +1,8 @@
+2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
+
+	* flumotion/manager/config.py:
+	Reintroduce the removed (in r8746) "source" tag to make Jan happy.
+
 2010-07-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/component/misc/httpserver/mimetypes.py:
