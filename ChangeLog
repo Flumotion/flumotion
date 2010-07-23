@@ -1,5 +1,13 @@
 2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
 
+	reviewed by: Jan Urbanski  <jurbanski@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	Warn about deprecated property 'issuer-class' but do not fail.
+
+2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
+
 	patch by: Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/keycards.py:

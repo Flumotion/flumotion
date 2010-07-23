@@ -259,6 +259,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
     def do_check(self):
         props = self.config['properties']
         self.fixRenamedProperties(props, [
+            ('issuer', 'issuer-class'),
             ('porter_socket_path', 'porter-socket-path'),
             ('porter_username', 'porter-username'),
             ('porter_password', 'porter-password'),
@@ -325,6 +326,14 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self.httpauth.setRequesterId(self.config['avatarId'])
         if 'bouncer' in props:
             self.httpauth.setBouncerName(props['bouncer'])
+        if 'issuer-class' in props:
+            self.warning("The component property 'issuer-class' has been"
+                         "deprecated.")
+            msg = messages.Warning(T_(N_(
+                        "The component property 'issuer-class' has "
+                        "been deprecated.")))
+            self.addMessage(msg)
+
         if 'allow-default' in props:
             self.httpauth.setAllowDefault(props['allow-default'])
         if 'ip-filter' in props:
