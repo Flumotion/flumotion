@@ -185,8 +185,8 @@ class KeycardToken(Keycard, credentials.Token):
     """
 
     def __init__(self, token, address, path=None):
-        credentials.Token.__init__(self, token)
         Keycard.__init__(self)
+        credentials.Token.__init__(self, token)
         self.address = address
         self.path = path
 
