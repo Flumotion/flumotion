@@ -268,8 +268,8 @@ pb.setUnjellyableForClass(KeycardUASPCC, KeycardUASPCC)
 class KeycardHTTPDigest(Keycard, credentials.HTTPDigestChallenger):
 
     def __init__(self, username):
-        credentials.HTTPDigestChallenger.__init__(self, username)
         Keycard.__init__(self)
+        credentials.HTTPDigestChallenger.__init__(self, username)
 
     def getData(self):
         d = Keycard.getData(self)

@@ -3,6 +3,14 @@
 	patch by: Zaheer Abbas Merali <zaheerabbas@merali.org>
 
 	* flumotion/common/keycards.py:
+	Keycard base class needs to be initialised first, otherwise
+	username gets overwritten.
+
+2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
+
+	patch by: Zaheer Abbas Merali <zaheerabbas@merali.org>
+
+	* flumotion/common/keycards.py:
 	* flumotion/component/base/http.py:
 	* flumotion/component/bouncers/multibouncer.py:
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
