@@ -281,7 +281,6 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         httpauth = HTTPAuthentication(streamer)
         resource = resources.HTTPStreamingResource(streamer, httpauth)
         # override issuer
-        httpauth.setIssuerClass('HTTPTokenIssuer')
         httpauth.setBouncerName('fakebouncer')
         httpauth.setDomain('FakeDomain')
 
@@ -315,7 +314,6 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         httpauth = HTTPAuthentication(streamer)
         resource = resources.HTTPStreamingResource(streamer, httpauth)
         # override issuer
-        httpauth.setIssuerClass('HTTPTokenIssuer')
         httpauth.setBouncerName('fakebouncer')
         httpauth.setDomain('FakeDomain')
 

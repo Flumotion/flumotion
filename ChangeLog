@@ -1,3 +1,23 @@
+2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
+
+	patch by: Zaheer Abbas Merali <zaheerabbas@merali.org>
+
+	* flumotion/common/keycards.py:
+	* flumotion/component/base/http.py:
+	* flumotion/component/bouncers/multibouncer.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/test/test_bouncers_ipbouncer.py:
+	* flumotion/test/test_http.py:
+	* flumotion/test/test_keycards.py:
+	* flumotion/test/test_pb.py:
+	* flumotion/twisted/pb.py:
+	Unify all non-challenge response bouncers to be KeycardGeneric.
+	Have just one issuer for streamers (live and ondemand).
+	Remove issuer-class from http-streamer and http-server.
+
 2010-07-22  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	* flumotion/common/mimetypes.py:

@@ -473,6 +473,11 @@ class Authenticator(flog.Loggable, pb.Referenceable):
         return keycards.KeycardUACPP(self.username, self.password,
             self.address)
 
+    def issue_KeycardGeneric(self):
+        keycard = keycards.KeycardGeneric()
+        keycard.username = self.username
+        keycard.address = self.address
+        return keycard
     # challenge types
 
     def issue_KeycardUACPCC(self):

@@ -57,86 +57,32 @@ HTTP_SERVER = '%s/%s' % (HTTP_SERVER_NAME, HTTP_SERVER_VERSION)
 ### flumotion.common.keycards or related
 
 
-class Issuer(log.Loggable):
+class HTTPGenericIssuer(log.Loggable):
     """
-    I am a base class for all Issuers.
-    An issuer issues keycards of a given class based on an object
-    (incoming HTTP request, ...)
-    """
-
-    def issue(self, *args, **kwargs):
-        """
-        Return a keycard, or None, based on the given arguments.
-        """
-        raise NotImplementedError
-
-
-class HTTPGenericIssuer(Issuer):
-    """
-    I create L{flumotion.common.keycards.Keycard} based on just a
-    standard HTTP request.  Useful for authenticating based on
-    server-side checks such as time, rather than client credentials.
+    I create L{flumotion.common.keycards.Keycard} based on an
+    HTTP request.  Useful for authenticating based on
+    server-side checks such as time, as well as client credentials
+    such as HTTP Auth, get parameters, IP address and token.
     """
 
     def issue(self, request):
         keycard = keycards.KeycardGeneric()
+        keycard.username = request.getUser()
+        keycard.password = request.getPassword()
+        keycard.address = request.getClientIP()
+        # args can have lists as values, if more than one specified
+        token = request.args.get('token', None)
+        if token and not isinstance(token, str):
+            token = token[0]
+        keycard.token = token
+        keycard.arguments = request.args
+        keycard.path = request.path
         self.debug("Asking for authentication, generic HTTP")
         return keycard
 
 
-class HTTPAuthIssuer(Issuer):
-    """
-    I create L{flumotion.common.keycards.KeycardUACPP} keycards based on
-    an incoming L{twisted.protocols.http.Request} request's standard
-    HTTP authentication information.
-    """
-
-    def issue(self, request):
-        # for now, we're happy with a UACPP keycard; the password arrives
-        # plaintext anyway
-        keycard = keycards.KeycardUACPP(
-            request.getUser(),
-            request.getPassword(), request.getClientIP())
-        self.debug('Asking for authentication, user %s, password %s, ip %s' % (
-            keycard.username, keycard.password, keycard.address))
-        return keycard
-
-
-class HTTPTokenIssuer(Issuer):
-    """
-    I create L{flumotion.common.keycards.KeycardToken} keycards based on
-    an incoming L{twisted.protocols.http.Request} request's GET "token"
-    parameter.
-    """
-
-    def issue(self, request):
-        if not 'token' in request.args.keys():
-            return None
-
-        # args can have lists as values, if more than one specified
-        token = request.args['token']
-        if not isinstance(token, str):
-            token = token[0]
-
-        keycard = keycards.KeycardToken(token,
-            request.getClientIP(), request.path)
-        return keycard
-
-
-class HTTPGetArgumentsIssuer(Issuer):
-    """
-    I create L{flumotion.common.keycards.KeycardHTTPGetArguments}
-    keycards based on an incoming L{twisted.protocols.http.Request}.
-    """
-
-    def issue(self, request):
-        arguments = request.args
-        address = request.getClientIP()
-        path = request.path
-        return keycards.KeycardHTTPGetArguments(arguments, address, path)
-
-
 BOUNCER_SOCKET = 'flumotion.component.bouncers.plug.BouncerPlug'
+BUS_SOCKET = 'flumotion.component.plugs.bus.BusPlug'
 
 
 class HTTPAuthentication(log.Loggable):
@@ -158,7 +104,7 @@ class HTTPAuthentication(log.Loggable):
         self._fdToDurationCall = {}    # request fd -> IDelayedCall
                                        # for duration
         self._domain = None            # used for auth challenge and on keycard
-        self._issuer = HTTPAuthIssuer() # issues keycards; default for compat
+        self._issuer = HTTPGenericIssuer() # issues keycards;default for compat
         self.bouncerName = None
         self.setRequesterId(component.getName())
         self._defaultDuration = None   # default duration to use if the keycard
@@ -235,20 +181,6 @@ class HTTPAuthentication(log.Loggable):
 
     def setAllowDefault(self, allowDefault):
         self._allowDefault = allowDefault
-
-    def setIssuerClass(self, issuerClass):
-        # FIXME: in the future, we want to make this pluggable and have it
-        # look up somewhere ?
-        if issuerClass == 'HTTPTokenIssuer':
-            self._issuer = HTTPTokenIssuer()
-        elif issuerClass == 'HTTPGetArgumentsIssuer':
-            self._issuer = HTTPGetArgumentsIssuer()
-        elif issuerClass == 'HTTPAuthIssuer':
-            self._issuer = HTTPAuthIssuer()
-        elif issuerClass == 'HTTPGenericIssuer':
-            self._issuer = HTTPGenericIssuer()
-        else:
-            raise ValueError("issuerClass %s not accepted" % issuerClass)
 
     def authenticate(self, request):
         """

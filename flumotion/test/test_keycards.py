@@ -31,28 +31,14 @@ from flumotion.common import keycards
 # test all the keycards
 
 
-class TestKeycardUACPP(testsuite.TestCase):
-
-    def testInit(self):
-        keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
-        self.assertEquals(keycard.state, keycards.REQUESTING)
-        self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
-
-
-class TestKeycardUACPCC(testsuite.TestCase):
-
-    def testInit(self):
-        keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
-        self.assertEquals(keycard.state, keycards.REQUESTING)
-        self.failUnless(credentials.IUsernameCryptPassword.providedBy(keycard))
-
-
 class TestKeycardToken(testsuite.TestCase):
 
     def testInit(self):
-        keycard = keycards.KeycardToken('token', '127.0.0.1')
+        keycard = keycards.KeycardGeneric()
+        keycard.token = 'token'
+        keycard.address = '127.0.0.1'
         self.assertEquals(keycard.state, keycards.REQUESTING)
-        self.failUnless(credentials.IToken.providedBy(keycard))
+        #self.failUnless(credentials.IToken.providedBy(keycard))
 
         d = keycard.getData()
         self.assertEquals(d['token'], 'token')
@@ -64,7 +50,8 @@ class TestKeycardToken(testsuite.TestCase):
 class TestKeycardHTTPDigest(testsuite.TestCase):
 
     def testInit(self):
-        keycard = keycards.KeycardHTTPDigest('username')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'username'
         self.assertEquals(keycard.state, keycards.REQUESTING)
 
         d = keycard.getData()
@@ -101,7 +88,10 @@ class Worker(testsuite.TestWorker):
 
     def remote_getKeycard(self):
         if not self.keycard:
-            keycard = keycards.KeycardUACPP('user', 'test', '127.0.0.1')
+            keycard = keycards.KeycardGeneric()
+            keycard.username = 'user'
+            keycard.password = 'test'
+            keycard.address = '127.0.0.1'
             #print "Worker keycard %r, id: %d" % (keycard, id(keycard))
             self.keycard = keycard
 

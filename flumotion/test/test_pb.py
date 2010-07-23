@@ -191,7 +191,7 @@ class Test_BouncerWrapper(testsuite.TestCase):
         return d
 
     def testUACPPWrongPassword(self):
-        keycard = keycards.KeycardUACPP('user', 'tes', '127.0.0.1')
+        keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
         d = self.wrapper.remote_login(keycard, "avatarId",
             'twisted.spread.pb.IPerspective')
 
@@ -324,7 +324,7 @@ class TestAuthenticator(testsuite.TestCase):
         # allow us to issue a keycard
         a = pb.Authenticator(username="tarzan")
         d = a.issue([
-            "flumotion.common.keycards.KeycardUACPP", ])
+            "flumotion.common.keycards.KeycardGeneric", ])
         d.addCallback(lambda r: self.failIf(r))
         return d
 
@@ -333,7 +333,7 @@ class TestAuthenticator(testsuite.TestCase):
         a = pb.Authenticator(username="tarzan", password="jane",
             address="localhost")
         d = a.issue([
-            "flumotion.common.keycards.KeycardUACPP", ])
+            "flumotion.common.keycards.KeycardGeneric", ])
         d.addCallback(lambda r: self.failIf(r))
 
     def testIssueUACPCC(self):
@@ -486,7 +486,9 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         factory = pb.FPBClientFactory()
 
         # create
-        keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.address = '127.0.0.1'
 
         # send
         d = factory.login(keycard, 'MIND')
@@ -515,7 +517,9 @@ class Test_FPBClientFactoryHTPasswdCrypt(Test_FPBClientFactory):
         factory = pb.FPBClientFactory()
 
         # create
-        keycard = keycards.KeycardUACPCC('user', '127.0.0.1')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.address = '127.0.0.1'
         self.assert_(keycard)
         self.assertEquals(keycard.state, keycards.REQUESTING)
 

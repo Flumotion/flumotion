@@ -36,48 +36,75 @@ class TestIPBouncer(bouncertest.BouncerTestHelper):
 
     def test_trivial(self):
         bouncer = self.get_bouncer({})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d = self.check_auth(keycard, bouncer, False)
         return self.stop_bouncer(bouncer, d)
 
     def test_trivial_allow_correct(self):
         bouncer = self.get_bouncer({'allow': ['62.121.66.134/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d = self.check_auth(keycard, bouncer, True)
         return self.stop_bouncer(bouncer, d)
 
     def test_trivial_allow_deny(self):
         bouncer = self.get_bouncer({'allow': ['62.121.66.134/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.135')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.135'
         d = self.check_auth(keycard, bouncer, False)
         return self.stop_bouncer(bouncer, d)
 
     def test_trivial_deny(self):
         bouncer = self.get_bouncer({'deny': ['62.121.66.134/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d = self.check_auth(keycard, bouncer, False)
         return self.stop_bouncer(bouncer, d)
 
     def test_trivial_deny_allow_default(self):
         bouncer = self.get_bouncer({'deny-default': False,
                                      'deny': ['62.121.66.134/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d = self.check_auth(keycard, bouncer, False)
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.135')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.135'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
         return self.stop_bouncer(bouncer, d)
 
     def test_both_allow_and_deny(self):
         bouncer = self.get_bouncer({'allow': ['62.121.66.134/32'],
                                      'deny': ['62.121.66.135/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.135')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.135'
         d = self.check_auth(keycard, bouncer, False)
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.133')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.133'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, False))
         return self.stop_bouncer(bouncer, d)
 
@@ -85,13 +112,22 @@ class TestIPBouncer(bouncertest.BouncerTestHelper):
         bouncer = self.get_bouncer({'deny-default': False,
                                      'allow': ['62.121.66.134/32'],
                                      'deny': ['62.121.66.135/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.135')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.135'
         d = self.check_auth(keycard, bouncer, False)
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.133')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.133'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
         return self.stop_bouncer(bouncer, d)
 
@@ -100,37 +136,64 @@ class TestIPBouncer(bouncertest.BouncerTestHelper):
                                                '62.121.66.133/32'],
                                      'deny': ['62.121.66.135/32',
                                               '62.121.66.136/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.136')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.136'
         d = self.check_auth(keycard, bouncer, False)
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.133')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.133'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.137')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.137'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, False))
         return self.stop_bouncer(bouncer, d)
 
     def test_trivial_subnet_allow(self):
         bouncer = self.get_bouncer({'allow': ['62.121.66.0/24']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d = self.check_auth(keycard, bouncer, True)
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.3')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.3'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.253')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.253'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.65.12')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.65.12'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, False))
         return self.stop_bouncer(bouncer, d)
 
     def test_trivial_subnet_deny(self):
         bouncer = self.get_bouncer({'deny': ['62.121.66.0/24']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d = self.check_auth(keycard, bouncer, False)
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.3')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.3'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, False))
         return self.stop_bouncer(bouncer, d)
 
@@ -138,16 +201,29 @@ class TestIPBouncer(bouncertest.BouncerTestHelper):
         bouncer = self.get_bouncer({'deny': ['62.121.66.0/24'],
                                      'allow': ['62.121.0.0/16',
                                                '62.122.66.134/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
+
         d = self.check_auth(keycard, bouncer, False)
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.65.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.65.134'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.122.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.122.66.134'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.123.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.123.66.134'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, False))
         return self.stop_bouncer(bouncer, d)
 
@@ -157,25 +233,43 @@ class TestIPBouncer(bouncertest.BouncerTestHelper):
                                               '62.122.66.0/24'],
                                      'allow': ['62.121.66.134/32',
                                                '62.122.66.134/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.134'
         d = self.check_auth(keycard, bouncer, True)
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.121.66.135')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.121.66.135'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, False))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.122.66.135')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.122.66.135'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, False))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.122.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.122.66.134'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
 
-        keycard = keycards.KeycardUACPP('user', 'test', '62.123.66.134')
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = '62.123.66.134'
         d.addCallback(lambda _: self.check_auth(keycard, bouncer, True))
         return self.stop_bouncer(bouncer, d)
 
     def test_no_ip(self):
         bouncer = self.get_bouncer({'deny': ['62.121.66.134/32']})
-        keycard = keycards.KeycardUACPP('user', 'test', None)
+        keycard = keycards.KeycardGeneric()
+        keycard.username = 'user'
+        keycard.password = 'test'
+        keycard.address = None
         d = self.check_auth(keycard, bouncer, False)
         return self.stop_bouncer(bouncer, d)
 

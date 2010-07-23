@@ -58,6 +58,18 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     @type  domain:      str
     @ivar  state:       state the keycard is in
     @type  state:       int
+    @ivar  address:     IP address of requester (optional)
+    @type  address:     str
+    @ivar  username:    username of requester (optional)
+    @type  username:    str
+    @ivar  password:    password of requester (optional)
+    @type  password:    str
+    @ivar  path:        path of request (optional)
+    @type  path:        str
+    @type  token:       token for request (optional)
+    @type  token:       str
+    @ivar  arguments:   arguments passed with request (optional)
+    @type  arguments:   dict of str->str
     """
     implements(ICredentials)
 
@@ -69,6 +81,12 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         self.duration = 0
         self.domain = None
         self.state = REQUESTING
+        self.address = None
+        self.username = None
+        self.password = None
+        self.path = None
+        self.token = None
+        self.arguments = {}
 
     def getData(self):
         """
@@ -80,7 +98,12 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         """
         return {'id': self.id,
                 'requester': self.requesterId,
-                'domain': self.domain}
+                'domain': self.domain,
+                'username': self.username,
+                'address': self.address,
+                'path': self.path,
+                'token': self.token,
+                'arguments': self.arguments}
 
     def __repr__(self):
         return "<%s for requesterId %r in state %s>" % (
@@ -106,8 +129,8 @@ class KeycardUACPP(Keycard, UCPP):
     """
 
     def __init__(self, username, password, address):
-        UCPP.__init__(self, username, password)
         Keycard.__init__(self)
+        UCPP.__init__(self, username, password)
         self.address = address
 
     def getData(self):
@@ -137,8 +160,8 @@ class KeycardUACPCC(Keycard, UCPCC):
     """
 
     def __init__(self, username, address):
-        UCPCC.__init__(self, username)
         Keycard.__init__(self)
+        UCPCC.__init__(self, username)
         self.address = address
 
     def getData(self):
@@ -224,8 +247,8 @@ class KeycardUASPCC(Keycard, USPCC):
     """
 
     def __init__(self, username, address):
-        USPCC.__init__(self, username)
         Keycard.__init__(self)
+        USPCC.__init__(self, username)
         self.address = address
 
     def getData(self):

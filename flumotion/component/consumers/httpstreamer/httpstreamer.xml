@@ -36,8 +36,6 @@
              a plug, not this property -->
         <property name="bouncer" type="string"
                   _description="The name of a bouncer in the atmosphere to authenticate against." />
-        <property name="issuer-class" type="string"
-                  _description="The Python class of the Keycard issuer to use." />
 	<property name="allow-default" type="bool"
 		  _description="Whether failure to communicate with the bouncer should make the component accept the connection." />
         <property name="mount-point" type="string"
