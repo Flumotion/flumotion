@@ -73,6 +73,13 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     """
     implements(ICredentials)
 
+    address = None
+    username = None
+    password = None
+    path = None
+    token = None
+    arguments = {}
+
     def __init__(self):
         self.bouncerName = None
         self.requesterId = None
@@ -81,11 +88,6 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
         self.duration = 0
         self.domain = None
         self.state = REQUESTING
-        self.address = None
-        self.username = None
-        self.password = None
-        self.path = None
-        self.token = None
         self.arguments = {}
 
     def getData(self):

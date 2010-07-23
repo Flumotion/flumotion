@@ -2,6 +2,16 @@
 
 	reviewed by: Jan Urbanski  <jurbanski@flumotion.com>
 
+	* flumotion/common/keycards.py:
+	When unjellying the __init__ method is not called and, sadly, the
+	attributes that are not common for all the old keycard types are not
+	created. Initialize them for backwards compatibility with old
+	keycards.
+
+2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
+
+	reviewed by: Jan Urbanski  <jurbanski@flumotion.com>
+
 	* flumotion/component/bouncers/multibouncer.py:
 	We still need the old keycard classes to be allowed by the bouncer for
 	backwards compatibility
