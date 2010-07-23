@@ -1,5 +1,11 @@
 2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
 
+	* flumotion/common/keycards.py:
+	Set the token attribute to an empty string by default so further
+	checks of the token's length don't crash
+
+2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
+
 	reviewed by: Jan Urbanski  <jurbanski@flumotion.com>
 
 	* flumotion/common/keycards.py:

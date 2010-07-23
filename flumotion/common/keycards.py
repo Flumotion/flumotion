@@ -77,7 +77,7 @@ class Keycard(pb.Copyable, pb.RemoteCopy):
     username = None
     password = None
     path = None
-    token = None
+    token = ''
     arguments = {}
 
     def __init__(self):
