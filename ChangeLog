@@ -1,3 +1,8 @@
+2010-07-23  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/misc/httpserver/mimetypes.py:
+	Add webm to the mimetype mapping.
+
 2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
 
 	* flumotion/common/keycards.py:

@@ -32,6 +32,7 @@ class MimeTypes(object):
         d = static.loadMimeTypes()
         d['.flv'] = 'video/x-flv'
         d['.mp4'] = 'video/mp4'
+        d['.webm'] = 'video/webm'
         return d
 
     def __init__(self):
