@@ -37,7 +37,10 @@ T_ = gettexter()
 class MultiBouncer(component.Bouncer):
 
     logCategory = 'multibouncer'
-    keycardClasses = (keycards.KeycardGeneric, )
+    # FIXME random classes for now, they're going away anyway
+    keycardClasses = (keycards.KeycardHTTPGetArguments,
+                      keycards.KeycardGeneric, keycards.KeycardUACPCC,
+                      keycards.KeycardUACPP, keycards.KeycardToken)
 
     def init(self):
         self.watchable_keycards = watched.WatchedDict() # keycard id -> Keycard
