@@ -173,6 +173,24 @@ class WatchedDictTest(TestCase):
         l.watch(watcher)
         self.assertRaises(KeyError, l.pop, 1)
 
+    def testPopError2(self):
+
+        def watcher(item):
+            return
+
+        l = WatchedDict()
+        l.watch(watcher)
+        self.assertRaises(TypeError, l.pop, 1, 2, 3)
+
+    def testPopError3(self):
+
+        def watcher(item):
+            assert item == (1, 'default')
+
+        l = WatchedDict()
+        l.watch(watcher)
+        l.pop(1, 'default')
+
     def testPopitem(self):
 
         def watcher(item):

@@ -1,5 +1,10 @@
 2010-07-26  Thodoris Paschidis <tpaschidis@flumotion.com>
 
+	* flumotion/test/test_common_watched.py:
+	Added some tests to make test complete.
+
+2010-07-26  Thodoris Paschidis <tpaschidis@flumotion.com>
+
     * flumotion/common/watched.py:
 	Minor syntax error change.
 
