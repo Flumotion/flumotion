@@ -87,16 +87,16 @@ class WatchedDict(dict):
         self.notify_changed((key, val))
 
     def pop(self, key, *args):
-        if len(args) <= 1:
-            try:
-                val = dict.pop(self, key)
-            except KeyError:
-                if not len(args):
-                    raise
-                val = args[0]
-            self.notify_changed((key, val))
-        elif:
-            raise TypeError
+        if len(args) > 1:
+            raise TypeError('pop expected at most 2 arguments, got %d' %
+                    (len(args) + 1))
+        try:
+            val = dict.pop(self, key)
+        except KeyError:
+            if not len(args):
+                raise
+            val = args[0]
+        self.notify_changed((key, val))
 
     def popitem(self):
         ret = dict.popitem(self)

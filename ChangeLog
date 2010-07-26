@@ -1,5 +1,10 @@
 2010-07-26  Thodoris Paschidis <tpaschidis@flumotion.com>
 
+    * flumotion/common/watched.py:
+	Minor syntax error change.
+
+2010-07-26  Thodoris Paschidis <tpaschidis@flumotion.com>
+
 	* flumotion/common/watched.py:
 	* flumotion/test/test_common_watched.py:
 	Wrote unit testing for watched.py and fixed some errors in code.
