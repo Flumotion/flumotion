@@ -1,3 +1,9 @@
+2010-07-26  Thodoris Paschidis <tpaschidis@flumotion.com>
+
+	* flumotion/common/watched.py:
+	* flumotion/test/test_common_watched.py:
+	Wrote unit testing for watched.py and fixed some errors in code.
+
 2010-07-23  Xavier Queralt  <xqueralt@gmail.com>
 
 	* flumotion/manager/config.py:

@@ -37,7 +37,7 @@ class WatchedList(list):
         self.notify_changed(o)
 
     def insert(self, idx, o):
-        list.insert(self, ids, o)
+        list.insert(self, idx, o)
         self.notify_changed(o)
 
     def remove(self, o):
@@ -87,15 +87,19 @@ class WatchedDict(dict):
         self.notify_changed((key, val))
 
     def pop(self, key, *args):
-        try:
-            val = dict.pop(key)
-        except KeyError:
-            if not len(args):
-                raise
-        self.notify_changed((key, val))
+        if len(args) <= 1:
+            try:
+                val = dict.pop(self, key)
+            except KeyError:
+                if not len(args):
+                    raise
+                val = args[0]
+            self.notify_changed((key, val))
+        elif:
+            raise TypeError
 
     def popitem(self):
-        ret = dict.popitem()
+        ret = dict.popitem(self)
         self.notify_changed(ret)
         return ret
 
