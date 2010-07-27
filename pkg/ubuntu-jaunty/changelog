@@ -1,3 +1,9 @@
+flumotion (0.7.0.1-1flu1~jaunty3) jaunty; urgency=low
+
+  * Update to SVN 2010-07-27
+
+ -- Xavier Queralt <xqueralt@flumotion.com>  Tue, 27 Jul 2010 21:52:06 +0200
+
 flumotion (0.7.0.1-1flu1~jaunty2) jaunty; urgency=low
 
   * Update to SVN 2009-10-29

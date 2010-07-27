@@ -1,5 +1,12 @@
 2010-07-27  Xavier Queralt <xqueralt@gmail.com>
 
+	* pkg/ubuntu-jaunty/changelog:
+	Update development package
+	* pkg/ubuntu-jaunty/control:
+	Add myself as maitainer
+
+2010-07-27  Xavier Queralt <xqueralt@gmail.com>
+
 	* flumotion/common/config.py:
 	Reintroduce the removed (in r8746) "socket" attribute to make
 	Julien happy this time.
