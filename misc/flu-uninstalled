@@ -1,8 +1,9 @@
-#!/bin/bash -i
+#!/bin/bash
 #
 # this script setups up env to work on flumotion uninstalled
 
-# this script is run -i so that PS1 doesn't get cleared
+# this script should not run, because it can't then be used in
+# non-interactive sessions
 
 self=$0
 absolute=$self
