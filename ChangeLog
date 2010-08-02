@@ -1,3 +1,8 @@
+2010-08-02  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* env.in:
+	Let env be a symbolic link and figure out the correct path
+
 2010-07-29  Jan Urbanski  <jurbanski@flumotion.com>
 
 	* misc/flu-uninstalled:
