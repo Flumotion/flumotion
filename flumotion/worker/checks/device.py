@@ -104,10 +104,8 @@ def fetchDevices(mid, factories, parameter):
         if factories:
             return fetchDevices(mid, factories, parameter)
         else:
-            m = messages.Error(T_(
-            N_("Could not find any Firewire device on the system.\n"
-               "Please check whether the device is correctly plugged in "
-               "and whether the modules are correctly loaded.")), mid=mid)
 
-        result.add(m)
-        return defer.succeed(result)
+            m = messages.Error(T_(
+                N_("No devices were found for %s."), factory), mid=mid)
+            result.add(m)
+            return defer.succeed(result)

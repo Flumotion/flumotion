@@ -1,5 +1,10 @@
 2010-08-02  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/worker/checks/device.py:
+	Use a generic error message instead of the firewire one.
+
+2010-08-02  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* env.in:
 	Let env be a symbolic link and figure out the correct path
 
