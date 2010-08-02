@@ -1,5 +1,12 @@
 2010-08-02  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/component/producers/playlist/playlist.py:
+	With the default value of clock type (monotonic) we got dates from the
+	70s. Set it to realtime so we don't have to wait 40 years to see the
+	playlist videos.
+
+2010-08-02  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/worker/checks/device.py:
 	Use a generic error message instead of the firewire one.
 

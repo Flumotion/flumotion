@@ -264,7 +264,8 @@ class PlaylistProducer(feedcomponent.FeedComponent):
 
     def _setupClock(self, pipeline):
         # Configure our pipeline to use a known basetime and clock.
-        clock = gst.SystemClock()
+        clock = gst.system_clock_obtain()
+        clock.set_property('clock-type', 'realtime')
         # It doesn't matter too much what this basetime is, so long as we know
         # the value.
         self.basetime = clock.get_time()
