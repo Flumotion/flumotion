@@ -1,3 +1,10 @@
+2010-08-04  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/component/feedcomponent.py:
+	Fix a typpo
+	* flumotion/component/feedcomponent010.py:
+	Reset headers backlog when we receive a NewSegment event.
+
 2010-08-02  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/component/producers/playlist/playlist.py:

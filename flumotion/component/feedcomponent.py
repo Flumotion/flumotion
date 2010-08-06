@@ -1022,7 +1022,7 @@ class DecoderComponent(ReconfigurableComponent):
             return True
         self.info("Received flumotion-reset, not droping buffers anymore")
 
-        self.dropStreamheaders = False
+        self.dropStreamHeaders = False
         if self.disconnectedPads:
             return False
         return True
@@ -1030,7 +1030,7 @@ class DecoderComponent(ReconfigurableComponent):
     def _new_decoded_pad_cb(self, decoder, pad, last):
         self.log("Decoder %s got new decoded pad %s", decoder, pad)
 
-        self.dropStreamheaders = True
+        self.dropStreamHeaders = True
         new_caps = pad.get_caps()
 
         # Select a compatible output element

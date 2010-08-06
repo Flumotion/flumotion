@@ -357,6 +357,7 @@ class FeedComponent(basecomponent.BaseComponent):
                     self.info("Subsequent new segment event received on "
                               "depay on eater %s", eater.eaterAlias)
                     # swallow (gulp)
+                    eater.streamheader = []
                     return False
                 else:
                     eater._gotFirstNewSegment = True
@@ -798,6 +799,7 @@ class FeedComponent(basecomponent.BaseComponent):
                     self.log("Pushing earlier buffers with IN_CAPS flag")
                     for buff in eater.streamheader:
                         pad.push(buff)
+                    self.dropStreamHeaders = True
 
                 eater.streamheader = []
                 return True
