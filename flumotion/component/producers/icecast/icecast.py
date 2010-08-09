@@ -97,7 +97,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
                 self, bus, message)
 
     def connect(self):
-        self.info('Connecting to icecast server: %s', self.url)
+        self.info('Connecting to icecast server on %s', self.url)
         self.src.set_state(gst.STATE_READY)
         # can't just self.src.set_state(gst.STATE_PLAYING),
         # because the pipeline might NOT be in PLAYING,
@@ -107,19 +107,19 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         return self.attemptD
 
     def _src_connected(self, name):
-        self.info('Connected to icecast server : %s', self.url)
+        self.info('Connected to icecast server on %s', self.url)
         if self.reconnecting:
             assert self.attemptD
             self.attemptD.callback(None)
             self.reconnecting = False
 
     def _src_disconnected(self, name):
-        self.info('Icecast server: %s got disconnected', self.url)
+        self.info('Disconnected from icecast server on %s', self.url)
         if not self.reconnecting:
             self.reconnecting = True
             self.reconnector.start()
 
     def _retry(self):
         assert self.attemptD
-        self.debug('Retrying connection to icecast server: %s', self.url)
+        self.debug('Retrying connection to icecast server on %s', self.url)
         self.attemptD.errback(errors.ConnectionError)
