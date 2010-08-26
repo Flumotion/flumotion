@@ -47,13 +47,17 @@ class VideoscaleBin(gst.Bin):
             1, 10000, 100, gobject.PARAM_READWRITE),
         'is-square': (gobject.TYPE_BOOLEAN, 'PAR 1/1',
             'Output with PAR 1/1',
+            False, gobject.PARAM_READWRITE),
+        'add-borders': (gobject.TYPE_BOOLEAN, 'Add borders',
+            'Add black borders to keep DAR if needed',
             False, gobject.PARAM_READWRITE)}
 
-    def __init__(self, width, height, is_square):
+    def __init__(self, width, height, is_square, add_borders):
         gst.Bin.__init__(self)
         self._width = width
         self._height = height
         self._is_square = is_square
+        self._add_borders = add_borders
 
         self._inpar = None # will be set when active
         self._inwidth = None
@@ -133,6 +137,8 @@ class VideoscaleBin(gst.Bin):
         caps = gst.Caps(p)
 
         self._capsfilter.set_property("caps", caps)
+        if gstreamer.element_has_property(self._videoscaler, 'add-borders'):
+            self._videoscaler.set_property('add-borders', self._add_borders)
 
     def _sinkSetCaps(self, pad, caps):
         self.info("in:%s" % caps.to_string())
@@ -150,6 +156,12 @@ class VideoscaleBin(gst.Bin):
             self._width = value
         elif property.name == 'height':
             self._height = value
+        elif property.name == 'add-borders':
+            if not gstreamer.element_has_property(self._videoscaler,
+                                                  'add-borders'):
+                self.warning("Can't add black borders because videoscale\
+                    element doesn't have 'add-borders' property.")
+            self._add_borders = value
         elif property.name == 'is-square':
             self._is_square = value
         else:
@@ -160,6 +172,8 @@ class VideoscaleBin(gst.Bin):
             return self._width or 0
         elif property.name == 'height':
             return self._height or 0
+        elif property.name == 'add-borders':
+            return self._add_borders
         elif property.name == 'is-square':
             return self._is_square or False
         else:
@@ -178,14 +192,14 @@ class Videoscale(feedcomponent.PostProcEffect):
     logCategory = "videoscale-effect"
 
     def __init__(self, name, component, sourcePad, pipeline,
-                 width, height, is_square):
+                 width, height, is_square, add_borders=False):
         """
         @param element:     the video source element on which the post
                             processing effect will be added
         @param pipeline:    the pipeline of the element
         """
         feedcomponent.PostProcEffect.__init__(self, name, sourcePad,
-            VideoscaleBin(width, height, is_square), pipeline)
+            VideoscaleBin(width, height, is_square, add_borders), pipeline)
         self.pipeline = pipeline
         self.component = component
 
@@ -202,7 +216,7 @@ class Videoscale(feedcomponent.PostProcEffect):
     def setUIState(self, state):
         feedcomponent.Effect.setUIState(self, state)
         if state:
-            for k in 'width', 'height', 'is-square':
+            for k in 'width', 'height', 'is-square', 'add-borders':
                 state.addKey('videoscale-%s' % k,
                     self.effectBin.get_property(k))
 
@@ -246,6 +260,15 @@ class Videoscale(feedcomponent.PostProcEffect):
 
     def effect_getIsSquare(self):
         return self.effectBin.get_property('is-square')
+
+    def effect_setAddBorders(self, add_borders):
+        self.effectBin.set_property('add-borders', add_borders)
+        self.info('Changing add-borders to %r' % add_borders)
+        self.uiState.set('videoscale-add-borders', add_borders)
+        return add_borders
+
+    def effect_getAddBorders(self):
+        return self.effectBin.get_property('add-borders')
 
     def effect_setPAR(self, par):
         self.par = par

@@ -32,6 +32,8 @@
                   _description="The width to scale to before correcting.(Deprecated)" />
         <property name="is-square" type="bool"
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
+        <property name="add-borders" type="bool"
+                  _description="Add black borders if DAR can't be kept." />
         <property name="framerate" type="fraction"
                   _description="The framerate (in fps)."/>
         <property name="guid" type="string"

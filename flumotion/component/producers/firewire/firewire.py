@@ -83,6 +83,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.height = props.get('height', 0)
         if not self.is_square and not self.height:
             self.height = int(576 * self.width/720.) # assuming PAL
+        self.add_borders = props.get('add-borders', True)
 
         guid = props.get('guid', None)
         self.deintMode = props.get('deinterlace-mode', 'auto')
@@ -150,7 +151,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
 
         videoscaler = videoscale.Videoscale('videoscale', self,
             deinterlacer.effectBin.get_pad("src"), pipeline,
-            self.width, self.height, self.is_square)
+            self.width, self.height, self.is_square, self.add_borders)
         self.addEffect(videoscaler)
         videoscaler.plug()
 

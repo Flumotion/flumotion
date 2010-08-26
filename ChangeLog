@@ -1,3 +1,14 @@
+2010-08-26  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/component/effects/videoscale/admin_gtk.py:
+	* flumotion/component/effects/videoscale/videoscale.glade:
+	* flumotion/component/effects/videoscale/videoscale.py:
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/firewire.xml:
+	Add support to keep DAR with black borders
+
 2010-08-09  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/producers/icecast/icecast.py:

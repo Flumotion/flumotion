@@ -46,6 +46,7 @@ class VideoscaleAdminGtkNode(EffectAdminGtkNode):
         self._par_n = self.wtree.get_widget('videoscale-par_n')
         self._par_d = self.wtree.get_widget('videoscale-par_d')
         self._is_square = self.wtree.get_widget('videoscale-is_square')
+        self._add_borders = self.wtree.get_widget('videoscale-add_borders')
         self._apply = self.wtree.get_widget('videoscale-apply')
 
         # do the callbacks for the mode setting
@@ -54,14 +55,18 @@ class VideoscaleAdminGtkNode(EffectAdminGtkNode):
         self._par_n.connect('value-changed', self._cb_par)
         self._par_d.connect('value-changed', self._cb_par)
         self._is_square.connect('toggled', self._cb_is_square)
+        self._add_borders.connect('toggled', self._cb_add_borders)
         self._apply.connect('clicked', self._cb_apply)
 
     def setUIState(self, state):
         EffectAdminGtkNode.setUIState(self, state)
         if not self.uiStateHandlers:
-            self.uiStateHandlers = {'videoscale-width': self.widthSet,
-                                    'videoscale-height': self.heightSet,
-                                    'videoscale-is-square': self.isSquareSet}
+            uiStateHandlers = {'videoscale-width': self.widthSet,
+                               'videoscale-height': self.heightSet,
+                               'videoscale-is-square': self.isSquareSet,
+                               'videoscale-add-borders': self.addBordersSet}
+            self.uiStateHandlers = uiStateHandlers
+
         for k, handler in self.uiStateHandlers.items():
             handler(state.get(k))
 
@@ -69,6 +74,10 @@ class VideoscaleAdminGtkNode(EffectAdminGtkNode):
         handler = self.uiStateHandlers.get(key, None)
         if handler:
             handler(value)
+
+    def addBordersSet(self, add_borders):
+        if add_borders is not None:
+            self._add_borders.set_active(add_borders)
 
     def isSquareSet(self, is_square):
         if is_square is not None:
@@ -105,6 +114,11 @@ class VideoscaleAdminGtkNode(EffectAdminGtkNode):
     def _cb_is_square(self, widget):
         is_square = self._is_square.get_active()
         d = self.effectCallRemote("setIsSquare", is_square)
+        d.addErrback(self.setErrback)
+
+    def _cb_add_borders(self, widget):
+        add_borders = self._add_borders.get_active()
+        d = self.effectCallRemote("setAddBorders", add_borders)
         d.addErrback(self.setErrback)
 
     def _cb_apply(self, widget):
