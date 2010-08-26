@@ -5,6 +5,7 @@ component_DATA = component.xml
 component_PYTHON = \
 	__init__.py \
 	component.py \
+	decodercomponent.py \
 	eater.py \
 	feed.py \
 	feeder.py \
