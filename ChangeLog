@@ -1,5 +1,18 @@
 2010-08-26  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/component/decoders/generic/generic.py:
+	Add an element to keep syncronization between video and audio output
+	in a way that is consistent with the input timestamps.
+	* flumotion/component/feedcomponent.py:
+	Improve the way we're rid of old elements in the pipeline and disable
+	the reconfiguration in encoders and muxers as it not working well yet.
+	* flumotion/component/feedcomponent010.py:
+	Allow the subclasses to decide wether they want to receive newsegments
+	or not. Used for now by the decoder component to know when a new
+	stream arrives.
+
+2010-08-26  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/component/Makefile.am:
 	How do you expect the tests to pass? Add the new module to tarball.
 

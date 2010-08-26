@@ -49,6 +49,7 @@ class FeedComponent(basecomponent.BaseComponent):
     FEEDER_STATS_UPDATE_FREQUENCY = 12.5
     keepStreamheaderForLater = False
     dropStreamHeaders = True
+    swallowNewSegment = True
 
     logCategory = 'feedcomponent'
 
@@ -358,7 +359,8 @@ class FeedComponent(basecomponent.BaseComponent):
                               "depay on eater %s", eater.eaterAlias)
                     # swallow (gulp)
                     eater.streamheader = []
-                    return False
+                    if self.swallowNewSegment:
+                        return False
                 else:
                     eater._gotFirstNewSegment = True
             return True

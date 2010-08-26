@@ -676,6 +676,12 @@ class ReconfigurableComponent(ParseLaunchComponent):
 
     disconnectedPads = False
 
+    def _get_base_pipeline_string(self):
+        """Should be overrided by subclasses to provide the pipeline the
+        component uses.
+        """
+        return ""
+
     def init(self):
         self.EATER_TMPL += ' ! queue name=input-%(name)s'
         self._reset_count = 0
@@ -800,24 +806,24 @@ class ReconfigurableComponent(ParseLaunchComponent):
                 self.debug('RESET: unlink %s with %s', pad, ppad)
                 pad.unlink(ppad)
 
-    def _remove_pipeline(self, pipeline, element, done, end):
+    def _remove_pipeline(self, pipeline, element, end, done=None):
+            if done is None:
+                done = []
             if not element:
                 return
             if element in done:
                 return
-            done.append(element)
-
-            self._unlink_pads(element, [gst.PAD_SRC])
-
             if element in end:
                 return
 
-            for sink in element.sink_pads():
-                if not sink.get_peer():
+            for src in element.src_pads():
+                self.log('going to start by pad %r', src)
+                if not src.get_peer():
                     continue
-                peer = sink.get_peer().get_parent()
-                self._remove_pipeline(pipeline, peer, done, end)
-
+                peer = src.get_peer().get_parent()
+                self._remove_pipeline(pipeline, peer, end, done)
+                done.append(peer)
+                element.unlink(peer)
 
             self.log("RESET: removing old element %s from pipeline", element)
             element.set_state(gst.STATE_NULL)
@@ -845,12 +851,14 @@ class ReconfigurableComponent(ParseLaunchComponent):
 
             to_link = []
             done.append(element)
+            self.log("RESET: going to remove %s", element)
             for src in element.src_pads():
+                self.log("RESET: got src pad element %s", src)
                 if not src.get_peer():
                     continue
                 peer = src.get_peer().get_parent()
                 to_link.append(peer)
-                self.log("RESET: got src pad element %s", src)
+
                 move_element(to_link[-1], orig, dest)
 
             self._unlink_pads(element, [gst.PAD_SRC, gst.PAD_SINK])
@@ -904,14 +912,16 @@ class ReconfigurableComponent(ParseLaunchComponent):
 
     def _on_pipeline_drained(self):
         self.debug('RESET: Proceed to unlink pipeline')
-        out = self.get_output_elements()[0]
-        start = out.get_pad('sink').get_peer().get_parent()
-        self._remove_pipeline(self.pipeline, start, [],
-                              self.get_input_elements())
+        start = self.get_input_elements()
+        end = self.get_output_elements()
+        done = []
+        for element in start:
+            element = element.get_pad('src').get_peer().get_parent()
+            self._remove_pipeline(self.pipeline, element, end, done)
         self._rebuild_pipeline()
 
 
-class EncoderComponent(ReconfigurableComponent):
+class EncoderComponent(ParseLaunchComponent):
     """
     Component that is reconfigured when new changes arrive through the
     flumotion-reset event (sent by the fms producer).
@@ -921,7 +931,7 @@ class EncoderComponent(ReconfigurableComponent):
         return self.get_pipeline_string(self.config['properties'])
 
 
-class MuxerComponent(ReconfigurableComponent, MultiInputParseLaunchComponent):
+class MuxerComponent(MultiInputParseLaunchComponent):
     """
     This class provides for multi-input ParseLaunchComponents, such as muxers,
     that handle flumotion-reset events for reconfiguration.

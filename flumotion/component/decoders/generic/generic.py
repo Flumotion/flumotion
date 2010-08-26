@@ -20,8 +20,7 @@
 # Headers in this file shall remain intact.
 
 import gst
-
-from twisted.internet import reactor
+import gobject
 
 from flumotion.component import decodercomponent as dc
 from flumotion.common import messages
@@ -46,6 +45,162 @@ class FeederInfo(object):
     def __init__(self, name, caps, linked=False):
         self.name = name
         self.caps = caps
+
+
+class SyncKeeper(gst.Element):
+    __gstdetails__ = ('SyncKeeper', 'Generic',
+                      'Retimestamp the output to be contiguous and maintain '
+                      'the sync', 'Xavier Queralt')
+    _audiosink = gst.PadTemplate("audio-in",
+                                 gst.PAD_SINK,
+                                 gst.PAD_ALWAYS,
+                                 gst.caps_from_string(BASIC_AUDIO_CAPS))
+    _videosink = gst.PadTemplate("video-in",
+                                 gst.PAD_SINK,
+                                 gst.PAD_ALWAYS,
+                                 gst.caps_from_string(BASIC_VIDEO_CAPS))
+    _audiosrc = gst.PadTemplate("audio-out",
+                                gst.PAD_SRC,
+                                gst.PAD_ALWAYS,
+                                gst.caps_from_string(BASIC_AUDIO_CAPS))
+    _videosrc = gst.PadTemplate("video-out",
+                                gst.PAD_SRC,
+                                gst.PAD_ALWAYS,
+                                gst.caps_from_string(BASIC_VIDEO_CAPS))
+
+    nextVideoTs = 0
+    nextAudioTs = 0
+    videoReceived = False
+    audioReceived = False
+    audioDiscontBuffer = None
+    videoDiscontBuffer = None
+
+    sendVideoNewSegment = True
+    sendAudioNewSegment = True
+    videoPadding = 0
+    audioPadding = 0
+    resetReceived = False
+
+    def __init__(self):
+        gst.Element.__init__(self)
+
+        self.audiosink = gst.Pad(self._audiosink, "audio-in")
+        self.audiosink.set_chain_function(self.chainfunc)
+        self.audiosink.set_event_function(self.eventfunc)
+        self.add_pad(self.audiosink)
+        self.videosink = gst.Pad(self._videosink, "video-in")
+        self.videosink.set_chain_function(self.chainfunc)
+        self.videosink.set_event_function(self.eventfunc)
+        self.add_pad(self.videosink)
+
+        self.audiosrc = gst.Pad(self._audiosrc, "audio-out")
+        self.add_pad(self.audiosrc)
+        self.videosrc = gst.Pad(self._videosrc, "video-out")
+        self.add_pad(self.videosrc)
+
+    def push_video_buffer(self, buffer):
+        buffer.timestamp += self.videoPadding
+        self.nextVideoTs = buffer.timestamp + buffer.duration
+        if self.sendVideoNewSegment:
+            self.videosrc.push_event(
+                gst.event_new_new_segment(True, 1.0, gst.FORMAT_TIME,
+                                          buffer.timestamp, -1, 0))
+            self.sendVideoNewSegment = False
+
+        self.log(
+          "Output video timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp),
+                                              gst.TIME_ARGS(buffer.duration)))
+        self.videosrc.push(buffer)
+
+    def push_audio_buffer(self, buffer):
+        buffer.timestamp += self.audioPadding
+        self.nextAudioTs = buffer.timestamp + buffer.duration
+        if self.sendAudioNewSegment:
+            self.audiosrc.push_event(
+                gst.event_new_new_segment(True, 1.0, gst.FORMAT_TIME,
+                                          buffer.timestamp, -1, 0))
+            self.sendAudioNewSegment = False
+
+        self.log(
+          "Output audio timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp)
+                                              gst.TIME_ARGS(buffer.duration)))
+        self.audiosrc.push(buffer)
+
+    def fixAVPadding(self, videoBuffer=None, audioBuffer=None):
+        if not self.resetReceived:
+            return False
+        if not videoBuffer or not audioBuffer:
+            return False
+        diff = audioBuffer.timestamp - videoBuffer.timestamp
+        newStart = max(self.nextVideoTs, self.nextAudioTs)
+
+        if diff > 0:
+            self.videoPadding = newStart - videoBuffer.timestamp
+            self.audioPadding = newStart + diff - audioBuffer.timestamp
+        else:
+            self.videoPadding = newStart + diff - videoBuffer.timestamp
+            self.audioPadding = newStart - audioBuffer.timestamp
+
+        self.resetReceived = False
+
+        return True
+
+    def chainfunc(self, pad, buffer):
+        if pad.get_name() == 'audio-in':
+            self.log(
+           "Input audio timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp),
+                                              gst.TIME_ARGS(buffer.duration)))
+            if self.fixAVPadding(self.videoDiscontBuffer, buffer):
+                self.push_video_buffer(self.videoDiscontBuffer)
+                self.videoDiscontBuffer = None
+
+            # Check contiguous buffer
+            self.audioReceived = True
+            if self.videoReceived:
+                self.push_audio_buffer(buffer)
+            elif self.resetReceived:
+                self.audioDiscontBuffer = buffer
+
+            return gst.FLOW_OK
+        elif pad.get_name() == 'video-in':
+            self.log(
+           "Input video timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp),
+                                              gst.TIME_ARGS(buffer.duration)))
+
+            if self.fixAVPadding(buffer, self.audioDiscontBuffer):
+                self.push_audio_buffer(self.audioDiscontBuffer)
+                self.audioDiscontBuffer = None
+
+            self.videoReceived = True
+            if self.audioReceived:
+                self.push_video_buffer(buffer)
+            elif self.resetReceived:
+                self.videoDiscontBuffer = buffer
+
+            return gst.FLOW_OK
+        else:
+            return gst.FLOW_ERROR
+
+    def eventfunc(self, pad, event):
+        self.debug("Received event %r from %s" % (event, event.src))
+        if event.type == gst.EVENT_NEWSEGMENT:
+            return False
+        if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
+            return True
+        if event.get_structure().get_name() != 'flumotion-reset':
+            return True
+        self.resetReceived = True
+        self.videoReceived = False
+        self.audioReceived = False
+        self.sendVideoNewSegment = True
+        self.sendAudioNewSegment = True
+
+        self.audiosrc.push_event(event)
+        self.videosrc.push_event(event)
+        return True
+
+gobject.type_register(SyncKeeper)
+gst.element_register(SyncKeeper, "synckeeper", gst.RANK_MARGINAL)
 
 
 class GenericDecoder(dc.DecoderComponent):
@@ -79,14 +234,17 @@ class GenericDecoder(dc.DecoderComponent):
         assert finfo, "No feeder info specified"
         self._feeders_info = dict([(i.name, i) for i in finfo])
 
-        pipeline_parts = [self._get_base_pipeline_string()]
+        base_pipeline = self._get_base_pipeline_string()
 
-        feeder_tmpl = ("identity name=%s single-segment=True "
-                       "silent=True ! %s ! @feeder:%s@")
+        pipeline_parts = ["%s synckeeper name=sync" % base_pipeline]
+
+        feeder_tmpl = ("identity name=%(ename)s silent=true ! %(caps)s ! "
+                       "sync.%(pad)s-in sync.%(pad)s-out ! @feeder:%(pad)s@")
 
         for i in self._feeders_info.values():
             ename = self._get_output_element_name(i.name)
-            pipeline_parts.append(feeder_tmpl % (ename, i.caps, i.name))
+            pipeline_parts.append(
+                feeder_tmpl % dict(ename=ename, caps=i.caps, pad=i.name))
 
         pipeline_str = " ".join(pipeline_parts)
         self.log("Decoder pipeline: %s", pipeline_str)
@@ -97,7 +255,7 @@ class GenericDecoder(dc.DecoderComponent):
 
     def configure_pipeline(self, pipeline, properties):
         dc.DecoderComponent.configure_pipeline(self, pipeline,
-                                                          properties)
+                                               properties)
 
         decoder = self.pipeline.get_by_name("decoder")
         decoder.connect('autoplug-select', self._autoplug_select_cb)
