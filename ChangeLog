@@ -1,3 +1,10 @@
+2010-08-26  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/component/decoders/generic/generic.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/decodercomponent.py (added):
+	Move the generic decoder to a new module
+
 2010-08-26  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Xavier Queralt

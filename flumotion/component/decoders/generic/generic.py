@@ -23,7 +23,7 @@ import gst
 
 from twisted.internet import reactor
 
-from flumotion.component import feedcomponent
+from flumotion.component import decodercomponent as dc
 from flumotion.common import messages
 from flumotion.common.i18n import N_, gettexter
 
@@ -48,7 +48,7 @@ class FeederInfo(object):
         self.caps = caps
 
 
-class GenericDecoder(feedcomponent.DecoderComponent):
+class GenericDecoder(dc.DecoderComponent):
     """
     Generic decoder component using decodebin2.
 
@@ -96,7 +96,7 @@ class GenericDecoder(feedcomponent.DecoderComponent):
         return pipeline_str
 
     def configure_pipeline(self, pipeline, properties):
-        feedcomponent.DecoderComponent.configure_pipeline(self, pipeline,
+        dc.DecoderComponent.configure_pipeline(self, pipeline,
                                                           properties)
 
         decoder = self.pipeline.get_by_name("decoder")
