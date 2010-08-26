@@ -122,7 +122,7 @@ class SyncKeeper(gst.Element):
             self.sendAudioNewSegment = False
 
         self.log(
-          "Output audio timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp)
+          "Output audio timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp),
                                               gst.TIME_ARGS(buffer.duration)))
         self.audiosrc.push(buffer)
 
