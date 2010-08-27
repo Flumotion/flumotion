@@ -1,6 +1,6 @@
-flumotion (0.7.0.2-1flu1~karmic1) karmic; urgency=low
+flumotion (0.7.0.2-1flu1~lucid1) lucid; urgency=low
 
-  * Lucid release
+  * Lucid pre-release
 
  -- Xavier Queralt <xqueralt@flumotion.com>  Fri, 27 Aug 2010 12:30:21 +0200
 

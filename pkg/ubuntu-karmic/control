@@ -1,21 +1,13 @@
 Source: flumotion
 Section: net
 Priority: optional
-Maintainer: Arek Korbik <arek@flumotion.com>
+Maintainer: Xavier Queralt <xqueralt@flumotion.com>
 Build-Depends: cdbs,
                debhelper (>= 5.0.37.2),
                pkg-config,
 	       intltool (>= 0.34.2),
-	       python-kiwi (>= 1.9.14),
                python-twisted (>= 2.5.0),
-               python-twisted-names,
-               python-twisted-web,
-               python-gobject-dev (>= 2.12.0),
-               python-gtk2-dev (>= 2.8.0),
-               python-glade2,
                python-epydoc,
-               python-rrd,
-	       libgstreamer0.10-dev (>= 0.10.0.1),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1),
                python-gst0.10 (>= 0.10.1),
                python,
@@ -41,7 +33,7 @@ Depends: ${python:Depends},
          python-gtk2 (>= 2.4.0),
 	 python-kiwi (>= 1.9.14),
 	 python-cairo (>= 1.2.0),
-         python-pyopenssl,
+         python-openssl,
          python-rrd,
          python-twisted-core (>= 2.5.0),
          python-twisted-web,
