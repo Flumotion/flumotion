@@ -241,7 +241,7 @@ class BaseConfigParser(fxml.Parser):
         def parsePlug(node):
             # <plug type=...>
             #   <property>
-            # F0.8
+            # F0.10
             # socket is unneeded and deprecated; we don't use it.
             plugType, socket = self.parseAttributes(
                 node, ('type', ), ('socket', ))

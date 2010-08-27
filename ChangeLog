@@ -1,5 +1,12 @@
 2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/common/config.py:
+	* flumotion/common/errors.py:
+	* flumotion/common/registry.py:
+	Reintroduce (removed in r8746) "description" attribute so Pepe is happy
+
+2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* pkg/ubuntu-lucid/changelog:
 	* pkg/ubuntu-lucid/control:
 	* pkg/ubuntu-lucid (added):

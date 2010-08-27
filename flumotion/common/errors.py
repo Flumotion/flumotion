@@ -173,7 +173,7 @@ class NoPerspectiveError(pb.Error):
 class FatalError(pb.Error):
     "A fatal error"
 
-# F0.8
+# F0.10
 __pychecker__ = 'no-shadowbuiltin'
 
 
