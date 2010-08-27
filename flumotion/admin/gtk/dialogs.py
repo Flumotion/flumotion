@@ -180,7 +180,9 @@ class AboutDialog(gtk.Dialog):
         authors = (
                    'Johan Dahlin',
                    'Alvin Delagon',
+                   'David Gay i Tello',
                    'Pedro Gracia Fajardo',
+                   'Aitor Guevara Escalante',
                    'Arek Korbik',
                    'Julien Le Goff',
                    'Marc-André Lureau',
@@ -189,6 +191,7 @@ class AboutDialog(gtk.Dialog):
                    'Andoni Morales Alastruey',
                    'Zaheer Abbas Merali',
                    'Sébastien Merle',
+                   'Thodoris Paschidis',
                    'Xavier Queralt Mateu',
                    'Guillaume Quintard',
                    'Josep Joan "Pepe" Ribas',
