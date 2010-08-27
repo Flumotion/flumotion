@@ -221,7 +221,8 @@ class GenericDecoder(dc.DecoderComponent):
     """
 
     logCategory = "gen-decoder"
-
+    feeder_tmpl = ("identity name=%(ename)s single-segment=true "
+                   "silent=true ! %(caps)s ! @feeder:%(pad)s@")
 
     ### Public Methods ###
 
@@ -234,17 +235,12 @@ class GenericDecoder(dc.DecoderComponent):
         assert finfo, "No feeder info specified"
         self._feeders_info = dict([(i.name, i) for i in finfo])
 
-        base_pipeline = self._get_base_pipeline_string()
-
-        pipeline_parts = ["%s synckeeper name=sync" % base_pipeline]
-
-        feeder_tmpl = ("identity name=%(ename)s silent=true ! %(caps)s ! "
-                       "sync.%(pad)s-in sync.%(pad)s-out ! @feeder:%(pad)s@")
+        pipeline_parts = [self._get_base_pipeline_string()]
 
         for i in self._feeders_info.values():
             ename = self._get_output_element_name(i.name)
             pipeline_parts.append(
-                feeder_tmpl % dict(ename=ename, caps=i.caps, pad=i.name))
+                self.feeder_tmpl % dict(ename=ename, caps=i.caps, pad=i.name))
 
         pipeline_str = " ".join(pipeline_parts)
         self.log("Decoder pipeline: %s", pipeline_str)
@@ -313,7 +309,12 @@ class SingleGenericDecoder(GenericDecoder):
 class AVGenericDecoder(GenericDecoder):
 
     logCategory = "avgen-decoder"
+    feeder_tmpl = ("identity name=%(ename)s silent=true ! %(caps)s ! "
+                   "sync.%(pad)s-in sync.%(pad)s-out ! @feeder:%(pad)s@")
 
     def _get_feeders_info(self):
         return (FeederInfo('audio', BASIC_AUDIO_CAPS),
                 FeederInfo('video', BASIC_VIDEO_CAPS))
+
+    def _get_base_pipeline_string(self):
+        return 'decodebin2 name=decoder synckeeper name=sync'
