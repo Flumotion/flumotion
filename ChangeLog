@@ -1,5 +1,12 @@
 2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/component/decodercomponent.py:
+	* flumotion/component/decoders/generic/generic.xml:
+	Enable the videorate, videscale and deinterlace effects to be used
+	with the decoder component.
+
+2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/component/decoders/generic/generic.py:
 	Only use the syncronizer with the A/V decoder. It doesn't make any
 	sense when we're only decoding one media type.
