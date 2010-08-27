@@ -46,6 +46,7 @@ class FireWireProducer(AudioProducer, VideoProducer):
 
         self.properties.is_square = True
         self.properties.framerate = 12.5
+        self.properties.decoder = 'ffdec_dvvideo'
 
     def __eq__(self, other):
         if not isinstance(other, FireWireProducer):
@@ -221,6 +222,24 @@ class _FireWireCommon:
         d = self.runInWorker('flumotion.worker.checks.gst010', 'check1394',
             mid='firewire-check', guid=self.guid.get_selected())
 
+        def chooseDecoder(missing):
+            if 'ffdec_dvvideo' in missing and 'dvdec' not in missing:
+                msg = messages.Warning(T_(
+                    N_("GStreamer's dv decoder element (dvdec) will be used "
+                       "instead of FFmpeg's which is better in terms of "
+                       "performance.\nIf the configuration doesn't work "
+                       "properly, consider installing the ffmpeg plugins for "
+                       "gstreamer.")), mid='firewire-warning')
+                self.wizard.add_msg(msg)
+                self.model.properties.decoder = 'dvdec'
+            elif 'dvdec' in missing:
+                msg = messages.Error(T_(
+                    N_("None of the dv decoder elements was found in your "
+                       "system, consider installing the ffmpeg plugins for "
+                       "gstreamer to continue.")), mid='firewire-error')
+                self.wizard.add_msg(msg)
+                self.wizard.blockNext(True)
+
         def firewireCheckDone(options):
             self.wizard.clear_msg('firewire-check')
             self._dims = (options['width'], options['height'])
@@ -235,6 +254,11 @@ class _FireWireCommon:
                 self.combobox_scaled_height.set_active(1)
             self._setSensitive(True)
             self._update_output_format(True)
+
+            d = self.wizard.checkElements(self.model.worker,
+                                          'ffdec_dvvideo', 'dvdec')
+            d.addCallback(chooseDecoder)
+            return d
 
         def trapRemoteFailure(failure):
             failure.trap(errors.RemoteRunFailure)

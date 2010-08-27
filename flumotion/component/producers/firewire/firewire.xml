@@ -30,6 +30,8 @@
                   _description="The final width, including correction." />
         <property name="scaled-width" type="int"
                   _description="The width to scale to before correcting.(Deprecated)" />
+        <property name="decoder" type="string"
+                  _description="The element to decode with (default=dvdec)" />
         <property name="is-square" type="bool"
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
         <property name="add-borders" type="bool"

@@ -1,3 +1,17 @@
+2010-08-27  Xavier Queralt <xqueralt@gmail.com>
+
+	reviewed by: Andoni Morales
+
+	* flumotion/component/producers/firewire/firewire.py:
+	* flumotion/component/producers/firewire/firewire.xml:
+	Factor the dv decoder out so the user can select which decoder the
+	component is going to use in the configuration.
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	Force the firewire-producer to use the ffdec_dvvideo decoder element
+	to improve performance and avoid a couple of bugs in dvdec.
+	* flumotion/test/test_wizard_save.py:
+	Update tests according to this behaviour.
+
 2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/component/feedcomponent.py:

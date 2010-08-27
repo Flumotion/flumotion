@@ -22,7 +22,7 @@
 import gst
 from twisted.internet import defer
 
-from flumotion.common import errors, messages
+from flumotion.common import errors, messages, gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.component.effects.deinterlace import deinterlace
@@ -51,9 +51,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         props = self.config['properties']
         deintMode = props.get('deinterlace-mode', 'auto')
         deintMethod = props.get('deinterlace-method', 'ffmpeg')
-        is_square = props.get('is-square', False)
-        width = props.get('width', None)
-        height = props.get('height', None)
 
         if deintMode not in deinterlace.DEINTERLACE_MODE:
             msg = messages.Error(T_(N_("Configuration error: '%s' " \
@@ -81,48 +78,35 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.is_square = props.get('is-square', False)
         self.width = props.get('width', 0)
         self.height = props.get('height', 0)
+        decoder = props.get('decoder', 'dvdec')
         if not self.is_square and not self.height:
             self.height = int(576 * self.width/720.) # assuming PAL
         self.add_borders = props.get('add-borders', True)
-
-        guid = props.get('guid', None)
+        guid = "guid=%s" % props.get('guid', 0)
         self.deintMode = props.get('deinterlace-mode', 'auto')
         self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
 
         fr = props.get('framerate', None)
         if fr is not None:
             self.framerate = gst.Fraction(fr[0], fr[1])
-            framerate_float = float(fr[0]) / fr[1]
-            if 12.5 < framerate_float:
-                drop_factor = 1
-            elif 6.3 < framerate_float <= 12.5:
-                drop_factor = 2
-            elif 3.2 < framerate_float <= 6.3:
-                drop_factor = 4
-            elif framerate_float <= 3.2:
-                drop_factor = 8
         else:
             self.framerate = None
-            drop_factor = 1
-
 
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can
         # replace it with videotestsrc of the same size and PAR, so we can
         # unittest the pipeline
         # need a queue in case tcpserversink blocks somehow
-        template = ('dv1394src %(guid)s'
+        template = ('dv1394src %s'
                     '    ! tee name=t'
                     '    ! queue leaky=2 max-size-time=1000000000'
                     '    ! dvdemux name=demux'
-                    '  demux. ! queue ! dvdec name=decoder drop-factor=%(df)d'
+                    '  demux. ! queue ! %s'
                     '    ! @feeder:video@'
                     '  demux. ! queue ! audio/x-raw-int '
                     '    ! volume name=setvolume'
                     '    ! level name=volumelevel message=true ! audiorate'
                     '    ! @feeder:audio@'
-                    '    t. ! queue ! @feeder:dv@'
-                    % dict(df=drop_factor,
-                           guid=(guid and ('guid=%s' % guid) or '')))
+                    '    t. ! queue ! @feeder:dv@' % (guid, decoder))
 
         return template
 
@@ -138,6 +122,23 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.addEffect(vol)
 
         decoder = pipeline.get_by_name("decoder")
+        if not decoder:
+            return
+        if gstreamer.element_has_property(decoder, 'drop-factor'):
+            if self.framerate:
+                framerate = float(self.framerate[0] / self.framerate[1])
+                if 12.5 < framerate:
+                    drop_factor = 1
+                elif 6.3 < framerate <= 12.5:
+                    drop_factor = 2
+                elif 3.2 < framerate <= 6.3:
+                    drop_factor = 4
+                elif framerate <= 3.2:
+                    drop_factor = 8
+            else:
+                drop_factor = 1
+            decoder.set_property('drop-factor', drop_factor)
+
         vr = videorate.Videorate('videorate',
             decoder.get_pad("src"), pipeline, self.framerate)
         self.addEffect(vr)
