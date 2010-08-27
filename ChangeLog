@@ -1,5 +1,10 @@
 2010-08-27  Xavier Queralt <xqueralt@gmail.com>
 
+	* configure.ac:
+	0.7.0.2 prerelase
+
+2010-08-27  Xavier Queralt <xqueralt@gmail.com>
+
 	* flumotion/admin/gtk/dialogs.py:
 	Update the list of authors.
 
