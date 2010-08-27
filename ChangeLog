@@ -1,5 +1,11 @@
 2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/component/feedcomponent.py:
+	Set the effect bin to playing otherwise it can lock on getting the
+	state.
+
+2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/common/config.py:
 	* flumotion/common/errors.py:
 	* flumotion/common/registry.py:

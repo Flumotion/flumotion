@@ -586,7 +586,7 @@ class PostProcEffect (Effect):
         peerSinkPad.unlink(peerSrcPad)
 
         # Add the deinterlacer bin to the pipeline
-        self.effectBin.set_state(self.pipeline.get_state()[1])
+        self.effectBin.set_state(gst.STATE_PLAYING)
         self.pipeline.add(self.effectBin)
 
         # link it with the element src pad and its peer's sink pad
