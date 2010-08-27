@@ -926,9 +926,7 @@ class EncoderComponent(ParseLaunchComponent):
     Component that is reconfigured when new changes arrive through the
     flumotion-reset event (sent by the fms producer).
     """
-
-    def _get_base_pipeline_string(self):
-        return self.get_pipeline_string(self.config['properties'])
+    pass
 
 
 class MuxerComponent(MultiInputParseLaunchComponent):
@@ -938,14 +936,6 @@ class MuxerComponent(MultiInputParseLaunchComponent):
     """
 
     LINK_MUXER = False
-    disconnectedPads = True
-
-    def _get_base_pipeline_string(self):
-        return self.get_muxer_string(self.config['properties'])
-
-    def _unblock_eaters(self):
-        # Let the eaters to be unblocked latter on, when they are linked
-        pass
 
     def get_link_pad(self, muxer, srcpad, caps):
         return muxer.get_compatible_pad(srcpad, caps)

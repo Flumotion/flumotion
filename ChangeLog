@@ -1,5 +1,10 @@
 2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/component/feedcomponent.py:
+	Encoders and muxers are not reconfigurable anymore.
+
+2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/component/decodercomponent.py:
 	* flumotion/component/decoders/generic/generic.xml:
 	Enable the videorate, videscale and deinterlace effects to be used
