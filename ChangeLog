@@ -1,5 +1,13 @@
 2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* pkg/ubuntu-lucid/changelog:
+	* pkg/ubuntu-lucid/control:
+	* pkg/ubuntu-lucid (added):
+	Add the packaging files for ubuntu lucid.
+	Remove unneeded build-requirements.
+
+2010-08-27  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/component/feedcomponent.py:
 	Encoders and muxers are not reconfigurable anymore.
 

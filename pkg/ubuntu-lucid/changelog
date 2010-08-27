@@ -1,0 +1,374 @@
+flumotion (0.7.0.2-1flu1~karmic1) karmic; urgency=low
+
+  * Lucid release
+
+ -- Xavier Queralt <xqueralt@flumotion.com>  Fri, 27 Aug 2010 12:30:21 +0200
+
+flumotion (0.7.0.1-1flu1~jaunty1) jaunty; urgency=low
+
+  * New version
+
+ -- Arek Korbik <arkadini@gmail.com>  Tue, 15 Sep 2009 12:52:46 +0200
+
+flumotion (0.5.4.2-1flu1~jaunty1) jaunty; urgency=low
+
+  * Update to 0.5.4.2 pre-release
+
+ -- Arek Korbik <arek@flumotion.com>  Wed, 12 Aug 2009 18:08:08 +0200
+
+flumotion (0.5.4.1-1flu1~jaunty1) jaunty; urgency=low
+
+  * Jaunty release
+  * Change maintainer to myself
+
+ -- Arek Korbik <arek@flumotion.com>  Wed, 12 Aug 2009 12:18:49 +0200
+
+flumotion (0.5.2-1flu1~hardy4) hardy; urgency=low
+
+  * Update to SVN 2008-05-07-2
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 07 May 2008 15:31:00 -0300
+
+flumotion (0.5.2-1flu1~hardy3) hardy; urgency=low
+
+  * Update to SVN 2008-05-07
+  * Fixes missing glade files.
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 07 May 2008 12:05:00 -0300
+
+flumotion (0.5.2-1flu1~hardy2) hardy; urgency=low
+
+  * Update to SVN 2008-05-06
+  * Add the flumotion user to audio & video group.
+
+ -- Johan Dahlin <johan@flumotion.com>  Tue, 06 May 2008 15:29:44 -0300
+
+flumotion (0.5.2-1flu1~hardy1) hardy; urgency=low
+
+  * New version
+  * Depend on python-kiwi, create /var/run/flumotion when starting the
+    script if it doesn't exist
+
+ -- Johan Dahlin <johan@flumotion.com>  Thu, 17 Apr 2008 09:41:49 -0300
+
+flumotion (0.5.1.1-1flu1~hardy3) hardy; urgency=low
+
+  * Depend on cortado and gstreamer0.10-schroedinger
+  * Build-depend on python-rrd
+
+ -- Johan Dahlin <johan@flumotion.com>  Thu, 17 Apr 2008 09:41:49 -0300
+
+flumotion (0.5.1.1-1flu1~hardy2) hardy; urgency=low
+
+  * New orig tarball
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:57:37 -0300
+
+flumotion (0.5.1.1-1flu1~hardy1) hardy; urgency=low
+
+  * Change versioning scheme again
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:46:48 -0300
+
+flumotion (0.5.1.1-0flu1~hardy1) hardy; urgency=low
+
+  * Hardy release
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:40:02 -0300
+
+flumotion (0.5.1.1-0flu7) hardy; urgency=low
+
+  * Hardy release
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 18:24:36 -0300
+
+flumotion (0.5.1.1-0flu6) gutsy; urgency=low
+
+  * Depends on python-rrdtool and build-depends on python-epydoc,
+  * Change maintainer to myself
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 14:48:39 -0300
+
+flumotion (0.5.1.1-0flu5) gutsy; urgency=low
+
+  * Add a dependency of kiwi 1.9.14 and pygobject 2.12.0
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 13:26:47 -0300
+
+flumotion (0.5.1.1-0flu4) gutsy; urgency=low
+
+  * build-depends on intltool
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 13:10:26 -0300
+
+flumotion (0.5.1.1-0flu3) gutsy; urgency=low
+
+  * Build for gutsy, copy files instead of symlink in autogen
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 12:38:43 -0300
+
+flumotion (0.5.1.1-0flu2) hardy; urgency=low
+
+  * New attempt, run maintainer-clean before and remove leftover patches in
+    the tree before uploading source.
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 11:52:26 -0300
+
+flumotion (0.5.1.1-0flu1) hardy; urgency=low
+
+  * New test release
+
+ -- Johan Dahlin <johan@flumotion.com>  Wed, 16 Apr 2008 10:39:20 -0300
+
+flumotion (0.4.2-2) unstable; urgency=low
+
+  * Wrap build-deps and deps.
+  * Depend on python-twisted-web for the HTTP stream to work; thanks
+    Riccardo Setti; closes: #432568.
+  * Bump up Debhelper compatibility level to 5.
+
+ -- Loic Minier <lool@dooz.org>  Wed, 11 Jul 2007 09:30:13 +0200
+
+flumotion (0.4.2-1) unstable; urgency=low
+
+  * New upstream stable release; "Belchica Strikes Back"; new upstream stable
+    series; closes: #424916.
+    - Downgrade libgstreamer0.10-dev build-dep and dep to >= 0.10.0.1.
+    - Bump up python-twisted build-dep and dep to >= 2.0.1.
+    - Only depend on python-twisted-core instead of python-twisted.
+    - Drop patch 20_depend-audiotest-for-volume-effect_r4358, merged upstream.
+    - Convert the configuration file of the "default" manager instance on
+      upgrades from 0.4.1; preserve permissions and keep a backup.
+    - Update default confirugation file of the package.
+    - Purge the backup on purge.
+    - Document how to upgrade configuration files in NEWS.Debian and mention
+      the automatic upgrade; depend on xsltproc.
+    - Install the new logrotate configuration file.
+    - Depend on python-gobject.
+    - Fix executable bit of usr/share/flumotion/make-dummy-cert.
+    - Switch to Arch: any for the fdpass extension and re-add the pytrayicon
+      extension; add shlibs:Depends and misc:Depends.
+    - Correctly builds against newer pygtks; closes: #422656.
+  * Rename postrm to flumotion.postrm, init to flumotion.init, and install to
+    flumotion.install.
+  * Ship sample configuration files in the examples dir.
+  * Drop dh_python call.
+  * Use debian/flumotion.docs instead of DEB_INSTALL_DOCS_flumotion.
+
+ -- Loic Minier <lool@dooz.org>  Sun, 27 May 2007 17:28:40 +0200
+
+flumotion (0.2.2-6) unstable; urgency=high
+
+  * New patch, 20_depend-audiotest-for-volume-effect_r4358, to properly depend
+    on the audiotest component for volume effect, fixes a visible and annoying
+    bug in the default pipeline; from upstream SVN r4358.
+
+ -- Loic Minier <lool@dooz.org>  Tue, 19 Dec 2006 10:40:17 +0100
+
+flumotion (0.2.2-5) unstable; urgency=medium
+
+  * Build-depend on autotools-dev for CDBS's config.guess and config.sub
+    auto-update to work.
+  * Document that you need to add the flumotion user to the relevant groups to
+    stream audio, video etc.; thanks Pablo Lorenzzoni; closes: #401976.
+  * Set XS-Python-Version to >= 2.3 instead of current.
+
+ -- Loic Minier <lool@dooz.org>  Fri, 15 Dec 2006 14:18:26 +0100
+
+flumotion (0.2.2-4) unstable; urgency=low
+
+  * Document that you should use user/test to connect to flumotion.
+
+ -- Loic Minier <lool@dooz.org>  Fri, 10 Nov 2006 15:31:49 +0100
+
+flumotion (0.2.2-3) unstable; urgency=high
+
+  * Simple rebuild against current python-defaults should make flumotion-admin
+    use the python2.4 Gtk2 bindings instead of the python2.3 bindings which
+    are currently broken; see #396694 and #396840; closes: #397896.
+  * Merge debian/postinst in debian/flumotion.postinst; fixes creation of the
+    flumotion user, doh! closes: #397897.
+  * Fix typo in changelog entry of 0.2.2-2.
+
+ -- Loic Minier <lool@dooz.org>  Fri, 10 Nov 2006 13:39:17 +0100
+
+flumotion (0.2.2-2) unstable; urgency=low
+
+  * Restart flumotion after the byte-compilation in postinst to workaround
+    #386970.
+
+ -- Loic Minier <lool@dooz.org>  Tue,  3 Oct 2006 16:50:42 +0200
+
+flumotion (0.2.2-1) unstable; urgency=low
+
+  * New upstream release, "IT".
+    - Bump up python-gtk2-dev >= 2.8.0 per .spec file.
+    - Ship flumotion.doap.
+    - Update patch 10_preserve-umask.
+  * Fix bashism in debian/rules.
+  * Bump up python-central build-dep as lintian suggests.
+  * Add CDBS' utils.
+  * Set DEB_CONFIGURE_SCRIPT_ENV to ignore DISPLAY via "env -u".
+  * Uncomment the user / test account in the default configuration since the
+    authentication policy switched to fail by default instead of accepting
+    anything; document the change in NEWS.Debian.
+
+ -- Loic Minier <lool@dooz.org>  Sat, 30 Sep 2006 19:46:59 +0200
+
+flumotion (0.2.1-3) unstable; urgency=low
+
+  * Update rtupdate script to:
+    - handle calls with three arguments.
+    - stop on pre-rtupdate and start on post-rtupdate.
+    - use LSB init functions.
+
+ -- Loic Minier <lool@dooz.org>  Thu,  3 Aug 2006 22:27:11 +0200
+
+flumotion (0.2.1-2) unstable; urgency=low
+
+  * Install rtupdate script manually to fix its permissions.
+  * Cleanup rtupdate script.
+  * Simple rebuild against python-gst0.10 0.10.4-5 to get a correct (2.3)
+    pyexecdir.
+
+ -- Loic Minier <lool@dooz.org>  Tue, 11 Jul 2006 23:05:25 +0200
+
+flumotion (0.2.1-1) unstable; urgency=low
+
+  * New upstream release, "Angel".
+    - Recommend python-gnome2 for gnomevfs support for clickable HTTP URLs.
+      [debian/control]
+  * Add watch file.
+  * Update to new Python policy.
+    - Bump up debhelper build-dep to >= 5.0.37.2.
+    - Set Python compatibility level to 2.
+    - Add XB-Python-Version to flumotion.
+    - Add a python-central (>= 0.4.17) build-dep.
+    - Build-depend on cdbs (>= 0.4.43).
+    - Add a XS-Python-Version (current).
+    - Call dh_pycentral to fill XB-Python-Version and add a pycentral dep.
+    - Add flumotion.rtupdate script to restart flumotion when the Python
+      runtime is changed.
+
+ -- Loic Minier <lool@dooz.org>  Sat,  8 Jul 2006 20:37:54 +0200
+
+flumotion (0.2.0-1) unstable; urgency=low
+
+  * New upstream release, "San Telmo".
+    - Switch to GStreamer 0.10.
+      . Bump up python-gtk2-dev build-dep to >= 2.6.3.
+        [debian/control]
+      . Add a python-gst0.10 (>= 0.10.1) build-dep.
+        [debian/control]
+      . Add a libgstreamer0.10-dev (>= 0.10.1) build-dep.
+        [debian/control]
+      . Drop libgstreamer0.8-dev build-dep.
+        [debian/control]
+      . Drop python-gst build-dep.
+        [debian/control]
+      . Change the python-gst dep in a python-gst0.10 dep and bump the version
+        requirement to >= 0.10.1.
+        [debian/control]
+      . Drop the gstreamer0.8-misc, gstreamer0.8-vorbis, gstreamer0.8-speex,
+        and gstreamer0.8-theora deps and add gstreamer0.10-plugins-base,
+        and gstreamer0.10-plugins-good deps.
+    - Build-depend on python-twisted-names and python-twisted-web explicitely
+      as these are checked for in the configure.ac.
+      [debian/control]
+    - Document the change in the XML config format and suggest xsltproc.
+      [debian/control, debian/NEWS]
+  * Add a TODO list.
+    [debian/TODO.Debian]
+  * Remove default.pem generated by postinst in postrm.
+    [debian/postrm]
+  * New patch to preserve umask and hence create log files and pid files with
+    the default umask instead of world-writable.
+    [debian/patches/10_preserve-umask.patch]
+  * Create various runtime directories.
+    [debian/dirs]
+  * Create flumotion user:group and let it own /var/cache/flumotion,
+    /var/log/flumotion, and /var/run/flumotion; depend on adduser; clean these
+    directories on purge.
+    [debian/postinst, debian/control, debian/postrm]
+  * Init script from skeleton and upstream.
+    [debian/init]
+  * Don't install binary helper for tray icon for now.
+    [debian/rules]
+  * Move most build-deps to build-depends-indep.
+    [debian/control]
+  * Build-depend on python.
+    [debian/control]
+  * Bump up Standards-Version to 3.7.2.
+    [debian/control]
+  * Force executable bit on files looking like python scripts below
+    /usr/lib/flumotion.
+    [debian/rules]
+  * Install upstream's default conf in /usr/share/doc/flumotion/example-conf.
+    [debian/install]
+  * Some notes on usage.
+    [debian/README.Debian]
+  * Update description.
+    [debian/control]
+  * Protect /etc/flumotion with a chmod 750.
+    [debian/rules]
+  * Ship a default worker which connects without password to the manager.
+    [debian/worker.xml, debian/install]
+
+ -- Loic Minier <lool@dooz.org>  Wed, 17 May 2006 20:42:21 +0200
+
+flumotion (0.1.7-1) unstable; urgency=low
+
+  * Imported from Ubuntu.
+  * Set myself as Maintainer:.
+    [debian/control]
+  * Bump-up Standards-Version to 3.6.2.
+    [debian/control]
+  * Enhance the contents of the copyright file.
+    [debian/copyright]
+
+ -- Loic Minier <lool@dooz.org>  Tue, 24 Jan 2006 22:58:18 +0100
+
+flumotion (0.1.7-0ubuntu1) hoary; urgency=low
+
+  * New upstream release
+    - Unsplit for now, will do this for breezy
+
+ -- Jeff Waugh <jeff.waugh@ubuntu.com>  Wed,  6 Apr 2005 03:31:04 +1000
+
+flumotion (0.1.6-0ubuntu1) hoary; urgency=low
+
+  * New upstream release
+  * Split into component packages
+  * Depend on python-pyopenssl
+  * debian/planet.xml:
+    - Listen on localhost:7531, via ssl by default
+
+ -- Jeff Waugh <jeff.waugh@ubuntu.com>  Sat, 19 Feb 2005 18:07:23 +1100
+
+flumotion (0.1.5-0ubuntu1) hoary; urgency=low
+
+  * New upstream release
+
+ -- Jeff Waugh <jeff.waugh@ubuntu.com>  Tue, 25 Jan 2005 22:22:00 +1100
+
+flumotion (0.1.3-3) hoary; urgency=low
+
+  * debian/control:
+    - Build-Depend on python-epydoc and libgstreamer0.8-dev.
+
+ -- Jeff Waugh <jeff.waugh@canonical.com>  Thu,  2 Dec 2004 14:08:12 +1100
+
+flumotion (0.1.3-2) hoary; urgency=low
+
+  * debian/control:
+    - Build-Depend on pkg-config, Depend on gstreamer0.8-misc >= 0.8.6 for
+      the tcp fix.
+
+ -- Jeff Waugh <jeff.waugh@canonical.com>  Tue, 30 Nov 2004 18:35:57 +1100
+
+flumotion (0.1.3-1) hoary; urgency=low
+
+  * Initial Release
+
+ -- Jeff Waugh <jdub@perkypants.org>  Tue, 01 Jun 2004 16:14:59 +1000
+
