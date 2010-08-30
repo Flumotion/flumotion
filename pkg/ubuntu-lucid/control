@@ -11,6 +11,7 @@ Build-Depends: cdbs,
                libgstreamer-plugins-base0.10-dev (>= 0.10.1),
                python-gst0.10 (>= 0.10.1),
                python,
+               python-dev,
                python-central (>= 0.5),
                autotools-dev
 Standards-Version: 3.7.3

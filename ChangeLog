@@ -1,3 +1,11 @@
+2010-08-30  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* pkg/ubuntu-karmic/control:
+	* pkg/ubuntu-lucid/control:
+	Add missing 'python-dev' build dependency
+
 2010-08-27  Xavier Queralt <xqueralt@gmail.com>
 
 	* configure.ac:
