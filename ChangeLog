@@ -1,5 +1,10 @@
 2010-08-31  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/test/test_wizard_save.py:
+	Fix tests to work with the new default configuration
+
+2010-08-31  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* configure.ac:
 	* pkg/ubuntu-karmic/changelog:
 	* pkg/ubuntu-lucid/changelog:
