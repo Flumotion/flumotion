@@ -1,5 +1,12 @@
 2010-08-31  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* configure.ac:
+	* pkg/ubuntu-karmic/changelog:
+	* pkg/ubuntu-lucid/changelog:
+	0.7.0.3 pre-release
+
+2010-08-31  Xavier Queralt  <xqueralt@flumotion.com>
+
 	reviewed by: Andoni Morales
 
 	* flumotion/component/producers/firewire/wizard_gtk.py:
