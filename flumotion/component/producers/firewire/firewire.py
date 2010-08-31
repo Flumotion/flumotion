@@ -100,7 +100,7 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     '    ! tee name=t'
                     '    ! queue leaky=2 max-size-time=1000000000'
                     '    ! dvdemux name=demux'
-                    '  demux. ! queue ! %s'
+                    '  demux. ! queue ! %s name=decoder'
                     '    ! @feeder:video@'
                     '  demux. ! queue ! audio/x-raw-int '
                     '    ! volume name=setvolume'
@@ -122,11 +122,9 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         self.addEffect(vol)
 
         decoder = pipeline.get_by_name("decoder")
-        if not decoder:
-            return
         if gstreamer.element_has_property(decoder, 'drop-factor'):
             if self.framerate:
-                framerate = float(self.framerate[0] / self.framerate[1])
+                framerate = float(self.framerate.num / self.framerate.denom)
                 if 12.5 < framerate:
                     drop_factor = 1
                 elif 6.3 < framerate <= 12.5:
