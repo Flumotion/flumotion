@@ -2,6 +2,13 @@
 
 	reviewed by: Andoni Morales
 
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	Default to gstreamer's deinterlace
+
+2010-08-31  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: Andoni Morales
+
 	* flumotion/component/producers/firewire/firewire.py:
 	Set the name to the decoder so the effects can be plugged properly
 

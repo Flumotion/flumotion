@@ -47,6 +47,7 @@ class FireWireProducer(AudioProducer, VideoProducer):
         self.properties.is_square = True
         self.properties.framerate = 12.5
         self.properties.decoder = 'ffdec_dvvideo'
+        self.properties.deinterlace_mode = 'tomsmocomp'
 
     def __eq__(self, other):
         if not isinstance(other, FireWireProducer):
