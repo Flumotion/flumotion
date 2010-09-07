@@ -156,6 +156,7 @@ flumotion/component/base/Makefile
 flumotion/component/bouncers/Makefile
 flumotion/component/bouncers/algorithms/Makefile
 flumotion/component/effects/Makefile
+flumotion/component/effects/audiorate/Makefile
 flumotion/component/effects/colorbalance/Makefile
 flumotion/component/effects/deinterlace/Makefile
 flumotion/component/effects/videorate/Makefile

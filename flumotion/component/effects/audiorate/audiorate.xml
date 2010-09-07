@@ -1,0 +1,30 @@
+<registry>
+  <bundles>
+
+    <bundle name="audiorate-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/audiorate">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="audiorate-effect">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="audiorate-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/audiorate">
+                <filename location="audiorate.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry>

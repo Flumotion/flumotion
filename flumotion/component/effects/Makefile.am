@@ -10,6 +10,7 @@ clean-local:
 	rm -rf *.pyc *.pyo
 
 SUBDIRS = \
+	audiorate \
 	colorbalance \
 	deinterlace  \
 	videorate \

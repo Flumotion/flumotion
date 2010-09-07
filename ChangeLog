@@ -1,5 +1,18 @@
 2010-09-07  Xavier Queralt  <xqueralt@flumotion.com>
 
+	reviewed by: Andoni Morales
+
+	* configure.ac:
+	* flumotion/component/effects/Makefile.am:
+	* flumotion/component/effects/audiorate:
+	* flumotion/component/effects/audiorate/Makefile.am:
+	* flumotion/component/effects/audiorate/__init__.py:
+	* flumotion/component/effects/audiorate/audiorate.py:
+	* flumotion/component/effects/audiorate/audiorate.xml:
+	Add an effect to resample audio streams
+
+2010-09-07  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/component/decoders/generic/generic.xml:
 	Remove the deinterlace effect from the decoder for now
 
