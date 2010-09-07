@@ -1,5 +1,10 @@
 2010-09-07  Xavier Queralt  <xqueralt@flumotion.com>
 
+	* flumotion/component/decoders/generic/generic.xml:
+	Remove the deinterlace effect from the decoder for now
+
+2010-09-07  Xavier Queralt  <xqueralt@flumotion.com>
+
 	* flumotion/test/test_wizard_save.py:
 	Fix tests to work with the new default configuration
 

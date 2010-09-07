@@ -30,10 +30,6 @@
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
        <property name="add-borders" type="bool"
                  _description="Add black borders if DAR can't be kept." />
-       <property name="deinterlace-mode" type="string"
-                  _description="Deinterlace mode.(Default=auto)" />
-       <property name="deinterlace-method" type="string"
-                  _description="Deinterlace method.(Default=ffmpeg)" />
       </properties>
     </component>
 
@@ -65,10 +61,6 @@
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
        <property name="add-borders" type="bool"
                  _description="Add black borders if DAR can't be kept." />
-       <property name="deinterlace-mode" type="string"
-                  _description="Deinterlace mode.(Default=auto)" />
-       <property name="deinterlace-method" type="string"
-                  _description="Deinterlace method.(Default=ffmpeg)" />
       </properties>
     </component>
 
@@ -78,8 +70,8 @@
         <dependencies>
             <dependency name="decoders-base" />
             <dependency name="volume-effect" />
-            <dependency name="deinterlace-effect" />
             <dependency name="videoscale-effect" />
+            <dependency name="videorate-effect" />
         </dependencies>
         <directories>
             <directory name="flumotion/component/decoders/generic">
