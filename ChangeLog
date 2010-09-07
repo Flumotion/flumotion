@@ -1,3 +1,8 @@
+2010-09-07  Josep Joan Ribas  <jribas@flumotion.com>
+
+	* flumotion/component/component.py:
+	Add remote call to get the mood of the component.
+
 2010-09-01  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/component/decodercomponent.py:

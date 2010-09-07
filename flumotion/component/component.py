@@ -271,6 +271,11 @@ class BaseComponentMedium(medium.PingingMedium):
         """
         return self.comp.uiState
 
+    def remote_getMood(self):
+        """Get mood of the component
+        """
+        return self.comp.getMood()
+
     def remote_getMasterClockInfo(self):
         """
         Base implementation of getMasterClockInfo, can be overridden by
