@@ -28,7 +28,7 @@ import gst.interfaces
 
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common import errors, messages
-from flumotion.component.effects.deinterlace import deinterlace
+from flumotion.component.effects.audiorate import audiorate
 from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
 from flumotion.component import feedcomponent as fc
@@ -45,25 +45,6 @@ class DecoderComponent(fc.ReconfigurableComponent):
 
     _feeders_info = []
 
-    def check_properties(self, props, addMessage):
-        props = self.config['properties']
-        deintMode = props.get('deinterlace-mode', 'auto')
-        deintMethod = props.get('deinterlace-method', 'ffmpeg')
-
-        if deintMode not in deinterlace.DEINTERLACE_MODE:
-            msg = messages.Error(T_(N_("Configuration error: '%s' " \
-                "is not a valid deinterlace mode." % deintMode)))
-            addMessage(msg)
-            raise errors.ConfigError(msg)
-
-        if deintMethod not in deinterlace.DEINTERLACE_METHOD:
-            msg = messages.Error(T_(N_("Configuration error: '%s' " \
-                "is not a valid deinterlace method." % deintMethod)))
-            self.debug("'%s' is not a valid deinterlace method",
-                deintMethod)
-            addMessage(msg)
-            raise errors.ConfigError(msg)
-
     def configure_pipeline(self, pipeline, properties):
         # Handle decoder dynamic pads
         eater = self.eaters.values()[0]
@@ -74,6 +55,7 @@ class DecoderComponent(fc.ReconfigurableComponent):
         decoder.connect('new-decoded-pad', self._new_decoded_pad_cb)
 
         self._add_video_effects()
+        self._add_audio_effects()
 
     def get_output_elements(self):
         return [self.get_element(i.name + '-output')
@@ -95,8 +77,6 @@ class DecoderComponent(fc.ReconfigurableComponent):
         # Add the effects to the component but don't plug them until we have a
         # valid video pad
         props = self.config['properties']
-        deintMode = props.get('deinterlace-mode', 'auto')
-        deintMethod = props.get('deinterlace-method', 'ffmpeg')
         is_square = props.get('is-square', False)
         add_borders = props.get('add-borders', False)
         width = props.get('width', None)
@@ -110,19 +90,22 @@ class DecoderComponent(fc.ReconfigurableComponent):
         #self.vr.effectBin.set_state(gst.STATE_PLAYING)
         self.debug("Videorate added")
 
-        self.deinterlacer = deinterlace.Deinterlace('deinterlace',
-            None, self.pipeline,
-            deintMode, deintMethod)
-        self.addEffect(self.deinterlacer)
-        #self.deinterlacer.effectBin.set_state(gst.STATE_PLAYING)
-        self.debug("Deinterlacer added")
-
         self.videoscaler = videoscale.Videoscale('videoscale', self,
             None, self.pipeline,
             width, height, is_square, add_borders)
         self.addEffect(self.videoscaler)
         #self.videoscaler.effectBin.set_state(gst.STATE_PLAYING)
         self.debug("Videoscaler  added")
+
+    def _add_audio_effects(self):
+        # Add the effects to the component but don't plug them until we have a
+        # valid video pad
+        props = self.config['properties']
+        samplerate = props.get('samplerate', 44100)
+
+        self.ar = audiorate.Audiorate('audiorate', None,
+                                      self.pipeline, samplerate)
+        self.addEffect(self.ar)
 
     def _new_decoded_pad_cb(self, decoder, pad, last):
         self.log("Decoder %s got new decoded pad %s", decoder, pad)
@@ -148,6 +131,8 @@ class DecoderComponent(fc.ReconfigurableComponent):
             # Plug effects
             if 'video' in pad_caps.to_string():
                 self._plug_video_effects(pad)
+            if 'audio' in pad_caps.to_string():
+                self._plug_audio_effects(pad)
             return
 
         self.info("No feeder found for decoded pad %s with caps %s",
@@ -156,7 +141,9 @@ class DecoderComponent(fc.ReconfigurableComponent):
     def _plug_video_effects(self, pad):
         self.vr.sourcePad = pad
         self.vr.plug()
-        self.deinterlacer.sourcePad = self.vr.effectBin.get_pad("src")
-        self.deinterlacer.plug()
-        self.videoscaler.sourcePad = self.deinterlacer.effectBin.get_pad("src")
+        self.videoscaler.sourcePad = self.vr.effectBin.get_pad("src")
         self.videoscaler.plug()
+
+    def _plug_audio_effects(self, pad):
+        self.ar.sourcePad = pad
+        self.ar.plug()

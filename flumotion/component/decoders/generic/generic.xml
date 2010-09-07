@@ -19,17 +19,19 @@
 		  _description="Decides whether the component decodes an audio or a video stream. Should be set to either &quot;audio&quot; or &quot;video&quot;." />
         <property name="blacklist" type="string" multiple="true"
                   _description="Forbid the decoder from using some elements." />
-       <!-- Effects related properties -->
-       <property name="width" type="int"
-                  _description="The width to capture the video at." />
-       <property name="height" type="int"
-                  _description="The height to capture the video at." />
-       <property name="framerate" type="fraction"
-                  _description="Output framerate" />
+        <!-- Effects related properties -->
+        <property name="width" type="int"
+                  _description="The width to scale the video at." />
+        <property name="height" type="int"
+                  _description="The height to scale the video at." />
+        <property name="framerate" type="fraction"
+                  _description="Output framerate." />
+        <property name="samplerate" type="int"
+                  _description="Output samplerate." />
         <property name="is-square" type="bool"
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
-       <property name="add-borders" type="bool"
-                 _description="Add black borders if DAR can't be kept." />
+        <property name="add-borders" type="bool"
+                  _description="Add black borders if DAR can't be kept." />
       </properties>
     </component>
 
@@ -50,17 +52,19 @@
       <properties>
         <property name="blacklist" type="string" multiple="true"
                   _description="Forbid the decoder from using some elements." />
-       <!-- Effects related properties -->
-       <property name="width" type="int"
-                  _description="The width to capture the video at." />
-       <property name="height" type="int"
-                  _description="The height to capture the video at." />
-       <property name="framerate" type="fraction"
-                  _description="Output framerate" />
-       <property name="is-square" type="bool"
+        <!-- Effects related properties -->
+        <property name="width" type="int"
+                  _description="The width to scale the video at." />
+        <property name="height" type="int"
+                  _description="The height to scale the video at." />
+        <property name="framerate" type="fraction"
+                  _description="Output framerate." />
+        <property name="samplerate" type="int"
+                  _description="Output samplerate." />
+        <property name="is-square" type="bool"
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
-       <property name="add-borders" type="bool"
-                 _description="Add black borders if DAR can't be kept." />
+        <property name="add-borders" type="bool"
+                  _description="Add black borders if DAR can't be kept." />
       </properties>
     </component>
 
@@ -69,7 +73,7 @@
     <bundle name="generic-decoder-component">
         <dependencies>
             <dependency name="decoders-base" />
-            <dependency name="volume-effect" />
+            <dependency name="audiorate-effect" />
             <dependency name="videoscale-effect" />
             <dependency name="videorate-effect" />
         </dependencies>

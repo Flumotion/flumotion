@@ -1,3 +1,10 @@
+2010-09-01  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/component/decodercomponent.py:
+	* flumotion/component/decoders/generic/generic.xml:
+	Add the audiorate effect to the decoder's audio output.
+	Completelly remove the deinterlace effect from the decoder.
+
 2010-09-07  Xavier Queralt  <xqueralt@flumotion.com>
 
 	reviewed by: Andoni Morales
