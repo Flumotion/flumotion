@@ -25,7 +25,8 @@ from flumotion.common import testsuite
 
 from flumotion.common import keycards
 from flumotion.common.planet import moods
-from flumotion.component.bouncers import multibouncer
+from flumotion.component import component
+from flumotion.component.bouncers import multibouncer, multibouncerplug
 from flumotion.component.bouncers import base as bouncers_base
 from flumotion.component.bouncers.algorithms import base
 
@@ -45,31 +46,11 @@ class AcceptingPlug(base.BouncerAlgorithm):
         return keycard
 
 
-def _get_bouncer(combination):
+class MultiBouncerTestCase(object):
+    """This is test case both for MultiBouncer and MultiBouncerPlug"""
 
-    def plugStructure(module, function):
-        socket = ".".join([module, function])
-        return \
-            {'type': function,
-             'socket': socket,
-             'entries': {'default':
-                   {'function-name': function,
-                    'module-name': module}},
-             'properties': {}}
-
-    plugs = {bouncers_base.BOUNCER_ALGORITHM_SOCKET:
-                [plugStructure('flumotion.test.test_bouncers_multibouncer', \
-                    'AcceptingPlug'),
-                 plugStructure('flumotion.test.test_bouncers_multibouncer', \
-                    'RejectingPlug')]}
-
-    props = {'name': 'testbouncer',
-             'plugs': plugs,
-             'properties': {'combination': combination}}
-    return multibouncer.MultiBouncer(props)
-
-
-class TestMultiBouncer(bouncertest.BouncerTestHelper):
+    def _testCase(self, *a):
+        raise NotImplementedError("Not impleneted error")
 
     def setUp(self):
         keycard = keycards.KeycardGeneric()
@@ -77,11 +58,6 @@ class TestMultiBouncer(bouncertest.BouncerTestHelper):
         keycard.password = 'test'
         keycard.address = '62.121.66.134'
         self.keycard = keycard
-
-    def _testCase(self, combination, result):
-        bouncer = _get_bouncer(combination)
-        d = self.check_auth(self.keycard, bouncer, result)
-        return self.stop_bouncer(bouncer, d)
 
     def testAndOperatorTrue(self):
         return self._testCase('AcceptingPlug and AcceptingPlug', True)
@@ -101,3 +77,84 @@ class TestMultiBouncer(bouncertest.BouncerTestHelper):
 
     def testOrOperatorTrue(self):
         return self._testCase('AcceptingPlug or RejectingPlug', True)
+
+
+class TestMultiBouncerPlug(bouncertest.BouncerTestHelper,\
+        MultiBouncerTestCase):
+
+    setUp = MultiBouncerTestCase.setUp
+
+    def _getComponentAndBouncer(self, combination):
+
+        def plugStructure(module, function):
+            socket = ".".join([module, function])
+            return \
+                {'type': function,
+                'socket': socket,
+                'entries': {'default':
+                    {'function-name': function,
+                        'module-name': module}},
+                'properties': {}}
+
+        plugs = {bouncers_base.BOUNCER_ALGORITHM_SOCKET:
+            [plugStructure('flumotion.test.test_bouncers_multibouncer', \
+                'AcceptingPlug'),
+             plugStructure('flumotion.test.test_bouncers_multibouncer', \
+                'RejectingPlug')]}
+
+        bouncer_props = {'name': 'testbouncer',
+                'plugs': {},
+                'properties': {'combination': combination}}
+        component_props = {'name': 'component',
+                'plugs': plugs,
+                'properties': {}}
+
+        comp = component.BaseComponent(component_props)
+        bouncer = multibouncerplug.MultiBouncerPlug(bouncer_props)
+        bouncer.start(comp)
+        return comp, bouncer
+
+    def stop_bouncer(self, bouncer, d, component):
+
+        def _stop(res):
+            bouncer.stop(component)
+            return res
+        return d.addBoth(_stop)
+
+    def _testCase(self, combination, result):
+        component, bouncer = self._getComponentAndBouncer(combination)
+        d = self.check_auth(self.keycard, bouncer, result)
+        return self.stop_bouncer(bouncer, d, component)
+
+
+class TestMultiBouncer(bouncertest.BouncerTestHelper, MultiBouncerTestCase):
+
+    setUp = MultiBouncerTestCase.setUp
+
+    def _testCase(self, combination, result):
+        bouncer = self._getBouncer(combination)
+        d = self.check_auth(self.keycard, bouncer, result)
+        return self.stop_bouncer(bouncer, d)
+
+    def _getBouncer(self, combination):
+
+        def plugStructure(module, function):
+            socket = ".".join([module, function])
+            return \
+                {'type': function,
+                'socket': socket,
+                'entries': {'default':
+                    {'function-name': function,
+                        'module-name': module}},
+                'properties': {}}
+
+        plugs = {bouncers_base.BOUNCER_ALGORITHM_SOCKET:
+            [plugStructure('flumotion.test.test_bouncers_multibouncer', \
+                'AcceptingPlug'),
+             plugStructure('flumotion.test.test_bouncers_multibouncer', \
+                'RejectingPlug')]}
+
+        props = {'name': 'testbouncer',
+                'plugs': plugs,
+                'properties': {'combination': combination}}
+        return multibouncer.MultiBouncer(props)
