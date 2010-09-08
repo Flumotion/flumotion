@@ -48,7 +48,7 @@ class AcceptingPlug(base.BouncerAlgorithm):
 def _get_bouncer(combination):
 
     def plugStructure(module, function):
-        socket = ".".join(module, function)
+        socket = ".".join([module, function])
         return \
             {'type': function,
              'socket': socket,
