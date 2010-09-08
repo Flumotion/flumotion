@@ -1,3 +1,8 @@
+2010-09-08  Marek Kowalski  <mkowalski@flumotion.com>
+
+	* flumotion/test/test_bouncers_multibouncer.py:
+	Add simple tests for multibouncer combination logic.
+
 2010-09-07  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/component/component.py:
