@@ -38,6 +38,9 @@
   ../flumotion-$VERSION/env ./autogen
   ../flumotion-$VERSION/env make
   ../flumotion-$VERSION/env make pdf
+* browse the documentation in flumotion.net, check if it's the current version
+* download the tarball, unpack it, run flumotion from it (ideally run
+  make install in a virtual machine), check if the wizard scenarios work and that things run
 * fix up ticket list to do and milestone (trac)
 * add version in trac
 * add news entry on site (edit flumotion.net/src/htdocs/news/news.xml, then commit)

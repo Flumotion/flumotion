@@ -40,9 +40,9 @@ Things to do before the release
 -------------------------
  * commit new warnings about broken components
  * verify that you have no open bugs with the release milestone
- * (optional) wrap up prerelase packages
- * (optional) build PPA packages for the prerelase
- * (optional) build other packages, like RPMs or Debian .debs
+ * wrap up prerelase packages
+ * build PPA packages for the prerelase
+ * build other packages, like RPMs or Debian .debs
 
 1 day before the release
 ------------------------
