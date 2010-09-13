@@ -1,5 +1,10 @@
 2010-09-13  Marek Kowalski  <mkowalski@flumotion.com>
 
+	* flumotion/component/bouncers/multibouncerplug.py
+	Fixed one more incompatibility with 2.4.
+
+2010-09-13  Marek Kowalski  <mkowalski@flumotion.com>
+
 	* flumotion/component/bouncers/multibouncer.py
 	Fixed usage of Expection().message argument incompatible with 2.4
 
