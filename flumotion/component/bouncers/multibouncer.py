@@ -108,7 +108,7 @@ class MultiBouncer(component.Bouncer):
             self.combinator.create_combination(spec)
         except combinator.ParseException, e:
             m = messages.Error(T_(N_(
-                        "Invalid algorithms combination: %s"), e.message),
+                        "Invalid algorithms combination: %s"), str(e)),
                                mid='wrong-combination')
             self.addMessage(m)
             raise errors.ComponentSetupHandledError()
