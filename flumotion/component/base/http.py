@@ -278,6 +278,7 @@ class HTTPAuthentication(log.Loggable):
         Expire a client's connection associated with the keycard Id.
         """
         keycard = self._idToKeycard[keycardId]
+
         fd = keycard._fd
 
         self.debug('[fd %5d] expiring client' % fd)
@@ -296,8 +297,9 @@ class HTTPAuthentication(log.Loggable):
             try:
                 self.expireKeycard(keycardId)
                 expired += 1
-            except:
-                pass
+            except KeyError, e:
+                self.warn("Failed to expire keycard %r: %s",
+                          keycardId, log.getExceptionMessage(e))
         return expired
 
     ### resource.Resource methods

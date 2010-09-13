@@ -23,14 +23,18 @@ from twisted.internet import defer
 
 from flumotion.common import testsuite
 
-from flumotion.common import keycards
+from flumotion.common import keycards, errors
 from flumotion.common.planet import moods
 from flumotion.component import component
-from flumotion.component.bouncers import multibouncer, multibouncerplug
+from flumotion.component.base import http
+from flumotion.component.bouncers import multibouncer, multibouncerplug, \
+                                         combinator
 from flumotion.component.bouncers import base as bouncers_base
 from flumotion.component.bouncers.algorithms import base
 
 from flumotion.test import bouncertest
+
+import pyparsing
 
 
 class RejectingPlug(base.BouncerAlgorithm):
@@ -46,11 +50,60 @@ class AcceptingPlug(base.BouncerAlgorithm):
         return keycard
 
 
+class MultiBouncerTestHelper(object):
+    """This is a helper used by both testcases to simulate
+    the job of the registery.
+    Basicaly I need this to use my own bouncer mocks"""
+
+    def plugStructure(self, module, function, properties={}):
+        socket = ".".join([module, function])
+        return \
+            {'type': function,
+            'socket': socket,
+            'entries': {'default':
+                {'function-name': function,
+                    'module-name': module}},
+            'properties': properties}
+
+    def _plugsAcceptingRejectingAndMulti(self, combination):
+        plugs = self._plugsAcceptingAndRejecting()
+        return self._addMultibouncerPlug(plugs, combination)
+
+    def _addMultibouncerPlug(self, plugs, combination):
+        plugSocket = 'flumotion.component.bouncers.multibouncerplug'
+        plugs[bouncers_base.BOUNCER_SOCKET] = \
+            [self.plugStructure(plugSocket,
+             'MultiBouncerPlug', {'combination': combination})]
+        return plugs
+
+    def _plugsAcceptingAndRejecting(self):
+        module = 'flumotion.test.test_bouncers_multibouncer'
+        return \
+            {bouncers_base.BOUNCER_ALGORITHM_SOCKET:
+                [self.plugStructure(module, 'AcceptingPlug'),
+                 self.plugStructure(module, 'RejectingPlug')]}
+
+    def _plugsTwiceAccepting(self):
+        module = 'flumotion.test.test_bouncers_multibouncer'
+        return \
+            {bouncers_base.BOUNCER_ALGORITHM_SOCKET:
+                [self.plugStructure(module, 'AcceptingPlug'),
+                 self.plugStructure(module, 'AcceptingPlug')]}
+
+    def _plugsTwiceAcceptingAndMulti(self, combination):
+        plugs = self._plugsTwiceAccepting()
+        return self._addMultibouncerPlug(plugs, combination)
+
+
 class MultiBouncerTestCase(object):
-    """This is test case both for MultiBouncer and MultiBouncerPlug"""
+    """This is test case run both agains for
+    MultiBouncer and MultiBouncerPlug"""
 
     def _testCase(self, *a):
-        raise NotImplementedError("Not impleneted error")
+        raise NotImplementedError("Not implemented error")
+
+    def _testForFailure(self, *a):
+        raise NotImplementedError("Not implenented error")
 
     def setUp(self):
         keycard = keycards.KeycardGeneric()
@@ -78,41 +131,37 @@ class MultiBouncerTestCase(object):
     def testOrOperatorTrue(self):
         return self._testCase('AcceptingPlug or RejectingPlug', True)
 
+    def testEmptyCombination(self):
+        self._testForFailure("", 'wrong-combination')
+
+    def testUnknownPlugins(self):
+        self._testForFailure("something and something-else",
+            'wrong-combination')
+
+    def testMissingPyparsing(self):
+        combinator.pyparsing = None
+        self._testForFailure("AcceptingPlug", 'missing-pyparsing')
+        combinator.pyparsing = pyparsing
+
 
 class TestMultiBouncerPlug(bouncertest.BouncerTestHelper,\
-        MultiBouncerTestCase):
+        MultiBouncerTestCase, MultiBouncerTestHelper):
 
     setUp = MultiBouncerTestCase.setUp
 
-    def _getComponentAndBouncer(self, combination):
-
-        def plugStructure(module, function):
-            socket = ".".join([module, function])
-            return \
-                {'type': function,
-                'socket': socket,
-                'entries': {'default':
-                    {'function-name': function,
-                        'module-name': module}},
-                'properties': {}}
-
-        plugs = {bouncers_base.BOUNCER_ALGORITHM_SOCKET:
-            [plugStructure('flumotion.test.test_bouncers_multibouncer', \
-                'AcceptingPlug'),
-             plugStructure('flumotion.test.test_bouncers_multibouncer', \
-                'RejectingPlug')]}
-
-        bouncer_props = {'name': 'testbouncer',
-                'plugs': {},
-                'properties': {'combination': combination}}
-        component_props = {'name': 'component',
+    def _buildComponent(self, plugs):
+        return {'name': 'component',
                 'plugs': plugs,
                 'properties': {}}
 
-        comp = component.BaseComponent(component_props)
-        bouncer = multibouncerplug.MultiBouncerPlug(bouncer_props)
-        bouncer.start(comp)
-        return comp, bouncer
+    def _getComponentAndBouncer(self, combination):
+        plugs = self._plugsAcceptingRejectingAndMulti(combination)
+        comp = component.BaseComponent(self._buildComponent(plugs))
+        return comp, self._extractBouncerPlug(comp)
+
+    def _extractBouncerPlug(self, comp):
+        http_auth = http.HTTPAuthentication(comp)
+        return http_auth.plug
 
     def stop_bouncer(self, bouncer, d, component):
 
@@ -123,11 +172,66 @@ class TestMultiBouncerPlug(bouncertest.BouncerTestHelper,\
 
     def _testCase(self, combination, result):
         component, bouncer = self._getComponentAndBouncer(combination)
+        bouncer.start(component)
         d = self.check_auth(self.keycard, bouncer, result)
         return self.stop_bouncer(bouncer, d, component)
 
+    def _testForFailure(self, combination, message_id, custom_component=None):
 
-class TestMultiBouncer(bouncertest.BouncerTestHelper, MultiBouncerTestCase):
+        def doAsserts(d):
+            self.assertEqual(component.getMood(), moods.sad.value)
+            self.debug(component.state.get('messages'))
+            self.assertEqual(component.state.get('messages')[0].id, message_id)
+
+        if custom_component:
+            component = custom_component
+            bouncer = self._extractBouncerPlug(component)
+        else:
+            component, bouncer = self._getComponentAndBouncer(combination)
+        d = defer.maybeDeferred(bouncer.start, component)
+        d.addBoth(doAsserts)
+
+    def testEmptyPlugs(self):
+        plugs = self._addMultibouncerPlug({}, "")
+        componentProps = self._buildComponent(plugs)
+        comp = component.BaseComponent(componentProps)
+        self._testForFailure("", 'no-algorithm', custom_component=comp)
+
+    def testAddingSuffixes(self):
+        plugs = self._plugsTwiceAcceptingAndMulti(
+            "AcceptingPlug and AcceptingPlug-1")
+        componentProps = self._buildComponent(plugs)
+        comp = component.BaseComponent(componentProps)
+        bouncer = self._extractBouncerPlug(comp)
+        d = self.check_auth(self.keycard, bouncer, True)
+        return self.stop_bouncer(bouncer, d, comp)
+
+    def testExpringKeycard(self):
+        plugs = self._plugsAcceptingRejectingAndMulti("AcceptingPlug")
+        componentProps = self._buildComponent(plugs)
+        comp = component.BaseComponent(componentProps)
+        # mock method instead using HTTPStreamer
+        comp.remove_client = callable
+        http_auth = http.HTTPAuthentication(comp)
+        bouncer = http_auth.plug
+        self.keycard._fd = 100
+
+        d = self.check_auth(self.keycard, bouncer, True)
+        # theese values would be set by the proper
+        # request authentication by HTTPStreamer
+        http_auth._idToKeycard[self.keycard.id] = self.keycard
+        http_auth._fdToKeycard[self.keycard._fd] = self.keycard
+
+        d.addCallback(lambda _:
+            self.assertIn(self.keycard.id, http_auth._idToKeycard))
+        d.addCallback(lambda _: bouncer.expireKeycardId(self.keycard.id))
+        d.addCallback(lambda _:
+            self.assertNotIn(self.keycard.id, http_auth._idToKeycard))
+        return self.stop_bouncer(bouncer, d, comp)
+
+
+class TestMultiBouncer(bouncertest.BouncerTestHelper,\
+            MultiBouncerTestCase, MultiBouncerTestHelper):
 
     setUp = MultiBouncerTestCase.setUp
 
@@ -137,24 +241,51 @@ class TestMultiBouncer(bouncertest.BouncerTestHelper, MultiBouncerTestCase):
         return self.stop_bouncer(bouncer, d)
 
     def _getBouncer(self, combination):
+        return multibouncer.MultiBouncer(self._buildBouncer(combination))
 
-        def plugStructure(module, function):
-            socket = ".".join([module, function])
-            return \
-                {'type': function,
-                'socket': socket,
-                'entries': {'default':
-                    {'function-name': function,
-                        'module-name': module}},
-                'properties': {}}
+    def _buildBouncer(self, combination):
 
-        plugs = {bouncers_base.BOUNCER_ALGORITHM_SOCKET:
-            [plugStructure('flumotion.test.test_bouncers_multibouncer', \
-                'AcceptingPlug'),
-             plugStructure('flumotion.test.test_bouncers_multibouncer', \
-                'RejectingPlug')]}
-
+        plugs = self._plugsAcceptingAndRejecting()
         props = {'name': 'testbouncer',
                 'plugs': plugs,
                 'properties': {'combination': combination}}
-        return multibouncer.MultiBouncer(props)
+
+        return props
+
+    def _testForFailure(self, combination, message_id, custom_bouncer=None):
+
+        def doAsserts(d):
+            self.assertEqual(bouncer.getMood(), moods.sad.value)
+            self.debug(bouncer.state.get('messages'))
+            self.assertEqual(bouncer.state.get('messages')[0].id, message_id)
+
+        if custom_bouncer:
+            bouncer = custom_bouncer
+        else:
+            bouncer = self._getBouncer(combination)
+        d = bouncer.waitForHappy()
+        d.addBoth(doAsserts)
+
+    def testEmptyPlugs(self):
+        bouncerProps = self._buildBouncer("")
+        bouncerProps['plugs'] = {}
+        bouncer = multibouncer.MultiBouncer(bouncerProps)
+        self._testForFailure("", 'no-algorithm', custom_bouncer=bouncer)
+
+    def testAddingSuffixes(self):
+        bouncerProps = self._buildBouncer("AcceptingPlug and AcceptingPlug-1")
+        bouncerProps['plugs'] = self._plugsTwiceAccepting()
+        bouncer = multibouncer.MultiBouncer(bouncerProps)
+        d = self.check_auth(self.keycard, bouncer, True)
+        return self.stop_bouncer(bouncer, d)
+
+    def testExpringKeycard(self):
+        bouncer = self._getBouncer("AcceptingPlug")
+
+        d = self.check_auth(self.keycard, bouncer, True)
+        d.addCallback(lambda _:
+            self.assertIn(self.keycard.id, bouncer.watchable_keycards))
+        d.addCallback(lambda _: bouncer.expireKeycardId(self.keycard.id))
+        d.addCallback(lambda _:
+            self.assertNotIn(self.keycard.id, bouncer.watchable_keycards))
+        return self.stop_bouncer(bouncer, d)
