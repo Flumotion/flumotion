@@ -1,5 +1,12 @@
 2010-09-14  Xavier Queralt  <xqueralt@gmail.com>
 
+	* flumotion/admin/gtk/Makefile.am:
+	* flumotion/admin/gtk/about.py:
+	* flumotion/admin/gtk/dialogs.py:
+	Use gtk's about dialog if possible, it simplifies a bit things.
+
+2010-09-14  Xavier Queralt  <xqueralt@gmail.com>
+
 	* flumotion/test/test_wizard_save.py:
 	Once again, if the defaults change these tests need to be updated
 

@@ -184,6 +184,7 @@ class AboutDialog(gtk.Dialog):
                    'Pedro Gracia Fajardo',
                    'Aitor Guevara Escalante',
                    'Arek Korbik',
+                   'Marek Kowalski',
                    'Julien Le Goff',
                    'Marc-André Lureau',
                    'Xavier Martinez',
@@ -213,6 +214,13 @@ class AboutDialog(gtk.Dialog):
         info.set_justify(gtk.JUSTIFY_FILL)
         info.set_line_wrap(True)
         info.show()
+
+
+try:
+    from flumotion.admin.gtk import about
+    AboutDialog = about.GtkAboutDialog
+except AttributeError:
+        pass
 
 
 def showConnectionErrorDialog(failure, info, parent=None):
