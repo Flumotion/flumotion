@@ -1,5 +1,10 @@
 2010-09-14  Xavier Queralt  <xqueralt@gmail.com>
 
+	* flumotion/test/test_wizard_save.py:
+	Once again, if the defaults change these tests need to be updated
+
+2010-09-14  Xavier Queralt  <xqueralt@gmail.com>
+
 	reviewed by: Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/component/producers/firewire/wizard_gtk.py:
