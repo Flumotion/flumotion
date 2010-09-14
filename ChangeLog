@@ -1,3 +1,15 @@
+2010-09-14  Xavier Queralt  <xqueralt@gmail.com>
+
+	reviewed by: Josep Joan Ribas  <jribas@flumotion.com>
+
+	* flumotion/component/producers/firewire/wizard_gtk.py:
+	Default to ffmpeg deinterlacing mode.
+	Set the width in the properties when using the padding correction
+	* flumotion.spec.in:
+	* pkg/ubuntu-karmic/control:
+	* pkg/ubuntu-lucid/control:
+	Depend on gstreamer-ffmpeg for the deinterlacing capabilities
+
 2010-09-13  Marek Kowalski  <mkowalski@flumotion.com>
 
 	* flumotion/component/bouncers/multibouncerplug.py

@@ -48,7 +48,7 @@ class FireWireProducer(AudioProducer, VideoProducer):
         self.properties.framerate = 12.5
         self.properties.decoder = 'ffdec_dvvideo'
         self.properties.deinterlace_mode = 'auto'
-        self.properties.deinterlace_method = 'tomsmocomp'
+        self.properties.deinterlace_method = 'ffmpeg'
 
     def __eq__(self, other):
         if not isinstance(other, FireWireProducer):
@@ -155,6 +155,8 @@ class _FireWireCommon:
             # only specify height, to let videobox compute the width
             self.model.properties.height = d['oh']
             out_width = (d['ow'] + 8) - d['ow'] % 8
+            #FIXME: This used to work without setting the width
+            self.model.properties.width = out_width
         else:
             self.model.properties.width = d['ow']
             out_width = d['ow']
