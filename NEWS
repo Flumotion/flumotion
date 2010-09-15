@@ -1,5 +1,133 @@
-This is Flumotion 0.6.0 "Can Punyetes"
-        
+This is Flumotion 0.8.0 "7 Portes"
+
+Features since 0.6.2:
+
+  * Added Twisted 2.5 compatibility. Dropped Twisted < 2.5 compatibility.
+
+  * Streamers and servers have at their disposal a new kind of bouncer:
+    The "multi-bouncer", with it you can combine different bouncers into
+    one generic bouncer.
+
+  * New effects have been added to enable video and audio post-processing:
+    deinterlace, videorate, videoscale and audiorate are now available.
+    Those functionalities have been decoupled from the producers code and
+    now are handled homogeneously.
+
+  * You'll notice a big improvement of the video quality when streaming in
+    full PAL from a firewire camera thanks to the integration of those
+    effects in this producer.
+    Note: this introduces a new dependency on gstreamer-ffmpeg
+
+  * The new fileprovider-httpcached plug helps on providing files from
+    another HTTP server performing local caching.
+
+  * A new type of component has been added: the decoder components.
+    For now only the generic-decoder is available. It can produce raw
+    audio and video from an input stream and use them as input for other
+    encoders.
+
+  * Added live WebM/VP8 support.
+
+  * It is now possible to load an existing configuration from the wizard.
+
+  * When the admin is closed it asks, if needed, to stop the worker and
+    manager started from the greeter.
+
+  * The wizard now checks for the existence of the needed muxers and
+    prompts the user with a message if they are not installed.
+
+  * The contents of the ondemand server are now browseable from
+    the admin in a directory-like interface.
+
+  * From the admin it is now possible to add new streamers from an already
+    running flow.
+
+Bugs fixed since 0.6.2:
+
+  * 341  : Message icons should appear in the treeview
+  * 729  : implement compound property support in flumotion-launch
+  * 753  : Write an unittest for the disker component
+  * 786  : ical bouncer error message should be better when modules are missing.
+  * 830  : Add manager name column in recent connections dialog.
+  * 855  : Wizard need to do an element check for all muxers
+  * 925  : icalbouncer doesn't handle fullday events
+  * 943  : flumotion.test.test_pb not compatible with twisted 8.0
+  * 966  : make-dummy-cert needs bash (not dash): "bad trap" error.
+  * 990  : Sad component names should be red
+  * 994  : ondemand component in wizard should create a porter
+  * 997  : Add a new streamer
+  * 1005 : Make it easier to shutdown a locally started manager/worker
+  * 1024 : flumotion-admin wizard: Bad default webcam settings
+  * 1092 : Include icons in the pattern combo on the video test source wizard page
+  * 1108 : flumotion-admin: on-demand server should show a list of file URLS
+  * 1109 : ical bouncer should provide a nicer error message when icalendar and/or dateutil modules are not installed
+  * 1131 : Propose between "Step by step", "scenario", and "saved configuration" in the first wizard page
+  * 1150 : flumotion.common.eventcalendar does not handle case where event has DTSTART+DURATION instead of DTSTART+DTEND
+  * 1157 : ical-bouncer does not disconnect keycards when a calendar changes in the middle of an event
+  * 1191 : Disk consumers should show more info on the admin
+  * 1254 : Admin Traceback during reconection to the manager
+  * 1310 : streamer returns a 500 Internal server error if bouncer is unavailable
+  * 1317 : Show some information in the componentview when multiple components are selected
+  * 1327 : CLOSE_WAIT states leaking if a served file by http-server fails to close
+  * 1337 : Generalise the plugarea used by httpstreamer step and add it to ondemand too
+  * 1347 : flumotion.test.test_twisted_integration fails is outputDir exists
+  * 1349 : Suggest the user what to do to enable the cortado plugin
+  * 1357 : Provide a way to add additional callbacks to StateCacheable
+  * 1360 : lintian: image-file-in-usr-lib warning
+  * 1363 : Have components stop polling for CPU and virtual memory when there's no observer
+  * 1370 : Disker producing corrupt files if any of its upstream components goes hungry, lost, or sleeping
+  * 1373 : make it possible to set default usernames/passwords in a file
+  * 1374 : think of a strategy for handling overlapping events
+  * 1377 : eventcalendar does not parse time zone data from ical file
+  * 1382 : Configuration assitant shouldn't allow to step forward for "Import a configuration file" until the filename is choosed.
+  * 1386 : We ship a font file when we really should be using system fonts
+  * 1387 : audio-video test sync producer
+  * 1399 : Nagios check for HLS
+  * 1407 : Generate version based on release, svn or git
+  * 1419 : cachedprovider blocks reactor when opening a file
+  * 1422 : Add VP8/Webm support into flumotion
+  * 1436 : Create a deinterlacing effect
+  * 1437 : Create a videoscale effect
+  * 1438 : Create a videorate effect
+  * 1439 : Make the firewire producer use the new deinterlace,videoscale,videorate effect
+  * 1440 : Add a new element for video conversion
+  * 1441 : Overlay converter should be able to dynamically switch the size of the overlayed image
+  * 1442 : The firewire producer wizard don't allow changing the scale correction option
+  * 1443 : flumotion trunk 8729 fails to export configuration
+
+Bugs fixed since 0.6.1:
+
+  * 1283 : (flumotion's) log system doesn't handle non-ascii characters
+  * 1345 : Assistant: Production page forgets the producers when going backwards
+  * 1353 : show a dialog when saving configuration fail
+  * 1359 : When going back in the wizard the last step worker is no remembered
+  * 1369 : firewire's component sets the drop factor of dvdec wrong for framerates > 25
+  * 1371 : wizard_gtk.py:227 TypeError: 'int' object is not iterable
+  * 1376 : fw audio step with multiple fw sources overridden
+  * 1378 : Model not updated doing a fw audio flow from wizard
+  * 1380 : LocalManagerSpawner do not stop porperly the components it starts
+  * 1383 : The wizard sidebar doesn't display the correct pages
+  * 1385 : [watcher] if an event fired by the watcher fails, no new checks are scheduled
+  * 1395 : registry is not rebuilt after an upgrade on a host running multiple managers
+  * 1397 : wizard sound card page doesn't properly use id's to make an error message override the initial looking for message
+  * 1401 : Live Alsa sound source reported to be in use
+  * 1404 : delete command in flumotion-command doesn't handle well errbacks
+  * 1411 : depened on a newer Twisted
+  * 1415 : successfully transmitted pb message should prevent ping timeouts
+  * 1420 : icecast-producer goes lost if connection to source url takes too long
+  * 1421 : connections.py:82 ValueError: column number is out of range
+  * 1423 : flumotion-git-zaheerm: overlay text/logo will get stream URL inactive
+  * 1425 : FPS setting of webcam beyond reasonable limits in Streaming Manager
+
+Bugs fixed since 0.6.0:
+
+  * 809 : bad error message for ical disker
+  * 1267 : disker component should handle all exceptions that it might get from parsing the ical file
+  * 1341 : [dirac] dirac encoder + ogg muxer produce empty output
+  * 1342 : [mulaw + multipartmux] mulaw + multipart don't work
+  * 1348 : cannot delete sleeping components for which there is no worker
+  * 1354 : Update flumotion-{worker,manager,admin} man pages
+
 Features since 0.5.4:
 
   * Added Python 2.6 compatibility. Dropped Python 2.3 compatibility. You

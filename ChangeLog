@@ -1,3 +1,15 @@
+=== release 0.8.0 ===
+
+2010-09-14  Xavier Queralt  <xqueralt@gmail.com>
+
+	* NEWS:
+	* RELEASE:
+	* configure.ac:
+	* flumotion.doap:
+	* pkg/ubuntu-karmic/changelog:
+	* pkg/ubuntu-lucid/changelog:
+	Releasing 0.8.0 "7 Portes"
+
 2010-09-14  Xavier Queralt  <xqueralt@gmail.com>
 
 	* flumotion/admin/gtk/Makefile.am:

@@ -342,5 +342,14 @@ differences that were added after 0.6.1.
 
   </Version>
  </release>
+ <release>
+  <Version>
+   <revision>0.8.0</revision>
+   <branch>0.8</branch>
+   <name>7 Portes</name>
+   <created>2010-09-10</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.8.0.tar.bz2" />
+  </Version>
+ </release>
 
 </Project>

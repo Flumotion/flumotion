@@ -1,3 +1,9 @@
+flumotion (0.8.0-1flu1~lucid1) lucid; urgency=low
+
+  * New upstream release!
+
+ -- Xavier Queralt <xqueralt@flumotion.com>  Fri, 10 Sep 2010 13:30:21 +0200
+
 flumotion (0.7.0.3-1flu1~lucid1) lucid; urgency=low
 
   * New pre-release
