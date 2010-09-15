@@ -1,6 +1,11 @@
 2010-09-15  Xavier Queralt  <xqueralt@gmail.com>
 
 	* configure.ac:
+	Start the new development series.
+
+2010-09-15  Xavier Queralt  <xqueralt@gmail.com>
+
+	* configure.ac:
 	Back to dev.
 
 === release 0.8.0 ===
