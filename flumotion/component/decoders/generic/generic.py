@@ -102,6 +102,9 @@ class SyncKeeper(gst.Element):
         buffer.timestamp += self.videoPadding
         self.nextVideoTs = buffer.timestamp + buffer.duration
         if self.sendVideoNewSegment:
+            self.info(
+              "Pushing new segment with start time %s for video" %
+                gst.TIME_ARGS(buffer.timestamp))
             self.videosrc.push_event(
                 gst.event_new_new_segment(True, 1.0, gst.FORMAT_TIME,
                                           buffer.timestamp, -1, 0))
@@ -116,6 +119,9 @@ class SyncKeeper(gst.Element):
         buffer.timestamp += self.audioPadding
         self.nextAudioTs = buffer.timestamp + buffer.duration
         if self.sendAudioNewSegment:
+            self.info(
+              "Pushing new segment with start time %s for audio" %
+                gst.TIME_ARGS(buffer.timestamp))
             self.audiosrc.push_event(
                 gst.event_new_new_segment(True, 1.0, gst.FORMAT_TIME,
                                           buffer.timestamp, -1, 0))
