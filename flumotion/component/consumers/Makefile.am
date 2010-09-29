@@ -13,5 +13,6 @@ SUBDIRS = \
 	disker \
 	gdp \
 	httpstreamer \
+	pipeline \
 	preview \
 	shout2

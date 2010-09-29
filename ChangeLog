@@ -1,3 +1,15 @@
+2010-09-29  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* configure.ac:
+	* flumotion/component/consumers/Makefile.am:
+	* flumotion/component/consumers/pipeline (added):
+	* flumotion/component/consumers/pipeline/pipeline.xml (added):
+	* flumotion/component/consumers/pipeline/__init__.py (added):
+	* flumotion/component/consumers/pipeline/Makefile.am (added):
+	* flumotion/component/consumers/pipeline/pipeline.py (added):
+	  Add a pipeline-consumer component, since we already had
+	  -producer and -converter.
+
 2010-09-15  Xavier Queralt  <xqueralt@gmail.com>
 
 	* configure.ac:
