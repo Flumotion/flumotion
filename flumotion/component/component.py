@@ -215,7 +215,7 @@ class BaseComponentMedium(medium.PingingMedium):
         Note: this is insufficient in general, and should be replaced by
         network mapping stuff later.
         """
-        assert self.remote
+        assert self.remote, "%r does not have a remote connection" % self
         host = self.remote.broker.transport.getHost()
         self.debug("getIP(): using %r as our IP", host.host)
         return host.host
