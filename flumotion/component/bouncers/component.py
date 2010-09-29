@@ -98,6 +98,7 @@ from flumotion.twisted import flavors, credentials
 __all__ = ['Bouncer']
 __version__ = "$Rev$"
 
+# How many keycards to expire in a single synchronous deferred expiration call.
 EXPIRE_BLOCK_SIZE = 100
 
 
@@ -389,6 +390,11 @@ class Bouncer(component.BaseComponent):
         return d
 
     def _expireNextKeycardBlock(self, total, keycardIds, finished):
+        # We can't expire all keycards in a single blocking call because
+        # there might be so many that the component goes lost.
+        # This call will trigger expiring all keycards by chunking them
+        # across separate deferreds.
+
         keycardBlock = keycardIds[:EXPIRE_BLOCK_SIZE]
         keycardIds = keycardIds[EXPIRE_BLOCK_SIZE:]
         idByReq = {}
@@ -401,6 +407,9 @@ class Bouncer(component.BaseComponent):
                 self.removeKeycardId(keycardId)
 
         if not (idByReq and self.medium):
+            # instead of serializing each block by chaining deferreds, which
+            # can trigger maximum recursion depth, we just callback once
+            # on the passed-in deferred
             finished.callback(total)
             return
 
