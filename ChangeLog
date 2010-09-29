@@ -1,3 +1,10 @@
+2010-09-29  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Julien Le Goff
+	* flumotion/component/feedcomponent.py:
+	factor out the buffer callback to ease subclassing
+	the muxer component
+
 2010-09-29  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/component.py:
