@@ -177,9 +177,6 @@ class FakeStreamer:
     def getName(self):
         return "fakestreamer"
 
-    def hasCaps(self):
-        return not self.caps == None
-
 
 class TestHTTPStreamingResource(testsuite.TestCase):
     # helpers

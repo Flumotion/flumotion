@@ -38,9 +38,7 @@ from flumotion.component.consumers.httpstreamer import resources
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
 
-import icymux
-
-__all__ = ['HTTPMedium', 'MultifdSinkStreamer', 'ICYStreamer']
+__all__ = ['HTTPMedium', 'MultifdSinkStreamer']
 __version__ = "$Rev$"
 T_ = gettexter()
 STATS_POLL_INTERVAL = 10
@@ -51,12 +49,10 @@ UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two
 # FIXME: generalize this class and move it out here ?
 
 
-class Stats(object):
+class Stats:
 
-    def __init__(self, sinks):
-        if not isinstance(sinks, list):
-            sinks = [sinks]
-        self.sinks = sinks
+    def __init__(self, sink):
+        self.sink = sink
 
         self.no_clients = 0
         self.clients_added_count = 0
@@ -145,12 +141,10 @@ class Stats(object):
             return self.getBytesReceived() * 8 / self.getUptime()
 
     def getBytesSent(self):
-        return sum(map(
-                lambda sink: sink.get_property('bytes-served'), self.sinks))
+        return self.sink.get_property('bytes-served')
 
     def getBytesReceived(self):
-        return max(map(
-                lambda sink: sink.get_property('bytes-to-serve'), self.sinks))
+        return self.sink.get_property('bytes-to-serve')
 
     def getUptime(self):
         return time.time() - self.start_time
@@ -276,7 +270,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                                 'recover-policy=3'
 
     componentMediumClass = HTTPMedium
-    defaultSyncMethod = 0
 
     def init(self):
         reactor.debug = True
@@ -412,17 +405,16 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 sink.set_property('buffers-max', 500)
         else:
             self.debug("no burst-on-connect, setting sync-method 0")
-            sink.set_property('sync-method', self.defaultSyncMethod)
+            sink.set_property('sync-method', 0)
 
             sink.set_property('buffers-soft-max', 250)
             sink.set_property('buffers-max', 500)
 
-    def configureAuthAndResource(self):
-        self.httpauth = http.HTTPAuthentication(self)
-        self.resource = resources.HTTPStreamingResource(self,
-                                                        self.httpauth)
+    def configure_pipeline(self, pipeline, properties):
+        Stats.__init__(self, sink=self.get_element('sink'))
 
-    def parseProperties(self, properties):
+        self._updateCallLaterId = reactor.callLater(10, self._updateStats)
+
         mountPoint = properties.get('mount-point', '')
         if not mountPoint.startswith('/'):
             mountPoint = '/' + mountPoint
@@ -444,10 +436,35 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if self.description is None:
             self.description = "Flumotion Stream"
 
+        # FIXME: tie these together more nicely
+        self.httpauth = http.HTTPAuthentication(self)
+        self.resource = resources.HTTPStreamingResource(self,
+                                                        self.httpauth)
+
         # check how to set client sync mode
+        sink = self.get_element('sink')
         self.burst_on_connect = properties.get('burst-on-connect', False)
         self.burst_size = properties.get('burst-size', 0)
         self.burst_time = properties.get('burst-time', 0.0)
+
+        self.setup_burst_mode(sink)
+
+        if gstreamer.element_factory_has_property('multifdsink',
+                                                  'resend-streamheader'):
+            sink.set_property('resend-streamheader', False)
+        else:
+            self.debug("resend-streamheader property not available, "
+                       "resending streamheader when it changes in the caps")
+
+        sink.connect('deep-notify::caps', self._notify_caps_cb)
+
+        # these are made threadsafe using idle_add in the handler
+        sink.connect('client-added', self._client_added_handler)
+
+        # We now require a sufficiently recent multifdsink anyway that we can
+        # use the new client-fd-removed signal
+        sink.connect('client-fd-removed', self._client_fd_removed_cb)
+        sink.connect('client-removed', self._client_removed_cb)
 
         if 'client-limit' in properties:
             limit = int(properties['client-limit'])
@@ -507,52 +524,15 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.port = int(properties.get('port', 8800))
 
-    def configureSink(self, sink):
-        self.setup_burst_mode(sink)
-
-        if gstreamer.element_factory_has_property('multifdsink',
-                                                  'resend-streamheader'):
-            sink.set_property('resend-streamheader', False)
-        else:
-            self.debug("resend-streamheader property not available, "
-                       "resending streamheader when it changes in the caps")
-
-        sink.connect('deep-notify::caps', self._notify_caps_cb)
-
-        # these are made threadsafe using idle_add in the handler
-        sink.connect('client-added', self._client_added_handler)
-
-        # We now require a sufficiently recent multifdsink anyway that we can
-        # use the new client-fd-removed signal
-        sink.connect('client-fd-removed', self._client_fd_removed_cb)
-        sink.connect('client-removed', self._client_removed_cb)
-
-        sink.caps = None
-
-    def configure_pipeline(self, pipeline, properties):
-        Stats.__init__(self, self.get_element('sink'))
-        self._updateCallLaterId = reactor.callLater(10, self._updateStats)
-
-        self.configureAuthAndResource()
-        self.parseProperties(properties)
-
-        sink = self.get_element('sink')
-        self.configureSink(sink)
-
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.name
 
     def getMaxClients(self):
         return self.resource.maxclients
 
-    def hasCaps(self):
-        # all the sinks should have caps set
-        sinkHasCaps = map(lambda sink: sink.caps is not None, self.sinks)
-        return None not in sinkHasCaps
-
     def get_mime(self):
-        if self.sinks[0].caps:
-            return self.sinks[0].caps[0].get_name()
+        if self.caps:
+            return self.caps.get_structure(0).get_name()
 
     def get_content_type(self):
         mime = self.get_mime()
@@ -595,7 +575,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return (deltaadded * bitrate, deltaremoved * bitrate, bytes_sent,
             clients_connected, current_load)
 
-    def add_client(self, fd, request):
+    def add_client(self, fd):
         sink = self.get_element('sink')
         sink.emit('add', fd)
 
@@ -663,8 +643,6 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     ### START OF THREAD-AWARE CODE (called from non-reactor threads)
 
     def _notify_caps_cb(self, element, pad, param):
-        # We store caps in sink objects as
-        # each sink might (and will) serve different content-type
         caps = pad.get_negotiated_caps()
         if caps == None:
             return
@@ -672,11 +650,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         caps_str = gstreamer.caps_repr(caps)
         self.debug('Got caps: %s' % caps_str)
 
-        if not element.caps == None:
+        if not self.caps == None:
             self.warning('Already had caps: %s, replacing' % caps_str)
 
         self.debug('Storing caps: %s' % caps_str)
-        element.caps = caps
+        self.caps = caps
 
         reactor.callFromThread(self.update_ui_state)
 
@@ -817,138 +795,3 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 self.addMessage(m)
                 self.setMood(moods.sad)
                 return defer.fail(errors.ComponentSetupHandledError(t))
-
-
-class ICYStreamer(MultifdSinkStreamer):
-    implements(interfaces.IStreamingComponent)
-
-    checkOffset = True
-
-    logCategory = 'icy-http'
-
-    pipe_template = 'identity name=identity1 ! tee name=tee ! queue ! ' + \
-        'multifdsink name=sink-without-id3 sync=false recover-policy=3 ' + \
-        'tee. ! queue ! icymux name=mux ! ' + \
-        'multifdsink name=sink-with-id3 sync=false recover-policy=3'
-
-    defaultSyncMethod = 2
-    defaultFrameSize = 256
-    defaultMetadataInterval = 2
-
-    def init(self):
-        MultifdSinkStreamer.init(self)
-
-        # fd -> sink
-        self.sinkConnections = {}
-        # headers to be included in HTTP response
-        self.icyHeaders = {}
-
-        for i in ('icy-title', 'icy-timestamp'):
-            self.uiState.addKey(i, None)
-
-    def configureAuthAndResource(self):
-        self.httpauth = http.HTTPAuthentication(self)
-        self.resource = resources.ICYStreamingResource(self,
-                                                        self.httpauth)
-
-    def configure_pipeline(self, pipeline, properties):
-        self.sinksByID3 =\
-                {False: self.get_element('sink-without-id3'),
-                 True: self.get_element('sink-with-id3')}
-        Stats.__init__(self, self.sinksByID3.values())
-
-        self._updateCallLaterId = reactor.callLater(10, self._updateStats)
-
-        self.configureAuthAndResource()
-        self.parseProperties(properties)
-
-        for sink in self.sinks:
-            self.configureSink(sink)
-
-        pad = pipeline.get_by_name('tee').get_pad('sink')
-        pad.add_event_probe(self._tag_event_cb)
-
-        self.configureMuxer(pipeline)
-
-    def _tag_event_cb(self, pad, event):
-
-        def store_tag(struc, headerKey, structureKey):
-            if structureKey in struc.keys():
-                self.icyHeaders[headerKey] = struc[structureKey]
-                self.debug("Set header key %s = %s", \
-                        headerKey, struc[structureKey])
-
-        mapping = {'icy-name': 'organization',
-                   'icy-genre': 'genre',
-                   'icy-url': 'location'}
-        if event.type == gst.EVENT_TAG:
-            struc = event.get_structure()
-            self.debug('Structure keys of tag event: %r', struc.keys())
-            for headerName in mapping:
-                reactor.callFromThread(\
-                        store_tag, struc, headerName, mapping[headerName])
-        return True
-
-    def parseProperties(self, properties):
-        MultifdSinkStreamer.parseProperties(self, properties)
-
-        self._frameSize = properties.get('frame-size', self.defaultFrameSize)
-        self._metadataInterval = properties.get('metadata-interval', \
-                                                 self.defaultMetadataInterval)
-
-    def configureMuxer(self, pipeline):
-        self.muxer = pipeline.get_by_name('mux')
-        self.muxer.set_property('frame-size', self._frameSize)
-
-        def _setMuxerBitrate(bitrate):
-            numFrames = int(self._metadataInterval * bitrate / \
-                            8 / self._frameSize)
-            self.debug("Setting number of frames to %r", numFrames)
-            self.muxer.set_property('num-frames', numFrames)
-
-            self.icyHeaders['icy-br'] = bitrate / 1000
-            self.icyHeaders['icy-metaint'] = \
-                self.muxer.get_property("icy-metaint")
-
-        def _calculateBitrate(pad, data):
-            self.debug('Calculating bitrate of the stream')
-            bitrate = 8 * data.size * gst.SECOND / data.duration
-            self.debug('bitrate: %r', bitrate)
-            pad.remove_event_probe(handler_id)
-            reactor.callFromThread(_setMuxerBitrate, bitrate)
-        handler_id = self.pipeline.get_by_name('identity1').get_pad('sink').\
-                                add_buffer_probe(_calculateBitrate)
-
-    def get_content_type(self, serveIcy):
-        sink = self.sinksByID3[serveIcy]
-        if sink.caps:
-            return sink.caps[0].get_name()
-
-    def add_client(self, fd, request):
-        sink = self.sinksByID3[request.serveIcy]
-        self.debug("Adding client to sink: %r", sink)
-        self.sinkConnections[fd] = sink
-
-        if request.serveIcy:
-            # FIXME: This sends title to every connected client.
-            # We should sent it only to the newly comming in client, but this
-            # requires patching multifdsink
-            self.muxer.emit('broadcast-title')
-        sink.emit('add', fd)
-
-    def remove_client(self, fd):
-        sink = self.sinkConnections[fd]
-        sink.emit('remove', fd)
-        del self.sinkConnections[fd]
-
-    def get_icy_headers(self):
-        self.debug("Icy headers: %r", self.icyHeaders)
-        return self.icyHeaders
-
-    def updateState(self, set):
-        Stats.updateState(self, set)
-
-        set('icy-title', self.muxer.get_property('iradio-title'))
-        timestamp = time.strftime("%c", time.localtime(\
-                self.muxer.get_property('iradio-timestamp')))
-        set('icy-timestamp', timestamp)

@@ -188,24 +188,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def setRedirectionOnLimits(self, url):
         self._redirectOnFull = url
 
-    def _setRequestHeaders(self, request):
-        content = self.streamer.get_content_type()
-        request.setHeader('Server', HTTP_SERVER)
-        request.setHeader('Date', http.datetimeToString())
-        request.setHeader('Connection', 'close')
-        request.setHeader('Cache-Control', 'no-cache')
-        request.setHeader('Cache-Control', 'private')
-        request.setHeader('Content-type', content)
-
-    def _formatHeaders(self, request):
-        # Mimic Twisted as close as possible
-        headers = []
-        for name, value in request.headers.items():
-            headers.append('%s: %s\r\n' % (name, value))
-        for cookie in request.cookies:
-            headers.append('%s: %s\r\n' % ("Set-Cookie", cookie))
-        return headers
-
     # FIXME: rename to writeHeaders
 
     def _writeHeaders(self, request):
@@ -228,13 +210,25 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             # FIXME: do this ? del request
             return False
 
-        self._setRequestHeaders(request)
+        content = self.streamer.get_content_type()
+        request.setHeader('Server', HTTP_SERVER)
+        request.setHeader('Date', http.datetimeToString())
+        request.setHeader('Connection', 'close')
+        request.setHeader('Cache-Control', 'no-cache')
+        request.setHeader('Cache-Control', 'private')
+        request.setHeader('Content-type', content)
 
         # Call request modifiers
         for modifier in self.modifiers:
             modifier.modify(request)
 
-        headers = self._formatHeaders(request)
+        # Mimic Twisted as close as possible
+        headers = []
+        for name, value in request.headers.items():
+            headers.append('%s: %s\r\n' % (name.capitalize(), value))
+        for cookie in request.cookies:
+            headers.append('%s: %s\r\n' % ("Set-Cookie", cookie))
+
 
         # ASF needs a Pragma header for live broadcasts
         # Apparently ASF breaks on WMP port 80 if you use the pragma header
@@ -272,7 +266,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         return False
 
     def isReady(self):
-        if not self.streamer.hasCaps():
+        if self.streamer.caps == None:
             self.debug('We have no caps yet')
             return False
 
@@ -504,7 +498,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             return
 
         # hand it to multifdsink
-        self.streamer.add_client(fd, request)
+        self.streamer.add_client(fd)
         ip = request.getClientIP()
 
         # PROBE: started request; see httpfile.httpfile
@@ -532,41 +526,3 @@ class HTTPRoot(web_resource.Resource, log.Loggable):
         r = web_resource.Resource.getChildWithDefault(self, fullPath, request)
         self.debug("Returning resource %r" % r)
         return r
-
-
-class ICYStreamingResource(HTTPStreamingResource):
-
-    def _render(self, request):
-        headerValue = request.getHeader('Icy-MetaData')
-        request.serveIcy = (headerValue == '1')
-
-        return HTTPStreamingResource._render(self, request)
-
-    def _setRequestHeaders(self, request):
-        content = self.streamer.get_content_type(request.serveIcy)
-        request.setHeader('Server', HTTP_SERVER)
-        request.setHeader('Date', http.datetimeToString())
-        request.setHeader('Connection', 'close')
-        request.setHeader('Cache-Control', 'no-cache')
-        request.setHeader('Cache-Control', 'private')
-        request.setHeader('Content-type', content)
-
-        if request.serveIcy:
-            additionalHeaders = self.streamer.get_icy_headers()
-
-            for header in additionalHeaders:
-                request.setHeader(header, additionalHeaders[header])
-
-    def _formatHeaders(self, request):
-        # Mimic Twisted as close as possible
-        headers = []
-        for name, value in request.headers.items():
-            if not name.startswith("icy"):
-                name = name.capitalize()
-            headers.append('%s: %s\r\n' % (name, value))
-        for cookie in request.cookies:
-            headers.append('%s: %s\r\n' % ("Set-Cookie", cookie))
-        return headers
-
-    render_GET = _render
-    render_HEAD = _render
