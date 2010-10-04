@@ -1,5 +1,13 @@
 2010-10-04  Andoni Morales Alastruey  <amorales@flumotion.com>
 
+	* flumotion/component/effects/audioresync/Makefile.am:
+	Add missing files to Makefile.am
+	* flumotion/component/effects/audioresync (svn:ignore):
+	Add missing files to svn:ignore
+
+
+2010-10-04  Andoni Morales Alastruey  <amorales@flumotion.com>
+
 	reviewed by: Xavier Queralt
 	* ChangeLog:
 	* configure.ac:
