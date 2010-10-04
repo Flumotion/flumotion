@@ -108,3 +108,6 @@ class TestFormatTime(TestCase):
 
         value = week * 291 + day * 5 + hour * 13 + minute * 5
         self.assertEquals(formatTime(value), "291 weeks 5 days 13:05")
+
+    def testNegative(self):
+        self.assertEquals(formatTime(-1.0, fractional=1), "- 00:00:01.0")

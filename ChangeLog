@@ -1,5 +1,17 @@
 2010-10-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/format.py:
+	  Support displaying of negative values in seconds.
+	  Fix up docstring.
+	  This fixes displaying discontinuity duration as
+	  6 days 23:59:59:999999999 when it's minus 1 nanosecond,
+	  which sometimes seems to happen in the ogg-muxer for theora
+	  streams.
+	* flumotion/test/test_common_format.py:
+	  Add a test for it.
+
+2010-10-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* doc/random/styleguide:
 	* flumotion/test/test_common_format.py:
 	  Don't use assert for comparisons in tests; it doesn't log the

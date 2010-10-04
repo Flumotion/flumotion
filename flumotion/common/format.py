@@ -71,18 +71,27 @@ def formatStorage(units, precision=2):
 
 def formatTime(seconds, fractional=0):
     """
-    Nicely format time in a human-readable format.
-    Will chunks weeks, days, hours and minutes.
+    Nicely format time in a human-readable format, like
+    5 days 3 weeks HH:MM
+
+    If fractional is zero, no seconds will be shown.
+    If it is greater than 0, we will show seconds and fractions of seconds.
+    As a side consequence, there is no way to show seconds without fractions)
 
     @param seconds:    the time in seconds to format.
     @type  seconds:    int or float
-    @param fractional: how many digits to show for the fractional part.
+    @param fractional: how many digits to show for the fractional part of
+                       seconds.
     @type  fractional: int
 
     @rtype: string
     @returns: a nicely formatted time string.
     """
     chunks = []
+
+    if seconds < 0:
+        chunks.append(('-'))
+        seconds = -seconds
 
     week = 60 * 60 * 24 * 7
     weeks = seconds / week
@@ -114,6 +123,7 @@ def formatTime(seconds, fractional=0):
         chunk += ':%0*.*f' % (fractional + 3, fractional, seconds)
 
     chunks.append(chunk)
+
     return " ".join(chunks)
 
 
