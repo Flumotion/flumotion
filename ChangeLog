@@ -1,5 +1,11 @@
 2010-10-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent010.py:
+	  Log timestamp discontinuities with nanosecond precision, so we
+	  actually see the 1 ns discontinuity on Theora.
+
+2010-10-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/format.py:
 	  Support displaying of negative values in seconds.
 	  Fix up docstring.

@@ -299,12 +299,25 @@ class FeedComponent(basecomponent.BaseComponent):
                     prevTs = s["prev-timestamp"]
                     prevDuration = s["prev-duration"]
                     curTs = s["cur-timestamp"]
+
+                    if prevTs == gst.CLOCK_TIME_NONE:
+                        self.debug("no previous timestamp")
+                        return
+                    if prevDuration == gst.CLOCK_TIME_NONE:
+                        self.debug("no previous duration")
+                        return
+                    if curTs == gst.CLOCK_TIME_NONE:
+                        self.debug("no current timestamp")
+                        return
+
                     discont = curTs - (prevTs + prevDuration)
                     dSeconds = discont / float(gst.SECOND)
-                    self.debug("we have a discont on eater %s of %f s "
+                    self.debug("we have a discont on eater %s of %.9f s "
                                "between %s and %s ", eater.eaterAlias,
-                               dSeconds, gst.TIME_ARGS(prevTs + prevDuration),
+                               dSeconds,
+                               gst.TIME_ARGS(prevTs + prevDuration),
                                gst.TIME_ARGS(curTs))
+
                     eater.timestampDiscont(dSeconds,
                                            float(curTs) / float(gst.SECOND))
 
