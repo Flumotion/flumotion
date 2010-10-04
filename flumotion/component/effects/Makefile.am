@@ -11,6 +11,7 @@ clean-local:
 
 SUBDIRS = \
 	audiorate \
+	audioresync \
 	colorbalance \
 	deinterlace  \
 	videorate \

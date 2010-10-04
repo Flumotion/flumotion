@@ -1,0 +1,44 @@
+<registry>
+  <bundles>
+
+    <bundle name="audioresync-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/audioresync">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="audioresync-admin-gtk">
+        <dependencies>
+            <dependency name="base-admin-gtk" />
+            <dependency name="audioresync-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/audioresync">
+                <filename location="admin_gtk.py" />
+                <filename location="audioresync.glade" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="audioresync-effect">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="audioresync-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/audioresync">
+                <filename location="audioresync.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry>

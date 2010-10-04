@@ -1,7 +1,20 @@
 2010-10-04  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Xavier Queralt
+	* ChangeLog:
+	* configure.ac:
+	* flumotion/component/effects/Makefile.am:
+	* flumotion/component/effects/audioresync/Makefile.am:
+	* flumotion/component/effects/audioresync/__init__.py:
+	* flumotion/component/effects/audioresync/admin_gtk.py:
+	* flumotion/component/effects/audioresync/audioresync.glade:
+	* flumotion/component/effects/audioresync/audioresync.py:
+	* flumotion/component/effects/audioresync/audioresync.xml:
+	Add audio resynchroniser effect
 
+2010-10-04  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
 	* flumotion/common/registry.py:
 	Add more logging to the registry
 
