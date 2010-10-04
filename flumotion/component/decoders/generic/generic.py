@@ -21,6 +21,7 @@
 
 import gst
 import gobject
+import threading
 
 from flumotion.component import decodercomponent as dc
 from flumotion.common import messages
@@ -68,141 +69,97 @@ class SyncKeeper(gst.Element):
                                 gst.PAD_ALWAYS,
                                 gst.caps_from_string(BASIC_VIDEO_CAPS))
 
-    nextVideoTs = 0
-    nextAudioTs = 0
-    videoReceived = False
-    audioReceived = False
-    audioDiscontBuffer = None
-    videoDiscontBuffer = None
-
-    sendVideoNewSegment = True
-    sendAudioNewSegment = True
-    videoPadding = 0
-    audioPadding = 0
-    resetReceived = False
-
     def __init__(self):
         gst.Element.__init__(self)
 
-        self.audiosink = gst.Pad(self._audiosink, "audio-in")
-        self.audiosink.set_chain_function(self.chainfunc)
-        self.audiosink.set_event_function(self.eventfunc)
-        self.add_pad(self.audiosink)
-        self.videosink = gst.Pad(self._videosink, "video-in")
-        self.videosink.set_chain_function(self.chainfunc)
-        self.videosink.set_event_function(self.eventfunc)
-        self.add_pad(self.videosink)
-
+        # create source pads
         self.audiosrc = gst.Pad(self._audiosrc, "audio-out")
         self.add_pad(self.audiosrc)
         self.videosrc = gst.Pad(self._videosrc, "video-out")
         self.add_pad(self.videosrc)
 
-    def push_video_buffer(self, buffer):
-        buffer.timestamp += self.videoPadding
-        self.nextVideoTs = buffer.timestamp + buffer.duration
-        if self.sendVideoNewSegment:
-            self.info(
-              "Pushing new segment with start time %s for video" %
-                gst.TIME_ARGS(buffer.timestamp))
-            self.videosrc.push_event(
+        # create the sink pads and set the chain and event function
+        self.audiosink = gst.Pad(self._audiosink, "audio-in")
+        self.audiosink.set_chain_function(lambda pad, buffer:
+            self.chainfunc(pad, buffer, self.audiosrc))
+        self.audiosink.set_event_function(lambda pad, buffer:
+            self.eventfunc(pad, buffer, self.audiosrc))
+        self.add_pad(self.audiosink)
+        self.videosink = gst.Pad(self._videosink, "video-in")
+        self.videosink.set_chain_function(lambda pad, buffer:
+            self.chainfunc(pad, buffer, self.videosrc))
+        self.videosink.set_event_function(lambda pad, buffer:
+            self.eventfunc(pad, buffer, self.videosrc))
+        self.add_pad(self.videosink)
+
+        # all this variables need to be protected with a lock!!!
+        self._lock = threading.Lock()
+        self._totalTime = 0L
+        self._syncTimestamp = 0L
+        self._syncOffset = 0L
+        self._resetReceived = True
+        self._sendNewSegment = True
+
+    def _send_new_segment(self):
+        for pad in [self.videosrc, self.audiosrc]:
+            pad.push_event(
                 gst.event_new_new_segment(True, 1.0, gst.FORMAT_TIME,
-                                          buffer.timestamp, -1, 0))
-            self.sendVideoNewSegment = False
+                                          self._syncTimestamp, -1, 0))
+        self._sendNewSegment = False
 
-        self.log(
-          "Output video timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp),
-                                              gst.TIME_ARGS(buffer.duration)))
-        self.videosrc.push(buffer)
+    def _update_sync_point(self, start, position):
+        # Only update the sync point if we haven't received any buffer
+        # (totalTime == 0) or we received a reset
+        if not self._totalTime and not self._resetReceived:
+            return
+        self._syncTimestamp = self._totalTime
+        self._syncOffset = start + (start - position)
+        self._resetReceived = False
+        self.info("Update sync point to % r, offset to %r" %
+            (gst.TIME_ARGS(self._syncTimestamp),
+            (gst.TIME_ARGS(self._syncOffset))))
 
-    def push_audio_buffer(self, buffer):
-        buffer.timestamp += self.audioPadding
-        self.nextAudioTs = buffer.timestamp + buffer.duration
-        if self.sendAudioNewSegment:
-            self.info(
-              "Pushing new segment with start time %s for audio" %
-                gst.TIME_ARGS(buffer.timestamp))
-            self.audiosrc.push_event(
-                gst.event_new_new_segment(True, 1.0, gst.FORMAT_TIME,
-                                          buffer.timestamp, -1, 0))
-            self.sendAudioNewSegment = False
+    def chainfunc(self, pad, buf, srcpad):
+        self.log("Input %s timestamp: %s, %s" %
+            (srcpad is self.audiosrc and 'audio' or 'video',
+            gst.TIME_ARGS(buf.timestamp),
+            gst.TIME_ARGS(buf.duration)))
 
-        self.log(
-          "Output audio timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp),
-                                              gst.TIME_ARGS(buffer.duration)))
-        self.audiosrc.push(buffer)
+        if not self._sendNewSegment:
+            self._send_new_segment()
 
-    def fixAVPadding(self, videoBuffer=None, audioBuffer=None):
-        if not self.resetReceived:
-            return False
-        if not videoBuffer or not audioBuffer:
-            return False
-        diff = audioBuffer.timestamp - videoBuffer.timestamp
-        newStart = max(self.nextVideoTs, self.nextAudioTs)
+        try:
+            self._lock.acquire()
+            buf.timestamp += self._syncTimestamp - self._syncOffset
+            dur = buf.duration != gst.CLOCK_TIME_NONE and buf.duration or 0
+            self._totalTime = max(buf.timestamp + dur, self._totalTime)
 
-        if diff > 0:
-            self.videoPadding = newStart - videoBuffer.timestamp
-            self.audioPadding = newStart + diff - audioBuffer.timestamp
-        else:
-            self.videoPadding = newStart + diff - videoBuffer.timestamp
-            self.audioPadding = newStart - audioBuffer.timestamp
+            self.log("Output %s timestamp: %s, %s" %
+                (srcpad is self.audiosrc and 'audio' or 'video',
+                gst.TIME_ARGS(buf.timestamp),
+                gst.TIME_ARGS(buf.duration)))
+        finally:
+            self._lock.release()
 
-        self.resetReceived = False
+        srcpad.push(buf)
+        return gst.FLOW_OK
 
-        return True
-
-    def chainfunc(self, pad, buffer):
-        if pad.get_name() == 'audio-in':
-            self.log(
-           "Input audio timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp),
-                                              gst.TIME_ARGS(buffer.duration)))
-            if self.fixAVPadding(self.videoDiscontBuffer, buffer):
-                self.push_video_buffer(self.videoDiscontBuffer)
-                self.videoDiscontBuffer = None
-
-            # Check contiguous buffer
-            self.audioReceived = True
-            if self.videoReceived:
-                self.push_audio_buffer(buffer)
-            elif self.resetReceived:
-                self.audioDiscontBuffer = buffer
-
-            return gst.FLOW_OK
-        elif pad.get_name() == 'video-in':
-            self.log(
-           "Input video timestamp: %s, %s" % (gst.TIME_ARGS(buffer.timestamp),
-                                              gst.TIME_ARGS(buffer.duration)))
-
-            if self.fixAVPadding(buffer, self.audioDiscontBuffer):
-                self.push_audio_buffer(self.audioDiscontBuffer)
-                self.audioDiscontBuffer = None
-
-            self.videoReceived = True
-            if self.audioReceived:
-                self.push_video_buffer(buffer)
-            elif self.resetReceived:
-                self.videoDiscontBuffer = buffer
-
-            return gst.FLOW_OK
-        else:
-            return gst.FLOW_ERROR
-
-    def eventfunc(self, pad, event):
+    def eventfunc(self, pad, event, srcpad):
         self.debug("Received event %r from %s" % (event, event.src))
-        if event.type == gst.EVENT_NEWSEGMENT:
-            return False
-        if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
-            return True
-        if event.get_structure().get_name() != 'flumotion-reset':
-            return True
-        self.resetReceived = True
-        self.videoReceived = False
-        self.audioReceived = False
-        self.sendVideoNewSegment = True
-        self.sendAudioNewSegment = True
+        try:
+            self._lock.acquire()
+            if event.type == gst.EVENT_NEWSEGMENT:
+                u, r, f, start, s, position = event.parse_new_segment()
+                self._update_sync_point(start, position)
+            if event.get_structure().get_name() == 'flumotion-reset':
+                self._resetReceived = True
+                self._send_new_segment = True
+        finally:
+            self._lock.release()
 
-        self.audiosrc.push_event(event)
-        self.videosrc.push_event(event)
+        # forward all the events except the new segment events
+        if event.type != gst.EVENT_NEWSEGMENT:
+            return srcpad.push_event(event)
         return True
 
 gobject.type_register(SyncKeeper)

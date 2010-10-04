@@ -1,3 +1,16 @@
+2010-10-04  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+	* flumotion/component/decoders/generic/generic.py:
+	Fix generic decoder's synchronisation element:
+	 - Make it thread safe (audio and video can be in different threads).
+	 - Retimestamp buffers using a common sync point for audio and video
+		and adding the buffer's running time calculated from the start of
+		the current segment to avoid desynchronisations whilst increasing
+		continuously the timetamps of the outgoing buffers.
+	 - Only drop new segment event and forward the rest.
+	 - Send a flumotion-reset event when the decoder is restarted.
+
 2010-10-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent010.py:
