@@ -206,7 +206,7 @@ class Overlay(feedcomponent.ParseLaunchComponent):
         @param source: the appsrc element to push to
         @type source: GstElement
         """
-        self.debug("Pushing buffer")
+        self.log("Pushing buffer")
         gstBuf = gst.Buffer(self.imgBuf)
         padcaps = gst.caps_from_string(self.capsStr)
         gstBuf.set_caps(padcaps)

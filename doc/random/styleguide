@@ -128,6 +128,19 @@ NAMING
 - component properties and uiState keys should be named lowercase and
   hyphenated.
 
+LOGGING
+-------
+- As in GStreamer:
+  - use log level 5 (LOG) for messages about steady state that occur often
+    (every second or less, every buffer, ...)
+  - log level 3 is meant for normal users to be read, so take special care
+    in formatting the messages.
+
+- Make logging consistent; for example, format logging about file descriptors
+  always in the same way to make it easy to search/grep
+
+- Make logging symmetrical; log starting and stopping in the same way.
+
 MODULES
 -------
 - the docstring should come before imports; otherwise it does not work
