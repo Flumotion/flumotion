@@ -161,3 +161,69 @@ class HTTPStreamerAdminGtk(BaseAdminGtk):
         self.nodes['Log'].logMessage(message)
 
 GUIClass = HTTPStreamerAdminGtk
+
+
+class IcyAdminGtkNode(BaseAdminGtkNode):
+    gladeFile = os.path.join('flumotion', 'component', 'consumers',
+                              'httpstreamer', 'icytab.glade')
+
+    def __init__(self, *args, **kwargs):
+        BaseAdminGtkNode.__init__(self, *args, **kwargs)
+        self._icytab = None
+        self._shown = False
+        self._stats = None
+        self._labels = {}
+
+    def haveWidgetTree(self):
+        self._labels = {}
+        self._icytab = self.wtree.get_widget('main_vbox')
+        self.widget = self._icytab
+
+        for name in ['title', 'timestamp']:
+            self._registerLabel('icy-' + name)
+
+        return self.widget
+
+    def _registerLabel(self, name):
+        widget = self.wtree.get_widget('label-' + name)
+        if not widget:
+            print "FIXME: no widget %s" % name
+            return
+
+        self._labels[name] = widget
+
+    def _updateLabels(self, stats):
+        for name in self._labels:
+            text = stats.get(name, '')
+            self._labels[name].set_text(text)
+
+    def setStats(self, stats):
+        # Set _stats regardless of if condition
+        # Used to be a race where _stats was
+        # not set if widget tree was gotten before
+        # ui state
+        self._stats = stats
+        if not self._icytab:
+            return
+
+        self._updateLabels(stats)
+
+        if not self._shown:
+            # widget tree created but not yet shown
+            self._shown = True
+            self._icytab.show_all()
+
+
+class ICYStreamerAdminGtk(HTTPStreamerAdminGtk):
+
+    def setup(self):
+        icytab = IcyAdminGtkNode(self.state, self.admin,
+            _("ICY"))
+        self.nodes['ICY'] = icytab
+
+        HTTPStreamerAdminGtk.setup(self)
+
+    def uiStateChanged(self, state):
+        HTTPStreamerAdminGtk.uiStateChanged(self, state)
+
+        self.nodes['ICY'].setStats(state)

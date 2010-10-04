@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 import gst
-from twisted.internet import defer
+from twisted.internet import defer, reactor
 from flumotion.component import feedcomponent
 from flumotion.twisted.defer import RetryingDeferred
 from flumotion.common import errors
@@ -33,42 +33,59 @@ class Icecast(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         return "souphttpsrc name=src ! typefind name=tf"
 
+    def _typefind_have_caps_cb(self, tf, prob, caps):
+        # Basing on the cappabilities plug additional gst compoponents:
+        # 1. If we have pure audio (http src doesn't support ICY) plug parser
+        # 2. If we have application/x-icy plug the icydemuxer and than parser
+        capsname = caps[0].get_name()
+        tf_src_pad = tf.get_pad('src')
+        gdp_sink_pad = tf_src_pad.get_peer()
+        # unlink the typefind from the gdp pad so that we can put another
+        # component in it's place
+        tf_src_pad.unlink(gdp_sink_pad)
+
+        if capsname == 'application/x-icy':
+            demuxer = gst.element_factory_make("icydemux")
+            demuxer.set_state(gst.STATE_PLAYING)
+            self.pipeline.add(demuxer)
+            tf.link(demuxer)
+            # demuxer src pad is dynamic, we need to register a callback
+            demuxer.connect('pad-added', self._link_parser, gdp_sink_pad)
+        else:
+            self._link_parser(tf, tf_src_pad, gdp_sink_pad)
+
+    def _link_parser(self, element, pad, gdp_sink_pad):
+        # Append the audio parser to the end of the pipeline
+        capsname = pad.get_caps().get_structure(0).get_name()
+        parser = None
+        if capsname == 'application/ogg':
+            parser = gst.element_factory_make('oggparse')
+        elif capsname == 'audio/mpeg':
+            parser = gst.element_factory_make('mp3parse')
+
+        if parser:
+            parser.set_state(gst.STATE_PLAYING)
+            self.pipeline.add(parser)
+            element.link(parser)
+            parser.get_pad('src').link(gdp_sink_pad)
+        else:
+            # in case we good sth else than mp3 or ogg just connect the
+            # gdb back
+            self.warn("Couldn't find the correct parser for caps: %s",\
+                capsname)
+            pad.link(gdp_sink_pad)
+
     def configure_pipeline(self, pipeline, properties):
         # Later, when the typefind element has successfully found the type
         # of the data, we'll rebuild the pipeline.
-
-        def have_caps(tf, prob, caps):
-            capsname = caps[0].get_name()
-            # We should add appropriate parsers for any given format here. For
-            # some it's critical for this to work at all, for others
-            # it's needed for timestamps (thus for things like
-            # time-based burst-on-connect) Currently, we only handle ogg.
-            parser = None
-            if capsname == 'application/ogg':
-                parser = gst.element_factory_make('oggparse')
-            elif capsname == 'audio/mpeg':
-                parser = gst.element_factory_make('mp3parse')
-
-            if parser:
-                parser.set_state(gst.STATE_PLAYING)
-                pipeline.add(parser)
-                # Relink - unlink typefind from the bits that follow it (the
-                # gdp payloader), link in the parser, relink to the payloader.
-                pad = tf.get_pad('src')
-                peer = pad.get_peer()
-                pad.unlink(peer)
-                tf.link(parser)
-                parser.link(peer.get_parent())
-                # Disconnect signal to avoid adding a parser every time
-                # it gets reconnected.
-                tf.disconnect(self.signal_id)
-
         self.src = pipeline.get_by_name('src')
         self.url = properties['url']
         self.src.set_property('location', self.url)
+        self.src.set_property('iradio-mode', True)
 
         typefind = pipeline.get_by_name('tf')
-        self.signal_id = typefind.connect('have-type', have_caps)
+        self.signal_id = typefind.connect('have-type',\
+                self._typefind_have_caps_cb)
 
         self._pad_monitors.attach(self.src.get_pad('src'), 'souphttp-src')
         self._pad_monitors['souphttp-src'].addWatch(
