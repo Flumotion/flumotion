@@ -100,6 +100,109 @@
                   _description="How much data to burst (in seconds)." />
       </properties>
     </component>
+
+    <component type="icy-streamer"
+               base="flumotion/component/consumers/httpstreamer"
+               _description="A consumer that streams ICY stream over HTTP.">
+<!-- old way of specifying component source -->
+      <source location="flumotion.component.consumers.httpstreamer.httpstreamer" />
+
+      <eater name="default" />
+      
+      <wizard type="consumer" feeder="default"
+              _description="S_tream over HTTP" rank="128"/>
+
+      <!-- entry points for distributable code bundles -->
+     <entries>
+        <entry type="component" location="httpstreamer.py"
+               function="ICYStreamer" />
+      </entries>
+
+      <sockets>
+        <socket type="flumotion.component.plugs.request.RequestLoggerPlug" />
+        <socket type="flumotion.component.plugs.base.ComponentPlug" />
+        <socket type="flumotion.component.plugs.streamdata.StreamDataProviderPlug" />
+        <socket type="flumotion.component.plugs.rrd.ComponentRRDPlug" />
+        <socket type="flumotion.component.plugs.requestmodifier.RequestModifierPlug"/>
+        <socket type="flumotion.component.bouncers.plug.BouncerPlug" />
+        <socket type="flumotion.component.bouncers.algorithms.BouncerAlgorithm" />
+      </sockets>
+
+      <properties>
+        <!-- FIXME, authenticating against remote bouncers should happen through
+             a plug, not this property -->
+        <property name="bouncer" type="string"
+
+                  _description="The name of a bouncer in the atmosphere to authenticate against." />
+        <property name="issuer-class" type="string"
+                  _description="The Python class of the Keycard issuer to use." />
+	<property name="allow-default" type="bool"
+		  _description="Whether failure to communicate with the bouncer should make the component accept the connection." />
+        <property name="mount-point" type="string"
+          _description="The mount point on which the stream can be accessed." />
+
+        <property name="type" type="string"
+                  _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
+
+        <!-- If type is 'master' (default) -->
+        <property name="port" type="int"
+                  _description="The port to listen on (if type is 'master')." />
+
+        <!-- If type is 'slave' -->
+        <property name="porter-socket-path" type="string"
+                  _description="The path to the socket to communicate with the porter." />
+        <property name="porter-username" type="string"
+                  _description="The username to authenticate to the porter." />
+        <property name="porter-password" type="string"
+                  _description="The password to authenticate to the porter." />
+
+        <!-- Hostname currently for display purposes -->
+        <property name="hostname" type="string"
+                  _description="The server's host name to display." />
+        <property name="domain" type="string"
+                  _description="The domain of the server for authentication." />
+
+        <property name="client-limit" type="int"
+                  _description="The maximum number of clients allowed." />
+        <property name="bandwidth-limit" type="int"
+                  _description="The maximum bandwidth usage allowed in bits per second." />
+        <property name="redirect-on-overflow" type="string"
+                  _description="A URL to redirect clients to if either of the limits have been reached." />
+
+        <property name="duration" type="float"
+                  _description="How long to keep clients connected (in seconds)."/>
+        <property name="description" type="string"
+                  _description="A description of the stream."/>
+
+        <!-- IP-based filtering for logs; commonly used to filter out
+             automated-tester IPs from the logs. Values should be of the form
+             network-address/prefix-length, e.g. "192.168.1.0/24" -->
+        <property name="ip-filter" type="string" multiple="yes"
+                  _description="The IP network-address/prefix-length to filter out of logs." />
+
+        <!-- Burst on connect options. Defaults to off.
+             If just burst-on-connect is specified, this gives a simple
+             burst-from-latest keyframe (so no effect for audio streams).
+
+             Additionally, you MAY specify either (not both) of burst-size,
+             burst-time. burst-size gives a minimum target burst in kB (it can
+             be larger to start from a keyframe).
+             burst-time gives a target burst time in seconds (but requires
+             gst-plugins-base 0.10.11 or later).
+          -->
+        <property name="burst-on-connect" type="bool"
+                  _description="Whether to burst old data on client connection (reduces buffering time)." />
+        <property name="burst-size" type="int"
+                  _description="How much data to burst (in KB)." />
+        <property name="burst-time" type="float"
+                  _description="How much data to burst (in seconds)." />
+	<property name="frame-size" type="int"
+		  _description="Size of the frame in bytes." />
+	<property name="metadata-interval" type="float"
+		  _description="How offten to send the stream title changes (in seconds)." />
+      </properties>
+    </component>
+
   </components>
 
   <bundles>
@@ -155,6 +258,22 @@
             <directory name="flumotion/component/consumers/httpstreamer">
                 <filename location="httpstreamer.py" />
                 <filename location="resources.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="icystreamer-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="httpstreamer-base" />
+	    <dependency name="httpstreamer-component" />
+            <dependency name="base-component-http" />
+            <dependency name="porterclient" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/httpstreamer">
+                <filename location="icymux.py" />
             </directory>
         </directories>
     </bundle>

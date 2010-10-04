@@ -1,3 +1,16 @@
+2010-10-01  Marek Kowalski  <mkowalski@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	Introduce icy-streamer component and ICYResource class for parsing
+	incoming request headers.
+	* flumotion/test/test_component_icystreamer.py:
+	Tests for new component.
+	* flumotion/component/consumers/httpstreamer/icymux.py:
+	Muxer producing application/x-icy stream combining title changes
+	based on events.
+
 2010-10-01  Marek Kowalski <mkowalski@flumotion.com>
 
 	* flumotion/component/producers/icecast/icecast.py:
