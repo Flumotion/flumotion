@@ -116,6 +116,8 @@
      <entries>
         <entry type="component" location="httpstreamer.py"
                function="ICYStreamer" />
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="ICYStreamerAdminGtk" />
       </entries>
 
       <sockets>
@@ -232,6 +234,21 @@
         </directory>
       </directories>
     </bundle>
+
+    <bundle name="icystreamer-admin-gtk">
+      <dependencies>
+        <dependency name="httpstreamer-base" />
+	<dependency name="httpstreamer-admin-gtk" />
+        <dependency name="base-admin-gtk" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/consumers/httpstreamer">
+	  <filename location="icytab.glade" />
+        </directory>
+      </directories>
+    </bundle>
+
     
     <bundle name="httpstreamer-wizard">
       <dependencies>

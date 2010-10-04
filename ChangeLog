@@ -1,3 +1,10 @@
+2010-10-04  Marek Kowalski  <mkowalski@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/httpstreamer/icytab.glade:
+	Admin UI for http streamer.
+
 2010-10-01  Marek Kowalski  <mkowalski@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
