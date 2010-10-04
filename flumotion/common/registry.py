@@ -1716,7 +1716,12 @@ class ComponentRegistry(log.Loggable):
         self._parser.clean()
 
     def rebuildNeeded(self):
-        if self.mtime is None or not os.path.exists(self.filename):
+        if self.mtime is None:
+            self.log("Rebuild needed: missing mtime")
+            return True
+        if not os.path.exists(self.filename):
+            self.log("Rebuild needed: registry file %s doesn't exists",
+                self.filename)
             return True
 
         # A bit complicated because we want to allow FLU_PROJECT_PATH to
@@ -1726,8 +1731,12 @@ class ComponentRegistry(log.Loggable):
                                 for directory in self.getDirectories()])
         if registryPaths != oldRegistryPaths:
             if oldRegistryPaths - registryPaths:
+                self.log("Rebuild needed: registry paths removed")
                 return True
-            if filter(os.path.exists, registryPaths - oldRegistryPaths):
+            f = filter(os.path.exists, registryPaths - oldRegistryPaths)
+            if f:
+                self.log("Rebuild needed: a newly added registry path doesn't "
+                    "exists: %s", f)
                 return True
 
         registry_modified = self.mtime

@@ -1,6 +1,13 @@
 2010-10-04  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Xavier Queralt
+
+	* flumotion/common/registry.py:
+	Add more logging to the registry
+
+2010-10-04  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
 	* flumotion/component/decoders/generic/generic.py:
 	Fix generic decoder's synchronisation element:
 	 - Make it thread safe (audio and video can be in different threads).
