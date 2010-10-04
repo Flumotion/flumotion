@@ -272,7 +272,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         return False
 
     def isReady(self):
-        if self.streamer.caps == None:
+        if not self.streamer.hasCaps():
             self.debug('We have no caps yet')
             return False
 

@@ -1,3 +1,10 @@
+2010-09-30  Marek Kowalski <mkowalski@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/test/test_http.py
+	Support for more than one sink in streamer component.
+
 2010-09-28  Marek Kowalski <mkowalski@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:

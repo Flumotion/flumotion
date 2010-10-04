@@ -49,10 +49,12 @@ UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two
 # FIXME: generalize this class and move it out here ?
 
 
-class Stats:
+class Stats(object):
 
-    def __init__(self, sink):
-        self.sink = sink
+    def __init__(self, sinks):
+        if not isinstance(sinks, list):
+            sinks = [sinks]
+        self.sinks = sinks
 
         self.no_clients = 0
         self.clients_added_count = 0
@@ -141,10 +143,12 @@ class Stats:
             return self.getBytesReceived() * 8 / self.getUptime()
 
     def getBytesSent(self):
-        return self.sink.get_property('bytes-served')
+        return sum(map(
+                lambda sink: sink.get_property('bytes-served'), self.sinks))
 
     def getBytesReceived(self):
-        return self.sink.get_property('bytes-to-serve')
+        return max(map(
+                lambda sink: sink.get_property('bytes-to-serve'), self.sinks))
 
     def getUptime(self):
         return time.time() - self.start_time
@@ -539,9 +543,14 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     def getMaxClients(self):
         return self.resource.maxclients
 
+    def hasCaps(self):
+        # all the sinks should have caps set
+        sinkHasCaps = map(lambda sink: sink.caps is not None, self.sinks)
+        return None not in sinkHasCaps
+
     def get_mime(self):
-        if self.caps:
-            return self.caps.get_structure(0).get_name()
+        if self.sinks[0].caps:
+            return self.sinks[0].caps[0].get_name()
 
     def get_content_type(self):
         mime = self.get_mime()
@@ -652,6 +661,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
     ### START OF THREAD-AWARE CODE (called from non-reactor threads)
 
     def _notify_caps_cb(self, element, pad, param):
+        # We store caps in sink objects as
+        # each sink might (and will) serve different content-type
         caps = pad.get_negotiated_caps()
         if caps == None:
             return
@@ -659,11 +670,11 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         caps_str = gstreamer.caps_repr(caps)
         self.debug('Got caps: %s' % caps_str)
 
-        if not self.caps == None:
+        if not element.caps == None:
             self.warning('Already had caps: %s, replacing' % caps_str)
 
         self.debug('Storing caps: %s' % caps_str)
-        self.caps = caps
+        element.caps = caps
 
         reactor.callFromThread(self.update_ui_state)
 
