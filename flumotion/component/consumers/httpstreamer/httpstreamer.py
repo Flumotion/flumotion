@@ -270,6 +270,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                                 'recover-policy=3'
 
     componentMediumClass = HTTPMedium
+    defaultSyncMethod = 0
 
     def init(self):
         reactor.debug = True
@@ -405,16 +406,17 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 sink.set_property('buffers-max', 500)
         else:
             self.debug("no burst-on-connect, setting sync-method 0")
-            sink.set_property('sync-method', 0)
+            sink.set_property('sync-method', self.defaultSyncMethod)
 
             sink.set_property('buffers-soft-max', 250)
             sink.set_property('buffers-max', 500)
 
-    def configure_pipeline(self, pipeline, properties):
-        Stats.__init__(self, sink=self.get_element('sink'))
+    def configureAuthAndResource(self):
+        self.httpauth = http.HTTPAuthentication(self)
+        self.resource = resources.HTTPStreamingResource(self,
+                                                        self.httpauth)
 
-        self._updateCallLaterId = reactor.callLater(10, self._updateStats)
-
+    def parseProperties(self, properties):
         mountPoint = properties.get('mount-point', '')
         if not mountPoint.startswith('/'):
             mountPoint = '/' + mountPoint
@@ -436,35 +438,10 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         if self.description is None:
             self.description = "Flumotion Stream"
 
-        # FIXME: tie these together more nicely
-        self.httpauth = http.HTTPAuthentication(self)
-        self.resource = resources.HTTPStreamingResource(self,
-                                                        self.httpauth)
-
         # check how to set client sync mode
-        sink = self.get_element('sink')
         self.burst_on_connect = properties.get('burst-on-connect', False)
         self.burst_size = properties.get('burst-size', 0)
         self.burst_time = properties.get('burst-time', 0.0)
-
-        self.setup_burst_mode(sink)
-
-        if gstreamer.element_factory_has_property('multifdsink',
-                                                  'resend-streamheader'):
-            sink.set_property('resend-streamheader', False)
-        else:
-            self.debug("resend-streamheader property not available, "
-                       "resending streamheader when it changes in the caps")
-
-        sink.connect('deep-notify::caps', self._notify_caps_cb)
-
-        # these are made threadsafe using idle_add in the handler
-        sink.connect('client-added', self._client_added_handler)
-
-        # We now require a sufficiently recent multifdsink anyway that we can
-        # use the new client-fd-removed signal
-        sink.connect('client-fd-removed', self._client_fd_removed_cb)
-        sink.connect('client-removed', self._client_removed_cb)
 
         if 'client-limit' in properties:
             limit = int(properties['client-limit'])
@@ -524,6 +501,38 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
 
         self.port = int(properties.get('port', 8800))
 
+    def configureSink(self, sink):
+        self.setup_burst_mode(sink)
+
+        if gstreamer.element_factory_has_property('multifdsink',
+                                                  'resend-streamheader'):
+            sink.set_property('resend-streamheader', False)
+        else:
+            self.debug("resend-streamheader property not available, "
+                       "resending streamheader when it changes in the caps")
+
+        sink.connect('deep-notify::caps', self._notify_caps_cb)
+
+        # these are made threadsafe using idle_add in the handler
+        sink.connect('client-added', self._client_added_handler)
+
+        # We now require a sufficiently recent multifdsink anyway that we can
+        # use the new client-fd-removed signal
+        sink.connect('client-fd-removed', self._client_fd_removed_cb)
+        sink.connect('client-removed', self._client_removed_cb)
+
+        sink.caps = None
+
+    def configure_pipeline(self, pipeline, properties):
+        Stats.__init__(self, self.get_element('sink'))
+        self._updateCallLaterId = reactor.callLater(10, self._updateStats)
+
+        self.configureAuthAndResource()
+        self.parseProperties(properties)
+
+        sink = self.get_element('sink')
+        self.configureSink(sink)
+
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.name
 
@@ -575,7 +584,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return (deltaadded * bitrate, deltaremoved * bitrate, bytes_sent,
             clients_connected, current_load)
 
-    def add_client(self, fd):
+    def add_client(self, fd, request):
         sink = self.get_element('sink')
         sink.emit('add', fd)
 

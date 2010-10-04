@@ -1,3 +1,11 @@
+2010-09-28  Marek Kowalski <mkowalski@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	Code refactoring in httpstreamer module.
+	Split long methods into smaller parts so that it is
+	easy to overload them in child class.
+
 2010-10-04  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	* flumotion/component/effects/audioresync/Makefile.am:
