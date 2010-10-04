@@ -103,6 +103,8 @@ example:
   indication of what is wrong
 - don't use failIf to do comparisons.  Instead, use assertEquals or
   failIfEquals
+- don't use a regular assert to do comparisons; it will not tell you
+  what the actual value is that is triggering the failure.
 
 NAMING
 ------

@@ -27,38 +27,38 @@ class TestFormatStorage(TestCase):
 
     def testBytes(self):
         value = 4
-        assert formatStorage(value) == "4.00 "
+        self.assertEquals(formatStorage(value), "4.00 ")
 
     def testKibibyte(self):
         value = 1024
-        assert formatStorage(value) == "1.02 k"
-        assert formatStorage(value, 3) == "1.024 k"
+        self.assertEquals(formatStorage(value), "1.02 k")
+        self.assertEquals(formatStorage(value, 3), "1.024 k")
 
     def testMegabyte(self):
         value = 1000 * 1000
-        assert formatStorage(value) == "1.00 M"
+        self.assertEquals(formatStorage(value), "1.00 M")
 
     def testMebibyte(self):
         value = 1024 * 1024
-        assert formatStorage(value) == "1.05 M"
-        assert formatStorage(value, 3) == "1.049 M"
-        assert formatStorage(value, 4) == "1.0486 M"
+        self.assertEquals(formatStorage(value), "1.05 M")
+        self.assertEquals(formatStorage(value, 3), "1.049 M")
+        self.assertEquals(formatStorage(value, 4), "1.0486 M")
 
     def testGibibyte(self):
         value = 1024 * 1024 * 1024
-        assert formatStorage(value, 4) == "1.0737 G"
+        self.assertEquals(formatStorage(value, 4), "1.0737 G")
 
     def testTebibyte(self):
         value = 1024 * 1024 * 1024 * 1024
-        assert formatStorage(value, 4) == "1.0995 T"
+        self.assertEquals(formatStorage(value, 4), "1.0995 T")
 
     def testPebibyte(self):
         value = 1024 * 1024 * 1024 * 1024 * 1024
-        assert formatStorage(value, 4) == "1.1259 P"
+        self.assertEquals(formatStorage(value, 4), "1.1259 P")
 
     def testExbibyte(self):
         value = 1024 * 1024 * 1024 * 1024 * 1024 * 1024
-        assert formatStorage(value, 4) == "1.1529 E"
+        self.assertEquals(formatStorage(value, 4), "1.1529 E")
 
 
 class TestFormatTime(TestCase):
@@ -70,35 +70,35 @@ class TestFormatTime(TestCase):
 
     def testSecond(self):
         value = 1
-        assert formatTime(value) == "00:00"
+        self.assertEquals(formatTime(value), "00:00")
 
     def testMinuteSecond(self):
         value = 60 + 1
-        assert formatTime(value) == "00:01"
+        self.assertEquals(formatTime(value), "00:01")
 
     def testHourMinuteSecond(self):
         value = 60 * 60 + 60 + 2
-        assert formatTime(value) == "01:01"
+        self.assertEquals(formatTime(value), "01:01")
 
     def testDay(self):
         value = 60 * 60 * 24
-        assert formatTime(value) == "1 day 00:00"
+        self.assertEquals(formatTime(value), "1 day 00:00")
 
     def testDays(self):
         value = 60 * 60 * 24 * 2
-        assert formatTime(value) == "2 days 00:00"
+        self.assertEquals(formatTime(value), "2 days 00:00")
 
     def testWeek(self):
         value = 60 * 60 * 24 * 7
-        assert formatTime(value) == "1 week 00:00"
+        self.assertEquals(formatTime(value), "1 week 00:00")
 
     def testWeeks(self):
         value = 60 * 60 * 24 * 7 * 2
-        assert formatTime(value) == "2 weeks 00:00"
+        self.assertEquals(formatTime(value), "2 weeks 00:00")
 
     def testYear(self):
         value = 60 * 60 * 24 * 365
-        assert formatTime(value) == "52 weeks 1 day 00:00"
+        self.assertEquals(formatTime(value), "52 weeks 1 day 00:00")
 
     def testReallyLong(self):
         minute = 60
@@ -107,4 +107,4 @@ class TestFormatTime(TestCase):
         week = day * 7
 
         value = week * 291 + day * 5 + hour * 13 + minute * 5
-        assert formatTime(value) == "291 weeks 5 days 13:05"
+        self.assertEquals(formatTime(value), "291 weeks 5 days 13:05")

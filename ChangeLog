@@ -1,6 +1,13 @@
 2010-10-03  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* doc/random/styleguide:
+	* flumotion/test/test_common_format.py:
+	  Don't use assert for comparisons in tests; it doesn't log the
+	  actual value when the test fails.
+
+2010-10-03  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* doc/random/styleguide:
 	* flumotion/component/converters/overlay/overlay.py:
 	  Logging about every buffer should be at LOG level.
 
