@@ -1,6 +1,11 @@
+2010-10-05  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	Add missing files to Makefile.am
+
 2010-10-04  Marek Kowalski  <mkowalski@flumotion.com>
 
-	* flumotion/test/test_component_icystreamer.py
+	* flumotion/test/test_component_icystreamer.py:
 	Make streamer listen on random port not to interfere with other tests
 	running.
 
