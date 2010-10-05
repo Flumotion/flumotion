@@ -846,6 +846,9 @@ class ICYStreamer(MultifdSinkStreamer):
         for i in ('icy-title', 'icy-timestamp'):
             self.uiState.addKey(i, None)
 
+        # fired after we receive first datablock and configure muxer
+        self._muxerConfiguredDeferred = defer.Deferred()
+
     def configureAuthAndResource(self):
         self.httpauth = http.HTTPAuthentication(self)
         self.resource = resources.ICYStreamingResource(self,
@@ -909,6 +912,7 @@ class ICYStreamer(MultifdSinkStreamer):
             self.icyHeaders['icy-br'] = bitrate / 1000
             self.icyHeaders['icy-metaint'] = \
                 self.muxer.get_property("icy-metaint")
+            self._muxerConfiguredDeferred.callback(None)
 
         def _calculateBitrate(pad, data):
             self.debug('Calculating bitrate of the stream')
@@ -952,3 +956,9 @@ class ICYStreamer(MultifdSinkStreamer):
         timestamp = time.strftime("%c", time.localtime(\
                 self.muxer.get_property('iradio-timestamp')))
         set('icy-timestamp', timestamp)
+
+    def do_pipeline_playing(self):
+        # change the component mood to happy after we receive first data block
+        # so that we can calculate the bitrate and configure muxer
+        d = MultifdSinkStreamer.do_pipeline_playing(self)
+        return defer.DeferredList([d, self._muxerConfiguredDeferred])

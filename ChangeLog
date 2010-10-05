@@ -1,5 +1,11 @@
 2010-10-04  Marek Kowalski  <mkowalski@flumotion.com>
 
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	Change streamer mood to happy after receiving first data buffer and
+	calculating stream bitrate.
+
+2010-10-04  Marek Kowalski  <mkowalski@flumotion.com>
+
 	* flumotion/component/consumers/httpstreamer/admin_gtk.py:
 	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
 	* flumotion/component/consumers/httpstreamer/icytab.glade:
