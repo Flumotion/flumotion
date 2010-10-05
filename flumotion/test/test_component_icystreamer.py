@@ -26,7 +26,7 @@ from twisted.python import failure
 from twisted.internet import defer, reactor, interfaces, gtk2reactor
 from twisted.web import client, error
 
-from flumotion.common import testsuite
+from flumotion.common import testsuite, netutils
 from flumotion.common import log, errors
 from flumotion.common.planet import moods
 from flumotion.component.consumers.httpstreamer import httpstreamer, icymux
@@ -52,11 +52,20 @@ class TestIcyStreamer(comptest.CompTestTestCase, log.Loggable):
         d.addCallback(comptest.cleanup_reactor)
         return d
 
+    def _getFreePort(self):
+        while True:
+            port = netutils.tryPort()
+            if port is not None:
+                break
+
+        return port
+
     def _initComp(self):
         self.compWrapper =\
            comptest.ComponentWrapper('icy-streamer', httpstreamer.ICYStreamer,
                                      name='icy-streamer',
-                                     props={'metadata-interval': 0.5})
+                                     props={'metadata-interval': 0.5,
+                                            'port': self._getFreePort()})
         self.tp.set_flow([self.prod, self.compWrapper])
 
 

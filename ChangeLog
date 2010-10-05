@@ -1,5 +1,11 @@
 2010-10-04  Marek Kowalski  <mkowalski@flumotion.com>
 
+	* flumotion/test/test_component_icystreamer.py
+	Make streamer listen on random port not to interfere with other tests
+	running.
+
+2010-10-04  Marek Kowalski  <mkowalski@flumotion.com>
+
 	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
 	Change streamer mood to happy after receiving first data buffer and
 	calculating stream bitrate.
