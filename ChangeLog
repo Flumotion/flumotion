@@ -1,3 +1,8 @@
+2010-10-05  Xavier Queralt  <xqueralt@flumotion.com>
+
+	* flumotion/twisted/flavors.py:
+	Reintroduce the removed (in r8746) "_set" attribute for compatibility.
+
 2010-10-05  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	* flumotion/component/consumers/httpstreamer/Makefile.am:
