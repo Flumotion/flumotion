@@ -165,6 +165,11 @@ class DeinterlaceBin(gst.Bin):
             oldDeinterlacer.set_state(gst.STATE_NULL)
             self.remove(oldDeinterlacer)
             self._colorspace.link(self._deinterlacer)
+            # switching to the ffmpeg deinterlacer may require a colorspace
+            # conversion to I420, we reset the state of the colorspace
+            # converter for a proper negotiation
+            self._colorspace.set_state(gst.STATE_NULL)
+            self._colorspace.set_state(gst.STATE_PLAYING)
             self._deinterlacer.link(self._videorate)
             reactor.callFromThread(self._sinkPeerPad.set_blocked, False)
             self.debug("%s has been replaced succesfully" %

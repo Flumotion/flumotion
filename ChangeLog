@@ -1,7 +1,14 @@
 2010-10-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
-	reviewed by: Julie Le Goff
+	reviewed by: Julien Le Goff 
+	* ChangeLog:
+	* flumotion/component/effects/deinterlace/deinterlace.py:
+	Reset the colorpsace converter after changing the deinterlacer
+	for a proper re-negotiation
 
+2010-10-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Julie Le Goff
 	* flumotion/component/effects/deinterlace/deinterlace.py:
 	Fix initialisation. The component was not switching the deinterlacer
 	properly repecting the configuration.
