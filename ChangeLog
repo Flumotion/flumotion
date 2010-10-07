@@ -1,3 +1,11 @@
+2010-10-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Julie Le Goff
+
+	* flumotion/component/effects/deinterlace/deinterlace.py:
+	Fix initialisation. The component was not switching the deinterlacer
+	properly repecting the configuration.
+
 2010-10-05  Xavier Queralt  <xqueralt@flumotion.com>
 
 	* flumotion/twisted/flavors.py:

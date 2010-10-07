@@ -77,9 +77,8 @@ class DeinterlaceBin(gst.Bin):
         gst.Bin.__init__(self)
 
         self.keepFR = True
-        self.deinterlacerName = None
+        self.deinterlacerName = PASSTHROUGH_DEINTERLACER
         self._interlaced = False
-        self._passthrough = False
 
         # Create elements
         self._colorspace = gst.element_factory_make("ffmpegcolorspace")
@@ -113,6 +112,9 @@ class DeinterlaceBin(gst.Bin):
         self._setMethod(method)
         self._setMode(mode)
 
+    def isPassthrough(self):
+        return self.deinterlacerName == PASSTHROUGH_DEINTERLACER
+
     def _sinkSetCaps(self, pad, caps):
         struct = caps[0]
         # Set in the source pad the same framerate as in the sink pad
@@ -139,10 +141,10 @@ class DeinterlaceBin(gst.Bin):
         # If we are in 'auto' mode and the interlaced field has changed,
         # switch to the appropiate deinterlacer
         if self.mode == 'auto':
-            if self._interlaced == True and self._passthrough:
+            if self._interlaced == True and self.isPassthrough():
                 self._replaceDeinterlacer(self._sinkPeerPad,
-                    self.deinterlacerName)
-            elif self._interlaced == False:
+                    DEINTERLACE_METHOD[self.method])
+            elif self._interlaced == False and not self.isPassthrough():
                 self._replaceDeinterlacer(self._sinkPeerPad,
                     PASSTHROUGH_DEINTERLACER)
         return True
@@ -183,23 +185,21 @@ class DeinterlaceBin(gst.Bin):
 
         # If the new mode is 'disabled' use the passthrough deinterlacer
         if self.mode == 'disabled':
-            self._passthrough = True
-            self._replaceDeinterlacer(self._sinkPeerPad,
-                PASSTHROUGH_DEINTERLACER)
+            if not self.isPassthrough():
+                self._replaceDeinterlacer(self._sinkPeerPad,
+                    PASSTHROUGH_DEINTERLACER)
         # If the new mode is 'interlaced' force deinterlacing by replacing
         # the deinterlacer if it was the passthrough one
         elif self.mode == 'interlaced':
-            if self._passthrough:
+            if self.isPassthrough():
                 self._replaceDeinterlacer(self._sinkPeerPad,
-                    self.deinterlacerName)
-                self._passthrough = False
+                    DEINTERLACE_METHOD[self.method])
         # If the new mode is 'auto' replace the deinterlacer if the old one is
         # passthough and the input content is interlaced
         elif self.mode == 'auto':
-            if self._interlaced and self._passthrough:
-                self._passthrough = False
+            if self._interlaced and self.isPassthrough():
                 self._replaceDeinterlacer(self._sinkPeerPad,
-                    self.deinterlacerName)
+                    DEINTERLACE_METHOD[self.method])
 
     def _setMethod(self, method):
         if method not in DEINTERLACE_METHOD:
@@ -216,7 +216,7 @@ class DeinterlaceBin(gst.Bin):
                 self._deinterlacer.set_property("method", method)
             return
 
-        if not self._passthrough:
+        if not self.isPassthrough():
             # Replace the deinterlacer
             self._replaceDeinterlacer(self._sinkPeerPad, deinterlacerName)
 
