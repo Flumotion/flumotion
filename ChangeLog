@@ -1,5 +1,12 @@
 2010-10-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
+	reviewed by: Julien Le Goff
+
+	* flumotion/component/converters/video/video.py:
+	Convert tuple to gst.Fraction
+
+2010-10-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
 	reviewed by: Julien Le Goff 
 	* ChangeLog:
 	* flumotion/component/effects/deinterlace/deinterlace.py:

@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+import gst
+
 from flumotion.common import errors, messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
@@ -55,10 +57,13 @@ class Converter(feedcomponent.ParseLaunchComponent):
     def configure_pipeline(self, pipeline, properties):
         self.deintMode = properties.get('deinterlace-mode', "auto")
         self.deintMethod = properties.get('deinterlace-method', "ffmpeg")
-        self.framerate = properties.get('framerate', None)
         self.width = properties.get('width', None)
         self.height = properties.get('height', None)
         self.is_square = properties.get('is-square', False)
+        fr = properties.get('framerate', None)
+        self.framerate = None
+        if fr is not None:
+            self.framerate = gst.Fraction(fr[0], fr[1])
 
         identity = pipeline.get_by_name("identity")
         # Add videorate effect. The videorate is usually decreased, so it's
