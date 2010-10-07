@@ -57,7 +57,9 @@ class TestVideoConverter(comptest.CompTestTestCase, log.Loggable):
     @attr('slow')
     def test_running_and_happy(self):
         vc = comptest.ComponentWrapper('video-converter', video.Converter,
-                                       name='video-converter')
+                                       name='video-converter',
+                                       cfg={'properties':
+                                            {'deinterlace-mode': 'disabled'}})
 
         self.tp.set_flow([self.prod, vc])
 
@@ -97,35 +99,41 @@ class TestVideoConverter(comptest.CompTestTestCase, log.Loggable):
 
     @attr('slow')
     def test_is_square_False(self):
-        return self._videoscale_test({'is-square': False},
+        return self._videoscale_test({'is-square': False,
+                                     'deinterlace-mode': 'disabled'},
                                      gst.Fraction(1, 2), 320, 240)
 
     @attr('slow')
     def test_is_square_True(self):
-        return self._videoscale_test({'is-square': True},
+        return self._videoscale_test({'is-square': True,
+                                     'deinterlace-mode': 'disabled'},
                                      gst.Fraction(1, 1), 160, 240)
 
     @attr('slow')
     def test_width(self):
-        return self._videoscale_test({'width': 640},
+        return self._videoscale_test({'width': 640,
+                                     'deinterlace-mode': 'disabled'},
                                      gst.Fraction(1, 4), 640, 240)
 
     @attr('slow')
     def test_height(self):
-        return self._videoscale_test({'height': 120},
+        return self._videoscale_test({'height': 120,
+                                     'deinterlace-mode': 'disabled'},
                                      gst.Fraction(1, 4), 320, 120)
 
     @attr('slow')
     def test_width_and_square(self):
         return self._videoscale_test({'width': 640,
-                                      'is-square': True},
+                                     'is-square': True,
+                                     'deinterlace-mode': 'disabled'},
                                      gst.Fraction(1, 1), 640, 960)
 
     @attr('slow')
     def test_width_height_is_square(self):
         properties = {'width': 123,
                       'height': 321,
-                      'is-square': True}
+                      'is-square': True,
+                      'deinterlace-mode': 'disabled'}
         return self._videoscale_test(properties,
                                      gst.Fraction(1, 1), 123, 321)
 

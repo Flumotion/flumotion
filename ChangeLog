@@ -1,5 +1,10 @@
 2010-10-07  Andoni Morales Alastruey  <amorales@flumotion.com>
 
+	* flumotion/test/test_component_video_converter.py:
+	Fix video converter test. For the scalling tests do not use any deinterlacer
+
+2010-10-07  Andoni Morales Alastruey  <amorales@flumotion.com>
+
 	reviewed by: Julien Le Goff
 
 	* flumotion/component/converters/video/video.py:
