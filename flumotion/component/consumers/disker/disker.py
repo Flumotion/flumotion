@@ -23,6 +23,7 @@ import errno
 import os
 import time
 import tempfile
+import datetime as dt
 
 import gobject
 import gst
@@ -114,7 +115,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     last_tstamp = None
 
     _startFilenameTemplate = None # template to use when starting off recording
-    _startTimeTuple = None        # time tuple of event when starting
+    _startTime = None             # time of event when starting
     _rotateTimeDelayedCall = None
     _pollDiskDC = None            # _pollDisk delayed calls
     _symlinkToLastRecording = None
@@ -355,7 +356,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.info('Event %s is in progress, start recording' %
                     content)
                 self._startFilenameTemplate = content
-                self._startTimeTuple = instance.start.utctimetuple()
+                self._startTime = instance.start
                 self._recordAtStart = True
             else:
                 self.info('No events in progress')
@@ -368,14 +369,22 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 debug=log.getExceptionMessage(e), mid="error-parsing-ical")
             self.addMessage(m)
 
-    def changeFilename(self, filenameTemplate=None, timeTuple=None):
+    def changeFilename(self, filenameTemplate=None, datetime=None):
         """
         @param filenameTemplate: strftime format string to decide filename
-        @param timeTuple:        a valid time tuple to pass to strftime,
-                                 defaulting to time.localtime().
+        @param time:             an aware datetime used for the filename and
+                                 to compare if an existing file needs to be
+                                 overwritten. defaulting to datetime.now().
         """
         mime = self.getMime()
         ext = mimeTypeToExtention(mime)
+
+        # if the events comes from the calendar, datetime is aware and we can
+        # deduce from it both the local and utc time.
+        # in case datetime is None datetime.now() doesn't return an aware
+        # datetime, so we need to get both the local time and the utc time.
+        tm = datetime or dt.datetime.now()
+        tmutc = datetime or dt.datetime.utcnow()
 
         self.stopRecording()
 
@@ -387,7 +396,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if not filenameTemplate:
             filenameTemplate = self._defaultFilenameTemplate
         filename = "%s.%s" % (format.strftime(filenameTemplate,
-            timeTuple or time.localtime()), ext)
+            # for the filename we want to use the local time
+            tm.timetuple()), ext)
         self.location = os.path.join(self.directory, filename)
 
         # only overwrite existing files if it was last changed before the
@@ -396,7 +406,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         i = 1
         while os.path.exists(location):
             mtimeTuple = time.gmtime(os.stat(location).st_mtime)
-            if mtimeTuple <= timeTuple:
+            # time.gmtime returns a time tuple in utc, so we compare against
+            # the utc timetuple of the datetime
+            if mtimeTuple <= tmutc.utctimetuple():
                 self.info(
                     "Existing recording %s from previous event, overwriting",
                     location)
@@ -503,7 +515,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
         if new and self._recordAtStart:
             reactor.callLater(0, self.changeFilename,
-                self._startFilenameTemplate, self._startTimeTuple)
+                self._startFilenameTemplate, self._startTime)
 
     # multifdsink::client-removed
 
@@ -529,7 +541,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     def eventInstanceStarted(self, eventInstance):
         self.debug('starting recording of %s', eventInstance.event.content)
         self.changeFilename(eventInstance.event.content,
-            eventInstance.start.timetuple())
+            eventInstance.start)
         self._updateNextPoints()
 
     def eventInstanceEnded(self, eventInstance):
