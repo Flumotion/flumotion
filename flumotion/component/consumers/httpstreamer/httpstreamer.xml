@@ -109,9 +109,6 @@
 
       <eater name="default" />
       
-      <wizard type="consumer" feeder="default"
-              _description="S_tream over HTTP" rank="128"/>
-
       <!-- entry points for distributable code bundles -->
      <entries>
         <entry type="component" location="httpstreamer.py"
