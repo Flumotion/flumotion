@@ -82,22 +82,32 @@ class DeinterlaceBin(gst.Bin):
 
         # Create elements
         self._colorspace = gst.element_factory_make("ffmpegcolorspace")
+        self._colorfilter = gst.element_factory_make("capsfilter")
         self._deinterlacer = gst.element_factory_make(PASSTHROUGH_DEINTERLACER)
         self._videorate = gst.element_factory_make("videorate")
-        self._capsfilter = gst.element_factory_make("capsfilter")
+        self._ratefilter = gst.element_factory_make("capsfilter")
 
         # Add elements to the bin
-        self.add(self._colorspace, self._deinterlacer, self._videorate,
-            self._capsfilter)
+        self.add(self._colorspace, self._colorfilter, self._deinterlacer,
+            self._videorate, self._ratefilter)
+
+        # FIXME: I420 is the only format support by the ffmpeg deinterlacer.
+        # Forcing it simplifies renegotiation issues if the input colorspace
+        # is different and the ffmpeg deinterlacer is added after the
+        # negotiation happened in a different colorspace. This makes this
+        # element not-passthrough.
+        self._colorfilter.set_property('caps', gst.Caps(
+            'video/x-raw-yuv, format=(fourcc)I420'))
 
         # Link elements
-        self._colorspace.link(self._deinterlacer)
+        self._colorspace.link(self._colorfilter)
+        self._colorfilter.link(self._deinterlacer)
         self._deinterlacer.link(self._videorate)
-        self._videorate.link(self._capsfilter)
+        self._videorate.link(self._ratefilter)
 
         # Create source and sink pads
         self._sinkPad = gst.GhostPad('sink', self._colorspace.get_pad('sink'))
-        self._srcPad = gst.GhostPad('src', self._capsfilter.get_pad('src'))
+        self._srcPad = gst.GhostPad('src', self._ratefilter.get_pad('src'))
         self.add_pad(self._sinkPad)
         self.add_pad(self._srcPad)
 
@@ -124,7 +134,7 @@ class DeinterlaceBin(gst.Bin):
             except KeyError:
                 framerate = gst.Fraction(25, 1)
             fr = '%s/%s' % (framerate.num, framerate.denom)
-            self._capsfilter.set_property('caps', gst.Caps(
+            self._ratefilter.set_property('caps', gst.Caps(
                 'video/x-raw-yuv, framerate=%s;'
                 'video/x-raw-rgb, framerate=%s' % (fr, fr)))
         # Detect if it's an interlaced stream using the 'interlaced' field
@@ -159,17 +169,12 @@ class DeinterlaceBin(gst.Bin):
             self._deinterlacer.set_state(gst.STATE_PLAYING)
             self.add(self._deinterlacer)
             # unlink the sink and source pad of the old deinterlacer
-            self._colorspace.unlink(oldDeinterlacer)
+            self._colorfilter.unlink(oldDeinterlacer)
             oldDeinterlacer.unlink(self._videorate)
             # remove the old deinterlacer from the bin
             oldDeinterlacer.set_state(gst.STATE_NULL)
             self.remove(oldDeinterlacer)
-            self._colorspace.link(self._deinterlacer)
-            # switching to the ffmpeg deinterlacer may require a colorspace
-            # conversion to I420, we reset the state of the colorspace
-            # converter for a proper negotiation
-            self._colorspace.set_state(gst.STATE_NULL)
-            self._colorspace.set_state(gst.STATE_PLAYING)
+            self._colorfilter.link(self._deinterlacer)
             self._deinterlacer.link(self._videorate)
             reactor.callFromThread(self._sinkPeerPad.set_blocked, False)
             self.debug("%s has been replaced succesfully" %
