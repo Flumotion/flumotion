@@ -71,7 +71,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         else:
             # in case we good sth else than mp3 or ogg just connect the
             # gdb back
-            self.warn("Couldn't find the correct parser for caps: %s",\
+            self.warning("Couldn't find the correct parser for caps: %s",\
                 capsname)
             pad.link(gdp_sink_pad)
 

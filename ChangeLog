@@ -1,3 +1,8 @@
+2010-10-21  Marek Kowalski  <mkowalski@flumotion.com>
+
+	* flumotion/component/producers/icecast/icecast.py:
+	Fix typo (incorrect method called)
+
 2010-10-19  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Julien Le Goff 
