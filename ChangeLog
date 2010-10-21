@@ -1,3 +1,8 @@
+2010-10-21  Sébastien Merle  <sebastien@flumotion.com>
+
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	Put back the issuer-class property, and changed the doc to show deprecation.
+
 2010-10-21  Marek Kowalski  <mkowalski@flumotion.com>
 
 	* flumotion/component/producers/icecast/icecast.py:
