@@ -1,3 +1,11 @@
+2010-10-25  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-André Lureau 
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	Add the 'timeout' property to disconnect inactive clients
+
 2010-10-21  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Marc-André Lureau

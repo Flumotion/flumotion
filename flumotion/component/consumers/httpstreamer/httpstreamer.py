@@ -287,6 +287,7 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         self.httpauth = None
         self.mountPoint = None
         self.burst_on_connect = False
+        self.timeout = 0L
 
         self.description = None
 
@@ -498,6 +499,9 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
                 logFilter.addIPFilter(f)
             self.resource.setLogFilter(logFilter)
 
+        if 'timeout' in properties:
+            self.timeout = properties['timeout'] * gst.SECOND
+
         self.type = properties.get('type', 'master')
         if self.type == 'slave':
             # already checked for these in do_check
@@ -516,6 +520,8 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         else:
             self.debug("resend-streamheader property not available, "
                        "resending streamheader when it changes in the caps")
+
+        sink.set_property('timeout', self.timeout)
 
         sink.connect('deep-notify::caps', self._notify_caps_cb)
 

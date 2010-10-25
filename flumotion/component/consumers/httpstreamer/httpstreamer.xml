@@ -98,6 +98,8 @@
                   _description="How much data to burst (in KB)." />
         <property name="burst-time" type="float"
                   _description="How much data to burst (in seconds)." />
+        <property name="timeout" type="int"
+                  _description="Disconnect inactive clients after this timeout. Default is 0, for an infinite timeout (in seconds)." />
       </properties>
     </component>
 
