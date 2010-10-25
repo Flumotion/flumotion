@@ -1,3 +1,10 @@
+2010-10-21  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Marc-André Lureau
+
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	Add the client only when we know that the fd is really opened
+
 2010-10-21  Sébastien Merle  <sebastien@flumotion.com>
 
 	* flumotion/component/misc/httpserver/httpserver.xml:

@@ -474,7 +474,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         if not self._writeHeaders(request):
             self.debug("[fd %5d] not adding as a client" % fdi)
             return
-        self._addClient(request)
 
         # take over the file descriptor from Twisted by removing them from
         # the reactor
@@ -502,6 +501,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 self.warning("[fd %5d] error during check: %s (%d)" % (
                     fd, e.strerror, e.errno))
             return
+
+        self._addClient(request)
 
         # hand it to multifdsink
         self.streamer.add_client(fd, request)
