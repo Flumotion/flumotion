@@ -71,8 +71,8 @@ class HTTPGenericIssuer(log.Loggable):
         keycard.password = request.getPassword()
         keycard.address = request.getClientIP()
         # args can have lists as values, if more than one specified
-        token = request.args.get('token', None)
-        if token and not isinstance(token, str):
+        token = request.args.get('token', '')
+        if not isinstance(token, str):
             token = token[0]
         keycard.token = token
         keycard.arguments = request.args

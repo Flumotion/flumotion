@@ -1,3 +1,11 @@
+2010-10-26  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Julien Le Goff 
+
+	* flumotion/component/base/http.py:
+	Set the token attribute to an empty string by default so further
+	checks of the token's length don't crash. See r8774
+
 2010-10-25  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Marc-André Lureau 
