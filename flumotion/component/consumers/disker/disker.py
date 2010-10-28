@@ -107,7 +107,7 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     componentMediumClass = DiskerMedium
     checkOffset = True
-    pipe_template = 'multifdsink sync-method=1 name=fdsink mode=1 sync=false'
+    pipe_template = 'multifdsink sync-method=2 name=fdsink mode=1 sync=false'
     file = None
     directory = None
     location = None

@@ -1,3 +1,11 @@
+2010-10-28  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Julien Le Goff
+
+	* flumotion/component/consumers/disker/disker.py:
+	Always sink in the last keyframe to avoid having gaps in the recorded
+	files.
+
 2010-10-26  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Julien Le Goff 
