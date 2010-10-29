@@ -35,6 +35,10 @@ from httpstreamer import MultifdSinkStreamer, Stats
 import icymux
 
 
+__all__ = ['ICYStreamer']
+__version__ = "$Rev$"
+
+
 class ICYStreamer(MultifdSinkStreamer):
     implements(interfaces.IStreamingComponent)
 

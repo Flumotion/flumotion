@@ -1,5 +1,14 @@
 2010-10-29  Andoni Morales Alastruey  <amorales@flumotion.com>
 
+	reviewed by: Julien Le Goff 
+
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	Really delete the ICY streamer code and the import
+	* flumotion/component/consumers/httpstreamer/icystreamer.py:
+	Add __revision__ and __all__
+
+2010-10-29  Andoni Morales Alastruey  <amorales@flumotion.com>
+
 	reviewed by: Julien Le Goff
 
 	* flumotion/component/consumers/httpstreamer/Makefile.am:

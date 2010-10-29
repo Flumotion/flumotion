@@ -107,13 +107,13 @@
                base="flumotion/component/consumers/httpstreamer"
                _description="A consumer that streams ICY stream over HTTP.">
 <!-- old way of specifying component source -->
-      <source location="flumotion.component.consumers.httpstreamer.httpstreamer" />
+      <source location="flumotion.component.consumers.httpstreamer.icystreamer" />
 
       <eater name="default" />
       
       <!-- entry points for distributable code bundles -->
      <entries>
-        <entry type="component" location="httpstreamer.py"
+        <entry type="component" location="icystreamer.py"
                function="ICYStreamer" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="ICYStreamerAdminGtk" />
