@@ -1,3 +1,10 @@
+2010-10-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	reviewed by: Andoni Morales
+
+	* flumotion/component/effects/deinterlace/deinterlace.py:
+	If we plug in an identity, let us make it not verbose in the log!
+
 2010-10-28  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Julien Le Goff

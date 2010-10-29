@@ -84,6 +84,7 @@ class DeinterlaceBin(gst.Bin):
         self._colorspace = gst.element_factory_make("ffmpegcolorspace")
         self._colorfilter = gst.element_factory_make("capsfilter")
         self._deinterlacer = gst.element_factory_make(PASSTHROUGH_DEINTERLACER)
+        self._deinterlacer.set_property('silent', True)
         self._videorate = gst.element_factory_make("videorate")
         self._ratefilter = gst.element_factory_make("capsfilter")
 
@@ -166,6 +167,8 @@ class DeinterlaceBin(gst.Bin):
             self._deinterlacer = gst.element_factory_make(deinterlacerName)
             if deinterlacerName == GST_DEINTERLACER:
                 self._deinterlacer.set_property("method", self.method)
+            elif deinterlacerName == PASSTHROUGH_DEINTERLACER:
+                self._deinterlacer.set_property("silent", True)
             self._deinterlacer.set_state(gst.STATE_PLAYING)
             self.add(self._deinterlacer)
             # unlink the sink and source pad of the old deinterlacer
