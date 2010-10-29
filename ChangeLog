@@ -1,3 +1,14 @@
+2010-10-29  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Julien Le Goff
+
+	* flumotion/component/consumers/httpstreamer/Makefile.am:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.xml:
+	* flumotion/component/consumers/httpstreamer/icystreamer.py:
+	Fix bundling issue in the http-streamer component.
+	icymux was being imported in httpstreamer.py, but icymux.py is only
+	bundled for the icy-streamer component.
+
 2010-10-28  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
 
 	reviewed by: Andoni Morales

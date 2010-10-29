@@ -3,6 +3,7 @@ include $(top_srcdir)/common/python.mk
 component_PYTHON = 		\
 	__init__.py 		\
 	httpstreamer.py 	\
+	icystreamer.py  	\
 	icymux.py 		\
 	resources.py 		\
 	admin_gtk.py		\

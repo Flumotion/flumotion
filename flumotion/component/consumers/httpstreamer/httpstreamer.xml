@@ -280,16 +280,13 @@
 
     <bundle name="icystreamer-component">
         <dependencies>
-            <dependency name="component" />
-            <dependency name="httpstreamer-base" />
 	    <dependency name="httpstreamer-component" />
-            <dependency name="base-component-http" />
-            <dependency name="porterclient" />
         </dependencies>
 
         <directories>
             <directory name="flumotion/component/consumers/httpstreamer">
                 <filename location="icymux.py" />
+                <filename location="icystreamer.py" />
             </directory>
         </directories>
     </bundle>
