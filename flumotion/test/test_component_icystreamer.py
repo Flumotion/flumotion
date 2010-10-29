@@ -29,7 +29,7 @@ from twisted.web import client, error
 from flumotion.common import testsuite, netutils
 from flumotion.common import log, errors
 from flumotion.common.planet import moods
-from flumotion.component.consumers.httpstreamer import httpstreamer, icymux
+from flumotion.component.consumers.httpstreamer import icystreamer, icymux
 from flumotion.common import gstreamer
 
 from flumotion.test import comptest
@@ -62,7 +62,7 @@ class TestIcyStreamer(comptest.CompTestTestCase, log.Loggable):
 
     def _initComp(self):
         self.compWrapper =\
-           comptest.ComponentWrapper('icy-streamer', httpstreamer.ICYStreamer,
+           comptest.ComponentWrapper('icy-streamer', icystreamer.ICYStreamer,
                                      name='icy-streamer',
                                      props={'metadata-interval': 0.5,
                                             'port': self._getFreePort()})

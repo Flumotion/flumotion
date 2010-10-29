@@ -1,3 +1,10 @@
+2010-10-29  Xavier Queralt  <xqueralt@flumotion.com>
+
+	reviewed by: Julien Le Goff
+
+	* flumotion/test/test_component_icystreamer.py:
+	Fix the test to consider the changes in last revisions
+
 2010-10-29  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Julien Le Goff 
