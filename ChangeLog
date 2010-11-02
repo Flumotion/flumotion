@@ -1,3 +1,13 @@
+2010-11-02  Xavier Queralt  <xqueralt@gmail.com>
+
+	reviewed by: Pepe Ribas
+
+	* flumotion/twisted/reflect.py:
+	- Strip the quotation marks from the exception's message to be
+	compatible with python27's ihooks module.
+	- Use twisted's reflect.namedAny if we have twisted 8.0 or greater.
+	Fixes #1469
+
 2010-10-29  Xavier Queralt  <xqueralt@flumotion.com>
 
 	reviewed by: Julien Le Goff

@@ -57,7 +57,10 @@ def namedAny(name):
             # if the ImportError happened in the module being imported,
             # this is a failure that should be handed to our caller.
             shortname = trialname.split('.')[-1]
-            r = str(sys.exc_info()[1])
+            # if we're on python2.7 the module is wrapped in single quotation
+            # marks thus broking this method that relies on the message ending
+            # with the name that failed.
+            r = str(sys.exc_info()[1]).strip("'")
             if not (r.startswith('No module named') and
                     r.endswith(shortname)):
                 raise
@@ -71,3 +74,9 @@ def namedAny(name):
         obj = getattr(obj, n)
 
     return obj
+
+# Use the method that comes with twisted if we're running on 8.0 or higher.
+# FIXME: Remove this module when we can depend on Twisted 8.0
+from twisted import version
+if (version.major, version.minor, version.micro) >= (8, 0, 0):
+    from twisted.python.reflect import namedAny
