@@ -1,3 +1,12 @@
+2010-11-03  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Julien Le Goff
+
+	* flumotion/component/combiners/switch/basicwatchdog.py:
+	Add missing attribute to the SingleBasicWatchdog class that was
+	causing a traceback when using the single-basic-watchdog-combiner
+	component.
+
 2010-11-02  Xavier Queralt  <xqueralt@gmail.com>
 
 	reviewed by: Pepe Ribas

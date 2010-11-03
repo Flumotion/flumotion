@@ -39,6 +39,7 @@ class SingleBasicWatchdog(switch.SingleSwitch):
         # startedFine is set to True when all sink pads to all switch elements
         # have received data
         self.startedFine = False
+        self._started = []
 
     def feedSetInactive(self, feed):
         switch.SingleSwitch.feedSetInactive(self, feed)
