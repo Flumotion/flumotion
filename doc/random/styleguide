@@ -200,6 +200,11 @@ DEPRECATING
   the new version; for example:
 	warnings.warn("Please call disconnectByFunction instead",
             DeprecationWarning, stacklevel=2)
+- when deprecating components/classes/..., do so in a compatible way.
+  For example, have a stable series with deprecation warnings before
+  actually removing these objects in the next stable series.
+  Mistakes from the past include the incompatible keycard and bouncer changes
+  provoking 500 Internal Server Errors.
 
 REGISTRY
 --------
