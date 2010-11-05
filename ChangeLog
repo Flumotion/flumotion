@@ -1,3 +1,9 @@
+2010-11-04  Zaheer Abbas Merali  <zaheerabbas at merali dot org>
+
+	* flumotion/component/producers/looper/looper.py:
+	Call base class's method with instance as first argument as we
+	should be doing.
+
 2010-11-03  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Julien Le Goff

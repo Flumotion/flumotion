@@ -142,7 +142,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
                 debug='%s\n%s' % (gerror.message, debug),
                 mid=gerror.domain, priority=40)
         base = feedcomponent.ParseLaunchComponent
-        return base.make_message_for_gstreamer_error(gerror, debug)
+        return base.make_message_for_gstreamer_error(self, gerror, debug)
 
     def run_discoverer(self):
 
