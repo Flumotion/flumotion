@@ -1,5 +1,13 @@
 2010-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent.py:
+	  Show us what pipeline we can't parse.
+	* flumotion/component/eater.py:
+	* flumotion/component/feedcomponent010.py:
+	  Comments and doc strings.
+
+2010-11-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/test/test_component_padmonitor.py:
 	* flumotion/component/padmonitor.py:
 	  Make naming more uniform - an FREQUENCY is not an INTERVAL

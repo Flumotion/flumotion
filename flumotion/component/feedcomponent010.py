@@ -43,6 +43,9 @@ T_ = gettexter()
 class FeedComponent(basecomponent.BaseComponent):
     """
     I am a base class for all Flumotion feed components.
+
+    @type  eaters:  dict of str -> L{Eater}
+    @type  feeders: dict of str -> L{Feeder}
     """
 
     # how often to update the UIState feeder statistics

@@ -19,6 +19,9 @@
 
 # Headers in this file shall remain intact.
 
+# This module should not import or depend on gst
+# All timestamps should be in float seconds
+
 import time
 
 from twisted.internet import reactor
@@ -31,6 +34,30 @@ __version__ = "$Rev$"
 class Eater:
     """
     This class groups eater-related information as used by a Feed Component.
+
+    The UI state contains the following keys:
+     - eater-alias: str
+     - eater-name:  str
+     - connection:  dict of
+       - feed-id
+       - time-timestamp-discont
+       - timestamp-timestamp-discont
+       - last-timestamp-discont
+       - total-timestamp-discont
+       - count-timestamp-discont
+       - time-offset-discont
+       - offset-offset-discont
+       - last-offset-discont
+       - total-offset-discont
+       - count-offset-discont
+     - last-connect
+     - last-disconnect
+     - total-connections
+     - count-timestamp-discont
+     - count-offset-discont
+     - total-timestamp-discont
+     - total-offset-discont
+     - fd
 
     @ivar eaterAlias:  the alias of this eater (e.g. "default", "video",
                        ...)

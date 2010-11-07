@@ -346,7 +346,8 @@ class ParseLaunchComponent(FeedComponent):
             self.warning('Could not parse pipeline: %s' % e.message)
             m = messages.Error(T_(N_(
                 "GStreamer error: could not parse component pipeline.")),
-                debug=e.message)
+                debug="Reason: %s\nPipeline: %s" % (
+                    e.message, self.pipeline_string))
             self.addMessage(m)
             raise errors.PipelineParseError(e.message)
 
@@ -437,6 +438,13 @@ class ParseLaunchComponent(FeedComponent):
         return ''.join(out)
 
     def parse_pipeline(self, pipeline):
+        """
+        Parse the pipeline template into a fully expanded pipeline string.
+
+        @type  pipeline: str
+
+        @rtype: str
+        """
         pipeline = " ".join(pipeline.split())
         self.debug('Creating pipeline, template is %s', pipeline)
 
