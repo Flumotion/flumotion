@@ -31,7 +31,8 @@ import gst
 import optparse
 
 def usage(args, exitval=0):
-    print "usage: %s [OPTIONS] -w WORKER -p FEEDERPORT -f FULLFEEDID " \
+    print "usage: %s [OPTIONS] -w WORKER -p FEEDERPORT " \
+        "-U username -P password -f FULLFEEDID " \
         "<partial_pipeline>" % args[0]
     print ''
     print 'partial_pipeline is the part of the pipeline that will receive ' \
