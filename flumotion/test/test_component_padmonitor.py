@@ -63,8 +63,8 @@ class TestPadMonitor(testsuite.TestCase):
         return d
 
     def testPadMonitorTimeout(self):
-        padmonitor.PadMonitor.PAD_MONITOR_PROBE_FREQUENCY = 0.2
-        padmonitor.PadMonitor.PAD_MONITOR_TIMEOUT = 0.5
+        padmonitor.PadMonitor.PAD_MONITOR_PROBE_INTERVAL = 0.2
+        padmonitor.PadMonitor.PAD_MONITOR_CHECK_INTERVAL = 0.5
 
         pipeline = gst.parse_launch(
             'fakesrc num-buffers=1 ! identity name=id ! fakesink')
