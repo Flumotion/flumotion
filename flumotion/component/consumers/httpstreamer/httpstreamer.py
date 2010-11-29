@@ -22,9 +22,11 @@
 import time
 
 import gst
+
 from twisted.cred import credentials
 from twisted.internet import reactor, error, defer
 from twisted.web import server
+
 from zope.interface import implements
 
 from flumotion.common import gstreamer, errors
@@ -40,7 +42,9 @@ from flumotion.twisted import fdserver
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
 __version__ = "$Rev$"
+
 T_ = gettexter()
+
 STATS_POLL_INTERVAL = 10
 UI_UPDATE_THROTTLE_PERIOD = 2.0 # Don't update UI more than once every two
                                 # seconds
