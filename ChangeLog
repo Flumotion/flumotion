@@ -3,6 +3,20 @@
 	reviewed by: Julien Le Goff
 
 	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/disker/disker.xml:
+	Add a property to set the overlap time between files.
+	mutltfdsink doesn't keep enough buffers in it's internal queue and to sink
+	in the last keyframe this value should be equivalent to the maximum
+	keyframe distance.
+	Using the 'time-min' property in multifdsink would be another solution, but
+	for mpeg-ts streams with many buffers in between keyframes it takes up to
+	a 100% use of the cpu finding the sync point
+
+2010-12-01  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Julien Le Goff
+
+	* flumotion/component/consumers/disker/disker.py:
 	Fix typo
 
 2010-12-01  Andoni Morales Alastruey  <amorales@flumotion.com>

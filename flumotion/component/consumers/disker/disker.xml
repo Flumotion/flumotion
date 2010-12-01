@@ -53,6 +53,8 @@
                   _description="Writes an index for each file. (default: False)" />
         <property name="sync-on-tdt" type="bool" required="no"
                   _description="Uses the Time and Date Table events to write the index entries and create the new files starting from the first buffer after a TDT event (like if they were keyframes). Use this option carefully and only with sources that send TDT events periodically, like the dvb-ts-producer. (default: false)" />
+        <property name="time-overlap" type="int" required="no"
+                  _description="Time to delay the stop of a recording when changing the filename to ensure that the output files are overlaped and no gaps are introduced (default: 0 in seconds)" />
       </properties>
     </component>
   </components>

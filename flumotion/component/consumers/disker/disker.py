@@ -397,6 +397,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     indexLocation = None
     writeIndex = False
     syncOnTdt = False
+    timeOverlap = 0
     reactToMarks = False
 
     _offset = 0L
@@ -547,6 +548,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.writeIndex = properties.get('write-index', False)
         self.reactToMarks = properties.get('react-to-stream-markers', False)
         self.syncOnTdt = properties.get('sync-on-tdt', False)
+        self.timeOverlap = properties.get('time-overlap', 0)
 
         sink = self.get_element('fdsink')
 
@@ -706,8 +708,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if self.writeIndex and self.location:
             self.indexLocation = '.'.join([self.location,
                                            Index.INDEX_EXTENSION])
-        reactor.callLater(1, self._stopRecordingFull, self.file, self.location,
-                          self.last_tstamp, True)
+        reactor.callLater(self.timeOverlap, self._stopRecordingFull, self.file,
+                          self.location, self.last_tstamp, True)
 
         sink = self.get_element('fdsink')
         if sink.get_state() == gst.STATE_NULL:
