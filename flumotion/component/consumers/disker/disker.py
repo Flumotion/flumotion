@@ -382,6 +382,8 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
 
 
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
+    logCategory = "disker"
+
     componentMediumClass = DiskerMedium
     checkOffset = True
     pipe_template = 'multifdsink name=fdsink sync-method=2 mode=1 sync=false'
