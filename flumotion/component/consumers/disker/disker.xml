@@ -49,6 +49,8 @@
                   _description="Whether to start/stop the disker when stream marker events are received." />
         <property name="stream-marker-filename-prefix" type="string"
                   required="no" _description="The formatting template for the program id (default '%03d.')." />
+        <property name="write-index" type="bool"
+                  required="no" _description="Writes an index for each file." />
       </properties>
     </component>
   </components>

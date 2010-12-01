@@ -390,13 +390,20 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     location = None
     caps = None
     last_tstamp = None
+    indexLocation = None
+    writeIndex = False
 
+    _offset = 0L
+    _headers_size = 0
+    _index = None
+    _client_start_ts = None
     _startFilenameTemplate = None # template to use when starting off recording
     _startTime = None             # time of event when starting
     _rotateTimeDelayedCall = None
     _pollDiskDC = None            # _pollDisk delayed calls
     _symlinkToLastRecording = None
     _symlinkToCurrentRecording = None
+
 
     #   see the commented out import statement for IStateCacheableListener at
     #   the beginning of this file
@@ -499,6 +506,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def configure_pipeline(self, pipeline, properties):
         self.debug('configure_pipeline for disker')
+        self._clock = pipeline.get_clock()
         self._symlinkToLastRecording = \
             properties.get('symlink-to-last-recording', None)
         self._symlinkToCurrentRecording = \
@@ -529,6 +537,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             # self._can_schedule is False, so one of the above surely happened
             raise errors.ComponentSetupHandledError()
 
+        self.writeIndex = properties.get('write-index', False)
+
         sink = self.get_element('fdsink')
 
         if gstreamer.element_factory_has_property('multifdsink',
@@ -541,6 +551,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # connect to client-removed so we can detect errors in file writing
         sink.connect('client-removed', self._client_removed_cb)
 
+        if self.writeIndex:
+            self._index = Index()
+            sink.get_pad("sink").add_data_probe(self._src_pad_probe)
+
         # set event probe if we should react to video mark events
         react_to_marks = properties.get('react-to-stream-markers', False)
         if react_to_marks:
@@ -549,6 +563,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             sink.get_pad('sink').add_event_probe(self._markers_event_probe)
 
     ### our methods
+
+    def _updateIndex(self, offset, timestamp, isKeyframe, tdt=0):
+        self._index.addEntry(offset, timestamp, isKeyframe, tdt)
 
     def _pollDisk(self):
         # Figure out the remaining disk space where the disker is saving
@@ -670,6 +687,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # stream continuity if it's done close to a keyframe because when
         # multifdsink looks internally for the latest keyframe it's already to
         # late and a gap is introduced.
+        if self.writeIndex and self.location:
+            self.indexLocation = '.'.join([self.location,
+                                           Index.INDEX_EXTENSION])
         reactor.callLater(1, self._stopRecordingFull, self.file, self.location,
                           self.last_tstamp, True)
 
@@ -787,6 +807,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self._updateSymlink(location,
                                     self._symlinkToLastRecording)
 
+
+    # START OF THREAD AWARE METHODS
+
     def _notify_caps_cb(self, pad, param):
         caps = pad.get_negotiated_caps()
         if caps == None:
@@ -807,15 +830,37 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             reactor.callLater(0, self.changeFilename,
                 self._startFilenameTemplate, self._startTime)
 
-    # multifdsink::client-removed
-
     def _client_removed_cb(self, element, arg0, client_status):
         # treat as error if we were removed because of GST_CLIENT_STATUS_ERROR
         # FIXME: can we use the symbol instead of a numeric constant ?
+        if self.writeIndex:
+            stats = element.emit('get-stats', arg0)
+            reactor.callFromThread(self._index.updateStart, stats[6])
+            reactor.callFromThread(self._index.save, self.indexLocation,
+                                   stats[6], stats[7])
+
         if client_status == 4:
             # since we get called from the streaming thread, hand off handling
             # to the reactor's thread
             reactor.callFromThread(self._client_error_cb)
+
+    def _src_pad_probe(self, pad, data):
+        # IN_CAPS Buffers
+        if data.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
+            self._headers_size += data.size
+            self._index.setHeadersSize(self._headers_size)
+            return True
+
+        if data.timestamp == gst.CLOCK_TIME_NONE:
+            data.timestamp = self._clock.get_time()
+
+        if not data.flag_is_set(gst.BUFFER_FLAG_DELTA_UNIT):
+            reactor.callFromThread(self._updateIndex,
+                self._offset, data.timestamp, True)
+        self._offset += data.size
+        return True
+
+    # END OF THREAD AWARE METHODS
 
     def _client_error_cb(self):
         self.file.close()
