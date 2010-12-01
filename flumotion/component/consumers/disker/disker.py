@@ -75,17 +75,18 @@ understand arbitrary timezones.
 """
 
 
-def _openFile(component, location, mode):
+def _openFile(self, component, location, mode):
     try:
         file = open(location, mode)
         return file
     except IOError, e:
-        component.warning("Failed to open output file %s: %s",
+        self.warning("Failed to open output file %s: %s",
                    location, log.getExceptionMessage(e))
-        m = messages.Error(T_(N_(
-            "Failed to open output file '%s' for writing. "
-            "Check permissions on the file."), location))
-        component.addMessage(m)
+        if component is not None:
+            m = messages.Error(T_(N_(
+                "Failed to open output file '%s' for writing. "
+                "Check permissions on the file."), location))
+            component.addMessage(m)
         return None
 
 
@@ -115,9 +116,10 @@ class Index(log.Loggable):
 
     logCategory = "index"
 
-    def __init__(self):
+    def __init__(self, component=None):
         self._index = []
         self._headers_size = 0
+        self.comp = component
 
     ### Public methods ###
 
@@ -204,7 +206,7 @@ class Index(log.Loggable):
             self.warning("The index doesn't contain any entry and it will not "
                          "be saved")
             return False
-        f = _openFile(self, location, 'w+')
+        f = _openFile(self, self.comp, location, 'w+')
         if not f:
             return False
 
@@ -559,7 +561,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.connect('client-removed', self._client_removed_cb)
 
         if self.writeIndex:
-            self._index = Index()
+            self._index = Index(self)
 
         if self.reactToMarks:
             pfx = properties.get('stream-marker-filename-prefix', '%03d.')
@@ -745,15 +747,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.location = location
 
         self.info("Changing filename to %s", self.location)
-        try:
-            self.file = open(self.location, 'wb')
-        except IOError, e:
-            self.warning("Failed to open output file %s: %s",
-                       self.location, log.getExceptionMessage(e))
-            m = messages.Error(T_(N_(
-                "Failed to open output file '%s' for writing. "
-                "Check permissions on the file."), self.location))
-            self.addMessage(m)
+        self.file = _openFile(self, self, self.location, 'wb')
+        if self.file is None:
             return
         self._recordingStarted(self.file, self.location)
         sink.emit('add', self.file.fileno())
