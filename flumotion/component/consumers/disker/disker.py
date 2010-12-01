@@ -835,7 +835,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
 
-        if new and self._recordAtStart and not self._syncOnTdt:
+        if new and self._recordAtStart and not self.syncOnTdt:
             reactor.callLater(0, self.changeFilename,
                 self._startFilenameTemplate, self._startTime)
 

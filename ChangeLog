@@ -1,5 +1,12 @@
 2010-12-01  Andoni Morales Alastruey  <amorales@flumotion.com>
 
+	reviewed by: Julien Le Goff
+
+	* flumotion/component/consumers/disker/disker.py:
+	Fix typo
+
+2010-12-01  Andoni Morales Alastruey  <amorales@flumotion.com>
+
 	reviewed by: Xavier Queralt
 
 	* flumotion/component/consumers/disker/disker.xml:
