@@ -392,12 +392,14 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     last_tstamp = None
     indexLocation = None
     writeIndex = False
+    syncOnTdt = False
     reactToMarks = False
 
     _offset = 0L
     _headers_size = 0
     _index = None
-    _client_start_ts = None
+    _nextIsKF = False
+    _lastTdt = None
     _startFilenameTemplate = None # template to use when starting off recording
     _startTime = None             # time of event when starting
     _rotateTimeDelayedCall = None
@@ -540,6 +542,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
         self.writeIndex = properties.get('write-index', False)
         self.reactToMarks = properties.get('react-to-stream-markers', False)
+        self.syncOnTdt = properties.get('sync-on-tdt', False)
 
         sink = self.get_element('fdsink')
 
@@ -560,11 +563,22 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             pfx = properties.get('stream-marker-filename-prefix', '%03d.')
             self._markerPrefix = pfx
 
-        if self.reactToMarks or self.writeIndex:
+        if self.reactToMarks or self.writeIndex or self.syncOnTdt:
             sink.get_pad("sink").add_data_probe(self._src_pad_probe)
 
 
     ### our methods
+
+    def _tdt_to_datetime(self, s):
+        '''
+        Can raise and Exception if the structure doesn't cotains all the
+        requiered fields. Protect with try-except.
+        '''
+        if s.get_name() != 'tdt':
+            return None
+        t = dt.datetime(s['year'], s['month'], s['day'], s['hour'],
+            s['minute'], s['second'])
+        return time.mktime(t.timetuple())
 
     def _updateIndex(self, offset, timestamp, isKeyframe, tdt=0):
         self._index.addEntry(offset, timestamp, isKeyframe, tdt)
@@ -847,14 +861,22 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             reactor.callFromThread(self._client_error_cb)
 
     def _handle_event(self, event):
-        if event.type == gst.EVENT_CUSTOM_DOWNSTREAM:
-            struct = event.get_structure()
-            struct_name = struct.get_name()
-            if struct_name == 'FluStreamMark' and self.reactToMarks:
-                if struct['action'] == 'start':
-                    self._onMarkerStart(struct['prog_id'])
-                elif struct['action'] == 'stop':
-                    self._onMarkerStop()
+        if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
+            return True
+
+        struct = event.get_structure()
+        struct_name = struct.get_name()
+        if struct_name == 'FluStreamMark' and self.reactToMarks:
+            if struct['action'] == 'start':
+                self._onMarkerStart(struct['prog_id'])
+            elif struct['action'] == 'stop':
+                self._onMarkerStop()
+        elif struct_name == 'tdt' and self.syncOnTdt:
+            try:
+                self._lastTdt = self._tdt_to_datetime(struct)
+                self._nextIsKF = True
+            except KeyError, e:
+                self.warning("Error parsing tdt event: %r", e)
         return True
 
     def _handle_buffer(self, buf):
@@ -869,17 +891,32 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if buf.timestamp == gst.CLOCK_TIME_NONE:
             buf.timestamp = self._clock.get_time()
 
-        if not buf.flag_is_set(gst.BUFFER_FLAG_DELTA_UNIT):
+        if self.syncOnTdt:
+            if self._nextIsKF:
+                # That's the first buffer after a 'tdt'. we mark it as a
+                # keyframe and the sink will start streaming from it.
+                buf.flag_unset(gst.BUFFER_FLAG_DELTA_UNIT)
+                self._nextIsKF = False
+                reactor.callFromThread(self._updateIndex, self._offset,
+                    buf.timestamp, False, int(self._lastTdt))
+            else:
+                buf.flag_set(gst.BUFFER_FLAG_DELTA_UNIT)
+        # if we don't sync on TDT and this is a keyframe, add it to the index
+        elif not buf.flag_is_set(gst.BUFFER_FLAG_DELTA_UNIT):
             reactor.callFromThread(self._updateIndex,
                 self._offset, buf.timestamp, True)
         self._offset += buf.size
         return True
 
     def _src_pad_probe(self, pad, data):
+        # Events
         if type(data) is gst.Event:
-            return self._handle_event(data)
-        else:
+            if self.reactToMarks or self.syncOnTdt:
+                return self._handle_event(data)
+        # Buffers
+        elif self.writeIndex:
             return self._handle_buffer(data)
+        return True
 
     # END OF THREAD AWARE METHODS
 
