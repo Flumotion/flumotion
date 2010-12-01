@@ -3,6 +3,13 @@
 	reviewed by: Xavier Queralt
 
 	* flumotion/component/consumers/disker/disker.py:
+	Use a common pad probe for events and buffers
+
+2010-11-26  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/component/consumers/disker/disker.py:
 	* flumotion/component/consumers/disker/disker.xml:
 	Add a new property to write an index for each file created by
 	the disker

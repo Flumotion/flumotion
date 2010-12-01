@@ -392,6 +392,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     last_tstamp = None
     indexLocation = None
     writeIndex = False
+    reactToMarks = False
 
     _offset = 0L
     _headers_size = 0
@@ -538,6 +539,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             raise errors.ComponentSetupHandledError()
 
         self.writeIndex = properties.get('write-index', False)
+        self.reactToMarks = properties.get('react-to-stream-markers', False)
 
         sink = self.get_element('fdsink')
 
@@ -553,14 +555,14 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
         if self.writeIndex:
             self._index = Index()
-            sink.get_pad("sink").add_data_probe(self._src_pad_probe)
 
-        # set event probe if we should react to video mark events
-        react_to_marks = properties.get('react-to-stream-markers', False)
-        if react_to_marks:
+        if self.reactToMarks:
             pfx = properties.get('stream-marker-filename-prefix', '%03d.')
             self._markerPrefix = pfx
-            sink.get_pad('sink').add_event_probe(self._markers_event_probe)
+
+        if self.reactToMarks or self.writeIndex:
+            sink.get_pad("sink").add_data_probe(self._src_pad_probe)
+
 
     ### our methods
 
@@ -844,21 +846,40 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             # to the reactor's thread
             reactor.callFromThread(self._client_error_cb)
 
-    def _src_pad_probe(self, pad, data):
+    def _handle_event(self, event):
+        if event.type == gst.EVENT_CUSTOM_DOWNSTREAM:
+            struct = event.get_structure()
+            struct_name = struct.get_name()
+            if struct_name == 'FluStreamMark' and self.reactToMarks:
+                if struct['action'] == 'start':
+                    self._onMarkerStart(struct['prog_id'])
+                elif struct['action'] == 'stop':
+                    self._onMarkerStop()
+        return True
+
+    def _handle_buffer(self, buf):
         # IN_CAPS Buffers
-        if data.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
-            self._headers_size += data.size
+        if buf.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
+            self._headers_size += buf.size
             self._index.setHeadersSize(self._headers_size)
             return True
 
-        if data.timestamp == gst.CLOCK_TIME_NONE:
-            data.timestamp = self._clock.get_time()
+        # re-timestamp buffers without timestamp, so that we can get from
+        # multifdsink's client stats the first and last buffer received
+        if buf.timestamp == gst.CLOCK_TIME_NONE:
+            buf.timestamp = self._clock.get_time()
 
-        if not data.flag_is_set(gst.BUFFER_FLAG_DELTA_UNIT):
+        if not buf.flag_is_set(gst.BUFFER_FLAG_DELTA_UNIT):
             reactor.callFromThread(self._updateIndex,
-                self._offset, data.timestamp, True)
-        self._offset += data.size
+                self._offset, buf.timestamp, True)
+        self._offset += buf.size
         return True
+
+    def _src_pad_probe(self, pad, data):
+        if type(data) is gst.Event:
+            return self._handle_event(data)
+        else:
+            return self._handle_buffer(data)
 
     # END OF THREAD AWARE METHODS
 
@@ -937,16 +958,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             plug.recordingStopped(file, location)
 
     ### marker methods
-
-    def _markers_event_probe(self, element, event):
-        if event.type == gst.EVENT_CUSTOM_DOWNSTREAM:
-            evt_struct = event.get_structure()
-            if evt_struct.get_name() == 'FluStreamMark':
-                if evt_struct['action'] == 'start':
-                    self._onMarkerStart(evt_struct['prog_id'])
-                elif evt_struct['action'] == 'stop':
-                    self._onMarkerStop()
-        return True
 
     def _onMarkerStop(self):
         self.stopRecording()
