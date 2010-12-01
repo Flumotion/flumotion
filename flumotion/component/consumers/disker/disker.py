@@ -848,6 +848,18 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # FIXME: can we use the symbol instead of a numeric constant ?
         if self.writeIndex:
             stats = element.emit('get-stats', arg0)
+            if len(stats) <= 6:
+                self.warning("The current version of multifdsink doesn't "
+                             "include the timestamp of the first and last "
+                             "buffers sent: the indexing will be disabled.")
+                m = messages.Warning(
+                    T_(N_("Versions up to and including %s of the '%s' "
+                          "GStreamer plug-in can't be used to write index "
+                          "files.\n"),
+                          '0.10.30', 'multifdsink'))
+                self.addMessage(m)
+                self.writeIndex = False
+                return
             reactor.callFromThread(self._index.updateStart, stats[6])
             reactor.callFromThread(self._index.save, self.indexLocation,
                                    stats[6], stats[7])
