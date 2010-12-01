@@ -844,7 +844,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.debug('Storing caps: %s' % caps_str)
         self.caps = caps
 
-        if new and self._recordAtStart:
+        if new and self._recordAtStart and not self._syncOnTdt:
             reactor.callLater(0, self.changeFilename,
                 self._startFilenameTemplate, self._startTime)
 
@@ -875,6 +875,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self._onMarkerStop()
         elif struct_name == 'tdt' and self.syncOnTdt:
             try:
+                if self._lastTdt == None:
+                    self._firstTdt = True
                 self._lastTdt = self._tdt_to_datetime(struct)
                 self._nextIsKF = True
             except KeyError, e:
@@ -901,6 +903,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self._nextIsKF = False
                 reactor.callFromThread(self._updateIndex, self._offset,
                     buf.timestamp, False, int(self._lastTdt))
+                if self._recordAtStart and self._firstTdt:
+                    reactor.callLater(0, self.changeFilename,
+                        self._startFilenameTemplate, self._startTime)
+                    self._firstTdt = False
             else:
                 buf.flag_set(gst.BUFFER_FLAG_DELTA_UNIT)
         # if we don't sync on TDT and this is a keyframe, add it to the index
