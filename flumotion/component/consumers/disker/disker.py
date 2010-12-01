@@ -107,7 +107,7 @@ class DiskerMedium(feedcomponent.FeedComponentMedium):
 class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     componentMediumClass = DiskerMedium
     checkOffset = True
-    pipe_template = 'multifdsink sync-method=2 name=fdsink mode=1 sync=false'
+    pipe_template = 'multifdsink name=fdsink sync-method=2 mode=1 sync=false'
     file = None
     directory = None
     location = None
@@ -386,7 +386,15 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         tm = datetime or dt.datetime.now()
         tmutc = datetime or dt.datetime.utcnow()
 
-        self.stopRecording()
+        # delay the stop of the current recording to ensure there are no gaps
+        # in the recorded files. We could think that emitting first the signal
+        # to add a new client before the one to remove the client and syncing
+        # with the latest keyframe should be enough, but it doesn't ensure the
+        # stream continuity if it's done close to a keyframe because when
+        # multifdsink looks internally for the latest keyframe it's already to
+        # late and a gap is introduced.
+        reactor.callLater(1, self._stopRecordingFull, self.file, self.location,
+                          self.last_tstamp, True)
 
         sink = self.get_element('fdsink')
         if sink.get_state() == gst.STATE_NULL:
@@ -467,19 +475,24 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self.addMessage(m)
 
     def stopRecording(self):
+        self._stopRecordingFull(self.file, self.location,
+                               self.last_tstamp, False)
+
+    def _stopRecordingFull(self, file, location, lastTstamp, delayedStop):
         sink = self.get_element('fdsink')
         if sink.get_state() == gst.STATE_NULL:
             sink.set_state(gst.STATE_READY)
 
-        if self.file:
-            self.file.flush()
-            sink.emit('remove', self.file.fileno())
-            self._recordingStopped(self.file, self.location)
-            self.file = None
-            self.uiState.set('filename', None)
-            self.uiState.set('recording', False)
+        if file:
+            file.flush()
+            sink.emit('remove', file.fileno())
+            self._recordingStopped(file, location)
+            file = None
+            if not delayedStop:
+                self.uiState.set('filename', None)
+                self.uiState.set('recording', False)
             try:
-                size = format.formatStorage(os.stat(self.location).st_size)
+                size = format.formatStorage(os.stat(location).st_size)
             except EnvironmentError, e:
                 # catch File not found, permission denied, disk problems
                 size = "unknown"
@@ -489,12 +502,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             if FILELIST_SIZE == len(fl):
                 self.uiState.remove('filelist', fl[0])
 
-            self.uiState.append('filelist', (self.last_tstamp,
-                                             self.location,
+            self.uiState.append('filelist', (lastTstamp,
+                                             location,
                                              size))
 
-            if self._symlinkToLastRecording:
-                self._updateSymlink(self.location,
+            if not delayedStop and self._symlinkToLastRecording:
+                self._updateSymlink(location,
                                     self._symlinkToLastRecording)
 
     def _notify_caps_cb(self, pad, param):

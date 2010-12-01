@@ -1,3 +1,10 @@
+2010-11-26  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/component/consumers/disker/disker.py:
+	Ensure that recorded files have no gaps overlapping them
+
 2010-11-16  Josep Joan Ribas  <jribas@flumotion.com>
 
 	* flumotion/component/producers/videotest/wizard.glade:
