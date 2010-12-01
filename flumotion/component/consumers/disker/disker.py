@@ -26,19 +26,17 @@ import tempfile
 import datetime as dt
 import bisect
 
-import gobject
 import gst
 
 from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
-from flumotion.common import log, gstreamer, pygobject, messages,\
+from flumotion.common import log, gstreamer, messages,\
                              errors, common
 from flumotion.common import documentation, format
 from flumotion.common import eventcalendar, poller
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.mimetypes import mimeTypeToExtention
-from flumotion.common.pygobject import gsignal
 
 #   the flumotion.twisted.flavors is not bundled, and as we only need it for
 #   the interface, we can skip doing the import and thus not create
