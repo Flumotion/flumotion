@@ -575,6 +575,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
 
     def _tdt_to_datetime(self, s):
         '''
+        TDT events contains a structure representing the UTC time of the
+        stream with the fields:
+        'year', 'month', 'day', 'hour', 'minute', 'second'
+
         Can raise and Exception if the structure doesn't cotains all the
         requiered fields. Protect with try-except.
         '''

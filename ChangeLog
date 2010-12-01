@@ -2,6 +2,13 @@
 
 	reviewed by: Xavier Queralt
 
+	* flumotion/component/consumers/disker/disker.xml:
+	Document better the sync-on-tdt property
+
+2010-12-01  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
 	* flumotion/component/consumers/disker/disker.py:
 	Remove unused method
 

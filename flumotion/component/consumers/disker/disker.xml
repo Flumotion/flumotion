@@ -49,10 +49,10 @@
                   _description="Whether to start/stop the disker when stream marker events are received." />
         <property name="stream-marker-filename-prefix" type="string"
                   required="no" _description="The formatting template for the program id (default '%03d.')." />
-        <property name="write-index" type="bool"
-                  required="no" _description="Writes an index for each file." />
-        <property name="sync-on-tdt" type="bool"
-                  required="no" _description="Start files from the first buffer after a 'tdt' upstream event." />
+        <property name="write-index" type="bool" required="no"
+                  _description="Writes an index for each file. (default: False)" />
+        <property name="sync-on-tdt" type="bool" required="no"
+                  _description="Uses the Time and Date Table events to write the index entries and create the new files starting from the first buffer after a TDT event (like if they were keyframes). Use this option carefully and only with sources that send TDT events periodically, like the dvb-ts-producer. (default: false)" />
       </properties>
     </component>
   </components>
