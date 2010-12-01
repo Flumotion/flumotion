@@ -115,6 +115,8 @@ class Index(log.Loggable):
     INDEX_KEYS = ['CHK', 'POS', 'LEN', 'TS', 'DUR', 'KF', 'TDT', 'TDUR']
     INDEX_EXTENSION = 'index'
 
+    logCategory = "index"
+
     def __init__(self):
         self._index = []
         self._headers_size = 0
