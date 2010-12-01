@@ -643,14 +643,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if self.caps:
             return self.caps.get_structure(0).get_name()
 
-    # FIXME: is this method used anywhere ?
-
-    def get_content_type(self):
-        mime = self.getMime()
-        if mime == 'multipart/x-mixed-replace':
-            mime += ";boundary=ThisRandomString"
-        return mime
-
     def scheduleRecordings(self, icalFile):
         self.uiState.set('has-schedule', True)
         self.debug('Parsing iCalendar file %s' % icalFile)

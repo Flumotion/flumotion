@@ -1,3 +1,10 @@
+2010-12-01  Andoni Morales Alastruey  <amorales@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/component/consumers/disker/disker.py:
+	Remove unused method
+
 2010-11-29  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Xavier Queralt
