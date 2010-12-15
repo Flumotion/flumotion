@@ -277,6 +277,9 @@ class Vishnu(log.Loggable):
             self.info("Registry changed, rebuilding")
             registry.getRegistry().verify(force=True)
             self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
+        elif not self.bundlerBasket.isUptodate(registry.getRegistry().mtime):
+            self.info("BundlerBasket is older than the Registry, rebuilding")
+            self.bundlerBasket = registry.getRegistry().makeBundlerBasket()
         return self.bundlerBasket
 
     def addMessage(self, level, mid, format, *args, **kwargs):

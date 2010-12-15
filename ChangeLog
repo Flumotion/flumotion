@@ -1,3 +1,16 @@
+2010-12-15  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/common/bundle.py:
+	* flumotion/common/registry.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_manager_manager.py:
+	Manager has to rebuild the BundlerBasket when the registry has been
+	updated. This prevents asking for a bundle that has been found in the
+	recently updated Registry but it is not available in the outdated
+	BundlerBasket.
+
 2010-12-01  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Julien Le Goff

@@ -789,3 +789,11 @@ class TestVishnu(testsuite.TestCase):
 
         # now lets empty planet
         return self.vishnu.emptyPlanet()
+
+    def testUpdateBundlerBasket(self):
+        basket = self.vishnu.getBundlerBasket()
+        self.assertEqual(basket, self.vishnu.getBundlerBasket())
+        # Force registry rebuild
+        from flumotion.common import registry
+        registry.getRegistry().verify(force=True)
+        self.assertNotEqual(basket, self.vishnu.getBundlerBasket())

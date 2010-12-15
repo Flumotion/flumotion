@@ -271,7 +271,7 @@ class BundlerBasket:
     I manage bundlers that are registered through me.
     """
 
-    def __init__(self):
+    def __init__(self, mtime=None):
         """
         Create a new bundler basket.
         """
@@ -281,6 +281,12 @@ class BundlerBasket:
         self._imports = {}      # import statements -> bundle name
 
         self._graph = dag.DAG()
+
+        self._mtime = mtime     # Registry modifcation time when the basket was
+                                # created
+
+    def isUptodate(self, mtime):
+        return self._mtime >= mtime
 
     def add(self, bundleName, source, destination=None):
         """

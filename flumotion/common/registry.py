@@ -1654,7 +1654,7 @@ class ComponentRegistry(log.Loggable):
         """
 
         def load():
-            ret = BundlerBasket()
+            ret = BundlerBasket(self.mtime)
             for b in self.getBundles():
                 bundleName = b.getName()
                 self.debug('Adding bundle %s', bundleName)
