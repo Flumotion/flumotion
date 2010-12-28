@@ -75,7 +75,6 @@ def find_upstream_demuxer_and_pad(pad):
 
 
 def get_type_from_decoder(decoder):
-    log.debug("stream", "%r" % decoder)
     klass = decoder.get_factory().get_klass()
     parts = klass.split('/', 2)
     if len(parts) != 3:

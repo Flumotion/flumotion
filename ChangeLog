@@ -1,5 +1,11 @@
 2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/producers/playlist/singledecodebin.py:
+	  Pychecker caught an invocation of log. when there is no log
+	  module imported.  Removing the log line.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
 	  Adapt to name change.
 
