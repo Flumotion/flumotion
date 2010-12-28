@@ -19,6 +19,8 @@
 
 # Headers in this file shall remain intact.
 
+from twisted.internet import defer
+
 from flumotion.common import log
 
 __version__ = "$Rev$"

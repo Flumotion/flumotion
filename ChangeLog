@@ -1,5 +1,11 @@
 2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/plugs/base.py:
+	  Pychecker caught an invocation of defer. without the matching
+	  import.  Importing.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/producers/playlist/singledecodebin.py:
 	  Pychecker caught an invocation of log. when there is no log
 	  module imported.  Removing the log line.
