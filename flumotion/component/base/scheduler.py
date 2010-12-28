@@ -128,7 +128,6 @@ class Scheduler(log.Loggable):
             when = datetime.datetime.now(eventcalendar.LOCAL)
 
         self.debug('getPoints at %s', str(when))
-        earliest = when + self.windowSize
 
         points = self._calendar.getPoints(when, self.windowSize)
 

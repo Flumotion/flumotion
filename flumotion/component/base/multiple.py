@@ -119,7 +119,6 @@ class MultipleComponentsAdminGtk(log.Loggable):
             co = ComponentOverview(state.get('name'))
             vbox.pack_start(co, False, True)
             vbox.pack_start(gtk.HSeparator(), False, True)
-            mood = state.get('mood')
             if state.get('mood') in [moods.lost.value,
                                      moods.sleeping.value,
                                      moods.sad.value]:
