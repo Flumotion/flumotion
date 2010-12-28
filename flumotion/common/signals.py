@@ -22,8 +22,6 @@
 """synchronous message passing between python objects
 """
 
-import warnings
-
 from flumotion.common import log
 
 __version__ = "$Rev$"

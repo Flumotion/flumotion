@@ -19,8 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import os
-
 from twisted.internet import reactor
 
 from flumotion.configure import configure

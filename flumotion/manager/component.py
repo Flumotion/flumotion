@@ -25,8 +25,6 @@ manager-side objects for components
 API Stability: semi-stable
 """
 
-import time
-
 from twisted.spread import pb
 from twisted.internet import reactor, defer
 from twisted.internet import error as terror
