@@ -201,7 +201,7 @@ class CachedSource(resource_manager.DataSource):
     Data source that read data directly from a localy cached file.
     """
 
-    mimetypes = mimetypes.MimeTypes()
+    mimetypes = ourmimetypes.MimeTypes()
 
     def __init__(self, ident, url, cachedFile, stats):
         self.identifier = ident
@@ -358,7 +358,7 @@ class CachingSession(BaseCachingSession, log.Loggable):
      ABORTED,
      ERROR) = range(10)
 
-    mimetypes = mimetypes.MimeTypes()
+    mimetypes = ourmimetypes.MimeTypes()
 
     def __init__(self, strategy, url, cache_stats, ifModifiedSince=None):
         self.strategy = strategy
