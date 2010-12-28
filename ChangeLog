@@ -1,5 +1,11 @@
 2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/converters/overlay/overlay.py:
+	  Pychecker caught two mistakes, globals that are in fact self
+	  attributes.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/consumers/disker/disker.py:
 	  _openFile is used by two objects.  Rename self to loggable to make
 	  clear this is a function, not a method.
