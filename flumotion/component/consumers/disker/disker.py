@@ -802,6 +802,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             try:
                 size = format.formatStorage(os.stat(location).st_size)
             except EnvironmentError, e:
+                self.debug("Failed to stat %s: %s", location,
+                      log.getExceptionMessage(e))
                 # catch File not found, permission denied, disk problems
                 size = "unknown"
 
@@ -967,7 +969,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # so convert all to UTC then remove tzinfo.
 
         def _utcAndStripTZ(dt):
-            from flumotion.common import eventcalendar
             return dt.astimezone(eventcalendar.UTC).replace(tzinfo=None)
 
         for p in points:
