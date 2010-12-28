@@ -75,12 +75,13 @@ understand arbitrary timezones.
 """
 
 
-def _openFile(self, component, location, mode):
+def _openFile(loggable, component, location, mode):
+    # used by both Disker and Index
     try:
         file = open(location, mode)
         return file
     except IOError, e:
-        self.warning("Failed to open output file %s: %s",
+        loggable.warning("Failed to open output file %s: %s",
                    location, log.getExceptionMessage(e))
         if component is not None:
             m = messages.Error(T_(N_(

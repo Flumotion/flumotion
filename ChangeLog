@@ -1,6 +1,12 @@
 2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/consumers/disker/disker.py:
+	  _openFile is used by two objects.  Rename self to loggable to make
+	  clear this is a function, not a method.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
 	  Remove an inner import that was already at the top.
 	  Log an exception when statting a file.
 
