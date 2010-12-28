@@ -152,10 +152,10 @@ class DeinterlaceBin(gst.Bin):
         # If we are in 'auto' mode and the interlaced field has changed,
         # switch to the appropiate deinterlacer
         if self.mode == 'auto':
-            if self._interlaced == True and self.isPassthrough():
+            if self._interlaced and self.isPassthrough():
                 self._replaceDeinterlacer(self._sinkPeerPad,
                     DEINTERLACE_METHOD[self.method])
-            elif self._interlaced == False and not self.isPassthrough():
+            elif not self._interlaced and not self.isPassthrough():
                 self._replaceDeinterlacer(self._sinkPeerPad,
                     PASSTHROUGH_DEINTERLACER)
         return True
