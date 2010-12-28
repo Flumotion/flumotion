@@ -177,7 +177,7 @@ class FixedOffsetTimezone(datetime.tzinfo):
         return self.__name
 
     def dst(self, dt):
-        return datetime.deltatime(0)
+        return datetime.timedelta(0)
 
     def copy(self):
         return FixedOffsetTimezone(self.__offset, self.__name)
