@@ -1,5 +1,10 @@
 2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
+	  Adapt to name change.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpserver/ourmimetypes.py (added):
 	* flumotion/component/misc/httpserver/mimetypes.py (deleted):
 	  Rename, so it doesn't conflict with a built-in module of the

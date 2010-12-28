@@ -28,7 +28,7 @@ from twisted.internet import defer, reactor, abstract
 from flumotion.common import log
 
 from flumotion.component.misc.httpserver import fileprovider
-from flumotion.component.misc.httpserver import mimetypes
+from flumotion.component.misc.httpserver import ourmimetypes
 from flumotion.component.misc.httpserver import cachestats
 from flumotion.component.misc.httpserver.httpcached import common
 from flumotion.component.misc.httpserver.httpcached import resource_manager
