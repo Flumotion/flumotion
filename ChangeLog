@@ -1,3 +1,14 @@
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpserver/ourmimetypes.py (added):
+	* flumotion/component/misc/httpserver/mimetypes.py (deleted):
+	  Rename, so it doesn't conflict with a built-in module of the
+	  same name that actually gets imported by twisted.web.static
+	* flumotion/component/misc/httpserver/Makefile.am:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/localpath.py:
+	  Adapt to name change.
+
 2010-12-15  Josep Joan Ribas  <jribas@flumotion.com>
 
 	reviewed by: Xavier Queralt

@@ -7,7 +7,7 @@ httpserverdir = $(libdir)/flumotion/python/flumotion/component/misc/httpserver
 httpserver_PYTHON =		\
 	__init__.py		\
 	admin_gtk.py		\
-	cachemanager.py	\
+	cachemanager.py		\
 	cachedprovider.py	\
 	cachestats.py		\
 	fileprovider.py		\
@@ -18,8 +18,8 @@ httpserver_PYTHON =		\
 	ondemandbrowser.py	\
 	ratecontrol.py          \
 	serverstats.py		\
-	metadataprovider.py \
-	mimetypes.py
+	metadataprovider.py	\
+	ourmimetypes.py
 
 httpserver_DATA = 		\
 	httpfile.glade		\

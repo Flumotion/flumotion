@@ -160,10 +160,10 @@
                 <filename location="httpserver.py" />
                 <filename location="serverstats.py" />
                 <!--
-                  http-server-component depend on localprovider.py because
+                  http-server-component depends on localprovider.py because
                   it's the default file provider used when no plug is specified
                 -->
-                <filename location="mimetypes.py" />
+                <filename location="ourmimetypes.py" />
                 <filename location="localpath.py" />
                 <filename location="localprovider.py" />
             </directory>
