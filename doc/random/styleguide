@@ -129,6 +129,7 @@ NAMING
   http://twistedmatrix.com/projects/core/documentation/howto/policy/coding-standard.html
 - component properties and uiState keys should be named lowercase and
   hyphenated.
+- do not use names that are also builtins; pychecker checks for this.
 
 LOGGING
 -------
