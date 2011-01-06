@@ -29,7 +29,7 @@ import time
 import gtk
 
 from flumotion.common import common
-from flumotion.common.format import formatStorage, formatTime, formatTimeStamp
+from flumotion.common import format as formatting
 from flumotion.common.i18n import gettexter
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.component.base.statewatcher import StateWatcher
@@ -82,7 +82,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
                                              % (value, ))
 
     def setFeederClientBytesReadCurrent(self, state, value):
-        txt = value and (formatStorage(value) + _('Byte')) or ''
+        txt = value and (formatting.formatStorage(value) + _('Byte')) or ''
         self.labels['bytes-read-current'].set_text(txt)
         self.updateConnectionTime()
         self.updateDisconnectionTime()
@@ -96,7 +96,7 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
         self.updateDisconnectionTime()
 
     def setFeederClientBytesReadTotal(self, state, value):
-        txt = value and (formatStorage(value) + _('Byte')) or ''
+        txt = value and (formatting.formatStorage(value) + _('Byte')) or ''
         self.labels['bytes-read-total'].set_text(txt)
 
     def setFeederClientBuffersDroppedTotal(self, state, value):
@@ -110,21 +110,21 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
     def setFeederClientLastConnect(self, state, value):
         if value:
-            text = formatTimeStamp(time.localtime(value))
+            text = formatting.formatTimeStamp(time.localtime(value))
             self.labels['connected-since'].set_text(text)
             self._lastConnect = value
             self.updateConnectionTime()
 
     def setFeederClientLastDisconnect(self, state, value):
         if value:
-            text = formatTimeStamp(time.localtime(value))
+            text = formatting.formatTimeStamp(time.localtime(value))
             self.labels['disconnected-since'].set_text(text)
             self._lastDisconnect = value
             self.updateDisconnectionTime()
 
     def setFeederClientLastActivity(self, state, value):
         if value:
-            text = formatTimeStamp(time.localtime(value))
+            text = formatting.formatTimeStamp(time.localtime(value))
             self.labels['last-activity'].set_text(text)
 
     def setFeederClientFD(self, state, value):
@@ -140,14 +140,14 @@ class FeedersAdminGtkNode(BaseAdminGtkNode):
 
     def updateConnectionTime(self):
         if self._lastConnect:
-            text = formatTime(time.time() - self._lastConnect)
+            text = formatting.formatTime(time.time() - self._lastConnect)
             self.labels['connection-time'].set_text(text)
 
     # FIXME: add a timeout to update this ?
 
     def updateDisconnectionTime(self):
         if self._lastDisconnect:
-            text = formatTime(time.time() - self._lastDisconnect)
+            text = formatting.formatTime(time.time() - self._lastDisconnect)
             self.labels['disconnection-time'].set_text(text)
 
     def addFeeder(self, uiState, state):

@@ -20,6 +20,7 @@ flumotion_PYTHON = \
 	errors.py \
 	fraction.py \
 	format.py \
+	formatting.py \
 	fxml.py \
 	gstreamer.py \
 	identity.py \

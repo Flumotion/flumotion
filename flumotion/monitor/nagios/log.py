@@ -4,7 +4,7 @@
 import commands
 import time
 
-from flumotion.common.format import formatTime
+from flumotion.common import format as formatting
 from flumotion.monitor.nagios import util
 
 __version__ = "$Rev: 6687 $"
@@ -89,7 +89,7 @@ checking should be in the same timezone.
 
         msg = 'Last log line%s is %s old.' % (
             self.options.string and " with '%s'" % self.options.string or '',
-            formatTime(delta, fractional=2))
+            formatting.formatTime(delta, fractional=2))
         if delta > int(self.options.critical):
             return util.critical(msg)
         elif delta > int(self.options.warning):

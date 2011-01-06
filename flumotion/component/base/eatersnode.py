@@ -29,7 +29,7 @@ import time
 
 import gtk
 
-from flumotion.common.format import formatStorage, formatTime, formatTimeStamp
+from flumotion.common import format as formatting
 from flumotion.common.i18n import gettexter
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.component.base.statewatcher import StateWatcher
@@ -74,7 +74,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
         self.labels['eater-name'].set_markup(_('Eater <b>%s</b>') % value)
 
     def _setEaterBytesReadCurrent(self, state, value):
-        txt = value and (formatStorage(value) + _('Byte')) or ''
+        txt = value and (formatting.formatStorage(value) + _('Byte')) or ''
         self.labels['bytes-read-current'].set_text(txt)
         self._updateConnectionTime()
         self._updateDisconnectionTime()
@@ -88,24 +88,24 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             if value > 0:
                 self._expander_discont_current.show()
         elif key == 'time-timestamp-discont':
-            text = formatTimeStamp(time.localtime(value))
+            text = formatting.formatTimeStamp(time.localtime(value))
             self.labels['timestamp-discont-time-current'].set_text(text)
             if value is not None:
                 self._vbox_timestamp_discont_current.show()
         elif key == 'last-timestamp-discont':
-            text = formatTime(value, fractional=9)
+            text = formatting.formatTime(value, fractional=9)
             self.labels['timestamp-discont-last-current'].set_text(text)
             if value > 0.0:
                 self._vbox_timestamp_discont_current.show()
         elif key == 'total-timestamp-discont':
-            text = formatTime(value, fractional=9)
+            text = formatting.formatTime(value, fractional=9)
             self.labels['timestamp-discont-total-current'].set_text(text)
             if value > 0.0:
                 self._vbox_timestamp_discont_current.show()
         elif key == 'timestamp-timestamp-discont':
             if value is None:
                 return
-            text = formatTime(value, fractional=9)
+            text = formatting.formatTime(value, fractional=9)
             self.labels['timestamp-discont-timestamp-current'].set_text(text)
         # offsets
         elif key == 'count-offset-discont':
@@ -113,7 +113,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
             if value > 0:
                 self._expander_discont_current.show()
         elif key == 'time-offset-discont':
-            text = formatTimeStamp(time.localtime(value))
+            text = formatting.formatTimeStamp(time.localtime(value))
             self.labels['offset-discont-time-current'].set_text(text)
             if value is not None:
                 self._vbox_offset_discont_current.show()
@@ -145,7 +145,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
     def _setEaterTotalTimestampDiscont(self, state, value):
         if value is None:
             return
-        text = formatTime(value, fractional=9)
+        text = formatting.formatTime(value, fractional=9)
         self.labels['timestamp-discont-total'].set_text(text)
         if value > 0.0:
             self._vbox_timestamp_discont_total.show()
@@ -167,7 +167,7 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
 
     def _setEaterLastConnect(self, state, value):
         if value:
-            text = formatTimeStamp(time.localtime(value))
+            text = formatting.formatTimeStamp(time.localtime(value))
             self.labels['connected-since'].set_text(text)
             self._table_connected.show()
             self._table_disconnected.hide()
@@ -191,14 +191,14 @@ class EatersAdminGtkNode(BaseAdminGtkNode):
 
     def _updateConnectionTime(self):
         if self._lastConnect:
-            text = formatTime(time.time() - self._lastConnect)
+            text = formatting.formatTime(time.time() - self._lastConnect)
             self.labels['connection-time'].set_text(text)
 
     # FIXME: add a timeout to update this ?
 
     def _updateDisconnectionTime(self):
         if self._lastDisconnect:
-            text = formatTime(time.time() - self._lastDisconnect)
+            text = formatting.formatTime(time.time() - self._lastDisconnect)
             self.labels['disconnection-time'].set_text(text)
 
     def addEater(self, uiState, state):

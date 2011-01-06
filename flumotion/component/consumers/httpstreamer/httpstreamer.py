@@ -31,14 +31,15 @@ from zope.interface import implements
 
 from flumotion.common import gstreamer, errors
 from flumotion.common import messages, netutils, interfaces
-from flumotion.common.format import formatStorage, formatTime
-from flumotion.common.i18n import N_, gettexter
+from flumotion.common import format as formatting
 from flumotion.component import feedcomponent
 from flumotion.component.base import http
 from flumotion.component.component import moods
 from flumotion.component.consumers.httpstreamer import resources
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
+
+from flumotion.common.i18n import N_, gettexter
 
 __all__ = ['HTTPMedium', 'MultifdSinkStreamer']
 __version__ = "$Rev$"
@@ -184,13 +185,14 @@ class Stats(object):
 
         set('stream-mime', c.get_mime())
         set('stream-url', c.getUrl())
-        set('stream-uptime', formatTime(uptime))
+        set('stream-uptime', formatting.formatTime(uptime))
         bitspeed = bytes_received * 8 / uptime
         currentbitrate = self.getCurrentBitrate()
-        set('stream-bitrate', formatStorage(bitspeed) + 'bit/s')
+        set('stream-bitrate', formatting.formatStorage(bitspeed) + 'bit/s')
         set('stream-current-bitrate',
-            formatStorage(currentbitrate) + 'bit/s')
-        set('stream-totalbytes', formatStorage(bytes_received) + 'Byte')
+            formatting.formatStorage(currentbitrate) + 'bit/s')
+        set('stream-totalbytes',
+            formatting.formatStorage(bytes_received) + 'Byte')
         set('stream-bitrate-raw', bitspeed)
         set('stream-totalbytes-raw', bytes_received)
 
@@ -201,10 +203,13 @@ class Stats(object):
         set('clients-average', str(int(c.getAverageClients())))
 
         bitspeed = bytes_sent * 8 / uptime
-        set('consumption-bitrate', formatStorage(bitspeed) + 'bit/s')
+        set('consumption-bitrate',
+            formatting.formatStorage(bitspeed) + 'bit/s')
         set('consumption-bitrate-current',
-            formatStorage(currentbitrate * c.getClients()) + 'bit/s')
-        set('consumption-totalbytes', formatStorage(bytes_sent) + 'Byte')
+            formatting.formatStorage(
+                currentbitrate * c.getClients()) + 'bit/s')
+        set('consumption-totalbytes',
+            formatting.formatStorage(bytes_sent) + 'Byte')
         set('consumption-bitrate-raw', bitspeed)
         set('consumption-totalbytes-raw', bytes_sent)
 

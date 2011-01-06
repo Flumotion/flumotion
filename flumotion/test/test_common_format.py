@@ -20,85 +20,85 @@
 # Headers in this file shall remain intact.
 
 from flumotion.common.testsuite import TestCase
-from flumotion.common.format import formatStorage, formatTime
+from flumotion.common import format as formatting
 
 
 class TestFormatStorage(TestCase):
 
     def testBytes(self):
         value = 4
-        self.assertEquals(formatStorage(value), "4.00 ")
+        self.assertEquals(formatting.formatStorage(value), "4.00 ")
 
     def testKibibyte(self):
         value = 1024
-        self.assertEquals(formatStorage(value), "1.02 k")
-        self.assertEquals(formatStorage(value, 3), "1.024 k")
+        self.assertEquals(formatting.formatStorage(value), "1.02 k")
+        self.assertEquals(formatting.formatStorage(value, 3), "1.024 k")
 
     def testMegabyte(self):
         value = 1000 * 1000
-        self.assertEquals(formatStorage(value), "1.00 M")
+        self.assertEquals(formatting.formatStorage(value), "1.00 M")
 
     def testMebibyte(self):
         value = 1024 * 1024
-        self.assertEquals(formatStorage(value), "1.05 M")
-        self.assertEquals(formatStorage(value, 3), "1.049 M")
-        self.assertEquals(formatStorage(value, 4), "1.0486 M")
+        self.assertEquals(formatting.formatStorage(value), "1.05 M")
+        self.assertEquals(formatting.formatStorage(value, 3), "1.049 M")
+        self.assertEquals(formatting.formatStorage(value, 4), "1.0486 M")
 
     def testGibibyte(self):
         value = 1024 * 1024 * 1024
-        self.assertEquals(formatStorage(value, 4), "1.0737 G")
+        self.assertEquals(formatting.formatStorage(value, 4), "1.0737 G")
 
     def testTebibyte(self):
         value = 1024 * 1024 * 1024 * 1024
-        self.assertEquals(formatStorage(value, 4), "1.0995 T")
+        self.assertEquals(formatting.formatStorage(value, 4), "1.0995 T")
 
     def testPebibyte(self):
         value = 1024 * 1024 * 1024 * 1024 * 1024
-        self.assertEquals(formatStorage(value, 4), "1.1259 P")
+        self.assertEquals(formatting.formatStorage(value, 4), "1.1259 P")
 
     def testExbibyte(self):
         value = 1024 * 1024 * 1024 * 1024 * 1024 * 1024
-        self.assertEquals(formatStorage(value, 4), "1.1529 E")
+        self.assertEquals(formatting.formatStorage(value, 4), "1.1529 E")
 
 
 class TestFormatTime(TestCase):
 
     def testFractionalSecond(self):
         value = 1.1
-        self.assertEquals(formatTime(value, fractional=2),
+        self.assertEquals(formatting.formatTime(value, fractional=2),
             "00:00:01.10")
 
     def testSecond(self):
         value = 1
-        self.assertEquals(formatTime(value), "00:00")
+        self.assertEquals(formatting.formatTime(value), "00:00")
 
     def testMinuteSecond(self):
         value = 60 + 1
-        self.assertEquals(formatTime(value), "00:01")
+        self.assertEquals(formatting.formatTime(value), "00:01")
 
     def testHourMinuteSecond(self):
         value = 60 * 60 + 60 + 2
-        self.assertEquals(formatTime(value), "01:01")
+        self.assertEquals(formatting.formatTime(value), "01:01")
 
     def testDay(self):
         value = 60 * 60 * 24
-        self.assertEquals(formatTime(value), "1 day 00:00")
+        self.assertEquals(formatting.formatTime(value), "1 day 00:00")
 
     def testDays(self):
         value = 60 * 60 * 24 * 2
-        self.assertEquals(formatTime(value), "2 days 00:00")
+        self.assertEquals(formatting.formatTime(value), "2 days 00:00")
 
     def testWeek(self):
         value = 60 * 60 * 24 * 7
-        self.assertEquals(formatTime(value), "1 week 00:00")
+        self.assertEquals(formatting.formatTime(value), "1 week 00:00")
 
     def testWeeks(self):
         value = 60 * 60 * 24 * 7 * 2
-        self.assertEquals(formatTime(value), "2 weeks 00:00")
+        self.assertEquals(formatting.formatTime(value), "2 weeks 00:00")
 
     def testYear(self):
         value = 60 * 60 * 24 * 365
-        self.assertEquals(formatTime(value), "52 weeks 1 day 00:00")
+        self.assertEquals(formatting.formatTime(value), "52 weeks 1 day 00:00")
 
     def testReallyLong(self):
         minute = 60
@@ -107,7 +107,9 @@ class TestFormatTime(TestCase):
         week = day * 7
 
         value = week * 291 + day * 5 + hour * 13 + minute * 5
-        self.assertEquals(formatTime(value), "291 weeks 5 days 13:05")
+        self.assertEquals(formatting.formatTime(value),
+            "291 weeks 5 days 13:05")
 
     def testNegative(self):
-        self.assertEquals(formatTime(-1.0, fractional=1), "- 00:00:01.0")
+        self.assertEquals(formatting.formatTime(-1.0, fractional=1),
+            "- 00:00:01.0")

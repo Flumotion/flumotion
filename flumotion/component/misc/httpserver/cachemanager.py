@@ -27,7 +27,8 @@ import stat
 
 from twisted.internet import defer, threads, protocol, reactor, utils
 
-from flumotion.common import log, common, python, format, errors
+from flumotion.common import log, common, python, errors
+from flumotion.common import format as formatting
 
 from flumotion.component.misc.httpserver import fileprovider
 
@@ -217,7 +218,7 @@ class CacheManager(object, log.Loggable):
             if usage <= self._cacheMinUsage:
                 # We reach the cleanup limit
                 self.debug('cleaned up, cache use is now %sbytes',
-                    format.formatStorage(usage))
+                    formatting.formatStorage(usage))
                 break
         d = threads.deferToThread(self._rmfiles, rmlist)
         d.addBoth(self._setCacheUsage, usage)
@@ -244,7 +245,7 @@ class CacheManager(object, log.Loggable):
             return defer.succeed((self._cacheUsageLastUpdate, size))
 
         self.debug('cache usage will be %sbytes, need more cache',
-            format.formatStorage(usage + size))
+            formatting.formatStorage(usage + size))
 
         if not self._cleanupEnabled:
             # No space available and cleanup disabled: allocation failed.

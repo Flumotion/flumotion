@@ -1,3 +1,27 @@
+2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/formatting.py (added):
+	  Add new module name.  Move code there.
+	* flumotion/common/format.py:
+	  Make this an empty stub, to be removed for Flumotion 0.10
+	* flumotion/common/Makefile.am:
+	  Add new file.
+	* flumotion/component/base/componentnode.py:
+	* flumotion/component/base/eatersnode.py:
+	* flumotion/component/base/feedersnode.py:
+	* flumotion/component/base/multiple.py:
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/misc/httpserver/cachemanager.py:
+	* flumotion/monitor/nagios/log.py:
+	* flumotion/monitor/nagios/process.py:
+	* flumotion/test/test_common_format.py:
+	  Change all imports to
+	  from flumotion.common import format as formatting
+	  to prepare for the deprecation.
+
 2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/misc/httpserver/cachemanager.py:

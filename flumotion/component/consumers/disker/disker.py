@@ -33,7 +33,8 @@ from twisted.internet import reactor
 from flumotion.component import feedcomponent
 from flumotion.common import log, gstreamer, messages,\
                              errors, common
-from flumotion.common import documentation, format
+from flumotion.common import documentation
+from flumotion.common import format as formatting
 from flumotion.common import eventcalendar, poller
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.mimetypes import mimeTypeToExtention
@@ -501,12 +502,12 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             self.setSizeRotate(properties['size'])
             self.uiState.set('rotate-type',
                              'every %sB' % \
-                             format.formatStorage(properties['size']))
+                             formatting.formatStorage(properties['size']))
         elif rotateType == 'time':
             self.setTimeRotate(properties['time'])
             self.uiState.set('rotate-type',
                              'every %s' % \
-                             format.formatTime(properties['time']))
+                             formatting.formatTime(properties['time']))
         else:
             self.uiState.set('rotate-type', 'disabled')
         # FIXME: should add a way of saying "do first cycle at this time"
@@ -608,7 +609,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         if not s:
             free = None
         else:
-            free = format.formatStorage(s.f_frsize * s.f_bavail)
+            free = formatting.formatStorage(s.f_frsize * s.f_bavail)
 
         if self.uiState.get('disk-free') != free:
             self.debug("disk usage changed, reporting to observers")
@@ -719,7 +720,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         filename = ""
         if not filenameTemplate:
             filenameTemplate = self._defaultFilenameTemplate
-        filename = "%s.%s" % (format.strftime(filenameTemplate,
+        filename = "%s.%s" % (formatting.strftime(filenameTemplate,
             # for the filename we want to use the local time
             tm.timetuple()), ext)
         self.location = os.path.join(self.directory, filename)
@@ -801,7 +802,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.uiState.set('filename', None)
                 self.uiState.set('recording', False)
             try:
-                size = format.formatStorage(os.stat(location).st_size)
+                size = formatting.formatStorage(os.stat(location).st_size)
             except EnvironmentError, e:
                 self.debug("Failed to stat %s: %s", location,
                       log.getExceptionMessage(e))
@@ -976,7 +977,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             dtUTC = _utcAndStripTZ(p.dt)
             dtStart = p.eventInstance.start.replace(tzinfo=None)
             new.append((dtUTC, p.which,
-                format.strftime(p.eventInstance.event.content,
+                formatting.strftime(p.eventInstance.event.content,
                     dtStart.timetuple())))
 
         for t in current:

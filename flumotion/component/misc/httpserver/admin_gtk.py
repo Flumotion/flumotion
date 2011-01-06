@@ -26,7 +26,7 @@ import webbrowser
 import gtk
 
 from flumotion.common.i18n import N_
-from flumotion.common.format import formatTime, formatStorage, formatTimeStamp
+from flumotion.common import format as formatting
 from flumotion.component.base.admin_gtk import BaseAdminGtk
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 from flumotion.ui.linkwidget import LinkWidget
@@ -184,7 +184,7 @@ class ServerStatsAdminGtkNode(StatisticsAdminGtkNode):
 
         # Update Server Uptime
         uptime = state.get('server-uptime')
-        self._uptime.set_text(formatTime(uptime))
+        self._uptime.set_text(formatting.formatTime(uptime))
 
     # Private
 
@@ -265,11 +265,11 @@ def _formatReqRate(value):
 
 
 def _formatBytes(value):
-    return formatStorage(value) + _('Byte')
+    return formatting.formatStorage(value) + _('Byte')
 
 
 def _formatBitrate(value):
-    return formatStorage(value) + _('bit/s')
+    return formatting.formatStorage(value) + _('bit/s')
 
 
 def _formatPercent(value):

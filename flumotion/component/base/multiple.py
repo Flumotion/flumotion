@@ -28,10 +28,11 @@ from twisted.python import util
 from twisted.internet import defer
 
 from flumotion.common import log
+from flumotion.common import format as formatting
+
 from flumotion.common.errors import SleepingComponentError
 from flumotion.common.i18n import getLL, gettexter
 from flumotion.common.planet import moods
-from flumotion.common.format import formatStorage
 
 _ = gettext.gettext
 __version__ = "$Rev$"
@@ -77,7 +78,7 @@ class ComponentOverview(gtk.Expander, log.Loggable):
             fraction = 0
         else:
             fraction = size / self.total_mem
-            size = '%sB' % formatStorage(size)
+            size = '%sB' % formatting.formatStorage(size)
 
         self.mem.set_text(size)
         self.mem.set_fraction(fraction)
