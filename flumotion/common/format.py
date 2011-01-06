@@ -65,8 +65,8 @@ def formatStorage(units, precision=2):
         prefix = prefixes.pop()
         value /= 1000
 
-    format = "%%.%df %%s" % precision
-    return format % (value, prefix)
+    formatString = "%%.%df %%s" % precision
+    return formatString % (value, prefix)
 
 
 def formatTime(seconds, fractional=0):

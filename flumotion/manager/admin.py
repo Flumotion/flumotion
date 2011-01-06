@@ -550,14 +550,14 @@ class AdminAvatar(base.ManagerAvatar):
                     if wizard.type not in types:
                         continue
                 if provides is not None:
-                    for format in wizard.provides:
-                        if format.media_type in provides:
+                    for formatProvided in wizard.provides:
+                        if formatProvided.media_type in provides:
                             break
                     else:
                         continue
                 if accepts is not None:
-                    for format in wizard.accepts:
-                        if format.media_type in accepts:
+                    for formatAccepted in wizard.accepts:
+                        if formatAccepted.media_type in accepts:
                             break
                     else:
                         continue

@@ -61,11 +61,11 @@ class FancyEqMixin:
         return not self.__eq__(other)
 
 
-def N_(format):
+def N_(formatString):
     """
     Mark a singular string for translation, without translating it.
     """
-    return format
+    return formatString
 
 
 def ngettext(singular, plural, count):
@@ -89,11 +89,11 @@ def gettexter(domain=configure.PACKAGE):
     @param domain: the gettext domain to create translatables for.
     """
 
-    def create(format, *args):
-        if isinstance(format, str):
-            return TranslatableSingular(domain, format, *args)
+    def create(formatString, *args):
+        if isinstance(formatString, str):
+            return TranslatableSingular(domain, formatString, *args)
         else:
-            return TranslatablePlural(domain, format, *args)
+            return TranslatablePlural(domain, formatString, *args)
 
     return lambda *args: create(*args)
 
@@ -120,14 +120,14 @@ class TranslatableSingular(Translatable, FancyEqMixin):
 
     compareAttributes = ["domain", "format", "args"]
 
-    def __init__(self, domain, format, *args):
+    def __init__(self, domain, formatString, *args):
         """
-        @param domain: the text domain for translations of this message
-        @param format: a format string
-        @param args:   any arguments to the format string
+        @param domain:       the text domain for translations of this message
+        @param formatString: a format string
+        @param args:         any arguments to the format string
         """
         self.domain = domain
-        self.format = format
+        self.format = formatString
         self.args = args
 
     def untranslated(self):
@@ -146,13 +146,13 @@ class TranslatablePlural(Translatable, FancyEqMixin):
 
     compareAttributes = ["domain", "singular", "plural", "count", "args"]
 
-    def __init__(self, domain, format, *args):
+    def __init__(self, domain, formatString, *args):
         """
-        @param domain: the text domain for translations of this message
-        @param format: a (singular, plural, count) tuple
-        @param args:   any arguments to the format string
+        @param domain:       the text domain for translations of this message
+        @param formatString: a (singular, plural, count) tuple
+        @param args:         any arguments to the format string
         """
-        singular, plural, count = format
+        singular, plural, count = formatString
         self.domain = domain
         self.singular = singular
         self.plural = plural
@@ -210,35 +210,36 @@ class Translator(log.Loggable):
         else:
             self.debug('no locales for domain %s' % domain)
 
-        format = None
+        formatString = None
         if not t:
             # if no translation object found, fall back to C
             self.debug('no translation found, falling back to C')
             if isinstance(translatable, TranslatableSingular):
-                format = translatable.format
+                formatString = translatable.format
             elif isinstance(translatable, TranslatablePlural):
                 if translatable.count == 1:
-                    format = translatable.singular
+                    formatString = translatable.singular
                 else:
-                    format = translatable.plural
+                    formatString = translatable.plural
             else:
                 raise NotImplementedError('Cannot translate translatable %r' %
                     translatable)
         else:
             # translation object found, translate
             if isinstance(translatable, TranslatableSingular):
-                format = t.gettext(translatable.format)
+                formatString = t.gettext(translatable.format)
             elif isinstance(translatable, TranslatablePlural):
-                format = t.ngettext(translatable.singular, translatable.plural,
+                formatString = t.ngettext(translatable.singular,
+                    translatable.plural,
                     translatable.count)
             else:
                 raise NotImplementedError('Cannot translate translatable %r' %
                     translatable)
 
         if translatable.args:
-            return format % translatable.args
+            return formatString % translatable.args
         else:
-            return format
+            return formatString
 
     def translate(self, message, lang=None):
         """

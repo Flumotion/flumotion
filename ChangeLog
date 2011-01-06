@@ -1,3 +1,17 @@
+2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/pb.py:
+	* flumotion/common/format.py:
+	* flumotion/common/componentui.py:
+	* flumotion/common/i18n.py:
+	* flumotion/common/medium.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/producers/webcam/webcam.py:
+	* flumotion/component/producers/looper/looper.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/manager/admin.py:
+	  'format' is a builtin.  Replace it.
+
 2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/common/signals.py:

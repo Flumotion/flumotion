@@ -236,7 +236,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         def check_time():
             self.log("checking position")
             try:
-                pos, format = self.pipeline.query_position(gst.FORMAT_TIME)
+                pos, _ = self.pipeline.query_position(gst.FORMAT_TIME)
             except:
                 self.debug("position query didn't succeed")
             else:

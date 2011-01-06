@@ -22,8 +22,6 @@
 """base classes for PB client-side mediums.
 """
 
-import time
-
 from twisted.spread import pb
 from twisted.internet import defer
 from zope.interface import implements
@@ -115,11 +113,11 @@ class BaseMedium(fpb.Referenceable):
         if level is not None:
             debugClass = str(self.__class__).split(".")[-1].upper()
             startArgs = [self.remoteLogName, debugClass, name]
-            format, debugArgs = log.getFormatArgs(
+            formatString, debugArgs = log.getFormatArgs(
                 '%s --> %s: callRemote(%s, ', startArgs,
                 ')', (), args, kwargs)
             logKwArgs = self.doLog(level, stackDepth - 1,
-                                   format, *debugArgs)
+                                   formatString, *debugArgs)
 
         if not self.remote:
             self.warning('Tried to callRemote(%s), but we are disconnected'
@@ -127,17 +125,17 @@ class BaseMedium(fpb.Referenceable):
             return defer.fail(errors.NotConnectedError())
 
         def callback(result):
-            format, debugArgs = log.getFormatArgs(
+            formatString, debugArgs = log.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
                 '): %s', (log.ellipsize(result), ), args, kwargs)
-            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            self.doLog(level, -1, formatString, *debugArgs, **logKwArgs)
             return result
 
         def errback(failure):
-            format, debugArgs = log.getFormatArgs(
+            formatString, debugArgs = log.getFormatArgs(
                 '%s <-- %s: callRemote(%s, ', startArgs,
                 '): %r', (failure, ), args, kwargs)
-            self.doLog(level, -1, format, *debugArgs, **logKwArgs)
+            self.doLog(level, -1, formatString, *debugArgs, **logKwArgs)
             return failure
 
         d = self.remote.callRemote(name, *args, **kwargs)

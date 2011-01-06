@@ -101,30 +101,30 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
 
     # Private
 
-    def _regReqStat(self, name, converter=str, format="%s", default=0):
+    def _regReqStat(self, name, converter=str, formatString="%s", default=0):
         widget = self.wtree.get_widget('label-' + name)
         if not widget:
             self.warning("FIXME: no widget %s" % name)
             return
-        self._reqStats[name] = (widget, converter, format, default)
+        self._reqStats[name] = (widget, converter, formatString, default)
 
     def _refreshStatistics(self, state):
         for name in self._reqStats:
-            widget, converter, format, default = self._reqStats[name]
+            widget, converter, formatString, default = self._reqStats[name]
             value = state.get(name)
             if value is not None:
-                widget.set_text(format % converter(value))
+                widget.set_text(formatString % converter(value))
             else:
-                widget.set_text(format % converter(default))
+                widget.set_text(formatString % converter(default))
 
     def _updateStatistic(self, name, value):
         if name not in self._reqStats:
             return
-        widget, converter, format, default = self._reqStats[name]
+        widget, converter, formatString, default = self._reqStats[name]
         if value is not None:
-            widget.set_text(format % converter(value))
+            widget.set_text(formatString % converter(value))
         else:
-            widget.set_text(format % converter(default))
+            widget.set_text(formatString % converter(default))
 
 
 class ServerStatsAdminGtkNode(StatisticsAdminGtkNode):

@@ -43,13 +43,13 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
         self.uiState.addKey('pattern', 0)
 
     def get_pipeline_string(self, properties):
-        format = properties.get('format', 'video/x-raw-yuv')
+        capsString = properties.get('format', 'video/x-raw-yuv')
 
-        if format == 'video/x-raw-yuv':
-            format = '%s,format=(fourcc)I420' % format
+        if capsString == 'video/x-raw-yuv':
+            capsString = '%s,format=(fourcc)I420' % capsString
 
         # Filtered caps
-        struct = gst.structure_from_string(format)
+        struct = gst.structure_from_string(capsString)
         for k in 'width', 'height':
             if k in properties:
                 struct[k] = properties[k]
@@ -65,7 +65,7 @@ class VideoTest(feedcomponent.ParseLaunchComponent):
             struct['pixel-aspect-ratio'] = gst.Fraction(par[0], par[1])
 
         # If RGB, set something ffmpegcolorspace can convert.
-        if format == 'video/x-raw-rgb':
+        if capsString == 'video/x-raw-rgb':
             struct['red_mask'] = 0xff00
         caps = gst.Caps(struct)
 

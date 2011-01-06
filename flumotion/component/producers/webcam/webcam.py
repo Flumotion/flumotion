@@ -40,13 +40,13 @@ class Webcam(feedcomponent.ParseLaunchComponent):
 
         # Filtered caps
         mime = properties.get('mime', 'video/x-raw-yuv')
-        format = properties.get('format', 'I420')
+        colorspace = properties.get('format', 'I420')
         width = properties.get('width', None)
         height = properties.get('height', None)
 
         string = mime
         if mime == 'video/x-raw-yuv':
-            string += ",format=(fourcc)%s" % format
+            string += ",format=(fourcc)%s" % colorspace
         if width:
             string += ",width=%d" % width
         if height:
