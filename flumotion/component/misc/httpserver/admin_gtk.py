@@ -250,9 +250,11 @@ class CacheStatsAdminGtkNode(StatisticsAdminGtkNode):
 
 def _formatClientCount(value):
     if isinstance(value, (int, long)):
-        format = gettext.ngettext(N_("%d client"), N_("%d clients"), value)
+        template = gettext.ngettext(
+            N_("%d client"), N_("%d clients"), value)
     else:
-        format = gettext.ngettext(N_("%.2f client"), N_("%.2f clients"), value)
+        template = gettext.ngettext(
+            N_("%.2f client"), N_("%.2f clients"), value)
     return format % value
 
 

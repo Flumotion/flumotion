@@ -95,8 +95,8 @@ class PlaylistAdminGtkNode(BaseAdminGtkNode):
                                                   str(item[1])])
 
     def _remove(self, item):
-        iter = self._iters[item[0]]
-        if iter:
+        i = self._iters[item[0]]
+        if i:
             self.store.remove(iter)
             self._iters.pop(iter)
 

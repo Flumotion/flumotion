@@ -332,7 +332,7 @@ class Porter(component.BaseComponent, log.Loggable):
                 fdserver.FDPort, self._socketPath,
                 serverfactory, mode=self._socketMode)
             self.info("Now listening on socketPath %s", self._socketPath)
-        except error.CannotListenError, e:
+        except error.CannotListenError:
             self.warning("Failed to create socket %s" % self._socketPath)
             m = messages.Error(T_(N_(
                 "Network error: socket path %s is not available."),

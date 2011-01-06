@@ -1,5 +1,16 @@
 2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpserver/ratecontrol.py:
+	  bytes is a built-in.
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	  format is a built-in.
+	* flumotion/component/misc/porter/porter.py:
+	  Remove unused exception.
+	* flumotion/component/producers/playlist/admin_gtk.py:
+	  iter is a built-in.
+
+2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/formatting.py (added):
 	  Add new module name.  Move code there.
 	* flumotion/common/format.py:
