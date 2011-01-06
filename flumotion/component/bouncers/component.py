@@ -612,12 +612,12 @@ class AuthSessionBouncer(Bouncer):
 
     def do_expireKeycards(self, elapsed):
         cont = Bouncer.do_expireKeycards(self, elapsed)
-        for id, (ttl, data) in self._sessions.items():
+        for sessionId, (ttl, data) in self._sessions.items():
             if ttl is not None:
                 ttl -= elapsed
-                self._sessions[id] = (ttl, data)
+                self._sessions[sessionId] = (ttl, data)
                 if ttl <= 0:
-                    del self._sessions[id]
+                    del self._sessions[sessionId]
 
         return cont and len(self._sessions) > 0
 

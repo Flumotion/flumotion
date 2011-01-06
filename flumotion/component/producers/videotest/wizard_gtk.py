@@ -66,10 +66,10 @@ class TestVideoProducerStep(VideoProducerStep):
                     ('Blink', 12, 'pattern_blink.png')]
         self.pattern_icons = dict()
 
-        for description, id, image in patterns:
-            self.pattern.append_item(_(description), id)
+        for description, number, image in patterns:
+            self.pattern.append_item(_(description), number)
             if image:
-                self.pattern_icons[id] = os.path.join(configure.imagedir,
+                self.pattern_icons[number] = os.path.join(configure.imagedir,
                                                       'wizard', image)
 
         self.pattern.connect('changed', self._change_image)

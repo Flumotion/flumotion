@@ -455,11 +455,11 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
             self._wizard.finish(completed=True)
             return
 
-        next = step.getNext()
-        if isinstance(next, WizardStep):
-            nextStep = next
-        elif isinstance(next, Deferred):
-            d = next
+        stepNext = step.getNext()
+        if isinstance(stepNext, WizardStep):
+            nextStep = stepNext
+        elif isinstance(stepNext, Deferred):
+            d = stepNext
 
             def getStep(step):
                 if step is None:
@@ -476,12 +476,12 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
             d.addCallback(getStep)
             d.addErrback(manageBundleError)
             return
-        elif next is None:
+        elif stepNext is None:
             nextStep = self._getNextStep()
             if nextStep is None:
                 return
         else:
-            raise AssertionError(next)
+            raise AssertionError(stepNext)
 
         self._showNextStep(nextStep)
 

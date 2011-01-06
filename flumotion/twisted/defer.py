@@ -256,8 +256,8 @@ class RetryingDeferred(object):
 
     def _failed(self, failure):
         if self._running:
-            next = self._nextDelay()
-            self._callId = reactor.callLater(next, self._retry)
+            nextDelay = self._nextDelay()
+            self._callId = reactor.callLater(nextDelay, self._retry)
         else:
             self._masterD.errback(failure)
             self._masterD = None

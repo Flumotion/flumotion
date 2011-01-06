@@ -298,8 +298,8 @@ class StatusNode(BaseAdminGtkNode):
 
     def stateRemove(self, state, key, value):
         if key == 'filelist':
-            iter = self._iters[value[0]]
-            if iter:
+            i = self._iters[value[0]]
+            if i:
                 self.store.remove(iter)
                 self._iters.pop(value[0])
 

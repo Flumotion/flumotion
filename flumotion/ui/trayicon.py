@@ -167,8 +167,8 @@ class FluTrayIcon(log.Loggable, gobject.GObject):
         Shows a popup menu with the quit option.
         """
         menu = gtk.Menu()
-        quit = gtk.ImageMenuItem(gtk.STOCK_QUIT)
-        quit.connect('activate', self._on_quit__activate)
+        quitButton = gtk.ImageMenuItem(gtk.STOCK_QUIT)
+        quitButton.connect('activate', self._on_quit__activate)
         menu.add(quit)
         menu.popup(None, None, None, 3, gtk.get_current_event_time())
         menu.show_all()

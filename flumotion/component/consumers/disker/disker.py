@@ -78,8 +78,8 @@ understand arbitrary timezones.
 def _openFile(loggable, component, location, mode):
     # used by both Disker and Index
     try:
-        file = open(location, mode)
-        return file
+        handle = open(location, mode)
+        return handle
     except IOError, e:
         loggable.warning("Failed to open output file %s: %s",
                    location, log.getExceptionMessage(e))
@@ -231,9 +231,9 @@ class Index(log.Loggable):
                                 self.INDEX_EXTENSION)
         try:
             self.info("Loading index file %s", location)
-            file = open(location, 'r')
-            indexString = file.readlines()
-            file.close()
+            handle = open(location, 'r')
+            indexString = handle.readlines()
+            handle.close()
         except IOError, e:
             return invalidIndex("error reading index file (%r)" % e)
         # Check if the file is not empty
@@ -787,16 +787,16 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self._stopRecordingFull(self.file, self.location,
                                self.last_tstamp, False)
 
-    def _stopRecordingFull(self, file, location, lastTstamp, delayedStop):
+    def _stopRecordingFull(self, handle, location, lastTstamp, delayedStop):
         sink = self.get_element('fdsink')
         if sink.get_state() == gst.STATE_NULL:
             sink.set_state(gst.STATE_READY)
 
-        if file:
-            file.flush()
-            sink.emit('remove', file.fileno())
-            self._recordingStopped(file, location)
-            file = None
+        if handle:
+            handle.flush()
+            sink.emit('remove', handle.fileno())
+            self._recordingStopped(handle, location)
+            handle = None
             if not delayedStop:
                 self.uiState.set('filename', None)
                 self.uiState.set('recording', False)
@@ -989,7 +989,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self.debug('appending tuple %r to next-points', t)
                 self.uiState.append('next-points', t)
 
-    def _recordingStarted(self, file, location):
+    def _recordingStarted(self, handle, location):
         socket = 'flumotion.component.consumers.disker.disker_plug.DiskerPlug'
         # make sure plugs are configured with our socket, see #732
         if socket not in self.plugs:
@@ -997,9 +997,9 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         for plug in self.plugs[socket]:
             self.debug('invoking recordingStarted on '
                        'plug %r on socket %s', plug, socket)
-            plug.recordingStarted(file, location)
+            plug.recordingStarted(handle, location)
 
-    def _recordingStopped(self, file, location):
+    def _recordingStopped(self, handle, location):
         socket = 'flumotion.component.consumers.disker.disker_plug.DiskerPlug'
         # make sure plugs are configured with our socket, see #732
         if socket not in self.plugs:
@@ -1007,7 +1007,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         for plug in self.plugs[socket]:
             self.debug('invoking recordingStopped on '
                        'plug %r on socket %s', plug, socket)
-            plug.recordingStopped(file, location)
+            plug.recordingStopped(handle, location)
 
     ### marker methods
 

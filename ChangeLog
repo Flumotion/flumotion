@@ -1,5 +1,23 @@
 2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/common/netutils.py:
+	  bytes is a builtin.  Replace it.
+	* flumotion/twisted/defer.py:
+	* flumotion/component/producers/playlist/playlistparser.py:
+	* flumotion/ui/wizard.py:
+	  next is a builtin.  Replace it.
+	* flumotion/component/bouncers/component.py:
+	* flumotion/component/producers/videotest/wizard_gtk.py:
+	  id is a builtin.  Replace it.
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	  iter is a builtin.  Replace it.
+	* flumotion/component/consumers/disker/disker.py:
+	  file is a builtin.  Replace it.
+	* flumotion/ui/trayicon.py:
+	  quit is a builtin.  Replace it.
+
+2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/twisted/pb.py:
 	* flumotion/common/format.py:
 	* flumotion/common/componentui.py:
