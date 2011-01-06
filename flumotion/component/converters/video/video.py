@@ -40,9 +40,6 @@ class Converter(feedcomponent.ParseLaunchComponent):
         props = self.config['properties']
         deintMode = props.get('deinterlace-mode', 'auto')
         deintMethod = props.get('deinterlace-method', 'ffmpeg')
-        is_square = props.get('is-square', False)
-        width = props.get('width', None)
-        height = props.get('height', None)
 
         if deintMode not in deinterlace.DEINTERLACE_MODE:
             msg = "'%s' is not a valid deinterlace mode." % deintMode

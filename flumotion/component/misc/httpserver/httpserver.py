@@ -346,7 +346,6 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         plugs = self.plugs.get(socket, [])
         if plugs:
             # Rate controller factory plug; only one supported.
-            path = props.get('path')
             self._rateControlPlug = self.plugs[socket][-1]
 
         plugs = self.plugs.get(FILEPROVIDER_SOCKET, [])

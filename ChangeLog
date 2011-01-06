@@ -1,5 +1,16 @@
 2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/effects/videoscale/admin_gtk.py:
+	  Remove unused import.
+	* flumotion/worker/checks/video.py:
+	* flumotion/component/converters/video/video.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	  Remove unused code.
+	* flumotion/worker/checks/audio.py:
+	  Remove unused exception.
+
+2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/common/netutils.py:
 	  bytes is a builtin.  Replace it.
 	* flumotion/twisted/defer.py:

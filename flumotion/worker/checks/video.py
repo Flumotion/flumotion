@@ -73,7 +73,6 @@ def checkWebcam(device, mid):
     # so that we can offer helpful hints on what to do.
 
     def probeDevice(element):
-        name = element.get_property('device-name')
         caps = element.get_pad("src").get_caps()
         log.debug('check', 'caps: %s' % caps.to_string())
 
