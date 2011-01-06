@@ -28,7 +28,7 @@ import time
 
 from twisted.internet import defer, reactor, threads, abstract
 
-from flumotion.common import log, format, common, python
+from flumotion.common import log, common, python
 from flumotion.component.misc.httpserver import cachestats
 from flumotion.component.misc.httpserver import cachemanager
 from flumotion.component.misc.httpserver import fileprovider
@@ -56,18 +56,18 @@ def open_stat(path, mode='rb'):
     @rtype: (file, statinfo)
     """
     try:
-        file = open(path, mode)
-        fd = file.fileno()
+        handle = open(path, mode)
+        fd = handle.fileno()
     except IOError, e:
         cls = errnoLookup.get(e.errno, fileprovider.FileError)
         raise cls("Failed to open file '%s': %s" % (path, str(e)))
     try:
         info = os.fstat(fd)
     except OSError, e:
-        file.close()
+        handle.close()
         cls = errnoLookup.get(e.errno, fileprovider.FileError)
         raise cls("Failed to stat file '%s': %s" % (path, str(e)))
-    return file, info
+    return handle, info
 
 
 class FileProviderLocalCachedPlug(fileprovider.FileProviderPlug,

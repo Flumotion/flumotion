@@ -111,9 +111,9 @@ class CacheManager(object, log.Loggable):
         """
         ident = self._identifiers.get(path, None)
         if ident is None:
-            hash = python.sha1()
-            hash.update(self._cachePrefix + path)
-            ident = hash.digest().encode("hex").strip('\n')
+            sha1Hash = python.sha1()
+            sha1Hash.update(self._cachePrefix + path)
+            ident = sha1Hash.digest().encode("hex").strip('\n')
             # Prevent the cache from growing endlessly
             if len(self._identifiers) >= ID_CACHE_MAX_SIZE:
                 self._identifiers.clear()
@@ -307,7 +307,7 @@ class CacheManager(object, log.Loggable):
 
         try:
             return TempFile(self, path, tag, size, mtime)
-        except OSError, e:
+        except OSError:
             return None
 
     def newTempFile(self, path, size, mtime=None):
@@ -329,14 +329,14 @@ class CachedFile:
 
     def __init__(self, cachemgr, resPath):
         cachedPath = cachemgr.getCachePath(resPath)
-        file = open(cachedPath, 'rb')
-        stat = os.fstat(file.fileno())
+        handle = open(cachedPath, 'rb')
+        stat = os.fstat(handle.fileno())
 
         cachemgr.log("Opened cached file %s [fd %d]",
-                     cachedPath, file.fileno())
+                     cachedPath, handle.fileno())
 
         self.name = cachedPath
-        self.file = file
+        self.file = handle
         self.stat = stat
 
     def unlink(self):
@@ -349,12 +349,11 @@ class CachedFile:
             if (s[stat.ST_MTIME] > self.stat[stat.ST_MTIME]):
                 return
             os.unlink(self.name)
-        except OSError, e:
+        except OSError:
             pass
 
     def __getattr__(self, name):
-        file = self.__dict__['file']
-        a = getattr(file, name)
+        a = getattr(self.__dict__['file'], name)
         if type(a) != type(0):
             setattr(self, name, a)
         return a
@@ -388,8 +387,7 @@ class TempFile:
         self.name = tempPath
 
     def __getattr__(self, name):
-        file = self.__dict__['file']
-        a = getattr(file, name)
+        a = getattr(self.__dict__['file'], name)
         if type(a) != type(0):
             setattr(self, name, a)
         return a
@@ -429,7 +427,7 @@ class TempFile:
                                   self.name, self.fileno())
                 self.cachemgr.releaseCacheSpace(self.tag)
                 os.unlink(self.name)
-        except OSError, e:
+        except OSError:
             pass
 
         self.file.close()

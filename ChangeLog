@@ -1,5 +1,17 @@
 2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/misc/httpserver/cachemanager.py:
+	  hash and file are builtin, replace them.
+	  Remove unused exceptions.
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	  Remove unused import.
+	  file is a builtin, replace it.
+	* flumotion/worker/checks/device.py:
+	  Remove unused imports.
+	  id is a builtin, replace it.
+
+2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/effects/videoscale/admin_gtk.py:
 	  Remove unused import.
 	* flumotion/worker/checks/video.py:

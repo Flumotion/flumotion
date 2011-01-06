@@ -19,9 +19,6 @@
 
 # Headers in this file shall remain intact.
 
-import os
-
-import gobject
 import gst
 import gst.interfaces
 from twisted.internet.threads import deferToThread
@@ -77,21 +74,21 @@ def fetchDevices(mid, factories, parameter):
             return fetchDevices(mid, factories, parameter)
 
     element.probe_property_name(parameter)
-    ids = element.probe_get_values_name(parameter)
+    values = element.probe_get_values_name(parameter)
 
     pipeline_str = "%s name=source %s" % (factory, parameter)
     pipeline_str += "=%s ! fakesink"
 
     devices = []
 
-    for id in ids:
-        pipeline = gst.parse_launch(pipeline_str % id)
+    for value in values:
+        pipeline = gst.parse_launch(pipeline_str % value)
         pipeline.set_state(gst.STATE_READY)
         source = pipeline.get_by_name("source")
         name = source.get_property("device-name")
-        log.debug("device-check", "New device found: %s with ids=%s",
-                  name, id)
-        devices.append((name, id))
+        log.debug("device-check", "New device found: %s with values=%s",
+                  name, value)
+        devices.append((name, value))
         pipeline.set_state(gst.STATE_NULL)
 
     if devices:
