@@ -255,7 +255,7 @@ def _formatClientCount(value):
     else:
         template = gettext.ngettext(
             N_("%.2f client"), N_("%.2f clients"), value)
-    return format % value
+    return template % value
 
 
 def _formatTimeStamp(value):
