@@ -1,5 +1,14 @@
 2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
+	* flumotion/component/feedcomponent.py:
+	  comparison with True is not necessary.
+	* flumotion/component/misc/porter/porter.py:
+	  Another unused e.
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	  min and max are built-ins.
+
+2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
 	* flumotion/component/misc/httpserver/ratecontrol.py:
 	  bytes is a built-in.
 	* flumotion/component/misc/httpserver/admin_gtk.py:

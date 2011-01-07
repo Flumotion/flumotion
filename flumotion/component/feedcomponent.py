@@ -585,7 +585,7 @@ class PostProcEffect (Effect):
         Plug the effect in the pipeline unlinking the source element with it's
         downstream peer
         """
-        if self.plugged == True:
+        if self.plugged:
             return
         # Unlink the source pad of the source element after which we need
         # are going to be plugged

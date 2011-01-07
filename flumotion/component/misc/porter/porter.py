@@ -360,7 +360,7 @@ class Porter(component.BaseComponent, log.Loggable):
                     interface=self._interface)
             self.info("Now listening on interface %r on port %d",
                       self._interface, self._port)
-        except error.CannotListenError, e:
+        except error.CannotListenError:
             self.warning("Failed to listen on interface %r on port %d",
                          self._interface, self._port)
             m = messages.Error(T_(N_(
