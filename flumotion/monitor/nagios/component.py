@@ -22,7 +22,7 @@
 
 from twisted.internet import reactor, defer
 
-from flumotion.common import common, planet, log
+from flumotion.common import planet, log
 from flumotion.monitor.nagios import util
 
 

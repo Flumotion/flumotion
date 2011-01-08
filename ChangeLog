@@ -1,3 +1,62 @@
+2011-01-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/command/component.py:
+	* flumotion/admin/command/manager.py:
+	* flumotion/admin/command/worker.py:
+	* flumotion/common/bundleclient.py:
+	* flumotion/common/connection.py:
+	* flumotion/component/base/admin_text.py:
+	* flumotion/component/base/http.py:
+	* flumotion/component/base/multiple.py:
+	* flumotion/component/bouncers/admin_gtk.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/multibouncer.py:
+	* flumotion/component/bouncers/multibouncerplug.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/effects/videorate/videorate.py:
+	* flumotion/component/effects/videoscale/videoscale.py:
+	* flumotion/component/encoders/vp8/vp8.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/cachemanager.py:
+	* flumotion/component/misc/httpserver/httpfile.py:
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/misc/porter/porterclient.py:
+	* flumotion/component/muxers/checks.py:
+	* flumotion/component/plugs/adminaction.py:
+	* flumotion/component/plugs/rrd.py:
+	* flumotion/component/producers/checks.py:
+	* flumotion/component/producers/looper/wizard_gtk.py:
+	* flumotion/component/producers/screencast/screencast.py:
+	* flumotion/component/producers/videotest/admin_text.py:
+	* flumotion/job/job.py:
+	* flumotion/launch/main.py:
+	* flumotion/launch/parse.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/monitor/nagios/component.py:
+	* flumotion/monitor/nagios/main.py:
+	* flumotion/monitor/nagios/stream.py:
+	* flumotion/twisted/integration.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/portal.py:
+	* flumotion/twisted/reflect.py:
+	* flumotion/ui/glade.py:
+	* flumotion/worker/checks/device.py:
+	* flumotion/worker/checks/gst010.py:
+	  Clean up unused imports an experimental pychecker detected.
+	* flumotion/common/medium.py:
+	* flumotion/component/bouncers/component.py:
+	* flumotion/job/main.py:
+	* flumotion/ui/wizard.py:
+	  Additionally, some style guide conforming.
+
 2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* flumotion/component/feedcomponent.py:

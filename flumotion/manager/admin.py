@@ -30,7 +30,6 @@ from StringIO import StringIO
 
 from twisted.internet import reactor
 from twisted.python import failure
-from twisted.spread import pb
 from zope.interface import implements
 
 from flumotion.manager import base
@@ -43,7 +42,6 @@ from flumotion.monitor.nagios import util
 from flumotion.common import messages
 
 # make ComponentState proxyable
-from flumotion.twisted import flavors
 from flumotion.common import componentui
 
 __version__ = "$Rev$"

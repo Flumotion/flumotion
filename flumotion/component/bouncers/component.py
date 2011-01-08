@@ -88,12 +88,11 @@ import time
 
 from twisted.internet import defer, reactor
 
-from flumotion.common import interfaces, keycards, errors, python
-from flumotion.common.poller import Poller
+from flumotion.common import keycards, errors, python, poller
 from flumotion.common.componentui import WorkerComponentUIState
 
 from flumotion.component import component
-from flumotion.twisted import flavors, credentials
+from flumotion.twisted import credentials
 
 __all__ = ['Bouncer']
 __version__ = "$Rev$"
@@ -174,9 +173,9 @@ class Bouncer(component.BaseComponent):
         self._idFormat = time.strftime('%Y%m%d%H%M%S-%%d')
         self._keycards = {} # keycard id -> Keycard
 
-        self._expirer = Poller(self._expire,
-                               self.KEYCARD_EXPIRE_INTERVAL,
-                               start=False)
+        self._expirer = poller.Poller(self._expire,
+                            self.KEYCARD_EXPIRE_INTERVAL,
+                            start=False)
         self.enabled = True
 
     def setDomain(self, name):

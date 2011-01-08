@@ -32,7 +32,7 @@ from flumotion.common import gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
 from flumotion.component import component as basecomponent
-from flumotion.component import feed, padmonitor
+from flumotion.component import padmonitor
 from flumotion.component.feeder import Feeder
 from flumotion.component.eater import Eater
 

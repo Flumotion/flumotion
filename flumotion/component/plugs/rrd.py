@@ -28,7 +28,7 @@ except ImportError:
     rrdtool = None
 
 from flumotion.component.plugs import base
-from flumotion.common import common, messages, i18n, log
+from flumotion.common import messages, i18n, log
 from flumotion.common.poller import Poller
 
 from flumotion.common.i18n import N_

@@ -23,7 +23,6 @@ import re
 
 from twisted.spread import pb
 
-from flumotion.common import common
 from flumotion.twisted import pb as fpb
 
 __version__ = "$Rev$"

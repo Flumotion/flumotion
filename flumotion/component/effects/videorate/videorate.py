@@ -23,9 +23,11 @@ from twisted.internet import reactor
 import gobject
 import gst
 
-from flumotion.common import errors, messages, gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
+
+# register serializables
+from flumotion.common import messages
 
 __version__ = "$Rev$"
 T_ = gettexter()

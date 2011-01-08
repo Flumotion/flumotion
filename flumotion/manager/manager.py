@@ -33,20 +33,18 @@ API Stability: semi-stable
 import os
 
 from twisted.internet import reactor, defer
-from twisted.python import components, failure
 from twisted.spread import pb
 from twisted.cred import portal
 from zope.interface import implements
 
 from flumotion.common import errors, interfaces, log, registry
-from flumotion.common import planet, common, dag, messages, reflectcall, server
+from flumotion.common import planet, common, messages, reflectcall, server
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.identity import RemoteIdentity, LocalIdentity
 from flumotion.common.netutils import addressGetHost
 from flumotion.common.planet import moods
 from flumotion.configure import configure
 from flumotion.manager import admin, component, worker, base, config
-from flumotion.twisted import checkers
 from flumotion.twisted import portal as fportal
 from flumotion.project import project
 

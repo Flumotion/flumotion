@@ -74,7 +74,6 @@ from flumotion.common import log, common, registry, errors, messages
 from flumotion.common import i18n
 from flumotion.common.options import OptionParser
 from flumotion.configure import configure
-from flumotion.twisted import flavors
 
 from flumotion.launch import parse
 

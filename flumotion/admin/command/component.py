@@ -23,10 +23,7 @@
 component commands
 """
 
-from twisted.python import failure
-
 from flumotion.common import errors, planet, log
-from flumotion.common import common as fccommon
 from flumotion.monitor.nagios import util
 from flumotion.common.planet import moods
 

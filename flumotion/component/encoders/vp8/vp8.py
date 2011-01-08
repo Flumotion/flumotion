@@ -22,7 +22,6 @@
 from flumotion.common import messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
-from flumotion.worker.checks import check
 
 
 __version__ = "$Rev$"

@@ -28,7 +28,7 @@ import time
 
 from twisted.internet import defer, reactor, threads, abstract
 
-from flumotion.common import log, common, python
+from flumotion.common import log, common
 from flumotion.component.misc.httpserver import cachestats
 from flumotion.component.misc.httpserver import cachemanager
 from flumotion.component.misc.httpserver import fileprovider

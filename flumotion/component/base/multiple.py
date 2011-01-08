@@ -24,9 +24,6 @@ import gtk
 import locale
 import os
 
-from twisted.python import util
-from twisted.internet import defer
-
 from flumotion.common import log
 from flumotion.common import format as formatting
 

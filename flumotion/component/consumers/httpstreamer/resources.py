@@ -36,14 +36,13 @@ except ImportError:
 
 from twisted.web import server, resource as web_resource
 from twisted.internet import reactor, defer
-from twisted.python import reflect
 
 from flumotion.configure import configure
-from flumotion.common import errors
+from flumotion.common import log
 
-from flumotion.common import common, log, keycards
+# register serializable
+from flumotion.common import keycards
 
-from flumotion.component.base import http as httpbase
 
 __all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
 __version__ = "$Rev$"

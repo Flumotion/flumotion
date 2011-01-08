@@ -80,7 +80,6 @@ import os
 import signal
 import tempfile
 
-from twisted.python import failure
 from twisted.internet import reactor, protocol, defer
 from flumotion.common import log as flog
 

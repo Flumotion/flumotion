@@ -26,7 +26,7 @@ portal-related functionality inspired by twisted.cred.portal
 from twisted.spread import flavors
 from twisted.internet import defer
 from twisted.cred.portal import Portal
-from twisted.python import failure, reflect
+from twisted.python import reflect
 from twisted.python.components import registerAdapter
 
 from flumotion.common import keycards, log, interfaces, errors

@@ -24,10 +24,10 @@ common classes and code to support manager-side objects
 """
 
 from twisted.internet import reactor, defer
-from twisted.spread import pb, flavors
-from twisted.python import failure, reflect
+from twisted.spread import pb
+from twisted.python import reflect
 
-from flumotion.common import errors, interfaces, log, common
+from flumotion.common import errors, log, common
 from flumotion.common.planet import moods
 from flumotion.twisted import pb as fpb
 

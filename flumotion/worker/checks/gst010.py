@@ -173,6 +173,11 @@ def check1394(mid, guid):
         w = s['width']
         h = s['height']
         par = s['pixel-aspect-ratio']
+        # FIXME: not a good idea to reuse the result name which
+        # also exists in the parent context.
+        # pychecker should warn; however it looks like
+        # the parent result doesn't get stored as name,
+        # but instead with STORE_DEREF
         result = dict(width=w, height=h, par=(par.num, par.denom))
         log.debug('check', 'returning dict %r' % result)
         return result

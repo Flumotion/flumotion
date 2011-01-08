@@ -25,12 +25,10 @@ import tempfile
 import time
 import stat
 
-from twisted.internet import defer, threads, protocol, reactor, utils
+from twisted.internet import defer, threads, reactor, utils
 
 from flumotion.common import log, common, python, errors
 from flumotion.common import format as formatting
-
-from flumotion.component.misc.httpserver import fileprovider
 
 LOG_CATEGORY = "cache-manager"
 

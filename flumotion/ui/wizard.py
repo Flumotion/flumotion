@@ -25,12 +25,17 @@ import types
 
 import gobject
 import gtk
-from twisted.internet.defer import Deferred
+
+from twisted.internet import defer
 from twisted.python import util
 
-from flumotion.admin.gtk.dialogs import exceptionHandler
 from flumotion.configure import configure
-from flumotion.common import log, messages
+from flumotion.common import log
+
+# registers serializables
+from flumotion.common import messages
+
+from flumotion.admin.gtk.dialogs import exceptionHandler
 from flumotion.common.i18n import gettexter
 from flumotion.common.pygobject import gsignal
 from flumotion.ui.fgtk import ProxyWidgetMapping
@@ -458,7 +463,7 @@ class _WizardSidebar(gtk.EventBox, log.Loggable):
         stepNext = step.getNext()
         if isinstance(stepNext, WizardStep):
             nextStep = stepNext
-        elif isinstance(stepNext, Deferred):
+        elif isinstance(stepNext, defer.Deferred):
             d = stepNext
 
             def getStep(step):

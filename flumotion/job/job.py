@@ -38,7 +38,8 @@ from twisted.python import failure
 from twisted.spread import pb
 from zope.interface import implements
 
-from flumotion.common import errors, interfaces, log, keycards
+from flumotion.common import errors, interfaces, log
+
 from flumotion.common import medium, package
 from flumotion.common.reflectcall import createComponent, reflectCallCatching
 from flumotion.component import component
@@ -46,6 +47,9 @@ from flumotion.component import component
 from flumotion.twisted import fdserver
 from flumotion.twisted import pb as fpb
 from flumotion.twisted import defer as fdefer
+
+# register serializables
+from flumotion.common import keycards
 
 __version__ = "$Rev$"
 

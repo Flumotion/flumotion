@@ -26,7 +26,6 @@ manager commands
 import os
 
 from twisted.spread import flavors
-from twisted.python import failure
 
 from flumotion.common import errors, log
 from flumotion.monitor.nagios import util

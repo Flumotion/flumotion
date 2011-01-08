@@ -22,8 +22,10 @@
 import gtk
 from gtk import glade
 import gobject
+
 from kiwi.environ import environ
 from kiwi.ui.delegates import GladeDelegate
+
 from twisted.python.reflect import namedAny
 
 from flumotion.common.pygobject import gsignal

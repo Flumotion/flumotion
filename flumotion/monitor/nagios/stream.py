@@ -37,7 +37,6 @@ import gst
 import gobject
 
 from twisted.internet import reactor, defer
-from twisted.python import failure
 
 from flumotion.admin import admin, connections
 from flumotion.common import errors, keycards, python

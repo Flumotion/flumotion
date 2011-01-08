@@ -33,7 +33,6 @@ from twisted.internet import reactor, defer
 from twisted.spread import pb
 from zope.interface import implements
 
-from flumotion.configure import configure
 from flumotion.component import component as basecomponent
 from flumotion.component import feed
 from flumotion.common import common, interfaces, errors, log, pygobject, \

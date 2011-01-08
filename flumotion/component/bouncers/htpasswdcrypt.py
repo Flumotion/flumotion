@@ -25,11 +25,9 @@ an htpasswd-backed bouncer with crypt passwords
 
 import random
 
-from twisted.python import components
 from twisted.internet import defer
 
-from flumotion.common import interfaces, keycards, log, errors
-from flumotion.component import component
+from flumotion.common import keycards, log, errors
 from flumotion.component.bouncers import component as bcomponent
 from flumotion.twisted import credentials, checkers
 

@@ -27,7 +27,7 @@ from twisted.internet import defer
 from twisted.python import util
 
 from flumotion.common import keycards, watched
-from flumotion.common import python, messages, errors, documentation
+from flumotion.common import messages, errors, documentation
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component.bouncers import base, component, combinator
 

@@ -24,10 +24,8 @@ import gst.interfaces
 from twisted.internet.threads import deferToThread
 from twisted.internet import defer
 
-from flumotion.common import gstreamer, errors, log, messages
+from flumotion.common import log, messages
 from flumotion.common.i18n import N_, gettexter
-from flumotion.twisted import defer as fdefer
-from flumotion.worker.checks import check
 
 __version__ = "$Rev: 7678 $"
 T_ = gettexter()

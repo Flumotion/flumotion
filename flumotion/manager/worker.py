@@ -26,7 +26,7 @@ manager-side objects to handle worker clients
 from twisted.internet import defer
 
 from flumotion.manager import base
-from flumotion.common import errors, interfaces, log, registry
+from flumotion.common import errors, log, registry
 from flumotion.common import worker, common
 from flumotion.common.vfs import registerVFSJelly
 

@@ -27,7 +27,7 @@ import time
 from urllib2 import urlparse
 
 from twisted.cred import portal
-from twisted.internet import protocol, reactor, address, error, defer
+from twisted.internet import protocol, reactor, error, defer
 from twisted.spread import pb
 from zope.interface import implements
 
@@ -35,7 +35,7 @@ from flumotion.common import medium, log, messages, errors
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import component
 from flumotion.component.component import moods
-from flumotion.twisted import credentials, fdserver, checkers
+from flumotion.twisted import fdserver, checkers
 from flumotion.twisted import reflect
 
 __version__ = "$Rev$"

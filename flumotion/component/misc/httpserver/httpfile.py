@@ -31,19 +31,17 @@ except ImportError:
     pass
 
 from twisted.web import resource, server, http
-from twisted.web import error as weberror, static
-from twisted.internet import defer, reactor, error, abstract
-from twisted.cred import credentials
+from twisted.web import error as weberror
+from twisted.internet import defer, reactor, abstract
 from twisted.python.failure import Failure
 
 from flumotion.configure import configure
-from flumotion.component import component
-from flumotion.common import log, messages, errors, netutils
+from flumotion.common import log
 from flumotion.component.component import moods
-from flumotion.component.misc.porter import porterclient
 from flumotion.component.misc.httpserver import fileprovider
-from flumotion.component.base import http as httpbase
-from flumotion.twisted import fdserver
+
+# register serializables
+from flumotion.common import messages
 
 __version__ = "$Rev$"
 

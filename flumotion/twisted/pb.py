@@ -25,21 +25,19 @@ Flumotion Perspective Broker using keycards
 Inspired by L{twisted.spread.pb}
 """
 
-from twisted.cred import checkers, credentials
 from twisted.cred.portal import IRealm, Portal
 from twisted.internet import protocol, defer
 from twisted.internet import error as terror
-from twisted.python import log, reflect, failure
+from twisted.python import log, reflect
 from twisted.spread import pb, flavors
 from twisted.spread.pb import PBClientFactory
 from zope.interface import implements
 
 from flumotion.configure import configure
-from flumotion.common import keycards, interfaces, common, errors
+from flumotion.common import keycards, errors
 from flumotion.common import log as flog
 from flumotion.common.netutils import addressGetHost
 from flumotion.twisted import reflect as freflect
-from flumotion.twisted import credentials as fcredentials
 from flumotion.twisted.compat import reactor
 
 __version__ = "$Rev$"

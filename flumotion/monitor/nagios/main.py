@@ -28,12 +28,16 @@ import sys
 from twisted.internet import reactor, defer
 from twisted.internet.defer import failure
 
-from flumotion.common import common, errors, planet, log
-from flumotion.admin.connections import parsePBConnectionInfoRecent
+from flumotion.common import common, errors, log
 from flumotion.admin import admin
+
+# registers serializables
+from flumotion.common import planet
 
 from flumotion.monitor.nagios import util, process, stream, component
 from flumotion.monitor.nagios import log as nlog
+
+from flumotion.admin.connections import parsePBConnectionInfoRecent
 
 __version__ = "$Rev$"
 

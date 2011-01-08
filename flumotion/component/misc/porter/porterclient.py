@@ -22,7 +22,6 @@
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet.tcp import Port, Connection
 from twisted.internet import reactor, address
-from twisted.cred import credentials
 
 from flumotion.common import medium, log
 from flumotion.twisted import defer, fdserver

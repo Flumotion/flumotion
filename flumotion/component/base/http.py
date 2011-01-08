@@ -22,16 +22,15 @@
 import struct
 import socket
 
-from twisted.web import http, server
-from twisted.web import resource as web_resource
+from twisted.web import http
 from twisted.internet import reactor, defer
-from twisted.python import reflect, failure
+from twisted.python import failure
 
 from flumotion.configure import configure
 from flumotion.common import errors
 from flumotion.twisted.credentials import cryptChallenge
 
-from flumotion.common import common, log, keycards
+from flumotion.common import log, keycards
 
 #__all__ = ['HTTPStreamingResource', 'MultifdSinkStreamer']
 __version__ = "$Rev$"

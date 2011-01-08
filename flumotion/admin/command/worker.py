@@ -28,8 +28,6 @@ import time
 
 from gettext import gettext as _
 
-from twisted.python import failure
-
 from flumotion.configure import configure
 from flumotion.common import errors, log, i18n, messages
 from flumotion.monitor.nagios import util

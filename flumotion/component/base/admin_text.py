@@ -21,7 +21,7 @@
 
 from zope.interface import implements
 
-from flumotion.common import errors, log
+from flumotion.common import log
 from flumotion.twisted import flavors
 
 __version__ = "$Rev$"

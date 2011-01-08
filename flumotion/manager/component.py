@@ -25,19 +25,19 @@ manager-side objects for components
 API Stability: semi-stable
 """
 
-from twisted.spread import pb
 from twisted.internet import reactor, defer
-from twisted.internet import error as terror
 from twisted.python.failure import Failure
 from zope.interface import implements
 
-from flumotion.configure import configure
 from flumotion.manager import base, config
-from flumotion.common import errors, interfaces, keycards, log, planet
+from flumotion.common import errors, interfaces, log, planet
 from flumotion.common import messages, common
+
+# registers serializable
+from flumotion.common import keycards
+
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.planet import moods
-from flumotion.twisted import flavors
 
 __version__ = "$Rev$"
 T_ = gettexter()
