@@ -42,10 +42,10 @@ Getting your development environment installed
 ----------------------------------------------
 
 Once you have gstreamer installed on an uninstalled directory, you need to install flumotion the
-same way. This time though, you get the code from subversion directly as this is the most 
+same way. This time though, you get the code from git directly as this is the most 
 up to date code. So, let's start. create a folder and check it out::
 
-  svn checkout https://code.fluendo.com/flumotion/svn/flumotion/trunk/ flumotion
+  git clone ssh://git@code.fluendo.com/flumotion.git
 
 First the build environment needs to be prepared::
 
@@ -130,7 +130,7 @@ Flowtester is a tool to easily test flumotion flows.
 Flows can be handwritten or created by the configuration assistant.
 The code lives in the "flumotion-flowtester" module::
 
-  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-flowtester/trunk/ flumotion-flowtester
+  git clone ssh://git@code.fluendo.com/flumotion-flowtester.git
 
 To run flowtester, just type::
 
@@ -298,23 +298,14 @@ FIXME
 Resources and Tools
 ===================
 
-Subversion
-----------
-The source code of Flumotion is stored in a Subversion repository.
-You need to be able to use subversion properly.
+Git
+---
+The source code of Flumotion is stored in a Git repository.
+You need to be able to use Git properly.
 
-The SVN book is a good introduction to SVN.
+The Git Community book is a good introduction to Git.
 
 Understand and query information from the web frontend.
-
-Pay special attention to the Basic Work Cycle in the third Chapter:
-
-* checkout: FIXME link
-* status
-* diff
-* revert
-* update
-* commit
 
 
 Trac
@@ -353,7 +344,7 @@ If you use ubuntu or debian it's strongly recommended that you install the packa
 which can accept data from a pipe. Eg, to send a diff of your changes to pastebin it for review,
 issue the following command:
 
-  svn diff | pastebinit
+  git diff | pastebinit
 
 Which will output an url point to its pastebin entry.
 
@@ -362,7 +353,7 @@ Code Review
 Codereview, or Reitveld is a free web tool for reviewing and discussion of a patch.
 It requires a Google account for both uploader and reviewer. There's a script in the flumotion 
 module which facilities this.
-To upload your changes in the current svn directory, issue the following command::
+To upload your changes in the current git directory, issue the following command::
 
   python tools/codereview-upload.py
 
@@ -401,14 +392,14 @@ See more info at the `pychecker homepage <http://pychecker.sourceforge.net/>`_.
 
 Flumotion documentation
 -----------------------
-In the svn flumotion project there is a random docs directory. Some info there is very useful and
+In the git flumotion project there is a random docs directory. Some info there is very useful and
 some may be outdated. You can read it from your checkout directory or online from `here
 <https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/>`_.
 
 Also, you could checkout the flumotion-doc project and build the most up to date documentation
 yourself (by using autogen.sh and make, as usual)::
 
-  svn checkout https://code.fluendo.com/flumotion/svn/flumotion-doc/trunk flumotion-doc
+  git clone ssh://git@code.fluendo.com/flumotion-doc.git
 
 Development process
 ===================
@@ -423,76 +414,44 @@ Links: `Open a new Ticket`_
 
 Generating a patch
 ------------------
-To generate a patch use the svn diff command from the project root directory::
+To generate a patch, first review carefully your changes using the git diff command::
 
-  svn diff
+  git diff --color --word-diff
 
-Review it carefully, it's usually easiest to do this by piping via colordiff and less::
+If you have created new files, remember to add them to the index::
 
-  svn diff | colordiff | less -R 
+  git add new_file
 
-If you have created new files, they won't show up. So remember to add them by doing::
+Stage your changes and review what's going to be committed::
 
-  svn add new_file
+  git add -u .
+  git diff --staged --color --word-diff
 
-When you're satisfied with the changes, save the patch to disk::
+Once everything is ready, commit your work::
 
-  svn diff > filename
+  git commit
 
-filename can be anything, but it's recommended that you use a naming convention which scales.
-For instance use **XX_vY.diff** where **XX** is the name of the bug and **Y** is 
-an incremental counter. For instance, if you're submitting the first patch to bug 2249 
-you will call it 2249_v1.diff
+And finally, generate a patch in e-mail format with the commit::
+
+  git format-patch HEAD~1
 
 Committing
 ----------
 
-When you have your code reviewed you're ready to check it into subversion.
-First, generate a changelog using either prepare-ChangeLog::
+When you have your code reviewed you're ready to push it to the origin repository.
+First check which commits are going to be pushed from your local 'master' branch::
 
-  $ prepare-ChangeLog
+  git cherry -v oring/master
 
-or `moap`_::
+You can double check all the changes that are going to pushed to the remote repository::
 
-  $ moap cl pr
+  git diff -p oring/master
 
-.. _moap: http://thomas.apestaart.org/moap/trac/
+Finnaly, push your commits to the remote repository::
 
-You should now end up with an auto-generated entry in the ChangeLog file.
-Open it with your favorite editor and describe what you've just done, an example
-of a good ChangeLog entry is::
+  git push origin master
 
- 2006-05-25  Thomas Vander Stichele  <thomas at apestaart dot org>
 
-	* flumotion/admin/gtk/client.py:
-	privatize and rename self._sidepane
-	clear the sidepane when a component goes to sleeping.
-	Fixes #263.
-
-The last part of the commit message, "Fixes #263" is a directive to trac. It means that
-this commit solves the specified issue. It'll close the ticket and add a comment to it
-referencing the commit. Always include this directive if the commit closes a real bug.
-
-You can now do a final review of the changes to be committed using::
-
-  $ moap cl diff
-
-and commit them with the following command::
-
-  $ moap cl ci
-
-which will automatically use the ChangeLog entry as the checkin message.
-
-Alternatively, you can directly use Subversion to review the changes::
-
-  $ svn diff
-
-and commit them::
-
-  $ svn commit
-
-which will open up your editor of choice (configurable through the SVN_EDITOR variable).
-You should use the complete ChangeLog entry as the checkin message.
 
 
 Updating translation
