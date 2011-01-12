@@ -1,17 +1,17 @@
 
 .. contents:: Table of Contents
 
-.. _Open a new Ticket: https://code.fluendo.com/flumotion/trac/newticket 
-.. _Wiki: https://code.fluendo.com/flumotion/trac/wiki
-.. _Code Browser: https://code.fluendo.com/flumotion/trac/browser 
-.. _Timeline: https://code.fluendo.com/flumotion/trac/timeline
-.. _Style guide: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/styleguide
-.. _Existing tickets: https://code.fluendo.com/flumotion/trac/report 
+.. _Open a new Ticket: https://code.flumotion.com/trac/newticket 
+.. _Wiki: https://code.flumotion.com/trac/wiki
+.. _Code Browser: https://code.flumotion.com/trac/browser 
+.. _Timeline: https://code.flumotion.com/trac/timeline
+.. _Style guide: https://code.flumotion.com/trac/browser/flumotion/trunk/doc/random/styleguide
+.. _Existing tickets: https://code.flumotion.com/trac/report 
 .. _Buildbot: http://build.fluendo.com:8070/
 .. _Trial: http://twistedmatrix.com/trac/wiki/TwistedTrial
 .. _Twisted: http://twistedmatrix.com/
 .. _Gtk: http://www.gtk.org/
-.. _JHBuildWiki: https://code.fluendo.com/flumotion/trac/wiki/UsingJHBuild
+.. _JHBuildWiki: https://code.flumotion.com/trac/wiki/UsingJHBuild
 .. _GLib: http://library.gnome.org/devel/glib/
 .. _GObject: http://library.gnome.org/devel/gobject/
 .. _GStreamer: http://www.gstreamer.net/
@@ -22,7 +22,7 @@
 .. _Glade2Tutorial: http://www.kplug.org/glade_tutorial/glade2_tutorial/glade2_introduction.html
 .. _PyGTKManual: http://www.pygtk.org/docs/pygtk/
 .. _GtkManual: http://library.gnome.org/devel/gtk/stable/
-.. _Moods: https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/moods
+.. _Moods: https://code.flumotion.com/trac/browser/flumotion/trunk/doc/random/moods
 
 ============================================
  Developer introduction guide for Flumotion
@@ -45,7 +45,7 @@ Once you have gstreamer installed on an uninstalled directory, you need to insta
 same way. This time though, you get the code from git directly as this is the most 
 up to date code. So, let's start. create a folder and check it out::
 
-  git clone ssh://git@code.fluendo.com/flumotion.git
+   ssh://git@code.flumotion.com/~/flumotion.git
 
 First the build environment needs to be prepared::
 
@@ -130,7 +130,7 @@ Flowtester is a tool to easily test flumotion flows.
 Flows can be handwritten or created by the configuration assistant.
 The code lives in the "flumotion-flowtester" module::
 
-  git clone ssh://git@code.fluendo.com/flumotion-flowtester.git
+  git clone ssh://git@code.flumotion.com/~/flumotion-flowtester.git
 
 To run flowtester, just type::
 
@@ -394,12 +394,12 @@ Flumotion documentation
 -----------------------
 In the git flumotion project there is a random docs directory. Some info there is very useful and
 some may be outdated. You can read it from your checkout directory or online from `here
-<https://code.fluendo.com/flumotion/trac/browser/flumotion/trunk/doc/random/>`_.
+<http://code.flumotion.com/cgit/flumotion/tree/doc/random>`_.
 
 Also, you could checkout the flumotion-doc project and build the most up to date documentation
 yourself (by using autogen.sh and make, as usual)::
 
-  git clone ssh://git@code.fluendo.com/flumotion-doc.git
+  git clone ssh://git@code.flumotion.com/~/flumotion-doc.git
 
 Development process
 ===================
