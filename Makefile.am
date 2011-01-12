@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS = 1.8 dist-bzip2
 
 ACLOCAL_AMFLAGS = -I m4 -I common
 
+include $(srcdir)/common/changelog.mk
 include $(srcdir)/common/common.mk
 include $(srcdir)/common/pychecker.mk
 include $(srcdir)/common/rpm.mk
@@ -85,8 +86,10 @@ DISTCLEANFILES = \
 BUILT_SOURCES = $(top_srcdir)/.version
 $(top_srcdir)/.version:
 	echo $(VERSION) > $@-t && mv $@-t $@
+
+dist: changelog
 dist-hook::
-	echo $(VERSION) > $(distdir)/.tarball-version
+	@echo $(VERSION) > $(distdir)/.tarball-version
 
 update-externals: update-external-command
 
@@ -94,4 +97,4 @@ update-external-command:
 	find flumotion/extern/command -type f ! -regex '.*/.svn/.*' -delete
 	svn export --force https://thomas.apestaart.org/moap/svn/trunk/moap/extern/command flumotion/extern/command
 
-.PHONY: update-externals update-external-command
+.PHONY: update-externals update-external-command ChangeLog

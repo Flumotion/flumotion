@@ -26,6 +26,9 @@ AC_SUBST(GST_010_REQ, 0.10.11)
 
 GST_010_SUPPORTED=true
 
+dnl Start date used to autogenrate ChangeLog from 'git log'
+AC_SUBST(GIT_LOG_START_DATE, "Jan 11 00:00:00 2011")
+
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common")
 
