@@ -5,7 +5,7 @@
 .. _Wiki: https://code.flumotion.com/trac/wiki
 .. _Code Browser: https://code.flumotion.com/trac/browser 
 .. _Timeline: https://code.flumotion.com/trac/timeline
-.. _Style guide: https://code.flumotion.com/trac/browser/flumotion/trunk/doc/random/styleguide
+.. _Style guide: https://code.flumotion.com/trac/browser/flumotion/doc/random/styleguide
 .. _Existing tickets: https://code.flumotion.com/trac/report 
 .. _Buildbot: http://build.fluendo.com:8070/
 .. _Trial: http://twistedmatrix.com/trac/wiki/TwistedTrial
@@ -22,7 +22,7 @@
 .. _Glade2Tutorial: http://www.kplug.org/glade_tutorial/glade2_tutorial/glade2_introduction.html
 .. _PyGTKManual: http://www.pygtk.org/docs/pygtk/
 .. _GtkManual: http://library.gnome.org/devel/gtk/stable/
-.. _Moods: https://code.flumotion.com/trac/browser/flumotion/trunk/doc/random/moods
+.. _Moods: https://code.flumotion.com/trac/browser/flumotion/doc/random/moods
 
 ============================================
  Developer introduction guide for Flumotion
