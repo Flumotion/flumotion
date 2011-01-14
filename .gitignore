@@ -31,7 +31,7 @@ libtool
 ltmain.sh
 missing
 mkinstalldirs
-
+py-compile
 
 # Ignore binaries
 bin/flumotion
@@ -51,6 +51,7 @@ bin/runtest
 # Ignore folders
 autom4te.cache/
 m4/
+locale/
 
 # Misc ignores
 data/flumotion-admin.desktop
@@ -58,6 +59,9 @@ flumotion/component/plugs/cortado/cortado_location.py
 flumotion/configure/installed.py
 flumotion/configure/uninstalled.py
 flumotion/extern/fdpass/.deps/
+flumotion/extern/fdpass/fdpass.so
+flumotion/extern/fdpass/fdpass_so-fdpass.o
+flumotion/project/flumotion.locale.xml
 misc/flumotion-verify-config
 pkgconfig/flumotion-uninstalled.pc
 pkgconfig/flumotion.pc
@@ -73,4 +77,4 @@ po/insert-header.sin
 po/quot.sed
 po/remove-potcdate.sin
 po/stamp-it
-py-compile
+po/*gmo
