@@ -1,0 +1,76 @@
+# Ignore tarballs
+*.tar.bz2
+*.tar.gz
+
+# Ignore all the Makefiles
+*Makefile
+*Makefile.in
+
+# Ignore autocrap
+.version
+ABOUT-NLS
+CangeLog.tmp
+ChangeLog.tmp
+INSTALL
+aclocal.m4
+autoregen.sh
+config.guess
+config.log
+config.rpath
+config.status
+config.sub
+configure
+depcomp
+env
+flumotion.spec
+install-sh
+intltool-extract
+intltool-merge
+intltool-update
+libtool
+ltmain.sh
+missing
+mkinstalldirs
+
+
+# Ignore binaries
+bin/flumotion
+bin/flumotion-admin
+bin/flumotion-admin-text
+bin/flumotion-command
+bin/flumotion-inspect
+bin/flumotion-job
+bin/flumotion-launch
+bin/flumotion-manager
+bin/flumotion-nagios
+bin/flumotion-rrdmon
+bin/flumotion-tester
+bin/flumotion-worker
+bin/runtest
+
+# Ignore folders
+autom4te.cache/
+m4/
+
+# Misc ignores
+data/flumotion-admin.desktop
+flumotion/component/plugs/cortado/cortado_location.py
+flumotion/configure/installed.py
+flumotion/configure/uninstalled.py
+flumotion/extern/fdpass/.deps/
+misc/flumotion-verify-config
+pkgconfig/flumotion-uninstalled.pc
+pkgconfig/flumotion.pc
+
+# Ignore po generated files
+po/Makefile.in.in
+po/POTFILES
+po/Rules-quot
+po/boldquot.sed
+po/en@boldquot.header
+po/en@quot.header
+po/insert-header.sin
+po/quot.sed
+po/remove-potcdate.sin
+po/stamp-it
+py-compile
