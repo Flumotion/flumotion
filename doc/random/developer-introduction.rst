@@ -38,6 +38,39 @@ Getting started
 This section describes how you'll get started as a developer. It means fetching the sources, 
 building, and running.
 
+Getting your git environment configured
+---------------------------------------
+
+Once you have installed git, you need to set your committer's name and email in git's global configuration.
+
+  - Set commiter name and email:::
+
+    $ git config --global user.name "Your Name Comes Here"
+    $ git config --global user.email you@flumotion.com
+
+You should also configure the following options and aliases to help you in the development.
+
+  - Get a colored diff by default, both in the console and the UI::
+
+    $ git config --global color.ui auto
+    $ git config --global color.diff auto
+
+  - Only push the tracking branch: ::
+
+    $ git config --global push.default tracking
+
+  - Always rebase instead of mergins for pulls in branches tracking other branches::
+
+    $ git config --global branch.autosetuprebase always
+
+  - Aliases::
+
+    $ git config --global alias.l "log --oneline --decorate --graph"
+    $ git config --global alias.d "diff --color--words"
+    $ git config --global alias.s "status --short"
+    $ git config --global alias.a "add -u"
+    $ git config --global alias.c "commit"
+
 Getting your development environment installed
 ----------------------------------------------
 
@@ -45,7 +78,7 @@ Once you have gstreamer installed on an uninstalled directory, you need to insta
 same way. This time though, you get the code from git directly as this is the most 
 up to date code. So, let's start. create a folder and check it out::
 
-   ssh://git@code.flumotion.com/~/flumotion.git
+   git clone ssh://git@code.flumotion.com/~/flumotion.git
 
 First the build environment needs to be prepared::
 
