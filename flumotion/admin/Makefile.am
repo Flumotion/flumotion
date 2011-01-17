@@ -6,7 +6,8 @@ component_PYTHON = \
 	admin.py \
 	config.py \
 	connections.py \
-	multi.py
+	multi.py \
+	settings.py
 
 SUBDIRS = assistant command gtk rrdmon text
 
