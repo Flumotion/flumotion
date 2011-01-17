@@ -17,6 +17,7 @@ ChangeLog.tmp
 INSTALL
 aclocal.m4
 autoregen.sh
+compile
 config.guess
 config.log
 config.rpath
@@ -25,6 +26,7 @@ config.sub
 configure
 depcomp
 env
+flu-saved-coverage.pickle
 flumotion.spec
 install-sh
 intltool-extract
@@ -52,11 +54,13 @@ bin/flumotion-worker
 bin/runtest
 
 # Ignore folders
+_trial_coverage/
 autom4te.cache/
 cache/
 flumotion/extern/_trial_temp/
 m4/
 locale/
+doc/reference/html/
 
 # Misc ignores
 data/flumotion-admin.desktop
