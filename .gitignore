@@ -2,6 +2,9 @@
 *.tar.bz2
 *.tar.gz
 
+# Ignore compiled files
+*pyc
+
 # Ignore all the Makefiles
 *Makefile
 *Makefile.in
@@ -50,6 +53,8 @@ bin/runtest
 
 # Ignore folders
 autom4te.cache/
+cache/
+flumotion/extern/_trial_temp/
 m4/
 locale/
 
