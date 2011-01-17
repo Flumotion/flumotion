@@ -367,6 +367,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.addKey('current-time')
         self.uiState.addKey('virtual-size')
         self.uiState.addKey('total-memory')
+        self.uiState.addKey('num-cpus')
 
         self.uiState.addHook(self)
 
@@ -588,6 +589,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.set('start-time', time.time())
 
         self.uiState.set('total-memory', self._getTotalMemory())
+        self.uiState.set('num-cpus', self._getNumberOfCPUs())
         d = run_setups()
         d.addCallbacks(setup_complete, got_error)
         # all status info via messages and the mood
@@ -817,3 +819,10 @@ class BaseComponent(common.InitMixin, log.Loggable):
         memtotal = f.readline()
         f.close()
         return int(memtotal[memtotal.index(":") + 1: -3]) * 1024
+
+    def _getNumberOfCPUs(self):
+        try:
+            return open('/proc/cpuinfo').read().count('processor\t:')
+        except IOError:
+            self.debug('Can not determine number of CPUs on this system')
+            return 1

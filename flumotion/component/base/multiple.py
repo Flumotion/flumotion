@@ -43,6 +43,7 @@ class ComponentOverview(gtk.Expander, log.Loggable):
 
     def __init__(self, label):
         self.total_mem = 0.0
+        self.num_cpus = 1
         gtk.Expander.__init__(self, '<b>%s</b>'%label)
         self.set_use_markup(True)
         table = gtk.Table(2, 2)
@@ -66,7 +67,7 @@ class ComponentOverview(gtk.Expander, log.Loggable):
     def update_cpu(self, fraction):
         if not fraction:
             fraction = 0
-        self.cpu.set_fraction(fraction)
+        self.cpu.set_fraction(fraction/self.num_cpus)
         self.cpu.set_text('%.2f %%'%(fraction * 100))
 
     def update_mem(self, size):
@@ -82,6 +83,9 @@ class ComponentOverview(gtk.Expander, log.Loggable):
 
     def set_total_memory(self, total_mem):
         self.total_mem = float(total_mem)
+
+    def set_num_cpus(self, num):
+        self.num_cpus = num
 
 
 class MultipleComponentsAdminGtk(log.Loggable):
@@ -139,6 +143,7 @@ class MultipleComponentsAdminGtk(log.Loggable):
         self.uiStates.append(state)
         self._stateValues[state] = widget
         widget.set_total_memory(state.get('total-memory', 0))
+        widget.set_num_cpus(state.get('num-cpus', 1))
         for key in state.keys():
             val = state.get(key)
             if val is not None:
