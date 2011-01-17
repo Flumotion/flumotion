@@ -79,6 +79,7 @@ from flumotion.admin.assistant.models import AudioProducer, Porter, \
      VideoProducer, Muxer
 from flumotion.admin.connections import getRecentConnections, \
      hasRecentConnections
+from flumotion.admin.settings import getSettings
 from flumotion.admin.gtk.dialogs import AboutDialog, ErrorDialog, \
      ProgressDialog, showConnectionErrorDialog
 from flumotion.admin.gtk.connections import ConnectionsDialog
@@ -211,7 +212,6 @@ class AdminWindow(Loggable, GladeDelegate):
         self._recentMenuID = None
         self._trayicon = None
         self._configurationAssistantIsRunning = False
-        self._currentDir = None
         self._managerSpawner = None
 
         self._createUI()
@@ -1404,12 +1404,17 @@ class AdminWindow(Loggable, GladeDelegate):
         ffilter.add_pattern("*")
         dialog.add_filter(ffilter)
 
-        if self._currentDir:
-            dialog.set_current_folder_uri(self._currentDir)
+        settings = getSettings()
+        if settings.hasValue('import_dir'):
+            dialog.set_current_folder_uri(settings.getValue('import_dir'))
 
         def response(dialog, response):
             if response == gtk.RESPONSE_ACCEPT:
-                self._currentDir = dialog.get_current_folder_uri()
+                if settings.getValue('import_dir') != \
+                        dialog.get_current_folder_uri():
+                    settings.setValue('import_dir',
+                                      dialog.get_current_folder_uri())
+                    settings.save()
                 for name in dialog.get_filenames():
                     conf_xml = open(name, 'r').read()
                     self._adminModel.loadConfiguration(conf_xml)
@@ -1428,8 +1433,9 @@ class AdminWindow(Loggable, GladeDelegate):
         d.set_default_response(gtk.RESPONSE_ACCEPT)
         d.set_current_name("configuration.xml")
 
-        if self._currentDir:
-            d.set_current_folder_uri(self._currentDir)
+        settings = getSettings()
+        if settings.hasValue('export_dir'):
+            d.set_current_folder_uri(settings.getValue('export_dir'))
 
         def getConfiguration(conf_xml, name, chooser):
             if not name.endswith('.xml'):
@@ -1462,6 +1468,11 @@ class AdminWindow(Loggable, GladeDelegate):
                 self._currentDir = d.get_current_folder_uri()
                 deferred = self._adminModel.getConfiguration()
                 name = d.get_filename()
+                if settings.getValue('export_dir') != \
+                        d.get_current_folder_uri():
+                    settings.setValue('export_dir',
+                                      d.get_current_folder_uri())
+                    settings.save()
                 deferred.addCallback(getConfiguration, name, d)
             else:
                 d.destroy()

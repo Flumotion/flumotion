@@ -32,6 +32,7 @@ from flumotion.ui.wizard import WizardStep
 from flumotion.common import messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.ui.fileselector import FileSelectorDialog
+from flumotion.admin.settings import getSettings
 
 __version__ = "$Rev$"
 _ = gettext.gettext
@@ -70,6 +71,7 @@ class LoadFlowStep(WizardStep):
     # Callbacks
 
     def on_select__clicked(self, button):
+        settings = getSettings()
         dialog = gtk.FileChooserDialog(
             _("Import Flow..."), self._window,
             gtk.FILE_CHOOSER_ACTION_OPEN,
@@ -85,9 +87,16 @@ class LoadFlowStep(WizardStep):
         ffilter.set_name(_("All files"))
         ffilter.add_pattern("*")
         dialog.add_filter(ffilter)
+        if settings.hasValue('import_dir'):
+            dialog.set_current_folder_uri(settings.getValue('import_dir'))
 
         def response(dialog, response):
             if response == gtk.RESPONSE_ACCEPT:
+                if settings.getValue('import_dir') != \
+                        dialog.get_current_folder_uri():
+                    settings.setValue('import_dir',
+                                      dialog.get_current_folder_uri())
+                    settings.save()
                 self.filename.set_text(dialog.get_filename())
                 self.wizard.blockNext(False)
             dialog.destroy()
