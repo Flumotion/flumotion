@@ -13,9 +13,8 @@
   <repository type="cvs" name="gstreamer.freedesktop.org"
               cvsroot=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
               password="" />
-  <repository type="svn" name="code.fluendo.com-flumotion" default="yes"
-              href="https://code.fluendo.com/flumotion/svn/"
-              password="" />
+  <repository type="git" name="code.flumotion.com-flumotion" default="yes"
+              href="git://code.flumotion.com/flumotion.git"/>
 
   <repository type="tarball" name="gstreamer-src"
               href="http://gstreamer.freedesktop.org/src/" />
@@ -48,8 +47,7 @@
   </autotools>
 
   <autotools id="flumotion">
-    <branch repo="code.fluendo.com-flumotion"
-            module="flumotion" revision="../trunk" />
+    <branch repo="code.flumotion.com-flumotion"/>
     <dependencies>
       <dep package="gst-plugins-good" />
       <dep package="gst-python" />

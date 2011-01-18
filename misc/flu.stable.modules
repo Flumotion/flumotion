@@ -8,13 +8,12 @@
 <moduleset>
 
   <!-- repositories -->
-  <repository type="svn" name="code.fluendo.com-flumotion" default="yes"
-              href="https://code.fluendo.com/flumotion/svn/"
-              password="" />
+  <repository type="git" name="code.flumotion.com-flumotion" default="yes"
+              href="git://code.flumotion.com/flumotion.git"/>
 
   <autotools id="flumotion">
-    <branch repo="code.fluendo.com-flumotion"
-            module="flumotion" revision="../tags/flumotion-0.6.1" />
+    <branch repo="code.flumotion.com-flumotion"
+            revision="flumotion-0.8.0" />
   </autotools>
 
 </moduleset>
