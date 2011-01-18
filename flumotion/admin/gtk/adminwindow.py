@@ -1084,6 +1084,7 @@ class AdminWindow(Loggable, GladeDelegate):
         # a component being removed means our selected component could
         # have gone away
         self._updateComponentActions()
+        self._trayicon.update(self._componentStates)
 
     def _componentStop(self, state):
         """
