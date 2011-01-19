@@ -46,8 +46,9 @@ class ICYStreamer(MultifdSinkStreamer):
 
     logCategory = 'icy-http'
 
-    pipe_template = 'identity name=identity1 ! tee name=tee ! queue ! ' + \
-        'multifdsink name=sink-without-id3 sync=false recover-policy=3 ' + \
+    pipe_template = 'identity name=input silent=true ! tee name=tee ' +  \
+        'tee. ! queue ! multifdsink name=sink-without-id3 sync=false ' + \
+        'recover-policy=3 ' + \
         'tee. ! queue ! icymux name=mux ! ' + \
         'multifdsink name=sink-with-id3 sync=false recover-policy=3'
 
@@ -140,7 +141,7 @@ class ICYStreamer(MultifdSinkStreamer):
             self.debug('bitrate: %r', bitrate)
             pad.remove_event_probe(handler_id)
             reactor.callFromThread(_setMuxerBitrate, bitrate)
-        handler_id = self.pipeline.get_by_name('identity1').get_pad('sink').\
+        handler_id = self.pipeline.get_by_name('input').get_pad('sink').\
                                 add_buffer_probe(_calculateBitrate)
 
     def get_content_type(self, serveIcy):
