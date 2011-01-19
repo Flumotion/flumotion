@@ -49,7 +49,7 @@ class AudiorateBin(gst.Bin):
         self._audioconv = gst.element_factory_make("audioconvert")
         self._audiorate = gst.element_factory_make("legacyresample")
         self._capsfilter = gst.element_factory_make("capsfilter")
-        self._identity = gst.element_factory_make("identity")
+        self._identity = gst.parse_launch("identity silent=true")
         self.add(self._audioconv)
         self.add(self._audiorate)
         self.add(self._capsfilter)
