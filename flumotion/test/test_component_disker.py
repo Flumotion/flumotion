@@ -284,7 +284,8 @@ CHK POS LEN TS DUR KF %s TDUR
     def testSave(self):
         self.fillIndex()
         fd, path = tempfile.mkstemp()
-        ret = self.index.save(path, 0)
+        self.index.setLocation(path)
+        ret = self.index.save(0)
         self.assertEquals(ret, True)
         file = open(path, 'r')
         lines = file.readlines()
@@ -301,7 +302,8 @@ CHK POS LEN TS DUR KF %s TDUR
         self.fillIndex()
         self.index.setHeadersSize(10)
         fd, path = tempfile.mkstemp()
-        ret =self.index.save(path, 0)
+        self.index.setLocation(path)
+        ret =self.index.save(0)
         self.assertEquals(ret, True)
         file = open(path, 'r')
         lines = file.readlines()
@@ -316,14 +318,23 @@ CHK POS LEN TS DUR KF %s TDUR
 
     def testSaveVoidIndex(self):
         fd, path = tempfile.mkstemp()
-        self.failUnlessRaisesWithMessage("The index doesn't contain any "
-            "entry and it will not be saved", self.index.save, path)
+        self.index.setLocation(path)
+        ret = self.index.save()
+        self.assertEquals(ret, True)
+        file = open(path, 'r')
+        lines = file.readlines()
+        self.assertEquals(lines,
+            ['FLUIDX1 #Flumotion\n',
+            'CHK POS LEN TS DUR KF TDT TDUR\n',
+            ])
+        file.close()
         os.remove(path)
 
     def testSaveBadFile(self):
         self.fillIndex()
+        self.index.setLocation('/')
         self.failUnlessRaisesWithMessage("Failed to open output file ",
-            self.index.save, '/')
+            self.index.save)
 
     def testLoadIndex(self):
         fd, path = tempfile.mkstemp(suffix='.index')

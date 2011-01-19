@@ -118,10 +118,11 @@ class Index(log.Loggable):
 
     logCategory = "index"
 
-    def __init__(self, component=None):
+    def __init__(self, component=None, location=None):
         self._index = []
         self._headers_size = 0
         self.comp = component
+        self.location = location
 
     ### Public methods ###
 
@@ -132,9 +133,10 @@ class Index(log.Loggable):
         self.debug("Removing entries older than %s", timestamp)
         self._index = self._filter_index(timestamp) or []
 
-    def addEntry(self, offset, timestamp, keyframe, tdt=0):
+    def addEntry(self, offset, timestamp, keyframe, tdt=0, writeIndex=True):
         '''
-        Add a new entry to the the index
+        Add a new entry to the the index and writes it to disk if
+        writeIndex is True
         '''
         if len(self._index) > 0:
             # Check that new entries have increasing timestamp, offset and tdt
@@ -142,6 +144,14 @@ class Index(log.Loggable):
                 return
             # And update the length and duration of the last entry
             self._updateLastEntry(offset, timestamp, tdt)
+            # Then write the last updated index entry to disk
+            if writeIndex and self.location:
+                f = _openFile(self, self.comp, self.location, 'a+')
+                if not f:
+                    return
+                off = self._index[0]['offset'] - self._headers_size
+                self._write_index_entry(f, self._index[-1], off,
+                                        len(self._index)-1)
 
         self._index.append({'offset': offset, 'length': -1,
                             'timestamp': timestamp, 'duration': -1,
@@ -150,6 +160,9 @@ class Index(log.Loggable):
 
         self.debug("Added new entry to the index: offset=%s timestamp=%s "
                    "keyframe=%s tdt=%s", offset, timestamp, keyframe, tdt)
+
+    def setLocation(self, location):
+        self.location = location
 
     def setHeadersSize(self, size):
         '''
@@ -200,22 +213,24 @@ class Index(log.Loggable):
         '''
         self._index = []
 
-    def save(self, location, start=None, stop=None):
+    def save(self, start=None, stop=None):
         '''
         Saves the index in a file, using the entries from 'start' to 'stop'
         '''
-        if len(self._index) == 0:
-            self.warning("The index doesn't contain any entry and it will not "
-                         "be saved")
+        if self.location is None:
+            self.warning("Couldn't save the index, the location is not set.")
             return False
-        f = _openFile(self, self.comp, location, 'w+')
+        f = _openFile(self, self.comp, self.location, 'w+')
         if not f:
             return False
 
         self._write_index_headers(f)
+        if len(self._index) == 0:
+            return True
+
         self._write_index_entries(f, self._filter_index(start, stop))
         self.info("Index saved successfully. start=%s stop=%s location=%s ",
-                   start, stop, location)
+                   start, stop, self.location)
         return True
 
     def loadIndexFile(self, location):
@@ -340,19 +355,22 @@ class Index(log.Loggable):
         file.write("%s" % self.INDEX_HEADER)
         file.write("%s\n" % ' '.join(self.INDEX_KEYS))
 
+    def _write_index_entry(self, file, entry, offset, count):
+        frmt = "%s\n" % " ".join(['%s'] * len(self.INDEX_KEYS))
+        file.write(frmt % (count, entry['offset'] - offset,
+                                  entry['length'],
+                                  entry['timestamp'],
+                                  entry['duration'],
+                                  entry['keyframe'],
+                                  entry['tdt'],
+                                  entry['tdt-duration']))
+
     def _write_index_entries(self, file, entries):
-        offset = self._headers_size - self._index[0]['offset']
+        offset =self._index[0]['offset'] - self._headers_size
         count = 0
 
         for entry in self._index:
-            frmt = "%s\n" % " ".join(['%s'] * len(self.INDEX_KEYS))
-            file.write(frmt % (count, entry['offset'] + offset,
-                                      entry['length'],
-                                      entry['timestamp'],
-                                      entry['duration'],
-                                      entry['keyframe'],
-                                      entry['tdt'],
-                                      entry['tdt-duration']))
+            self._write_index_entry(file, entry, offset, count)
             count += 1
 
 
