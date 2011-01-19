@@ -425,6 +425,8 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
     _index = None
     _nextIsKF = False
     _lastTdt = None
+    _lastEntry = None             # last KF/TDT
+    _clients = {}                 # dict of clients {fd: (index, synced)}
     _startFilenameTemplate = None # template to use when starting off recording
     _startTime = None             # time of event when starting
     _rotateTimeDelayedCall = None
@@ -583,7 +585,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         sink.connect('client-removed', self._client_removed_cb)
 
         if self.writeIndex:
-            self._index = Index(self)
+            sink.connect('client-added', self._client_added_cb)
 
         if self.reactToMarks:
             pfx = properties.get('stream-marker-filename-prefix', '%03d.')
@@ -610,8 +612,46 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             s['minute'], s['second'])
         return time.mktime(t.timetuple())
 
+    def _getStats(self, fd):
+        sink = self.get_element('fdsink')
+        stats = sink.emit('get-stats', fd)
+        if len(stats) <= 6:
+            self.warning("The current version of multifdsink doesn't "
+                         "include the timestamp of the first and last "
+                         "buffers sent: the indexing will be disabled.")
+            m = messages.Warning(
+                T_(N_("Versions up to and including %s of the '%s' "
+                      "GStreamer plug-in can't be used to write index "
+                      "files.\n"),
+                      '0.10.30', 'multifdsink'))
+            self.addMessage(m)
+            self.writeIndex = False
+            return None
+        return stats
+
     def _updateIndex(self, offset, timestamp, isKeyframe, tdt=0):
-        self._index.addEntry(offset, timestamp, isKeyframe, tdt)
+        for fd, val in self._clients.items():
+            index, synced = val
+            if not synced:
+                stats = self._getStats(fd)
+                # Check if multifdsink can be used for indexing
+                if not stats:
+                    return
+                # Very unlikely, but if we are not synced yet,
+                # add this entry to the index because it's going
+                # to be the sync point, and continue
+                if stats[6] == gst.CLOCK_TIME_NONE:
+                    index.addEntry(offset, timestamp, isKeyframe, tdt, False)
+                    continue
+                # if we know when the client was synced, trim the index.
+                index.updateStart(stats[6])
+                self._clients[fd] = (index, True)
+                # At this point we should have only one entry in the index
+                # which will be written to file after getting the next sync
+                # buffer and we can update its duration and length.
+
+            index.addEntry(offset, timestamp, isKeyframe, tdt, True)
+        self._lastEntry = (offset, timestamp, isKeyframe, tdt)
 
     def _pollDisk(self):
         # Figure out the remaining disk space where the disker is saving
@@ -725,9 +765,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # stream continuity if it's done close to a keyframe because when
         # multifdsink looks internally for the latest keyframe it's already to
         # late and a gap is introduced.
-        if self.writeIndex and self.location:
-            self.indexLocation = '.'.join([self.location,
-                                           Index.INDEX_EXTENSION])
         reactor.callLater(self.timeOverlap, self._stopRecordingFull, self.file,
                           self.location, self.last_tstamp, True)
 
@@ -840,6 +877,10 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
                 self._updateSymlink(location,
                                     self._symlinkToLastRecording)
 
+    def _updateHeadersSize(self):
+        for index, a in self._clients.values():
+            index.setHeadersSize(self._headers_size)
+
 
     # START OF THREAD AWARE METHODS
 
@@ -863,31 +904,32 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
             reactor.callLater(0, self.changeFilename,
                 self._startFilenameTemplate, self._startTime)
 
+    def _client_added_cb(self, element, arg0):
+        if not self.writeIndex:
+            return
+
+        indexLocation = '.'.join([self.location,
+                                  Index.INDEX_EXTENSION])
+        index = Index(self, indexLocation)
+        index.setHeadersSize(self._headers_size)
+        # Write the index headers
+        index.save()
+        # We will need the last entry because multifdsink syncs in
+        # the last keyframe
+        if self._lastEntry:
+            index.addEntry(*(self._lastEntry + (False, )))
+        self._clients[arg0] = (index, False)
+
     def _client_removed_cb(self, element, arg0, client_status):
         # treat as error if we were removed because of GST_CLIENT_STATUS_ERROR
         # FIXME: can we use the symbol instead of a numeric constant ?
-        if self.writeIndex:
-            stats = element.emit('get-stats', arg0)
-            if len(stats) <= 6:
-                self.warning("The current version of multifdsink doesn't "
-                             "include the timestamp of the first and last "
-                             "buffers sent: the indexing will be disabled.")
-                m = messages.Warning(
-                    T_(N_("Versions up to and including %s of the '%s' "
-                          "GStreamer plug-in can't be used to write index "
-                          "files.\n"),
-                          '0.10.30', 'multifdsink'))
-                self.addMessage(m)
-                self.writeIndex = False
-                return
-            reactor.callFromThread(self._index.updateStart, stats[6])
-            reactor.callFromThread(self._index.save, self.indexLocation,
-                                   stats[6], stats[7])
-
         if client_status == 4:
             # since we get called from the streaming thread, hand off handling
             # to the reactor's thread
             reactor.callFromThread(self._client_error_cb)
+
+        if self.writeIndex:
+            del self._clients[arg0]
 
     def _handle_event(self, event):
         if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
@@ -914,7 +956,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # IN_CAPS Buffers
         if buf.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
             self._headers_size += buf.size
-            self._index.setHeadersSize(self._headers_size)
+            reactor.callFromThread(self._updateHeadersSize)
             return True
 
         # re-timestamp buffers without timestamp, so that we can get from
