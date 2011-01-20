@@ -54,7 +54,7 @@
   </autotools>
 
   <autotools id="flumotion">
-    <branch repo="code.flumotion.com-flumotion" revision="flumotion-0.8.0" />
+    <branch repo="code.flumotion.com-flumotion" tag="flumotion-0.8.0" />
     <dependencies>
       <dep package="gst-plugins-good" />
       <dep package="gst-python" />

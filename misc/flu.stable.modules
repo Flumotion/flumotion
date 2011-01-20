@@ -12,8 +12,7 @@
               href="git://code.flumotion.com/flumotion.git"/>
 
   <autotools id="flumotion">
-    <branch repo="code.flumotion.com-flumotion"
-            revision="flumotion-0.8.0" />
+    <branch repo="code.flumotion.com-flumotion" tag="flumotion-0.8.0" />
   </autotools>
 
 </moduleset>
