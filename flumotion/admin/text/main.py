@@ -29,6 +29,8 @@ from flumotion.admin.text import connection
 from flumotion.admin.text.greeter import AdminTextGreeter
 from flumotion.common import messages # make Message proxyable
 from flumotion.common.options import OptionParser
+from flumotion.common.connection import PBConnectionInfo
+from flumotion.twisted import pb as fpb
 
 __version__ = "$Rev$"
 
@@ -70,8 +72,9 @@ def _runInterface(options):
                 pass
         if options.insecure:
             insecure = True
-        connection.connect_to_manager(stdscr, hostname, port,
-                                      insecure, username, password)
+        authenticator = fpb.Authenticator(username=username, password=password)
+        info = PBConnectionInfo(hostname, port, not insecure, authenticator)
+        connection.connect_to_manager(stdscr, info)
 
     else:
         # do greeter
