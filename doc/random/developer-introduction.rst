@@ -483,6 +483,18 @@ Once everything is ready, commit your work::
 
   git commit
 
+The commit message should be formated with a short description in one line
+(don't break it, even if it's bigger than 80 characters), and a paragraph after
+a line jump with the reviewer's name, a long description and the ticket
+beeing closed, if needed::
+
+  Fix bug in the UI
+
+  reviewed by: Major Rawls
+  A more detailed description on how the bug was fixed
+  should come here.
+  Fixes #1000
+
 And finally, generate a patch in e-mail format with the commit::
 
   git format-patch HEAD~1
