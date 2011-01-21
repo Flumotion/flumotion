@@ -138,6 +138,28 @@ class TestConfig(PluggableComponentTestCase, log.Loggable):
         # instantiating correctly
         return d
 
+    def test_config_rotate_invalid_size(self):
+        properties = {'directory': '/tmp',
+                      'rotate-type': 'size',
+                      'size': 0}
+
+        dc = comptest.ComponentWrapper('disk-consumer', disker.Disker,
+                                       name='dc',
+                                       cfg=self.get_config(properties))
+        d = dc.instantiate()
+        return self.failUnlessFailure(d, comptest.ComponentSad)
+
+    def test_config_rotate_invalid_time(self):
+        properties = {'directory': '/tmp',
+                      'rotate-type': 'time',
+                      'size': 0}
+
+        dc = comptest.ComponentWrapper('disk-consumer', disker.Disker,
+                                       name='dc',
+                                       cfg=self.get_config(properties))
+        d = dc.instantiate()
+        return self.failUnlessFailure(d, comptest.ComponentSad)
+
 
 class TestFlow(PluggableComponentTestCase, log.Loggable):
 

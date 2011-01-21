@@ -486,6 +486,35 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # Stop the BaseComponent pollers
         feedcomponent.ParseLaunchComponent.observerRemove(self, observer, num)
 
+    def check_properties(self, props, addMessage):
+        props = self.config['properties']
+        rotateType = props.get('rotate-type', 'none')
+
+        if not rotateType in ['none', 'size', 'time']:
+            msg = messages.Error(T_(N_(
+                "The configuration property 'rotate-type' should be set to "
+                "'size', time', or 'none', not '%s'. "
+                "Please fix the configuration."),
+                    rotateType), mid='rotate-type')
+            addMessage(msg)
+            raise errors.ConfigError(msg)
+
+        if rotateType in ['size', 'time']:
+            if rotateType not in props.keys():
+                msg = messages.Error(T_(N_(
+                    "The configuration property '%s' should be set. "
+                    "Please fix the configuration."),
+                        rotateType), mid='rotate-type')
+                addMessage(msg)
+                raise errors.ConfigError(msg)
+
+            if props[rotateType] == 0:
+                msg = messages.Error(T_(N_("Configuration error: " \
+                    "'rotate-type' %s value cannot be set to 0."),
+                    rotateType), mid='rotate-type')
+                addMessage(msg)
+                raise errors.ConfigError(msg)
+
     ### ParseLaunchComponent methods
 
     def get_pipeline_string(self, properties):
@@ -496,26 +525,6 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         self.fixRenamedProperties(properties, [('rotateType', 'rotate-type')])
 
         rotateType = properties.get('rotate-type', 'none')
-
-        # validate rotate-type and size/time properties first
-        if not rotateType in ['none', 'size', 'time']:
-            m = messages.Error(T_(N_(
-                "The configuration property 'rotate-type' should be set to "
-                "'size', time', or 'none', not '%s'. "
-                "Please fix the configuration."),
-                    rotateType), mid='rotate-type')
-            self.addMessage(m)
-            raise errors.ComponentSetupHandledError()
-
-        # size and time types need the property specified
-        if rotateType in ['size', 'time']:
-            if rotateType not in properties.keys():
-                m = messages.Error(T_(N_(
-                    "The configuration property '%s' should be set. "
-                    "Please fix the configuration."),
-                        rotateType), mid='rotate-type')
-                self.addMessage(m)
-                raise errors.ComponentSetupHandledError()
 
         # now act on the properties
         if rotateType == 'size':
