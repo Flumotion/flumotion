@@ -78,7 +78,7 @@ Once you have gstreamer installed on an uninstalled directory, you need to insta
 same way. This time though, you get the code from git directly as this is the most 
 up to date code. So, let's start. create a folder and check it out::
 
-   git clone ssh://git@code.flumotion.com/~/flumotion.git
+   git clone git@code.flumotion.com:flumotion.git
 
 First the build environment needs to be prepared::
 
@@ -163,7 +163,7 @@ Flowtester is a tool to easily test flumotion flows.
 Flows can be handwritten or created by the configuration assistant.
 The code lives in the "flumotion-flowtester" module::
 
-  git clone ssh://git@code.flumotion.com/~/flumotion-flowtester.git
+  git clone git@code.flumotion.com:flumotion-flowtester.git
 
 To run flowtester, just type::
 
@@ -419,7 +419,26 @@ there are often improvements coming directly from the flumotion developers.
 
 To run a pychecker test on your source code, type the following::
 
-  make pycheck
+  make pychecker
+
+If this fails, it will run again, this time with more verbose output showing
+all the warnings.  You can run::
+
+  make pycheckerverbose
+
+to run with verbose warnings.
+
+You can also run only the GStreamer 0.10-specific code or independent code::
+
+  make pychecker010
+  make pycheckerindep
+  make pycheckerverbose010
+  make pycheckerverboseindep
+
+If you want to run with a non-installed pychecker (for example, to try
+against CVS), use::
+
+  make PYCHECKER="python ~/dev/ext/pychecker/head/pychecker/checker.py" pychecker
 
 See more info at the `pychecker homepage <http://pychecker.sourceforge.net/>`_.
 
@@ -432,7 +451,7 @@ some may be outdated. You can read it from your checkout directory or online fro
 Also, you could checkout the flumotion-doc project and build the most up to date documentation
 yourself (by using autogen.sh and make, as usual)::
 
-  git clone ssh://git@code.flumotion.com/~/flumotion-doc.git
+  git clone git@code.flumotion.com:flumotion-doc.git
 
 Development process
 ===================
