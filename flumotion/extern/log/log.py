@@ -993,11 +993,11 @@ class TwistedLogObserver(Loggable):
 
 
 def logLevelToStdLevel(level):
-    t = {ERROR : logging.CRITICAL,
-         WARN : logging.ERROR,
-         INFO : logging.WARNING,
-         DEBUG : logging.INFO,
-         LOG : logging.DEBUG}
+    t = {ERROR: logging.CRITICAL,
+         WARN: logging.ERROR,
+         INFO: logging.WARNING,
+         DEBUG: logging.INFO,
+         LOG: logging.DEBUG}
     return t.get(level, logging.NOTSET)
 
 
