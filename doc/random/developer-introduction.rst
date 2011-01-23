@@ -504,7 +504,16 @@ Finnaly, push your commits to the remote repository::
   git push origin master
 
 
+Closing a ticket
+----------------
 
+Every ticket that gets closed should have a version.
+Every ticket that gets closed should have its milestone set to the next
+release that will be made (so that it shows up in the list of fixed tickets
+when the release gets made).
+
+There is a commit hook that automatically closes the ticket as fixed if your
+commit message contains 'Fixes #...' or 'Closes '#...'
 
 Updating translation
 --------------------
