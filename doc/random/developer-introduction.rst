@@ -66,7 +66,7 @@ You should also configure the following options and aliases to help you in the d
   - Aliases::
 
     $ git config --global alias.l "log --oneline --decorate --graph"
-    $ git config --global alias.d "diff --color--words"
+    $ git config --global alias.d "diff --color-words"
     $ git config --global alias.s "status --short"
     $ git config --global alias.a "add -u"
     $ git config --global alias.c "commit"
@@ -439,6 +439,11 @@ If you want to run with a non-installed pychecker (for example, to try
 against CVS), use::
 
   make PYCHECKER="python ~/dev/ext/pychecker/head/pychecker/checker.py" pychecker
+
+If you want to run it on just one or a set of files with the same configuration,
+try::
+
+  make PYCHECKER="python ~/dev/ext/pychecker/head/pychecker/checker.py" PYCHECKER_WHITELIST=flumotion/worker/checks/audio.py pychecker
 
 See more info at the `pychecker homepage <http://pychecker.sourceforge.net/>`_.
 
