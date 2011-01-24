@@ -58,9 +58,19 @@ _trial_coverage/
 autom4te.cache/
 cache/
 flumotion/extern/_trial_temp/
+flumotion/extern/command/.svn/*
 m4/
 locale/
 doc/reference/html/
+
+# Ignore external command
+flumotion/extern/command.revision
+flumotion/extern/command/ChangeLog
+flumotion/extern/command/README
+flumotion/extern/command/__init__.py
+flumotion/extern/command/command.py
+flumotion/extern/command/help2man.py
+flumotion/extern/command/test_command.py
 
 # Misc ignores
 data/flumotion-admin.desktop
