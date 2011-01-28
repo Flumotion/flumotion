@@ -6,6 +6,8 @@ command:
 	svn co http://thomas.apestaart.org/moap/svn/trunk/moap/extern/command
 	svn info command > command.revision
 
+command/__init__.py: command
+
 flumotiondir = $(libdir)/flumotion/python/flumotion/extern
 
 flumotion_PYTHON = 		\
