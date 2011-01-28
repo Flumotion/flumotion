@@ -2,7 +2,7 @@ dnl initialize autoconf
 dnl when going to/from release please remove/add the nano (fourth number)
 dnl releases only do Wall, cvs and prerelease does Werror too
 
-AC_INIT(flumotion, m4_esyscmd([ test -z "$VERSION" && VERSION=0.9.0.2;
+AC_INIT(flumotion, m4_esyscmd([ test -z "$VERSION" && VERSION=0.9.0.1;
                    common/version-gen $VERSION .tarball-version]),
    https://code.flumotion.com/flumotion/trac/newticket?component=flumotion,
    flumotion)
