@@ -63,8 +63,6 @@ PYCHECKER_BLACKLIST = \
 
 COVERAGE_MODULES = flumotion
 
-.PHONY: test 
-
 integration:
 	trial tests.integration
 
@@ -97,4 +95,4 @@ update-external-command:
 	find flumotion/extern/command -type f ! -regex '.*/.svn/.*' -delete
 	svn export --force https://thomas.apestaart.org/moap/svn/trunk/moap/extern/command flumotion/extern/command
 
-.PHONY: update-externals update-external-command ChangeLog
+.PHONY: update-externals update-external-command ChangeLog test
