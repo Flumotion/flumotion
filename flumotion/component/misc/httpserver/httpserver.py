@@ -34,7 +34,8 @@ from flumotion.common.i18n import N_, gettexter
 from flumotion.component import component
 from flumotion.component.base import http as httpbase
 from flumotion.component.component import moods
-from flumotion.component.misc.httpserver import httpfile, localprovider
+from flumotion.component.misc.httpserver import httpfile, \
+        localprovider, localpath
 from flumotion.component.misc.httpserver import serverstats
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
@@ -201,6 +202,10 @@ class HTTPFileMedium(component.BaseComponentMedium):
 
     def remote_rotateLog(self):
         return self.comp.rotateLog()
+
+    def remote_reloadMimeTypes(self):
+        self.debug('reloading mime types')
+        return localpath.reloadMimeTypes()
 
 
 class HTTPFileStreamer(component.BaseComponent, log.Loggable):

@@ -27,6 +27,10 @@ from flumotion.component.misc.httpserver.fileprovider import InsecureError
 from flumotion.component.misc.httpserver.fileprovider import NotFoundError
 
 
+def reloadMimeTypes():
+    LocalPath.contentTypes = ourmimetypes.MimeTypes()
+
+
 class LocalPath(fileprovider.FilePath):
 
     contentTypes = ourmimetypes.MimeTypes()
