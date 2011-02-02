@@ -48,7 +48,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
         return dl
 
     def check_properties(self, props, addMessage):
-        props = self.config['properties']
         deintMode = props.get('deinterlace-mode', 'auto')
         deintMethod = props.get('deinterlace-method', 'ffmpeg')
 
