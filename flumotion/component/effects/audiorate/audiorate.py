@@ -39,8 +39,9 @@ class AudiorateBin(gst.Bin):
     I am a GStreamer bin that can change the samplerate of an audio stream.
     """
     logCategory = "audiorate"
-    CAPS_TEMPLATE = "audio/x-raw-int,rate=%(rate)d;"\
-                    "audio/x-raw-float,rate=%(rate)d"
+    RATE_CAPS = ', rate=%d'
+    CAPS_TEMPLATE = ("audio/x-raw-int %(extra_caps)s ;"
+                    "audio/x-raw-float %(extra_caps)s")
 
     __gproperties__ = {
         'samplerate': (gobject.TYPE_UINT, 'samplerate',
@@ -51,9 +52,10 @@ class AudiorateBin(gst.Bin):
                        'tolerance', 0, sys.maxint, DEFAULT_TOLERANCE,
                        gobject.PARAM_READWRITE)}
 
-    def __init__(self, samplerate=44100, tolerance=DEFAULT_TOLERANCE):
+    def __init__(self, samplerate=None, tolerance=DEFAULT_TOLERANCE):
         gst.Bin.__init__(self)
         self._samplerate = samplerate
+        self._samplerate_caps = ''
 
         self._audiorate = gst.element_factory_make("audiorate")
         self._audioconv = gst.element_factory_make("audioconvert")
@@ -80,10 +82,17 @@ class AudiorateBin(gst.Bin):
         self._setSamplerate(samplerate)
         self._setTolerance(tolerance)
 
+    def _getCapsString(self):
+        # Use this for when we will have more stuff to add to the caps
+        extra_caps = ' '.join([self._samplerate_caps, ])
+        return self.CAPS_TEMPLATE % dict(extra_caps=extra_caps)
+
     def _setSamplerate(self, samplerate):
         self._samplerate = samplerate
-        self._capsfilter.set_property('caps',
-            gst.Caps(self.CAPS_TEMPLATE % dict(rate=samplerate)))
+        self._samplerate_caps = ''
+        if self.samplerate is not None:
+            self._samplerate_caps = self.RATE_CAPS % samplerate
+        self._capsfilter.set_property('caps', gst.Caps(self._getCapsString()))
 
     def _setTolerance(self, tolerance):
         self._tolerance = tolerance
@@ -117,7 +126,7 @@ class Audiorate(feedcomponent.PostProcEffect):
     """
     logCategory = "audiorate-effect"
 
-    def __init__(self, name, sourcePad, pipeline, samplerate,
+    def __init__(self, name, sourcePad, pipeline, samplerate=None,
             tolerance=DEFAULT_TOLERANCE):
         """
         @param element:     the video source element on which the post
