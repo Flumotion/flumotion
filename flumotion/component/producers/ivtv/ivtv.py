@@ -19,28 +19,75 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
+from flumotion.component.effects.deinterlace import deinterlace
+from flumotion.component.effects.videorate import videorate
+from flumotion.component.effects.videoscale import videoscale
 
 __version__ = "$Rev$"
 
 
 class Ivtv(feedcomponent.ParseLaunchComponent):
 
+    def check_properties(self, props, addMessage):
+        deintMode = props.get('deinterlace-mode', 'auto')
+        deintMethod = props.get('deinterlace-method', 'ffmpeg')
+
+        if deintMode not in deinterlace.DEINTERLACE_MODE:
+            msg = messages.Error(T_(N_("Configuration error: '%s' " \
+                "is not a valid deinterlace mode." % deintMode)))
+            addMessage(msg)
+            raise errors.ConfigError(msg)
+
+        if deintMethod not in deinterlace.DEINTERLACE_METHOD:
+            msg = messages.Error(T_(N_("Configuration error: '%s' " \
+                "is not a valid deinterlace method." % deintMethod)))
+            self.debug("'%s' is not a valid deinterlace method",
+                deintMethod)
+            addMessage(msg)
+            raise errors.ConfigError(msg)
+
     def get_pipeline_string(self, properties):
-        device = properties.get('device', '/dev/video0')
-        deinterlacer = properties.get('deinterlacer', '')
+        p = properties
+        device = p.get('device', '/dev/video0')
+        deinterlacer = p.get('deinterlacer', '')
+        self.is_square = p.get('is-square', False)
+        self.width = p.get('width', 0)
+        self.height = p.get('height', 0)
+        if not self.is_square and not self.height:
+            self.height = int(576 * self.width/720.) # assuming PAL
+        self.add_borders = p.get('add-borders', True)
+        self.deintMode = p.get('deinterlace-mode', 'auto')
+        self.deintMethod = p.get('deinterlace-method', 'ffmpeg')
 
-        # by default, we let GStreamer decide width and height
-        width = properties.get('width', 0)
-        height = properties.get('height', 0)
-        if width > 0 and height > 0:
-            scaling_template = (" videoscale method=1 ! "
-                "video/x-raw-yuv,width=%d,height=%d " % (width, height))
+        fr = p.get('framerate', None)
+        if fr is not None:
+            self.framerate = gst.Fraction(fr[0], fr[1])
         else:
-            scaling_template = ""
+            self.framerate = None
 
-        return ("filesrc name=src location=%s ! decodebin name=d ! queue !  "
-                " %s ! %s ! ffmpegcolorspace ! video/x-raw-yuv "
-                " ! @feeder:video@ d. ! queue ! audioconvert "
-                " ! audio/x-raw-int "
-                " ! @feeder:audio@"
-                % (device, deinterlacer, scaling_template))
+        template = ("filesrc name=src location=%s"
+                    "   ! decodebin name=dec "
+                    "  dec. ! identity silent=true name=video ! @feeder:video@"
+                    "  dec. ! audioconvert ! audio/x-raw-int "
+                    "   ! @feeder:audio@" % device)
+
+        return template
+
+    def configure_pipeline(self, pipeline, properties):
+        video = pipeline.get_by_name('video')
+        vr = videorate.Videorate('videorate',
+            video.get_pad("src"), pipeline, self.framerate)
+        self.addEffect(vr)
+        vr.plug()
+
+        deinterlacer = deinterlace.Deinterlace('deinterlace',
+            vr.effectBin.get_pad("src"), pipeline,
+            self.deintMode, self.deintMethod)
+        self.addEffect(deinterlacer)
+        deinterlacer.plug()
+
+        videoscaler = videoscale.Videoscale('videoscale', self,
+            deinterlacer.effectBin.get_pad("src"), pipeline,
+            self.width, self.height, self.is_square, self.add_borders)
+        self.addEffect(videoscaler)
+        videoscaler.plug()
