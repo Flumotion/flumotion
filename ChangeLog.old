@@ -1,3 +1,234 @@
+2011-01-08  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/admin/command/component.py:
+	* flumotion/admin/command/manager.py:
+	* flumotion/admin/command/worker.py:
+	* flumotion/common/bundleclient.py:
+	* flumotion/common/connection.py:
+	* flumotion/component/base/admin_text.py:
+	* flumotion/component/base/http.py:
+	* flumotion/component/base/multiple.py:
+	* flumotion/component/bouncers/admin_gtk.py:
+	* flumotion/component/bouncers/htpasswdcrypt.py:
+	* flumotion/component/bouncers/multibouncer.py:
+	* flumotion/component/bouncers/multibouncerplug.py:
+	* flumotion/component/bouncers/saltsha256.py:
+	* flumotion/component/component.py:
+	* flumotion/component/consumers/httpstreamer/resources.py:
+	* flumotion/component/effects/videorate/videorate.py:
+	* flumotion/component/effects/videoscale/videoscale.py:
+	* flumotion/component/encoders/vp8/vp8.py:
+	* flumotion/component/feedcomponent.py:
+	* flumotion/component/feedcomponent010.py:
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	* flumotion/component/misc/httpserver/cachemanager.py:
+	* flumotion/component/misc/httpserver/httpfile.py:
+	* flumotion/component/misc/porter/porter.py:
+	* flumotion/component/misc/porter/porterclient.py:
+	* flumotion/component/muxers/checks.py:
+	* flumotion/component/plugs/adminaction.py:
+	* flumotion/component/plugs/rrd.py:
+	* flumotion/component/producers/checks.py:
+	* flumotion/component/producers/looper/wizard_gtk.py:
+	* flumotion/component/producers/screencast/screencast.py:
+	* flumotion/component/producers/videotest/admin_text.py:
+	* flumotion/job/job.py:
+	* flumotion/launch/main.py:
+	* flumotion/launch/parse.py:
+	* flumotion/manager/admin.py:
+	* flumotion/manager/base.py:
+	* flumotion/manager/component.py:
+	* flumotion/manager/manager.py:
+	* flumotion/manager/worker.py:
+	* flumotion/monitor/nagios/component.py:
+	* flumotion/monitor/nagios/main.py:
+	* flumotion/monitor/nagios/stream.py:
+	* flumotion/twisted/integration.py:
+	* flumotion/twisted/pb.py:
+	* flumotion/twisted/portal.py:
+	* flumotion/twisted/reflect.py:
+	* flumotion/ui/glade.py:
+	* flumotion/worker/checks/device.py:
+	* flumotion/worker/checks/gst010.py:
+	  Clean up unused imports an experimental pychecker detected.
+	* flumotion/common/medium.py:
+	* flumotion/component/bouncers/component.py:
+	* flumotion/job/main.py:
+	* flumotion/ui/wizard.py:
+	  Additionally, some style guide conforming.
+
+2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/feedcomponent.py:
+	  comparison with True is not necessary.
+	* flumotion/component/misc/porter/porter.py:
+	  Another unused e.
+	* flumotion/component/producers/soundcard/wizard_gtk.py:
+	  min and max are built-ins.
+
+2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpserver/ratecontrol.py:
+	  bytes is a built-in.
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	  format is a built-in.
+	* flumotion/component/misc/porter/porter.py:
+	  Remove unused exception.
+	* flumotion/component/producers/playlist/admin_gtk.py:
+	  iter is a built-in.
+
+2011-01-07  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/formatting.py (added):
+	  Add new module name.  Move code there.
+	* flumotion/common/format.py:
+	  Make this an empty stub, to be removed for Flumotion 0.10
+	* flumotion/common/Makefile.am:
+	  Add new file.
+	* flumotion/component/base/componentnode.py:
+	* flumotion/component/base/eatersnode.py:
+	* flumotion/component/base/feedersnode.py:
+	* flumotion/component/base/multiple.py:
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	* flumotion/component/consumers/disker/disker.py:
+	* flumotion/component/consumers/httpstreamer/httpstreamer.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/misc/httpserver/cachemanager.py:
+	* flumotion/monitor/nagios/log.py:
+	* flumotion/monitor/nagios/process.py:
+	* flumotion/test/test_common_format.py:
+	  Change all imports to
+	  from flumotion.common import format as formatting
+	  to prepare for the deprecation.
+
+2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpserver/cachemanager.py:
+	  hash and file are builtin, replace them.
+	  Remove unused exceptions.
+	* flumotion/component/misc/httpserver/cachedprovider.py:
+	  Remove unused import.
+	  file is a builtin, replace it.
+	* flumotion/worker/checks/device.py:
+	  Remove unused imports.
+	  id is a builtin, replace it.
+
+2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/effects/videoscale/admin_gtk.py:
+	  Remove unused import.
+	* flumotion/worker/checks/video.py:
+	* flumotion/component/converters/video/video.py:
+	* flumotion/component/misc/httpserver/httpserver.py:
+	  Remove unused code.
+	* flumotion/worker/checks/audio.py:
+	  Remove unused exception.
+
+2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/netutils.py:
+	  bytes is a builtin.  Replace it.
+	* flumotion/twisted/defer.py:
+	* flumotion/component/producers/playlist/playlistparser.py:
+	* flumotion/ui/wizard.py:
+	  next is a builtin.  Replace it.
+	* flumotion/component/bouncers/component.py:
+	* flumotion/component/producers/videotest/wizard_gtk.py:
+	  id is a builtin.  Replace it.
+	* flumotion/component/consumers/disker/admin_gtk.py:
+	  iter is a builtin.  Replace it.
+	* flumotion/component/consumers/disker/disker.py:
+	  file is a builtin.  Replace it.
+	* flumotion/ui/trayicon.py:
+	  quit is a builtin.  Replace it.
+
+2011-01-06  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/twisted/pb.py:
+	* flumotion/common/format.py:
+	* flumotion/common/componentui.py:
+	* flumotion/common/i18n.py:
+	* flumotion/common/medium.py:
+	* flumotion/component/misc/httpserver/admin_gtk.py:
+	* flumotion/component/producers/webcam/webcam.py:
+	* flumotion/component/producers/looper/looper.py:
+	* flumotion/component/producers/videotest/videotest.py:
+	* flumotion/manager/admin.py:
+	  'format' is a builtin.  Replace it.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/signals.py:
+	* flumotion/component/effects/deinterlace/admin_gtk.py:
+	* flumotion/manager/component.py:
+	* flumotion/job/main.py:
+	  Remove unused imports.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/converters/overlay/overlay.py:
+	  Pychecker caught two mistakes, globals that are in fact self
+	  attributes.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
+	  _openFile is used by two objects.  Rename self to loggable to make
+	  clear this is a function, not a method.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/consumers/disker/disker.py:
+	  Remove an inner import that was already at the top.
+	  Log an exception when statting a file.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/common/eventcalendar.py:
+	  Pychecker caught a method called deltatime when it is actually
+	  timedelta.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/plugs/base.py:
+	  Pychecker caught an invocation of defer. without the matching
+	  import.  Importing.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/producers/playlist/singledecodebin.py:
+	  Pychecker caught an invocation of log. when there is no log
+	  module imported.  Removing the log line.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpserver/httpcached/strategy_base.py:
+	  Adapt to name change.
+
+2010-12-28  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* flumotion/component/misc/httpserver/ourmimetypes.py (added):
+	* flumotion/component/misc/httpserver/mimetypes.py (deleted):
+	  Rename, so it doesn't conflict with a built-in module of the
+	  same name that actually gets imported by twisted.web.static
+	* flumotion/component/misc/httpserver/Makefile.am:
+	* flumotion/component/misc/httpserver/httpserver.xml:
+	* flumotion/component/misc/httpserver/localpath.py:
+	  Adapt to name change.
+
+2010-12-15  Josep Joan Ribas  <jribas@flumotion.com>
+
+	reviewed by: Xavier Queralt
+
+	* flumotion/common/bundle.py:
+	* flumotion/common/registry.py:
+	* flumotion/manager/manager.py:
+	* flumotion/test/test_manager_manager.py:
+	Manager has to rebuild the BundlerBasket when the registry has been
+	updated. This prevents asking for a bundle that has been found in the
+	recently updated Registry but it is not available in the outdated
+	BundlerBasket.
+
 2010-12-01  Andoni Morales Alastruey  <amorales@flumotion.com>
 
 	reviewed by: Julien Le Goff
