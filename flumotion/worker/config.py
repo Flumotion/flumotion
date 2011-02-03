@@ -200,6 +200,9 @@ class WorkerConfigXML(log.Loggable):
         for term in terms:
             if '-' in term:
                 (lower, upper) = [int(x) for x in term.split('-')]
+                if lower > upper:
+                    raise ConfigError("<feederports> has an invalid range: "
+                            "%s > %s " % (lower, upper))
                 for port in range(lower, upper+1):
                     if port not in ports:
                         ports.append(port)
