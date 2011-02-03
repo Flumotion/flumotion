@@ -109,6 +109,8 @@ class FeedComponentMedium(basecomponent.BaseComponentMedium):
             else:
                 gst.debug_set_default_threshold(value)
 
+        self.comp.uiState.set('gst-debug', debug)
+
     def remote_eatFrom(self, eaterAlias, fullFeedId, host, port):
         """
         Tell the component the host and port for the FeedServer through which

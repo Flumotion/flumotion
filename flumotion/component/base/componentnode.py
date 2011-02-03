@@ -65,14 +65,18 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         self.widget = self.wtree.get_widget('main-vbox')
         assert self.widget, "No component-widget in %s" % self.gladeFile
         self.gst_mask = self.wtree.get_widget('gst_mask')
-        self.gst_mask.connect('changed', self._on_gst_mask_changed)
         self.gst_label = self.wtree.get_widget('gst_label')
         self.flu_mask = self.wtree.get_widget('flu_mask')
-        self.flu_mask.connect('changed', self._on_flu_mask_changed)
         self.gst_profile = self.wtree.get_widget('gst_profile')
         self.gst_profile.connect('changed', self._on_gst_profile_changed)
         self.flu_profile = self.wtree.get_widget('flu_profile')
         self.flu_profile.connect('changed', self._on_flu_profile_changed)
+        self.gst_button = self.wtree.get_widget('gst_button')
+        self.gst_button.connect('clicked', self._on_gst_button_clicked)
+        self.gst_mask.connect('activate', self._on_gst_button_clicked)
+        self.flu_button = self.wtree.get_widget('flu_button')
+        self.flu_button.connect('clicked', self._on_flu_button_clicked)
+        self.flu_mask.connect('activate', self._on_flu_button_clicked)
 
         # pid
         l = self.wtree.get_widget('label-pid')
@@ -124,16 +128,16 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
             gtk.Entry.set_text(self.flu_mask, profile)
         self.flu_mask.set_sensitive(profile is None)
 
-    def _on_flu_mask_changed(self, entry):
-        debug = entry.get_text()
+    def _on_flu_button_clicked(self, widget):
+        debug = self.flu_mask.get_text()
         if not self._debugEnabled or not self._validateMask(debug):
             return
         self.info('setting flu debug to %s for %s' % (
             debug, self.state.get('name')))
         self.admin.componentCallRemote(self.state, 'setFluDebug', debug)
 
-    def _on_gst_mask_changed(self, entry):
-        debug = entry.get_text()
+    def _on_gst_button_clicked(self, widget):
+        debug = self.gst_mask.get_text()
         if not self._debugEnabled or not self._validateMask(debug):
             return
         self.info('setting gst debug to %s for %s' % (
@@ -154,6 +158,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
             self.gst_profile.hide()
             self.gst_label.hide()
             self.gst_mask.hide()
+            self.gst_button.hide()
 
         self._debugEnabled = debugEnabled
 
@@ -171,6 +176,20 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
             self._label_uptime.set_text(formatting.formatTime(runtime))
         else:
             self._label_uptime.set_text(_("not available"))
+
+    def _setGstDebug(self, value):
+        self.gst_mask.set_text(value)
+        try:
+            self.gst_profile.select_item_by_data(value)
+        except KeyError:
+            self.gst_profile.select_item_by_data(None)
+
+    def _setFluDebug(self, value):
+        self.flu_mask.set_text(value)
+        try:
+            self.flu_profile.select_item_by_data(value)
+        except KeyError:
+            self.flu_profile.select_item_by_data(None)
 
     def _updateCPU(self, cpu):
         # given float for cpu, update the label
@@ -211,6 +230,10 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
             self._setCurrentTime(value)
         elif key == 'reset-count':
             self._updateResets(value)
+        elif key == 'flu-debug':
+            self._setFluDebug(value)
+        elif key == 'gst-debug':
+            self._setGstDebug(value)
 
     def stateAppend(self, object, key, value):
         pass

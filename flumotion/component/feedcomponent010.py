@@ -64,6 +64,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.eaters = {} # eater eaterAlias -> Eater
         self.uiState.addListKey('feeders')
         self.uiState.addListKey('eaters')
+        self.uiState.addKey('gst-debug')
 
         self.pipeline = None
         self.pipeline_signals = []
@@ -127,6 +128,7 @@ class FeedComponent(basecomponent.BaseComponent):
         self.connect_feeders(pipeline)
         self.set_pipeline(pipeline)
 
+        self.uiState.set('gst-debug', os.environ.get('GST_DEBUG', '*:0'))
         self.debug("FeedComponent.do_setup(): setup finished")
 
         self.try_start_pipeline()
