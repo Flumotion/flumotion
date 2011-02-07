@@ -11,9 +11,9 @@
                function="GDPProducer" />
       </entries>
       <properties>
-        <property name="host" type="string"
+        <property name="host" type="string" required="true"
                   _description="The host name or IP address of the GStreamer TCP server." />
-        <property name="port" type="int"
+        <property name="port" type="int" required="true"
                   _description="The port of the GStreamer TCP server." />
       </properties>
     </component>
