@@ -21,7 +21,7 @@
 
 from flumotion.component import feedcomponent
 
-__version__ = "$Rev: 6125 $"
+__version__ = "$Rev$"
 
 
 class GDPConsumer(feedcomponent.ParseLaunchComponent):
