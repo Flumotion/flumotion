@@ -11,7 +11,7 @@
                function="GDPConsumer" />
       </entries>
       <properties>
-        <property name="port" type="int"
+        <property name="port" type="int" required="true"
                   _description="The port of the GStreamer TCP server." />
       </properties>
     </component>
