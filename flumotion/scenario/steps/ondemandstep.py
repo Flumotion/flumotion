@@ -240,7 +240,6 @@ class OnDemandStep(WorkerWizardStep):
                 self.model.properties.path = fs.getFilename()
                 self._proxy.update('path')
                 self.wizard.clear_msg('ondemand-path-check')
-                self._verify()
 
         directory = self.model.properties.path
 
