@@ -41,6 +41,7 @@ HTML5TEMPLATE = \
 </body>
 """
 
+
 def _htmlbool(value):
     if value:
         return 'true'
