@@ -66,7 +66,7 @@ class Html5HTTPPlug(HTTPPlug):
         muxer = self.streamer
         while not isinstance(muxer, Muxer):
             muxer = muxer.eaters[0]
- 
+
         p.codecs = ""
         p.mime_type = ""
         if muxer.componentType == "ogg-muxer":
