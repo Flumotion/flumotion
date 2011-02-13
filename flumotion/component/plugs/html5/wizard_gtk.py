@@ -106,7 +106,7 @@ class Html5HTTPPlug(HTTPPlug):
 
 class Html5HTTPServer(HTTPServer):
     """I am a model representing the configuration file for a
-    HTTP server component which will be used to serve an html5 
+    HTTP server component which will be used to serve an html5
     video watching page.
     Most of the interesting logic here is actually in a plug.
     """
