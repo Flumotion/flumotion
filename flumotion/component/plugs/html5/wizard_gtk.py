@@ -27,7 +27,8 @@ from zope.interface import implements
 
 from flumotion.admin.assistant.interfaces import IHTTPConsumerPlugin, \
         IHTTPConsumerPluginLine
-from flumotion.admin.assistant.models import HTTPServer, HTTPPlug
+from flumotion.admin.assistant.models import HTTPServer, HTTPPlug, Muxer, \
+        Encoder
 from flumotion.ui.plugarea import WizardPlugLine
 
 _ = gettext.gettext
@@ -61,8 +62,34 @@ class Html5HTTPPlug(HTTPPlug):
     def getProperties(self):
         p = super(Html5HTTPPlug, self).getProperties()
         #TODO: find the encoders and muxer and pass in to the Html5HTTPPlug
-        p.codecs = "vorbis,vp8"
-        p.mime_type = "video/webm"
+        # find muxer
+        muxer = self.streamer
+        while not isinstance(muxer, Muxer):
+            muxer = muxer.eaters[0]
+                   
+        p.codecs = ""
+        p.mime_type = ""
+        if muxer.componentType == "ogg-muxer":
+            p.mime_type = "video/ogg"
+        elif muxer.componentType == "webm-muxer":
+            p.mime_type = "video/webm"
+        # now find the encoders
+        for eater in muxer.eaters:
+            encoder = eater
+            codec = ""
+            while not isinstance(encoder, Encoder):
+                encoder = encoder.eaters[0]
+            if encoder.componentType == "theora-encoder":
+                codec = "theora"
+            elif encoder.componentType == "vorbis-encoder":
+                codec = "vorbis"
+            elif encoder.componentType == "vp8-encoder":
+                codec = "vp8"
+            if p.codecs:
+                p.codecs = "%s,%s" % (p.codecs, codec)
+            else:
+                p.codecs = codec 
+
         p.stream_url = self.streamer.getURL()
 
         width = 320
