@@ -192,6 +192,7 @@ flumotion/component/muxers/Makefile
 flumotion/component/plugs/Makefile
 flumotion/component/plugs/cortado/Makefile
 flumotion/component/plugs/cortado/cortado_location.py
+flumotion/component/plugs/html5/Makefile
 flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile

@@ -1,0 +1,52 @@
+<registry>
+  <plugs>
+    <plug socket="flumotion.component.plugs.base.ComponentPlug"
+          type="component-html5"
+          _description="Serves an html5 player.">
+      <entries>
+        <entry type="default"
+               location="flumotion/component/plugs/html5/html5.py"
+               function="ComponentHtml5Plug" />
+        <entry type="wizard"
+               location="flumotion/component/plugs/html5/wizard_gtk.py"
+               function="Html5WizardPlugin" />
+      </entries>
+      <wizard _description="Publish embedded HTML5 player page" type="http-consumer"
+              feeder="default" eater="default">
+        <accept-format media-type="muxer:ogg"/>
+        <accept-format media-type="muxer:webm"/>
+        <accept-format media-type="audio:vorbis"/>
+        <accept-format media-type="video:theora"/>
+        <accept-format media-type="video:vp8"/>
+      </wizard>
+      <properties>
+        <property name="width" type="int" required="true"
+                  _description="The width of the video tag." />
+        <property name="height" type="int" required="true"
+                  _description="The height of the video tag." />
+        <property name="index" type="string"
+                  _description="The name of the index file. The default is index.html." />
+        <property name="stream-url" type="string" required="true"
+                  _description="The URL to the stream we are displaying." />
+        <property name="mime-type" type="string" required="true"
+                  _description="The mime type of the format." />
+        <property name="codecs" type="string" required="true"
+                  _description="The codecs string that the video tag takes." />
+      </properties>
+    </plug>
+  </plugs>
+  <bundles>
+    <bundle name="component-html5">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs/html5">
+          <filename location="__init__.py" />
+          <filename location="html5.py" />
+          <filename location="wizard_gtk.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry>
