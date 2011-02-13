@@ -88,7 +88,7 @@ class Html5HTTPPlug(HTTPPlug):
             if p.codecs:
                 p.codecs = "%s,%s" % (p.codecs, codec)
             else:
-                p.codecs = codec 
+                p.codecs = codec
 
         p.stream_url = self.streamer.getURL()
 
