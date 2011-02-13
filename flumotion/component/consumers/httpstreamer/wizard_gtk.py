@@ -291,7 +291,7 @@ class HTTPSpecificStep(ConsumerStep):
                         d.addCallback(cb, plugin, entry)
                     else:
                         self._addPlug(plugin.getPlugWizard(
-                            N_(entry.description)))
+                            N_(entry.description)), True)
                 d = self.wizard.getWizardPlugEntry(entry.componentType)
                 d.addCallback(response, entry)
 

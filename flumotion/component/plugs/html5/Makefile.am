@@ -1,18 +1,17 @@
 include $(top_srcdir)/common/python.mk
 
-cortadodir = $(libdir)/flumotion/python/flumotion/component/plugs/cortado
+html5dir = $(libdir)/flumotion/python/flumotion/component/plugs/html5
 
-cortado_PYTHON = 		\
+html5_PYTHON = 		\
 	__init__.py 		\
-	cortado.py 		\
-	cortado_location.py 	\
+	html5.py 		\
 	wizard_gtk.py
 
-cortado_DATA = cortado.xml
+html5_DATA = html5.xml
 
-TAGS_FILES = $(cortado_PYTHON)
+TAGS_FILES = $(html5_PYTHON)
 
 clean-local:
 	rm -rf *.pyc *.pyo
 
-EXTRA_DIST = $(cortado_PYTHON) $(cortado_DATA)
+EXTRA_DIST = $(html5_PYTHON) $(html5_DATA)

@@ -34,8 +34,8 @@ HTML5TEMPLATE = \
 <html>
 <head><title>Flumotion Stream</title></head>
 <body>
-<video height="%(height)d" width="%(width)d">
-<source type="%(mime-type)s; codecs='%(codecs)s'" src="%(stream-url)s">
+<video height="%(height)d" width="%(width)d" controls autoplay>
+<source type='%(mime-type)s; codecs="%(codecs)s"' src="%(stream-url)s">
 </source>
 </video>
 </body>
