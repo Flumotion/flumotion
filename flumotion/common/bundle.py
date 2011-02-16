@@ -97,7 +97,10 @@ class BundledFile:
         if not self.zipped:
             return True
 
-        timestamp = self.timestamp()
+        try:
+            timestamp = self.timestamp()
+        except OSError:
+            return True
         # if file still has an old timestamp, it hasn't changed
         # FIXME: looks bogus, shouldn't this check be != instead of <= ?
         if self._last_timestamp and timestamp <= self._last_timestamp:
