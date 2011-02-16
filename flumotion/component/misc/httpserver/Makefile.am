@@ -19,6 +19,7 @@ httpserver_PYTHON =		\
 	ratecontrol.py          \
 	serverstats.py		\
 	metadataprovider.py	\
+	mimetypes.py		\
 	ourmimetypes.py
 
 httpserver_DATA = 		\
