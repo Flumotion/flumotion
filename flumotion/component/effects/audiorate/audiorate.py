@@ -90,7 +90,7 @@ class AudiorateBin(gst.Bin):
     def _setSamplerate(self, samplerate):
         self._samplerate = samplerate
         self._samplerate_caps = ''
-        if self.samplerate is not None:
+        if self._samplerate is not None:
             self._samplerate_caps = self.RATE_CAPS % samplerate
         self._capsfilter.set_property('caps', gst.Caps(self._getCapsString()))
 
