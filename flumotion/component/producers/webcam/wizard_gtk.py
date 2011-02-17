@@ -47,11 +47,12 @@ class WebcamProducer(VideoProducer):
     def getProperties(self):
         p = super(WebcamProducer, self).getProperties()
 
-        p.width, p.height = self.size
-
-        p.mime = self.framerate['mime']
-        p.format = self.framerate.get('format', None)
-        p.framerate = fractionAsString(self.framerate['framerate'])
+        if 'mime' not in p:
+            p.mime = self.framerate['mime']
+        if 'format' not in p:
+            p.format = self.framerate.get('format', None)
+        if 'framerate' not in p:
+            p.framerate = fractionAsString(self.framerate['framerate'])
 
         self.properties = p
 
