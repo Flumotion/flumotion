@@ -89,6 +89,9 @@ class PorterMedium(medium.BaseMedium):
     def deregisterPrefix(self, prefix):
         return self.callRemote("deregisterPrefix", prefix)
 
+    def getPort(self):
+        return self.callRemote("getPort")
+
 
 class PorterClientFactory(fpb.ReconnectingPBClientFactory):
     """
@@ -145,6 +148,7 @@ class HTTPPorterClientFactory(PorterClientFactory):
         self._mountPoints = mountPoints
         self._prefixes = prefixes or []
         self._do_start_deferred = do_start_deferred
+        self.remote_port = None
 
     def _fireDeferred(self, r):
         # If we still have the deferred, fire it (this happens after we've
@@ -162,12 +166,16 @@ class HTTPPorterClientFactory(PorterClientFactory):
         # fire a different deferred
         self.debug("Got deferred login, adding callbacks")
         deferred.addCallback(self.medium.setRemoteReference)
+        deferred.addCallback(lambda r: self.medium.getPort())
+        deferred.addCallback(self._setRemotePort)
         for mount in self._mountPoints:
             self.debug("Registering mount point %s with porter", mount)
-            deferred.addCallback(lambda r, m: self.registerPath(m),
-                mount)
+            deferred.addCallback(lambda r, m: self.registerPath(m), mount)
         for mount in self._prefixes:
             self.debug("Registering mount prefix %s with porter", mount)
-            deferred.addCallback(lambda r, m: self.registerPrefix(m),
-                mount)
+            deferred.addCallback(lambda r, m: self.registerPrefix(m), mount)
         deferred.addCallback(self._fireDeferred)
+
+    def _setRemotePort(self, port):
+        self.remote_port = port
+        return port

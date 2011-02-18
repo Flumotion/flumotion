@@ -574,7 +574,19 @@ class MultifdSinkStreamer(feedcomponent.ParseLaunchComponent, Stats):
         return mime
 
     def getUrl(self):
-        return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)
+        port = self.port
+
+        if self.type == 'slave' and self._pbclient:
+            if not self._pbclient.remote_port:
+                return ""
+            port = self._pbclient.remote_port
+
+        if (not port) or (port == 80):
+            port_str = ""
+        else:
+            port_str = ":%d" % port
+
+        return "http://%s%s%s" % (self.hostname, port_str, self.mountPoint)
 
     def getStreamData(self):
         socket = 'flumotion.component.plugs.streamdata.StreamDataProviderPlug'

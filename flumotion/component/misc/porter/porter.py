@@ -78,6 +78,9 @@ class PorterAvatar(pb.Avatar, log.Loggable):
         self.log("Perspective called: deregistering default")
         self.porter.deregisterPrefix(prefix, self)
 
+    def perspective_getPort(self):
+        return self.porter._iptablesPort
+
 
 class PorterRealm(log.Loggable):
     """

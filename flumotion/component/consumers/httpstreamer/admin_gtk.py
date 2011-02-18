@@ -114,6 +114,9 @@ class StatisticsAdminGtkNode(BaseAdminGtkNode):
         uri = state.get('stream-url', '')
         if not self._link and uri:
             self._link = self._createLinkWidget(uri)
+        elif self._link:
+            self._link.set_uri(uri)
+            self._link.set_label(uri)
 
         disable = state.get('stream-mime') is None
         tooltip = _('The stream is temporarly unavailable.\n'
