@@ -45,7 +45,7 @@ Python Traceback:
 %(traceback)s
 }}}
 """
-_TRAC_URL = 'https://code.fluendo.com/flumotion/trac'
+_TRAC_URL = 'https://code.flumotion.com/trac'
 
 
 class BugReporter(object):
