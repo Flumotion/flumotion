@@ -130,7 +130,10 @@ class SyncKeeper(gst.Element):
 
         try:
             self._lock.acquire()
-            buf.timestamp += self._syncTimestamp - self._syncOffset
+            try:
+                buf.timestamp += self._syncTimestamp - self._syncOffset
+            except TypeError:
+                buf.timestamp = 0
             dur = buf.duration != gst.CLOCK_TIME_NONE and buf.duration or 0
             self._totalTime = max(buf.timestamp + dur, self._totalTime)
 
