@@ -138,6 +138,7 @@ class Servicer(log.Loggable):
         for workerFile in glob.glob(os.path.join(self.workersDir, '*.xml')):
             filename = os.path.split(workerFile)[1]
             name = filename.split(".xml")[0]
+            name = name.split("-disabled")[0]
             workers.append(name)
         workers.sort()
         return workers
@@ -202,7 +203,10 @@ class Servicer(log.Loggable):
             for name in names:
                 pid = getPid(kind, name)
                 if not pid:
-                    print "%s %s not running" % (kind, name)
+                    if self.checkDisabled(kind, name):
+                        print "%s %s is disabled" % (kind, name)
+                    else:
+                        print "%s %s not running" % (kind, name)
                     continue
                 if checkPidRunning(pid):
                     print "%s %s is running with pid %d" % (kind, name, pid)
@@ -402,6 +406,11 @@ user:PSfNpHTkpTx1M
         @returns: whether or not the manager daemon started
         """
         self.info("Starting manager %s" % name)
+
+        if self.checkDisabled('manager', name):
+            print "manager %s is disabled, cannot start" % name
+            return
+
         self.debug("Starting manager with flows %r" % flowNames)
         managerDir = os.path.join(self.managersDir, name)
         planetFile = os.path.join(managerDir, 'planet.xml')
@@ -462,6 +471,11 @@ user:PSfNpHTkpTx1M
         @returns: whether or not the worker daemon started
         """
         self.info("Starting worker %s" % name)
+
+        if self.checkDisabled('worker', name):
+            print "worker %s is disabled, cannot start" % name
+            return
+
         workerFile = os.path.join(self.workersDir, "%s.xml" % name)
         if not os.path.exists(workerFile):
             raise errors.FatalError, \
@@ -606,6 +620,141 @@ user:PSfNpHTkpTx1M
             # busy loop until kill is done
 
         return True
+
+    def enable(self, args):
+        if len(args) < 1:
+            raise errors.FatalError, 'Please specify what to enable'
+
+        which = args[0]
+        if which not in ['manager', 'worker']:
+            raise errors.FatalError, 'Please specify either manager or worker'
+
+        if len(args) < 2:
+            raise errors.FatalError, 'Please specify which %s to %s' % (
+                which, 'enable')
+
+        name = args[1]
+        if which == 'manager':
+            managers = self.getManagers()
+            if not name in managers:
+                raise errors.FatalError, 'No manager "%s"' % name
+            self.enableManager(name)
+        elif which == 'worker':
+            workers = self.getWorkers()
+            if not name in workers:
+                raise errors.FatalError, 'No worker with name %s' % name
+            self.enableWorker(name)
+        return
+
+    def disable(self, args):
+        if len(args) < 1:
+            raise errors.FatalError, 'Please specify what to disable'
+
+        which = args[0]
+        if which not in ['manager', 'worker']:
+            raise errors.FatalError, 'Please specify either manager or worker'
+
+        if len(args) < 2:
+            raise errors.FatalError, 'Please specify which %s to %s' % (
+                which, 'enable')
+
+        name = args[1]
+        if which == 'manager':
+            managers = self.getManagers()
+            if not name in managers:
+                raise errors.FatalError, 'No manager "%s"' % name
+            pid = getPid('manager', name)
+            if pid:
+                if checkPidRunning(pid):
+                    raise errors.FatalError, "Manager %s is running" % name
+            self.disableManager(name)
+        elif which == 'worker':
+            workers = self.getWorkers()
+            if not name in workers:
+                raise errors.FatalError, 'No worker with name %s' % name
+            pid = getPid('worker', name)
+            if pid:
+                if checkPidRunning(pid):
+                    raise errors.FatalError, "Worker %s is running" % name
+            self.disableWorker(name)
+        return
+
+    def enableManager(self, name):
+        self.debug("Enabling manager %s" % name)
+        managerDir = os.path.join(self.managersDir, name)
+        planetDisabledFile = os.path.join(managerDir, 'planet-disabled.xml')
+        planetFile = os.path.join(managerDir, 'planet.xml')
+        if not os.path.exists(planetDisabledFile):
+            if not os.path.exists(planetFile):
+                raise errors.FatalError, \
+                    "Planet file %s does not exist" % planetFile
+            else:
+                print "manager %s already enabled" % name
+                return
+        else:
+            os.rename(planetDisabledFile, planetFile)
+            print "manager %s enabled" %name
+
+    def enableWorker(self, name):
+        self.debug("Disabling worker %s" % name)
+        workerFile = os.path.join(self.workersDir, "%s.xml" % name)
+        workerDisFile = os.path.join(self.workersDir, "%s-disabled.xml" % name)
+        if not os.path.exists(workerDisFile):
+            if not os.path.exists(workerFile):
+                raise errors.FatalError, \
+                    "Worker file %s does not exist" % workerFile
+            else:
+                print "worker %s already enabled" % name
+        else:
+            os.rename(workerDisFile, workerFile)
+            print "worker %s enabled" % name
+
+    def disableManager(self, name):
+        self.debug("Disabling manager %s" % name)
+        managerDir = os.path.join(self.managersDir, name)
+        planetDisabledFile = os.path.join(managerDir, 'planet-disabled.xml')
+        planetFile = os.path.join(managerDir, 'planet.xml')
+        if not os.path.exists(planetFile):
+            if not os.path.exists(planetDisabledFile):
+                raise errors.FatalError, \
+                    "Planet file %s does not exist" % planetFile
+            else:
+                print "manager %s already disabled" % name
+                return
+        else:
+            os.rename(planetFile, planetDisabledFile)
+            print "manager %s disabled" %name
+
+    def disableWorker(self, name):
+        self.debug("Disabling worker %s" % name)
+        workerFile = os.path.join(self.workersDir, "%s.xml" % name)
+        workerDisFile = os.path.join(self.workersDir, "%s-disabled.xml" % name)
+        if not os.path.exists(workerFile):
+            if not os.path.exists(workerDisFile):
+                raise errors.FatalError, \
+                    "Worker file %s does not exist" % workerFile
+            else:
+                print "worker %s already disabled" % name
+        else:
+            os.rename(workerFile, workerDisFile)
+            print "worker %s disabled" % name
+
+    def checkDisabled(self, type, name):
+        if type == 'manager':
+            managerDir = os.path.join(self.managersDir, name)
+            planetDisFile = os.path.join(managerDir, 'planet-disabled.xml')
+            planetFile = os.path.join(managerDir, 'planet.xml')
+            if not os.path.exists(planetFile):
+                if os.path.exists(planetDisFile):
+                    return True
+            return False
+        elif type == 'worker':
+            workerFile = os.path.join(self.workersDir, "%s.xml" % name)
+            wkDisFile = os.path.join(self.workersDir, "%s-disabled.xml" % name)
+            if not os.path.exists(workerFile):
+                if os.path.exists(wkDisFile):
+                    return True
+            return False
 
     def list(self):
         """

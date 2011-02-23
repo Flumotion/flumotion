@@ -70,7 +70,8 @@ def main(args):
         command = args[1]
     except IndexError:
         print "Usage: flumotion " \
-            "{list|start|stop|restart|condrestart|status|clean} [which]"
+            "{list|start|stop|restart|condrestart|status|clean|" \
+            "enable|disable} [which]"
         sys.exit(0)
 
     if command == "list":
@@ -89,6 +90,10 @@ def main(args):
         return servicer.create(args[2:])
     elif command == "clean":
         return servicer.clean(args[2:])
+    elif command == "enable":
+        return servicer.enable(args[2:])
+    elif command == "disable":
+        return servicer.disable(args[2:])
 
     sys.stderr.write("No such command '%s'\n" % command)
     return 1
