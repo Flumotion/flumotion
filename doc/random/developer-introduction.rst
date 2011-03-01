@@ -510,16 +510,23 @@ Committing
 When you have your code reviewed you're ready to push it to the origin repository.
 First check which commits are going to be pushed from your local 'master' branch::
 
-  git cherry -v oring/master
+  git cherry -v origin/master
 
 You can double check all the changes that are going to pushed to the remote repository::
 
-  git diff -p oring/master
+  git diff -p origin/master
 
-Finnaly, push your commits to the remote repository::
+Finally, push your commits to the remote repository::
 
   git push origin master
 
+If the repository refuses your commit because of PEP-8 style issues, you
+might find the following git command useful::
+
+  git rebase -i HEAD~2
+
+It allows you to interactively rebase your current branch, and squash the
+PEP8 fix commit into the previous commit.
 
 Closing a ticket
 ----------------
