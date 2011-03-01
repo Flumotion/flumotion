@@ -696,7 +696,7 @@ user:PSfNpHTkpTx1M
             print "manager %s enabled" %name
 
     def enableWorker(self, name):
-        self.debug("Disabling worker %s" % name)
+        self.debug("Enabling worker %s" % name)
         workerFile = os.path.join(self.workersDir, "%s.xml" % name)
         workerDisFile = os.path.join(self.workersDir, "%s-disabled.xml" % name)
         if not os.path.exists(workerDisFile):
