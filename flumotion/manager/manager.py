@@ -1014,6 +1014,12 @@ class Vishnu(log.Loggable):
         # called when a worker logs out
         workerId = workerAvatar.avatarId
         self.debug('vishnu.workerDetached(): id %s' % workerId)
+        # Get all sad components for the detached worker and set the mood to
+        # sleeping
+        sadComponents = list([c for c in self.getComponentStates()
+                         if c.get('workerRequested') == workerId and \
+                                 c.get('mood') == moods.sad.value])
+        map(lambda c: c.setMood(moods.sleeping.value), sadComponents)
 
     def addComponentToFlow(self, componentState, flowName):
         # check if we have this flow yet and add if not
