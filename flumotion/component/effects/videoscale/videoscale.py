@@ -208,8 +208,8 @@ class Videoscale(feedcomponent.PostProcEffect):
         vt = gstreamer.get_plugin_version('videoscale')
         if not vt:
             raise errors.MissingElementError('videoscale')
-        # FIXME: this message should at least have a comment explaining what
-        #        the bug for older GStreamer versions is.
+        # 'add-borders' property was added in gst-plugins-base 0.10.29,
+        # and it's requiered to respect DAR by adding black borders
         if not vt > (0, 10, 29, 0):
             self.component.addMessage(
                 messages.Warning(T_(N_(
