@@ -27,8 +27,6 @@ from flumotion.common import errors, messages, gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 
-# FIXME: does this actually register something, or can this import go ?
-from flumotion.component.producers.playlist import smartscale
 
 __version__ = "$Rev$"
 T_ = gettexter()
