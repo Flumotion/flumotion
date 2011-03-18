@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: nxml -*-->
 
-<!-- unstable (trunk) Flumotion against unstable dependencies -->
+<!-- unstable (master) Flumotion against stable dependencies -->
 
 <!DOCTYPE moduleset SYSTEM "moduleset.dtd">
 <?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
@@ -8,50 +8,59 @@
 <moduleset>
 
   <!-- repositories -->
-  <repository type="svn" name="svn.gnome.org"
-              href="http://svn.gnome.org/svn/" />
-  <repository type="cvs" name="gstreamer.freedesktop.org"
-              cvsroot=":pserver:anoncvs@cvs.freedesktop.org:/cvs/gstreamer"
-              password="" />
-  <repository type="git" name="code.flumotion.com-flumotion" default="yes"
-              href="git://code.flumotion.com/flumotion.git"/>
-
-  <repository type="tarball" name="gstreamer-src"
-              href="http://gstreamer.freedesktop.org/src/" />
+  <repository type="git" name="code.flumotion.com" default="yes"
+              href="git://code.flumotion.com"/>
+  <repository type="git" name="gstreamer.freedesktop.org"
+              href="git://anongit.freedesktop.org/gstreamer/"/>
 
   <!-- modules -->
-  <autotools id="gstreamer" autogenargs="--disable-docs-build">
-    <branch repo="gstreamer.freedesktop.org" />
+  <autotools id="gstreamer" autogenargs="-- --disable-tests" supports-non-srcdir-builds="no">
+    <branch repo="gstreamer.freedesktop.org" module="gstreamer"/>
   </autotools>
 
-  <autotools id="gst-plugins-base" autogenargs="--disable-docs-build">
-    <branch repo="gstreamer.freedesktop.org" />
+  <autotools id="gst-plugins-base" autogenargs="--disable-tests --disable-gnome_vfs" supports-non-srcdir-builds="no">
+    <branch repo="gstreamer.freedesktop.org" module="gst-plugins-base"/>
     <dependencies>
-      <dep package="gstreamer" />
+      <dep package="gstreamer"/>
     </dependencies>
   </autotools>
 
-  <autotools id="gst-plugins-good" autogenargs="--disable-docs-build">
-    <branch repo="gstreamer.freedesktop.org" />
+  <autotools id="gst-plugins-good" autogenargs="--disable-tests --disable-examples" supports-non-srcdir-builds="no">
+    <branch repo="gstreamer.freedesktop.org" module="gst-plugins-good"/>
     <dependencies>
-      <dep package="gst-plugins-base" />
+      <dep package="gstreamer"/>
+      <dep package="gst-plugins-base"/>
     </dependencies>
   </autotools>
 
-  <autotools id="gst-python" autogenargs="--disable-docs-build">
-    <branch repo="gstreamer.freedesktop.org" />
+  <autotools id="gst-plugins-bad" autogenargs="--disable-tests --disable-examples" supports-non-srcdir-builds="no">
+    <branch repo="gstreamer.freedesktop.org" module="gst-plugins-bad"/>
     <dependencies>
-      <dep package="gstreamer" />
-      <dep package="gst-plugins-base" />
+      <dep package="gstreamer"/>
+      <dep package="gst-plugins-base"/>
+    </dependencies>
+  </autotools>
+  <autotools id="gst-python" autogenargs="--" supports-non-srcdir-builds="no">
+    <branch repo="gstreamer.freedesktop.org" module="gst-python"/>
+    <dependencies>
+      <dep package="gstreamer"/>
+      <dep package="gst-plugins-base"/>
     </dependencies>
   </autotools>
 
   <autotools id="flumotion">
-    <branch repo="code.flumotion.com-flumotion"/>
+    <branch module="flumotion.git" repo="code.flumotion.com"/>
     <dependencies>
-      <dep package="gst-plugins-good" />
-      <dep package="gst-python" />
+      <dep package="gst-plugins-good"/>
+      <dep package="gst-python"/>
     </dependencies>
   </autotools>
 
+  <autotools id="flumotion-dvb">
+    <branch module="flumotion-dvb.git" repo="code.flumotion.com"/>
+    <dependencies>
+      <dep package="flumotion"/>
+      <dep package="gst-plugins-bad"/>
+    </dependencies>
+  </autotools>
 </moduleset>

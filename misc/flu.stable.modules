@@ -8,11 +8,17 @@
 <moduleset>
 
   <!-- repositories -->
-  <repository type="git" name="code.flumotion.com-flumotion" default="yes"
-              href="git://code.flumotion.com/flumotion.git"/>
+  <repository type="git" name="code.flumotion.com" default="yes"
+              href="git://code.flumotion.com"/>
 
   <autotools id="flumotion">
-    <branch repo="code.flumotion.com-flumotion" tag="flumotion-0.8.0" />
+    <branch module="flumotion.git"
+            repo="code.flumotion.com"
+            tag="flumotion-0.8.1" />
+  </autotools>
+  <autotools id="flumotion-dvb">
+    <branch module="flumotion-dvb.git"
+            repo="code.flumotion.com" />
   </autotools>
 
 </moduleset>
