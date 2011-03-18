@@ -59,7 +59,12 @@ class AudiorateBin(gst.Bin):
 
         self._audiorate = gst.element_factory_make("audiorate")
         self._audioconv = gst.element_factory_make("audioconvert")
-        self._audioresample = gst.element_factory_make("legacyresample")
+
+        resampler = 'audioresample'
+        if gstreamer.element_factory_exists('legacyresample'):
+            resampler = 'legacyresample'
+        self._audioresample = gst.element_factory_make(resampler)
+
         self._capsfilter = gst.element_factory_make("capsfilter")
         self._identity = gst.parse_launch("identity silent=true")
         self.add(self._audiorate)
