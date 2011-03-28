@@ -81,7 +81,10 @@ def _first_sunday_on_or_after(dt):
 
     days_to_go = 6 - dt.weekday()
     if days_to_go:
+        month = dt.month
         dt += datetime.timedelta(days_to_go)
+        if month != dt.month:
+            dt -= datetime.timedelta(6)
     return dt
 
 
