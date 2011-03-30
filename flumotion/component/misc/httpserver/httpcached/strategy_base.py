@@ -89,7 +89,7 @@ class CachingStrategy(log.Loggable):
     def getSourceFor(self, url, stats):
         identifier = self.cachemgr.getIdentifier(url.path)
         session = self._identifiers.get(identifier, None)
-        if session is not None:
+        if session is not None and not session.checkModified:
             self.debug("Caching session found for '%s'", url)
 
             if (session.getState() in
@@ -186,7 +186,9 @@ class CachingStrategy(log.Loggable):
         if cachedFile is not None:
             self.log("Opened cached file '%s'", cachedFile.name)
             etime = self._etimes.get(identifier, None)
-            if etime and (etime > time.time()):
+            session = self._identifiers.get(identifier, None)
+            if (etime and (etime > time.time()) or
+                (session and session.checkModified)):
                 stats.onStarted(cachedFile.stat[stat.ST_SIZE],
                                 cachestats.CACHE_HIT)
                 return CachedSource(identifier, url, cachedFile, stats)
@@ -371,6 +373,8 @@ class CachingSession(BaseCachingSession, log.Loggable):
         self._refcount = 0
         self._state = self.PIPELINING
         self._request = None
+
+        self.checkModified = False
 
         self._infoDefers = []
         self._startedDefers = []

@@ -69,6 +69,7 @@ class CachingStrategy(strategy_base.CachingStrategy):
         sess = strategy_base.CachingSession(self, url,
             self.cachemgr.stats, ifModifiedSince=mtime)
         sess.cache()
+        sess.checkModified = True
         d = sess.waitStarted()
         args = (url, identifier, cachedFile, stats)
         d.addCallbacks(self._reallyOutdated, self._maybeNotOutdated,
@@ -77,6 +78,7 @@ class CachingStrategy(strategy_base.CachingStrategy):
 
     def _reallyOutdated(self, session, url, identifier, cachedFile, stats):
         self.debug("Resource outdated, caching the new one for '%s'", url)
+        sess.checkModified = False
         cachedFile.unlink()
         cachedFile.close()
         stats.onCacheOutdated()
