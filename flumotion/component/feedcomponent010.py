@@ -425,6 +425,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         for eater in self.eaters.values():
             self.install_eater_event_probes(eater)
+            self.install_in_caps_dropping_probe(eater)
             pad = self.get_element(eater.elementName).get_pad('src')
             self._pad_monitors.attach(pad, eater.elementName,
                                       padmonitor.EaterPadMonitor,
@@ -785,51 +786,6 @@ class FeedComponent(basecomponent.BaseComponent):
             def _block_cb(pad, blocked):
                 pass
             srcpad.set_blocked_async(True, _block_cb)
-            # add buffer probe to drop buffers that are flagged as IN_CAPS
-            # needs to be done to gdpdepay's src pad
-            depay = self.get_element(eater.depayName)
-
-            def remove_in_caps_buffers(pad, buffer, eater):
-                if buffer.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
-                    if self.keepStreamheaderForLater:
-                        self.log("We got buffer with IN_CAPS which we are "
-                                 "keeping for later %r", eater)
-                        eater.streamheader.append(buffer)
-                        return False
-                    self.info("We got streamheader buffer which " \
-                        "we are dropping because we do not want this just " \
-                        "after a reconnect because it breaks everything ")
-                    return False
-
-                # now we have a buffer with no flag set
-                # we should remove the handler
-                self.log("We got buffer with no in caps flag set on "
-                         "eater %r", eater)
-                if eater.streamheaderBufferProbeHandler:
-                    self.log("Removing buffer probe on depay src pad on "
-                             "eater %r", eater)
-                    pad.remove_buffer_probe(
-                        eater.streamheaderBufferProbeHandler)
-                    eater.streamheaderBufferProbeHandler = None
-                else:
-                    self.warning("buffer probe handler is None, bad news on "
-                                 "eater %r", eater)
-
-                if not self.dropStreamHeaders:
-                    self.log("Pushing earlier buffers with IN_CAPS flag")
-                    for buff in eater.streamheader:
-                        pad.push(buff)
-                    self.dropStreamHeaders = True
-
-                eater.streamheader = []
-                return True
-
-            if not eater.streamheaderBufferProbeHandler:
-                self.log("Adding buffer probe on depay src pad on "
-                         "eater %r", eater)
-                eater.streamheaderBufferProbeHandler = \
-                    depay.get_pad("src").add_buffer_probe(
-                    remove_in_caps_buffers, eater)
 
             self.unblock_eater(eaterAlias)
 
@@ -859,3 +815,51 @@ class FeedComponent(basecomponent.BaseComponent):
 
         if not pipeline_playing:
             self.try_start_pipeline()
+
+    def install_in_caps_dropping_probe(self, eater):
+
+        def remove_in_caps_buffers(pad, buffer, eater):
+            if buffer.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
+                if self.keepStreamheaderForLater:
+                    self.info("We got buffer with IN_CAPS which we are "
+                              "keeping for later %r", eater)
+                    eater.streamheader.append(buffer)
+                    return False
+                self.info("We got streamheader buffer which "
+                          "we are dropping because we do not want this just "
+                          "after a reconnect because it breaks everything ")
+                return False
+
+            # now we have a buffer with no flag set
+            # we should remove the handler
+            self.info("We got buffer with no in caps flag set on "
+                      "eater %r", eater)
+            if eater.streamheaderBufferProbeHandler:
+                self.info("Removing buffer probe on depay src pad on "
+                          "eater %r", eater)
+                pad.remove_buffer_probe(
+                    eater.streamheaderBufferProbeHandler)
+                eater.streamheaderBufferProbeHandler = None
+            else:
+                self.warning("buffer probe handler is None, bad news on "
+                             "eater %r", eater)
+
+            if not self.dropStreamHeaders:
+                self.info("Pushing earlier buffers with IN_CAPS flag")
+                for buff in eater.streamheader:
+                    pad.push(buff)
+                self.dropStreamHeaders = True
+
+            eater.streamheader = []
+            return True
+
+        # add buffer probe to drop buffers that are flagged as IN_CAPS
+        # needs to be done to gdpdepay's src pad
+        depay = self.get_element(eater.depayName)
+
+        if not eater.streamheaderBufferProbeHandler:
+            self.info("Adding buffer probe on depay src pad on "
+                      "eater %r", eater)
+            eater.streamheaderBufferProbeHandler = \
+                depay.get_pad("src").add_buffer_probe(
+                remove_in_caps_buffers, eater)
