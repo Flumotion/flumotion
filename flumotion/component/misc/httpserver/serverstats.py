@@ -84,7 +84,7 @@ class ServerStatistics(object):
         self._set("request-rate-peak-time", self.requestRatePeakTime)
         self._set("request-count-peak-time", self.requestCountPeakTime)
         if self._callId is None:
-            self._update()
+            self._callId = reactor.callLater(STATS_UPDATE_PERIOD, self._update)
 
     def stopUpdates(self):
         self._updater = None
