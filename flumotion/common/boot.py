@@ -133,6 +133,8 @@ def init_gst():
 
 
 def init_kiwi():
+    import gobject
+
     try:
         from kiwi.__version__ import version as kiwi_version
     except ImportError:
@@ -141,6 +143,31 @@ def init_kiwi():
     if kiwi_version < KIWI_REQ:
         raise SystemExit('ERROR: Kiwi %s or higher is required'
                          % '.'.join(map(str, KIWI_REQ)))
+    elif gobject.pygobject_version > (2, 26, 0):
+        # Kiwi is not compatible yet with the changes introduced in
+        # http://git.gnome.org/browse/pygobject/commit/?id=84d614
+        # Basically, what we do is to revert the changes in _type_register of
+        # GObjectMeta at least until kiwi works properly with new pygobject
+        from gobject._gobject import type_register
+
+        def _type_register(cls, namespace):
+            ## don't register the class if already registered
+            if '__gtype__' in namespace:
+                return
+
+            if not ('__gproperties__' in namespace or
+                    '__gsignals__' in namespace or
+                    '__gtype_name__' in namespace):
+                return
+
+            # Do not register a new GType for the overrides, as this would sort
+            # of defeat the purpose of overrides...
+            if cls.__module__.startswith('gi.overrides.'):
+                return
+
+            type_register(cls, namespace.get('__gtype_name__'))
+
+        gobject.GObjectMeta._type_register = _type_register
 
     return True
 
@@ -223,6 +250,9 @@ def boot(path, gtk=False, gst=True, installReactor=True):
 
     if gtk or gst:
         init_gobject()
+
+    if gtk:
+        init_kiwi()
 
     if gst:
         from flumotion.configure import configure
