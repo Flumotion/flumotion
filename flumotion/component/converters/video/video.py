@@ -49,7 +49,7 @@ class Converter(feedcomponent.ParseLaunchComponent):
             raise errors.ConfigError(msg)
 
     def get_pipeline_string(self, properties):
-        return 'identity name=identity'
+        return 'identity silent=true name=identity'
 
     def configure_pipeline(self, pipeline, properties):
         self.deintMode = properties.get('deinterlace-mode', "auto")
