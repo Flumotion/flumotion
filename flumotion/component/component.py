@@ -707,14 +707,14 @@ class BaseComponent(common.InitMixin, log.Loggable):
         @param list:       list of property names.
         @type  list:       list of str
         """
-        m = messages.Warning(T_(N_(
-            "Your configuration uses deprecated properties.  "
-            "Please update your configuration and correct them.\n")),
-            mid="deprecated")
+        msg = ("Your configuration uses deprecated properties.  "
+               "Please update your configuration and correct them.\n")
+        m = messages.Warning(T_(N_(msg)), mid="deprecated")
         for prop in list:
             m.add(T_(N_(
             "Please remove '%s' property.\n"), prop))
         self.addMessage(m)
+        self.warning(msg)
 
     def fixRenamedProperties(self, properties, list):
         """
