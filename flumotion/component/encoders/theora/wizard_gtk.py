@@ -46,11 +46,9 @@ class TheoraVideoEncoder(VideoEncoder):
         self.has_bitrate = True
         self.framerate = 25.0
 
-        self.properties.noise_sensitivity = 0
         self.properties.keyframe_delta = 2.0
         self.properties.bitrate = 400
         self.properties.quality = 16
-        self.properties.sharpness = 0
 
     def getProperties(self):
         properties = super(TheoraVideoEncoder, self).getProperties()
@@ -61,9 +59,6 @@ class TheoraVideoEncoder(VideoEncoder):
             del properties.bitrate
         else:
             raise AssertionError
-
-        properties.noise_sensitivity = max(
-            int(properties.noise_sensitivity * (32768 / 100.)), 1)
 
         # convert the human-friendly delta to maxdistance
         # FIXME: I think the theora-encoder component should not expose
@@ -97,17 +92,14 @@ class TheoraStep(VideoEncoderStep):
     def setup(self):
         self.bitrate.data_type = int
         self.quality.data_type = int
-        self.noise_sensitivity.data_type = int
         self.keyframe_delta.data_type = float
-        self.sharpness.data_type = int
         self.has_quality.data_type = bool
         self.has_bitrate.data_type = bool
 
         self.add_proxy(self.model,
                        ['has_quality', 'has_bitrate'])
         self.add_proxy(self.model.properties,
-                       ['bitrate', 'quality', 'keyframe_delta',
-                        'noise_sensitivity', 'sharpness'])
+                       ['bitrate', 'quality', 'keyframe_delta'])
 
         # we specify keyframe_delta in seconds, but theora expects
         # a number of frames, so we need the framerate and calculate

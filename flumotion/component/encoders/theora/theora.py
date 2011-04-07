@@ -44,14 +44,14 @@ class Theora(feedcomponent.EncoderComponent):
     def configure_pipeline(self, pipeline, properties):
         element = pipeline.get_by_name('encoder')
 
+        for p in ['sharpness', 'quick-compress', 'noise-sensitivity']:
+            if properties.get(p, None) is not None:
+                self.warnDeprecatedProperties([p])
+
         props = ('bitrate',
                  'quality',
-                 'keyframe-mindistance',
-                 ('quick-compress', 'quick'),
-                 ('keyframe-maxdistance', 'keyframe-freq'),
-                 ('keyframe-maxdistance', 'keyframe-force'),
-                 'noise-sensitivity',
-                 'sharpness')
+                 ('keyframe-mindistance', 'keyframe-freq'),
+                 ('keyframe-maxdistance', 'keyframe-force'))
 
         for p in props:
             if isinstance(p, tuple):

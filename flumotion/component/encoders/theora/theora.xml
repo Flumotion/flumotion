@@ -29,12 +29,11 @@
         <property name="keyframe-maxdistance" type="int"
                   _description="The maximum distance between key frames (in frames)." />
         <property name="quick-compress" type="bool"
-                  _description="Whether to use quick, lower-quality compression."/>
+                  _description="(Deprecated) Whether to use quick, lower-quality compression."/>
         <property name="noise-sensitivity" type="int"
-                  _description="The noise sensitivity (defaults to 1)" />
-                  <!-- FIXME: So what other values are possible? murrayc. -->
+                  _description="(Dreprecated) The noise sensitivity (defaults to 1)" />
         <property name="sharpness" type="int"
-                  _description="The sharpness encoder parameter: 0, 1, or 2."/>
+                  _description="(Deprecated) The sharpness encoder parameter: 0, 1, or 2."/>
       </properties>
     </component>
 
