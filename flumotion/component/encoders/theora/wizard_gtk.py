@@ -49,6 +49,7 @@ class TheoraVideoEncoder(VideoEncoder):
         self.properties.keyframe_delta = 2.0
         self.properties.bitrate = 400
         self.properties.quality = 16
+        self.properties.speed = 3
 
     def getProperties(self):
         properties = super(TheoraVideoEncoder, self).getProperties()
@@ -93,13 +94,14 @@ class TheoraStep(VideoEncoderStep):
         self.bitrate.data_type = int
         self.quality.data_type = int
         self.keyframe_delta.data_type = float
+        self.speed_type = int
         self.has_quality.data_type = bool
         self.has_bitrate.data_type = bool
 
         self.add_proxy(self.model,
                        ['has_quality', 'has_bitrate'])
         self.add_proxy(self.model.properties,
-                       ['bitrate', 'quality', 'keyframe_delta'])
+                       ['bitrate', 'quality', 'keyframe_delta', 'speed'])
 
         # we specify keyframe_delta in seconds, but theora expects
         # a number of frames, so we need the framerate and calculate
