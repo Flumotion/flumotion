@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import messages
+from flumotion.common import messages, errors
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.worker.checks import check
@@ -38,6 +38,17 @@ class Theora(feedcomponent.EncoderComponent):
         from flumotion.worker.checks import encoder
         return check.do_check(self, encoder.checkTheora)
 
+    def check_properties(self, props, addMessage):
+        props = self.config['properties']
+        speed = props.get('speed', 3)
+
+        if speed > 3:
+            msg = messages.Error(T_(N_(
+                "The configuration property 'speed' can only take "
+                "values from 0 to 3")), mid='speed')
+            addMessage(msg)
+            raise errors.ConfigError(msg)
+
     def get_pipeline_string(self, properties):
         return "ffmpegcolorspace ! theoraenc name=encoder"
 
@@ -50,6 +61,7 @@ class Theora(feedcomponent.EncoderComponent):
 
         props = ('bitrate',
                  'quality',
+                 ('speed', 'speed-level'),
                  ('keyframe-mindistance', 'keyframe-freq'),
                  ('keyframe-maxdistance', 'keyframe-force'))
 

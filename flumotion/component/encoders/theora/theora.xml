@@ -28,6 +28,8 @@
                   _description="The minimum distance between key frames (in frames)." />
         <property name="keyframe-maxdistance" type="int"
                   _description="The maximum distance between key frames (in frames)." />
+        <property name="speed" type="int"
+                  _description="Encoding speed from 0(slowest) to 3(fastest), (default to 3)"/>
         <property name="quick-compress" type="bool"
                   _description="(Deprecated) Whether to use quick, lower-quality compression."/>
         <property name="noise-sensitivity" type="int"
