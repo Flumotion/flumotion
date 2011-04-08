@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import messages
+from flumotion.common import messages, errors
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 
@@ -32,26 +32,43 @@ class VP8(feedcomponent.EncoderComponent):
     checkTimestamp = True
     checkOffset = True
 
+    def check_properties(self, props, addMessage):
+
+        def check_limit(prop_name, lower_limit, upper_limit):
+            val = props.get(prop_name, None)
+            if val is None:
+                return
+            if val < lower_limit or val > upper_limit:
+                msg = messages.Error(T_(N_(
+                    "The configuration property '%s' can only take "
+                    "values from %d to %d"),
+                    prop_name, lower_limit, upper_limit), mid='config')
+                addMessage(msg)
+                raise errors.ConfigError(msg)
+
+        check_limit('speed', 0, 2)
+        check_limit('threads', 1, 64)
+
     def get_pipeline_string(self, properties):
-        return "ffmpegcolorspace ! vp8enc speed=2 name=encoder"
+        return "ffmpegcolorspace ! vp8enc name=encoder"
 
     def configure_pipeline(self, pipeline, properties):
         element = pipeline.get_by_name('encoder')
 
-        props = ('bitrate',
-                 'quality',
-                 ('keyframe-maxdistance', 'max-keyframe-distance'))
+        props = (('bitrate', 'bitrate', 400),
+                 ('quality', 'quality', None),
+                 ('speed', 'speed', 2),
+                 ('threads', 'threads', 4),
+                 ('keyframe-maxdistance', 'max-keyframe-distance', 50))
 
-        for p in props:
-            if isinstance(p, tuple):
-                pproperty, eproperty = p
-            else:
-                pproperty = eproperty = p
+        for pproperty, eproperty, default in props:
+            if eproperty is None:
+                eproperty = properties
 
-            if not pproperty in properties:
+            if not pproperty in properties and default is None:
                 continue
 
-            value = properties[pproperty]
+            value = properties.get(pproperty, default)
             self.debug('Setting GStreamer property %s to %r' % (
                 eproperty, value))
 

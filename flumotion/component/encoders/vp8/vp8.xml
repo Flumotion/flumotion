@@ -26,6 +26,10 @@
                   _description="Quality used to encode." />
         <property name="keyframe-maxdistance" type="int"
                   _description="The maximum distance between key frames (in frames)." />
+        <property name="speed" type="int"
+                  _description="Encoding speed from 0 to 2 (defaults to 2)." />
+        <property name="threads" type="int"
+                  _description="Number of threads used by the encoder from 1 to 64 (defaults to 4)." />
       </properties>
     </component>
 
