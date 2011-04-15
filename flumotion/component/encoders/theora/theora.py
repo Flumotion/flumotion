@@ -19,7 +19,7 @@
 
 # Headers in this file shall remain intact.
 
-from flumotion.common import messages, errors
+from flumotion.common import messages, errors, gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 from flumotion.worker.checks import check
@@ -82,4 +82,14 @@ class Theora(feedcomponent.EncoderComponent):
             # with all other elements, so fix it up
             if pproperty == 'bitrate':
                 value = int(value/1000)
+            # Check for the speed-level property, introduced in
+            # gst-plugins-base-0.10.24
+            if eproperty == 'speed-level':
+                if not gstreamer.element_has_property(element, 'speed-level'):
+                    self.warning("Trying to set the 'speed-level' property "
+                                  "in a old version of gstreamer's theora "
+                                  "encoder element")
+                    self.warning("We will fallback to the 'quick' property")
+                    eproperty = 'quick'
+                    value = value > 0 and True or False
             element.set_property(eproperty, value)
