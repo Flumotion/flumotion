@@ -799,9 +799,10 @@ def fromICalendar(iCalendar):
 
     for vtimezone in iCalendar.walk('vtimezone'):
 
-        def parseObservance(observance):
+        def parseObservance(observance, tzid):
             try:
-                return (observance['TZNAME'], observance['TZOFFSETFROM'],
+                return (observance.get('TZNAME', tzid),
+                        observance['TZOFFSETFROM'],
                         observance['TZOFFSETTO'], observance['DTSTART'])
             except:
                 raise NotCompilantError(
@@ -811,7 +812,8 @@ def fromICalendar(iCalendar):
         # We need to parse all the timezone defined for the current iCalendar
         tzid = vtimezone.get('tzid')
         standard = vtimezone.walk('standard')[0]
-        stdname, stdoffsetfrom, stdoffset, dstend = parseObservance(standard)
+        stdname, stdoffsetfrom, stdoffset, dstend = parseObservance(standard,
+                                                                    tzid)
         try:
             daylight = vtimezone.walk('daylight')[0]
         except:
