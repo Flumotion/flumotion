@@ -642,7 +642,6 @@ def parseTimezone(vtimezone):
         rr = getRecurrence(observance, required[0])
         return required + (observance.get('TZNAME', tzname), rr)
 
-    # We need to parse all the timezone defined for the current iCalendar
     tzid = vtimezone.get('tzid')
     standard = vtimezone.walk('standard')[0]
     dstend, stdoffsetfrom, stdoffset, stdname, stdrrule = \
@@ -672,6 +671,7 @@ def fromICalendar(iCalendar):
     calendar = Calendar()
     timezones = {'UTC': tz.UTC}
 
+    # We need to parse all the timezones defined for the current iCalendar
     for vtimezone in iCalendar.walk('vtimezone'):
         tzinfo = parseTimezone(vtimezone)
         tzid = str(tzinfo)

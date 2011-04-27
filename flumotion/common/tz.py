@@ -102,10 +102,6 @@ class DSTTimezone(datetime.tzinfo):
                 dt + self._dstoffsetfrom or dt + self._stdoffsetfrom
 
     def dst(self, dt):
-        # The substraction is done converting the datetime values to UTC and
-        # adding the utcoffset of each one (see 9.1.4 datetime Objects)
-        # which is done only if both datetime are 'aware' and have different
-        # tzinfo member.
         if dt is None or dt.tzinfo is None:
             return self.ZERO
         assert dt.tzinfo is self
@@ -113,6 +109,10 @@ class DSTTimezone(datetime.tzinfo):
                 self.ZERO
 
     def copy(self):
+        # The substraction is done converting the datetime values to UTC and
+        # adding the utcoffset of each one (see 9.1.4 datetime Objects)
+        # which is done only if both datetime are 'aware' and have different
+        # tzinfo member, that's why we need a way to copy an instance
         return DSTTimezone(self._tzid, self._stdname, self._dstname,
                 self._stdoffset, self._dstoffset, self._stdoffsetfrom,
                 self._dstoffsetfrom, self._dststart, self._dstend,
