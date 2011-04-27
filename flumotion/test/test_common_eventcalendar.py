@@ -20,7 +20,7 @@
 # Headers in this file shall remain intact.
 
 import os
-import datetime
+from datetime import datetime, timedelta, date
 import time
 
 import calendar
@@ -30,16 +30,14 @@ from dateutil import parser, rrule, tz
 
 from flumotion.common import testsuite
 from flumotion.common import eventcalendar
+from flumotion.common.eventcalendar import (LOCAL, UTC, Event, Calendar,
+                                            DSTTimezone)
 
 attr = testsuite.attr
 
-LOCAL = eventcalendar.LOCAL
-LOCAL = icalendar.LocalTimezone()
-UTC = eventcalendar.UTC
-
 
 def _now(tz=UTC):
-    return datetime.datetime.now(tz)
+    return datetime.now(tz)
 
 _dayOfTheWeek = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
 
@@ -58,24 +56,22 @@ class ManualCalendarTest(testsuite.TestCase):
 
     def testAddEventsWithSameUID(self):
         # test that internally they end up in the same event set
-        calendar = eventcalendar.Calendar()
+        calendar = Calendar()
 
-        start1 = datetime.datetime.now(eventcalendar.UTC)
-        end1 = start1 + datetime.timedelta(hours=1)
+        start1 = datetime.now(UTC)
+        end1 = start1 + timedelta(hours=1)
         content1 = "content1"
-        now1 = start1
-        exdates1 = [start1 + datetime.timedelta(hours=2)]
+        exdates1 = [start1 + timedelta(hours=2)]
 
         start2 = start1
-        end2 = start2 + datetime.timedelta(hours=1)
+        end2 = start2 + timedelta(hours=1)
         content2 = "content2"
-        now2 = start2
-        exdates2 = [start2 + datetime.timedelta(hours=2)]
+        exdates2 = [start2 + timedelta(hours=2)]
 
-        e1 = eventcalendar.Event('uid', start1, end1, content1, rrules=None,
-                                 exdates=exdates1)
-        e2 = eventcalendar.Event('uid', start2, end2, content2, rrules=None,
-                                 exdates=exdates2)
+        e1 = Event('uid', start1, end1, content1, rrules=None,
+                   exdates=exdates1)
+        e2 = Event('uid', start2, end2, content2, rrules=None,
+                   exdates=exdates2)
 
         calendar.addEvent(e1)
         calendar.addEvent(e2)
@@ -91,20 +87,18 @@ class ManualCalendarTest(testsuite.TestCase):
 
     def testAddEventsWithDifferentUID(self):
         # test that internally they end up in different event sets
-        calendar = eventcalendar.Calendar()
+        calendar = Calendar()
 
-        start1 = datetime.datetime.now(eventcalendar.UTC)
-        end1 = start1 + datetime.timedelta(hours=1)
-        exdates1 = [start1 + datetime.timedelta(hours=2)]
+        start1 = datetime.now(UTC)
+        end1 = start1 + timedelta(hours=1)
+        exdates1 = [start1 + timedelta(hours=2)]
 
         start2 = start1
-        end2 = start2 + datetime.timedelta(hours=1)
-        exdates2 = [start2 + datetime.timedelta(hours=2)]
+        end2 = start2 + timedelta(hours=1)
+        exdates2 = [start2 + timedelta(hours=2)]
 
-        e1 = eventcalendar.Event('uid1', start1, end1, 'content1',
-            exdates=exdates1)
-        e2 = eventcalendar.Event('uid2', start2, end2, 'content2',
-            exdates=exdates2)
+        e1 = Event('uid1', start1, end1, 'content1', exdates=exdates1)
+        e2 = Event('uid2', start2, end2, 'content2', exdates=exdates2)
         calendar.addEvent(e1)
         calendar.addEvent(e2)
 
@@ -120,11 +114,11 @@ class ManualCalendarTest(testsuite.TestCase):
     def testAddEvent(self):
         now = _now()
         start = now
-        end = start + datetime.timedelta(hours=1)
-        exdates = [start + datetime.timedelta(hours=2)]
+        end = start + timedelta(hours=1)
+        exdates = [start + timedelta(hours=2)]
 
-        calendar = eventcalendar.Calendar()
-        calendar.addEvent(eventcalendar.Event('uid', start, end, 'foo',
+        calendar = Calendar()
+        calendar.addEvent(Event('uid', start, end, 'foo',
             exdates=exdates))
 
         event = calendar._eventSets['uid']._events[0]
@@ -133,11 +127,11 @@ class ManualCalendarTest(testsuite.TestCase):
 
     def testGetActiveSimple(self):
         now = _now()
-        start = now - datetime.timedelta(hours=1)
-        end = now + datetime.timedelta(minutes=1)
+        start = now - timedelta(hours=1)
+        end = now + timedelta(minutes=1)
 
-        calendar = eventcalendar.Calendar()
-        calendar.addEvent(eventcalendar.Event('uid', start, end, 'foo'))
+        calendar = Calendar()
+        calendar.addEvent(Event('uid', start, end, 'foo'))
 
         ei = calendar.getActiveEventInstances()[0]
         self.assertEventAttribsEqual(ei.event, start, end, 'foo',
@@ -148,15 +142,15 @@ class ManualCalendarTest(testsuite.TestCase):
         # and lasting two hours
         now = _now()
         now = now.replace(microsecond=0)
-        start = now - datetime.timedelta(hours=1)
-        end = now + datetime.timedelta(hours=1)
+        start = now - timedelta(hours=1)
+        end = now + timedelta(hours=1)
         rrules = ["FREQ=DAILY;WKST=MO", ]
 
         self.debug('now is %s', str(now))
         self.debug('rrule starts at %s', str(start))
 
-        cal = eventcalendar.Calendar()
-        cal.addEvent(eventcalendar.Event('uid', start, end, "event1",
+        cal = Calendar()
+        cal.addEvent(Event('uid', start, end, "event1",
             rrules=rrules))
 
         # check active instances now
@@ -165,31 +159,31 @@ class ManualCalendarTest(testsuite.TestCase):
 
         self.assertEventAttribsEqual(eis[0].event, start, end,
                                      "event1", rrules, None)
-        self.assertEquals(eis[0].start, now - datetime.timedelta(hours=1))
-        self.assertEquals(eis[0].end, now + datetime.timedelta(hours=1))
+        self.assertEquals(eis[0].start, now - timedelta(hours=1))
+        self.assertEquals(eis[0].end, now + timedelta(hours=1))
 
         # check active instances 1 day later
-        eis = cal.getActiveEventInstances(now + datetime.timedelta(days=1))
+        eis = cal.getActiveEventInstances(now + timedelta(days=1))
         self.assertEquals(len(eis), 1)
 
         self.assertEventAttribsEqual(eis[0].event, start, end,
                                      "event1", rrules, None)
-        self.assertEquals(eis[0].start, now + datetime.timedelta(hours=23))
-        self.assertEquals(eis[0].end, now + datetime.timedelta(hours=25))
+        self.assertEquals(eis[0].start, now + timedelta(hours=23))
+        self.assertEquals(eis[0].end, now + timedelta(hours=25))
 
     def testRecurrenceEventsHourly(self):
         # create an hourly recurring event, starting 1 hour and 58 minutes ago,
         # and lasting an hour
         now = _now()
         now = now.replace(microsecond=0)
-        start = now - datetime.timedelta(minutes=118)
-        end = now - datetime.timedelta(minutes=58)
+        start = now - timedelta(minutes=118)
+        end = now - timedelta(minutes=58)
         rrules = ["FREQ=HOURLY;WKST=MO", ]
         self.debug('now is %s', str(now))
         self.debug('rrule starts at %s', str(start))
 
-        cal = eventcalendar.Calendar()
-        cal.addEvent(eventcalendar.Event('uid', start, end, "event1",
+        cal = Calendar()
+        cal.addEvent(Event('uid', start, end, "event1",
             rrules=rrules))
 
         # check active instances now
@@ -198,19 +192,19 @@ class ManualCalendarTest(testsuite.TestCase):
 
         self.assertEventAttribsEqual(eis[0].event, start, end,
                                      "event1", rrules, None)
-        self.assertEquals(eis[0].start, now - datetime.timedelta(hours=1) +
-                          datetime.timedelta(minutes=2))
-        self.assertEquals(eis[0].end, now + datetime.timedelta(minutes=2))
+        self.assertEquals(eis[0].start, now - timedelta(hours=1) +
+                          timedelta(minutes=2))
+        self.assertEquals(eis[0].end, now + timedelta(minutes=2))
 
         # check active instances 1 hour later
-        eis = cal.getActiveEventInstances(now + datetime.timedelta(hours=1))
+        eis = cal.getActiveEventInstances(now + timedelta(hours=1))
         self.assertEquals(len(eis), 1)
 
         self.assertEventAttribsEqual(eis[0].event, start, end,
                                      "event1", rrules, None)
-        self.assertEquals(eis[0].start, now + datetime.timedelta(minutes=2))
-        self.assertEquals(eis[0].end, now + datetime.timedelta(minutes=2) +
-                          datetime.timedelta(hours=1))
+        self.assertEquals(eis[0].start, now + timedelta(minutes=2))
+        self.assertEquals(eis[0].end, now + timedelta(minutes=2) +
+                          timedelta(hours=1))
 
     def testRecurrenceEventsWhereExDateIsStartDate(self):
         """
@@ -218,13 +212,13 @@ class ManualCalendarTest(testsuite.TestCase):
         """
         now = _now()
         now = now.replace(microsecond=0) # recurring adjustments lose precision
-        start = now - datetime.timedelta(minutes=61)
-        end = now - datetime.timedelta(minutes=1)
+        start = now - timedelta(minutes=61)
+        end = now - timedelta(minutes=1)
         exdates = [start]
         rrules = ["FREQ=HOURLY;INTERVAL=1;COUNT=5", ]
 
-        calendar = eventcalendar.Calendar()
-        calendar.addEvent(eventcalendar.Event('uid', start, end, 'foo',
+        calendar = Calendar()
+        calendar.addEvent(Event('uid', start, end, 'foo',
             rrules=rrules, exdates=exdates))
 
         eis = calendar.getActiveEventInstances(start)
@@ -239,13 +233,13 @@ class ManualCalendarTest(testsuite.TestCase):
         # but with an exception for the first instances
         now = _now()
         now = now.replace(microsecond=0) # recurring adjustments lose precision
-        start = now - datetime.timedelta(minutes=61)
-        end = now - datetime.timedelta(minutes=1)
+        start = now - timedelta(minutes=61)
+        end = now - timedelta(minutes=1)
         exdates = [start]
         rrules = ["FREQ=HOURLY;INTERVAL=1;COUNT=5", ]
 
-        calendar = eventcalendar.Calendar()
-        calendar.addEvent(eventcalendar.Event('uid', start, end, 'foo',
+        calendar = Calendar()
+        calendar.addEvent(Event('uid', start, end, 'foo',
             rrules=rrules, exdates=exdates))
 
         eis = calendar.getActiveEventInstances()
@@ -260,13 +254,13 @@ class ManualCalendarTest(testsuite.TestCase):
         """
         now = _now()
         now = now.replace(microsecond=0) # recurring adjustments lose precision
-        start = now - datetime.timedelta(minutes=61)
-        end = now - datetime.timedelta(minutes=1)
-        exdates = [start + datetime.timedelta(hours=1)]
+        start = now - timedelta(minutes=61)
+        end = now - timedelta(minutes=1)
+        exdates = [start + timedelta(hours=1)]
         rrules = ["FREQ=HOURLY;INTERVAL=1;COUNT=5", ]
 
-        cal = eventcalendar.Calendar()
-        cal.addEvent(eventcalendar.Event(
+        cal = Calendar()
+        cal.addEvent(Event(
             'uid', start, end, 'content', rrules=rrules, exdates=exdates))
 
         self.failIf(cal.getActiveEventInstances())
@@ -278,20 +272,19 @@ class ManualCalendarTest(testsuite.TestCase):
         """
 
         def yesterdayDayOfTheWeek(now):
-            yesterday = now - datetime.timedelta(days=1)
+            yesterday = now - timedelta(days=1)
             day = calendar.weekday(yesterday.year, yesterday.month,
                                    yesterday.day)
             return _dayOfTheWeek[day]
 
         now = _now().replace(microsecond=0)
-        start = now - datetime.timedelta(days=1) - datetime.timedelta(weeks=1)
-        end = now + datetime.timedelta(hours=1) - datetime.timedelta(weeks=1)
+        start = now - timedelta(days=1) - timedelta(weeks=1)
+        end = now + timedelta(hours=1) - timedelta(weeks=1)
         rrules = [
             "FREQ=WEEKLY;BYDAY=" + yesterdayDayOfTheWeek(now) + ";WKST=MO",
         ]
-        cal = eventcalendar.Calendar()
-        cal.addEvent(eventcalendar.Event(
-            'uid', start, end, 'content', rrules=rrules))
+        cal = Calendar()
+        cal.addEvent(Event('uid', start, end, 'content', rrules=rrules))
 
         eis = cal.getActiveEventInstances()
         self.assertEquals(len(eis), 1)
@@ -300,10 +293,10 @@ class ManualCalendarTest(testsuite.TestCase):
 
     def testOverMidnight(self):
         now = _now()
-        start = now - datetime.timedelta(days=1)
-        end = now + datetime.timedelta(hours=1)
-        cal = eventcalendar.Calendar()
-        cal.addEvent(eventcalendar.Event('uid', start, end, 'content'))
+        start = now - timedelta(days=1)
+        end = now + timedelta(hours=1)
+        cal = Calendar()
+        cal.addEvent(Event('uid', start, end, 'content'))
 
         eis = cal.getActiveEventInstances()
         self.assertEquals(len(eis), 1)
@@ -312,21 +305,21 @@ class ManualCalendarTest(testsuite.TestCase):
 
     def testCurrentEventsDoNotEndBeforeNow(self):
         now = _now()
-        start = now - datetime.timedelta(hours=2)
-        end = now - datetime.timedelta(hours=1)
+        start = now - timedelta(hours=2)
+        end = now - timedelta(hours=1)
 
-        cal = eventcalendar.Calendar()
-        cal.addEvent(eventcalendar.Event('uid', start, end, 'content'))
+        cal = Calendar()
+        cal.addEvent(Event('uid', start, end, 'content'))
 
         self.failIf(cal.getActiveEventInstances())
 
     def testCurrentEventsDoNotStartLaterThanTomorrow(self):
         now = _now()
-        start = now + datetime.timedelta(days=2)
-        end = now + datetime.timedelta(days=3)
+        start = now + timedelta(days=2)
+        end = now + timedelta(days=3)
 
-        cal = eventcalendar.Calendar()
-        cal.addEvent(eventcalendar.Event('uid', start, end, 'content'))
+        cal = Calendar()
+        cal.addEvent(Event('uid', start, end, 'content'))
 
         self.failIf(cal.getActiveEventInstances())
 
@@ -354,31 +347,31 @@ END:VCALENDAR
         '''
         ical = icalendar.Calendar.from_string(data)
 
-        start = datetime.datetime(2015, 4, 4, 6, 0, 0, tzinfo=UTC)
+        start = datetime(2015, 4, 4, 6, 0, 0, tzinfo=UTC)
         cal = eventcalendar.fromICalendar(ical)
 
         # check that the first one is here
         instances = cal.getActiveEventInstances(
-            start + datetime.timedelta(seconds=1))
+            start + timedelta(seconds=1))
         self.assertEquals(len(instances), 1)
         self.assertEquals(instances[0].start, start)
 
-        second = datetime.timedelta(seconds=1)
+        second = timedelta(seconds=1)
 
         # check that the second one is not there exactly a week later,
         # because it also moved an hour
-        delta = datetime.timedelta(days=7)
+        delta = timedelta(days=7)
         instances = cal.getActiveEventInstances(start + delta + second)
         self.assertEquals(len(instances), 0)
 
         # check that the second one is there where it should be, an hour later
-        delta = datetime.timedelta(days=7, hours=1)
+        delta = timedelta(days=7, hours=1)
         instances = cal.getActiveEventInstances(start + delta + second)
         self.assertEquals(len(instances), 1)
         self.assertEquals(instances[0].start, start + delta)
 
         # check that the third one is back on the hour again
-        delta = datetime.timedelta(days=14)
+        delta = timedelta(days=14)
         instances = cal.getActiveEventInstances(start + delta + second)
         self.assertEquals(len(instances), 1)
         self.assertEquals(instances[0].start, start + delta)
@@ -400,9 +393,9 @@ class ICalSchedulerURGentTest(testsuite.TestCase):
         # on January 20, 2008, Farkli Bir Gece starts
         # at 11:00 AM CEST or 10:00 UTC
         # check 1 hour before
-        dateTime = datetime.datetime(2008, 1, 20, 9, 0, 0, tzinfo=UTC)
+        dateTime = datetime(2008, 1, 20, 9, 0, 0, tzinfo=UTC)
         points = self._calendar.getPoints(dateTime,
-            datetime.timedelta(seconds=5400))
+            timedelta(seconds=5400))
         self.assertEquals(len(points), 1)
 
         point = points[0]
@@ -410,20 +403,20 @@ class ICalSchedulerURGentTest(testsuite.TestCase):
         s = str(point.dt.tzinfo)
         event = point.eventInstance.event
         self.failUnless('Brussels' in s)
-        self.failUnless(point.dt.utcoffset() == datetime.timedelta(hours=1))
-        self.failUnless(point.dt.dst() == datetime.timedelta(hours=0))
+        self.failUnless(point.dt.utcoffset() == timedelta(hours=1))
+        self.failUnless(point.dt.dst() == timedelta(hours=0))
         self.failUnless(event.content.startswith('Farkli Bir Gece'),
             'next change is not to Farkli Bir Gece but to %s' % event.content)
         self.assertEquals(point.which, 'start')
         self.assertEquals(point.dt,
-            dateTime + datetime.timedelta(seconds=3600))
+            dateTime + timedelta(seconds=3600))
 
         # 3 hours later, at 14:00 AM CEST,
         # it stops, and Supercalifragilistic starts
         # check 1 minute before
-        dateTime = datetime.datetime(2008, 1, 20, 12, 59, 0, tzinfo=UTC)
+        dateTime = datetime(2008, 1, 20, 12, 59, 0, tzinfo=UTC)
         points = self._calendar.getPoints(dateTime,
-            datetime.timedelta(seconds=120))
+            timedelta(seconds=120))
         self.assertEquals(len(points), 2)
 
         point = points[0]
@@ -432,7 +425,7 @@ class ICalSchedulerURGentTest(testsuite.TestCase):
             'next change is not to Farkli Bir Gece but to %s' % event.content)
         self.assertEquals(point.which, 'end')
         self.assertEquals(point.dt,
-            dateTime + datetime.timedelta(seconds=60))
+            dateTime + timedelta(seconds=60))
 
         point = points[1]
         event = point.eventInstance.event
@@ -440,19 +433,19 @@ class ICalSchedulerURGentTest(testsuite.TestCase):
             'next change is not to Supercali but to %s' % event.content)
         self.assertEquals(point.which, 'start')
         self.assertEquals(point.dt,
-            dateTime + datetime.timedelta(seconds=60))
+            dateTime + timedelta(seconds=60))
 
     def test_getActiveEventInstances(self):
         # on January 20, 2008, Farkli Bir Gece starts
         # at 11:00 AM CEST or 10:00 UTC
 
         # check nothing is active before
-        dateTime = datetime.datetime(2008, 1, 20, 9, 0, 0, tzinfo=UTC)
+        dateTime = datetime(2008, 1, 20, 9, 0, 0, tzinfo=UTC)
         instances = self._calendar.getActiveEventInstances(dateTime)
         self.failIf(instances)
 
         # check one event is active right after
-        dateTime = datetime.datetime(2008, 1, 20, 11, 0, 0, tzinfo=UTC)
+        dateTime = datetime(2008, 1, 20, 11, 0, 0, tzinfo=UTC)
         instances = self._calendar.getActiveEventInstances(dateTime)
         self.failUnless(instances)
         self.assertEquals(len(instances), 1)
@@ -463,13 +456,62 @@ class ICalSchedulerURGentTest(testsuite.TestCase):
         # 3 hours later, at 14:00 AM CEST or 13:00 UTC,
         # it stops, and Supercalifragilistic starts
         # check one event is active during second show
-        dateTime = datetime.datetime(2008, 1, 20, 13, 1, 0, tzinfo=UTC)
+        dateTime = datetime(2008, 1, 20, 13, 1, 0, tzinfo=UTC)
         instances = self._calendar.getActiveEventInstances(dateTime)
         self.failUnless(instances)
         self.assertEquals(len(instances), 1)
         event = instances[0].event
         self.failUnless(event.content.startswith('Supercali'),
             'next change is not to Supercali but to %s' % event.content)
+
+
+class DaylightSavingTimezoneTest(testsuite.TestCase):
+
+    def makeTimezone(self, dststart, dstend, stdrrule, dstrrule):
+        return DSTTimezone('Test', 'STANDARD', 'DAYLIGHT',
+                           timedelta(hours=1), timedelta(hours=2),
+                           timedelta(hours=2), timedelta(hours=1),
+                           dststart, dstend, stdrrule, dstrrule)
+
+    def testEuropeanStandardToDaylightChange(self):
+        dststart = datetime(1970, 03, 29, 2)
+        stdstart = datetime(1970, 10, 25, 3)
+        stdrrule = rrule.rrulestr('FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
+                                   dtstart=stdstart)
+        dstrrule = rrule.rrulestr('FREQ=YEARLY;BYMONTH=03;BYDAY=-1SU',
+                                   dtstart=dststart)
+        tzinfo = self.makeTimezone(stdstart, dststart, stdrrule, dstrrule)
+        self.assertEquals(datetime(2011, 3, 26, 1, tzinfo=tzinfo).tzname(),
+                          'STANDARD')
+        self.assertEquals(datetime(2011, 3, 28, 1, tzinfo=tzinfo).tzname(),
+                          'DAYLIGHT')
+        self.assertEquals(datetime(2011, 3, 27, 1, tzinfo=tzinfo).tzname(),
+                          'STANDARD')
+        self.assertEquals(datetime(2011, 3, 27, 2, tzinfo=tzinfo).tzname(),
+                          'DAYLIGHT')
+        delta= datetime(2011, 3, 27, 3, tzinfo=tzinfo) - \
+               datetime(2011, 3, 27, 1, tzinfo=tzinfo.copy())
+        self.assertEquals(delta, timedelta(hours=1))
+
+    def testEuropeanDaylightToStandardChange(self):
+        dststart = datetime(1970, 03, 29, 2)
+        stdstart = datetime(1970, 10, 25, 3)
+        stdrrule = rrule.rrulestr('FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
+                                   dtstart=stdstart)
+        dstrrule = rrule.rrulestr('FREQ=YEARLY;BYMONTH=03;BYDAY=-1SU',
+                                   dtstart=dststart)
+        tzinfo = self.makeTimezone(stdstart, dststart, stdrrule, dstrrule)
+        self.assertEquals(datetime(2011, 10, 29, 1, tzinfo=tzinfo).tzname(),
+                          'DAYLIGHT')
+        self.assertEquals(datetime(2011, 10, 31, 1, tzinfo=tzinfo).tzname(),
+                          'STANDARD')
+        self.assertEquals(datetime(2011, 10, 30, 1, tzinfo=tzinfo).tzname(),
+                          'DAYLIGHT')
+        self.assertEquals(datetime(2011, 10, 30, 3, tzinfo=tzinfo).tzname(),
+                          'STANDARD')
+        delta = datetime(2011, 10, 30, 4, tzinfo=tzinfo) - \
+                datetime(2011, 10, 30, 1, tzinfo=tzinfo.copy())
+        self.assertEquals(delta, timedelta(hours=4))
 
 
 class ICalendarTest(testsuite.TestCase):
@@ -492,12 +534,12 @@ class ICalendarTest(testsuite.TestCase):
 
     def testParseCalendarWithDates(self):
         event = icalendar.Event()
-        startExpected = datetime.datetime(2015, 4, 4, 0, 0, 0, tzinfo=UTC)
-        endExpected = datetime.datetime(2015, 4, 5, 0, 0, 0, tzinfo=UTC)
+        startExpected = datetime(2015, 4, 4, 0, 0, 0, tzinfo=UTC)
+        endExpected = datetime(2015, 4, 5, 0, 0, 0, tzinfo=UTC)
         event['summary'] = 'Test calendar'
         event['uid'] = '42'
-        event.set('dtstart', datetime.date(2015, 4, 4))
-        event.set('dtend', datetime.date(2015, 4, 5))
+        event.set('dtstart', date(2015, 4, 4))
+        event.set('dtend', date(2015, 4, 5))
 
         self._icalendar.add_component(event)
 
@@ -507,14 +549,14 @@ class ICalendarTest(testsuite.TestCase):
 
     def testParseCalendarWithDateTimes(self):
         event = icalendar.Event()
-        startExpected = datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
-        endExpected = datetime.datetime(2015, 4, 5, 8, 0, 0, tzinfo=LOCAL)
+        startExpected = datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
+        endExpected = datetime(2015, 4, 5, 8, 0, 0, tzinfo=LOCAL)
         event['summary'] = 'Test calendar'
         event['uid'] = 'uid'
         event.set('dtstart',
-            datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
+            datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
         event.set('dtend',
-            datetime.datetime(2015, 4, 5, 8, 0, 0, tzinfo=LOCAL))
+            datetime(2015, 4, 5, 8, 0, 0, tzinfo=LOCAL))
 
         self._icalendar.add_component(event)
 
@@ -524,13 +566,13 @@ class ICalendarTest(testsuite.TestCase):
 
     def testParseCalendarWithStartDateAndEndDateTime(self):
         event = icalendar.Event()
-        startExpected = datetime.datetime(2015, 4, 4, 0, 0, 0, tzinfo=UTC)
-        endExpected = datetime.datetime(2015, 4, 5, 8, 0, 0, tzinfo=LOCAL)
+        startExpected = datetime(2015, 4, 4, 0, 0, 0, tzinfo=UTC)
+        endExpected = datetime(2015, 4, 5, 8, 0, 0, tzinfo=LOCAL)
         event['summary'] = 'Test calendar'
         event['uid'] = '42'
-        event.set('dtstart', datetime.date(2015, 4, 4))
+        event.set('dtstart', date(2015, 4, 4))
         event.set('dtend',
-            datetime.datetime(2015, 4, 5, 8, 0, 0, tzinfo=LOCAL))
+            datetime(2015, 4, 5, 8, 0, 0, tzinfo=LOCAL))
 
         self._icalendar.add_component(event)
 
@@ -540,13 +582,13 @@ class ICalendarTest(testsuite.TestCase):
 
     def testParseCalendarWithStartDateTimeAndEndDate(self):
         event = icalendar.Event()
-        startExpected = datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
-        endExpected = datetime.datetime(2015, 4, 5, 0, 0, 0, tzinfo=UTC)
+        startExpected = datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
+        endExpected = datetime(2015, 4, 5, 0, 0, 0, tzinfo=UTC)
         event['summary'] = 'Test calendar'
         event['uid'] = '42'
         event.set('dtstart',
-            datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
-        event.set('dtend', datetime.date(2015, 4, 5))
+            datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
+        event.set('dtend', date(2015, 4, 5))
 
         self._icalendar.add_component(event)
 
@@ -556,15 +598,15 @@ class ICalendarTest(testsuite.TestCase):
 
     def testParseCalendarWithStartDateTimeAndDuration(self):
         event = icalendar.Event()
-        startExpected = datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
-        duration = datetime.timedelta(hours=1, minutes=38, seconds=23)
+        startExpected = datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
+        duration = timedelta(hours=1, minutes=38, seconds=23)
         endExpected = startExpected + duration
         event['summary'] = 'Test calendar'
         event['uid'] = '42'
         event.set('dtstart',
-                datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
+                datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
         event.set('duration',
-                datetime.timedelta(hours=1, minutes=38, seconds=23))
+                timedelta(hours=1, minutes=38, seconds=23))
 
         self._icalendar.add_component(event)
 
@@ -574,15 +616,15 @@ class ICalendarTest(testsuite.TestCase):
 
     def testParseCalendar(self):
         event = icalendar.Event()
-        startExpected = datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
-        endExpected = datetime.datetime(2015, 4, 5, 0, 0, 0, tzinfo=UTC)
+        startExpected = datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
+        endExpected = datetime(2015, 4, 5, 0, 0, 0, tzinfo=UTC)
         contentExpected = 'Test calendar'
         event['summary'] = contentExpected
         uidExpected = 'uid'
         event['uid'] = uidExpected
         event.set('dtstart',
-            datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
-        event.set('dtend', datetime.date(2015, 4, 5))
+            datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL))
+        event.set('dtend', date(2015, 4, 5))
 
         self._icalendar.add_component(event)
 
@@ -598,8 +640,8 @@ class ICalendarTest(testsuite.TestCase):
 
     def testParseCalendarFromFile(self):
         event = icalendar.Event()
-        startExpected = datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
-        endExpected = datetime.datetime(2015, 4, 4, 9, 0, 0, tzinfo=LOCAL)
+        startExpected = datetime(2015, 4, 4, 8, 0, 0, tzinfo=LOCAL)
+        endExpected = datetime(2015, 4, 4, 9, 0, 0, tzinfo=LOCAL)
         contentExpected = 'Test calendar'
         uidExpected = 'uid'
         fileName = 'example.ics'
@@ -646,14 +688,14 @@ TZID:my_location
 BEGIN:DAYLIGHT
 TZOFFSETFROM:+0400
 TZOFFSETTO:+0500
-TZNAME:CEST
+TZNAME:MOJITO
 DTSTART:19700329T020000
 RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
 END:DAYLIGHT
 BEGIN:STANDARD
 TZOFFSETFROM:+0500
 TZOFFSETTO:+0400
-TZNAME:CET
+TZNAME:TEA
 DTSTART:19701025T030000
 RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
 END:STANDARD
@@ -668,18 +710,18 @@ END:VCALENDAR
         '''
         ical = icalendar.Calendar.from_string(data)
         cal = eventcalendar.fromICalendar(ical)
-        dateTime = datetime.datetime(2008, 9, 25, 19, 0, 0, tzinfo=UTC)
-        points = cal.getPoints(dateTime, datetime.timedelta(weeks=15))
+        dateTime = datetime(2008, 9, 25, 19, 0, 0, tzinfo=UTC)
+        points = cal.getPoints(dateTime, timedelta(weeks=15))
         point1 = points[0].dt
         point2 = points[1].dt
         self.failUnless(str(point1.tzinfo == 'my_location'))
-        self.failUnless(point1.utcoffset() == datetime.timedelta(hours=5))
-        self.failUnless(point1.dst() == datetime.timedelta(hours=1))
-        self.failUnless(point1.tzname() == 'CEST')
+        self.failUnless(point1.utcoffset() == timedelta(hours=5))
+        self.failUnless(point1.dst() == timedelta(hours=1))
+        self.failUnless(point1.tzname() == 'MOJITO')
         self.failUnless(str(point2.tzinfo == 'my_location'))
-        self.failUnless(point2.utcoffset() == datetime.timedelta(hours=4))
-        self.failUnless(point2.dst() == datetime.timedelta(hours=0))
-        self.failUnless(point2.tzname() == 'CET')
+        self.failUnless(point2.utcoffset() == timedelta(hours=4))
+        self.failUnless(point2.dst() == timedelta(hours=0))
+        self.failUnless(point2.tzname() == 'TEA')
 
 
 class FunctionsTest(testsuite.TestCase):
@@ -687,11 +729,11 @@ class FunctionsTest(testsuite.TestCase):
     def testToDateTime(self):
         self.failIf(eventcalendar._toDateTime(None))
 
-        dateTime = datetime.datetime(2015, 4, 4, 8, 0, 0, tzinfo=UTC)
+        dateTime = datetime(2015, 4, 4, 8, 0, 0, tzinfo=UTC)
         self.assertEquals(dateTime, eventcalendar._toDateTime(dateTime))
 
-        d = datetime.date(2015, 4, 4)
-        dateTimeExpected = datetime.datetime(2015, 4, 4, 0, 0, 0,
+        d = date(2015, 4, 4)
+        dateTimeExpected = datetime(2015, 4, 4, 0, 0, 0,
             tzinfo=UTC)
         self.assertEquals(dateTimeExpected, eventcalendar._toDateTime(d))
 
@@ -703,10 +745,10 @@ class EventTest(testsuite.TestCase):
         Test that the object contains the data. Very simple test.
         """
         now = _now()
-        start = now - datetime.timedelta(hours=1)
-        end = now + datetime.timedelta(minutes=1)
+        start = now - timedelta(hours=1)
+        end = now + timedelta(minutes=1)
         rrules = ["FREQ=HOURLY;INTERVAL=2;COUNT=5", ]
-        exdates = [now + datetime.timedelta(hours=2)]
+        exdates = [now + timedelta(hours=2)]
         uid = 'uid'
         e = eventcalendar.Event(uid, start, end, 'foo', rrules=rrules,
             exdates=exdates)
@@ -721,7 +763,7 @@ class EventTest(testsuite.TestCase):
         Test the operators: < > ==
         """
         now = _now()
-        hour = datetime.timedelta(hours=1)
+        hour = timedelta(hours=1)
 
         self.failUnless(
             eventcalendar.Event('uid', now, now + hour, 'foo') <
@@ -738,8 +780,8 @@ class EventTest(testsuite.TestCase):
         Test that when no timezone given to the init parameters,
         the LOCAL timezone is added to them.
         """
-        now = datetime.datetime.now()
-        hour = datetime.timedelta(hours=1)
+        now = datetime.now()
+        hour = timedelta(hours=1)
         self.assertEquals(now.tzinfo, None)
         start = now
         end = now + hour
@@ -762,14 +804,14 @@ class EventSetTestCase(testsuite.TestCase):
         """
 
         def yesterdayDayOfTheWeek(now):
-            yesterday = now-datetime.timedelta(days=1)
+            yesterday = now-timedelta(days=1)
             day = calendar.weekday(yesterday.year, yesterday.month,
                                    yesterday.day)
             return _dayOfTheWeek[day]
 
-        now = datetime.datetime.now().replace(microsecond=0)
-        start = now - datetime.timedelta(days=1) - datetime.timedelta(weeks=1)
-        end = now + datetime.timedelta(hours=1) - datetime.timedelta(weeks=1)
+        now = datetime.now().replace(microsecond=0)
+        start = now - timedelta(days=1) - timedelta(weeks=1)
+        end = now + timedelta(hours=1) - timedelta(weeks=1)
         rrules = [
             "FREQ=WEEKLY;BYDAY=" + yesterdayDayOfTheWeek(now) + ";WKST=MO",
         ]
@@ -778,21 +820,21 @@ class EventSetTestCase(testsuite.TestCase):
         event = eventcalendar.Event(uid, start, end, content, rrules=rrules)
         eventSet = eventcalendar.EventSet(uid)
         eventSet.addEvent(event)
-        p = eventSet.getPoints(event.start + datetime.timedelta(weeks=1),
+        p = eventSet.getPoints(event.start + timedelta(weeks=1),
             event.end - event.start)
         self.assertEquals(p[0].dt,
-            event.start + datetime.timedelta(weeks=1))
+            event.start + timedelta(weeks=1))
         self.assertEquals(p[0].which, 'start')
         self.assertEquals(p[1].dt,
-            event.end + datetime.timedelta(weeks=1))
+            event.end + timedelta(weeks=1))
         self.assertEquals(p[1].which, 'end')
 
     def testExAsStartDateWithRecurrence(self):
         """
         Exception to a recurrence rule.
         """
-        start = datetime.datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
-        end = datetime.datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
+        start = datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
+        end = datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
         uid = 'uid'
         content = 'content'
         rrules = ["FREQ=DAILY;WKST=MO", ]
@@ -809,12 +851,12 @@ class EventSetTestCase(testsuite.TestCase):
         """
         Exception to a recurrence rule.
         """
-        start = datetime.datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
-        end = datetime.datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
+        start = datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
+        end = datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
         uid = 'uid'
         content = 'content'
         rrules = ["FREQ=DAILY;WKST=MO", ]
-        exdate = datetime.datetime(2007, 12, 23, 9, 0, 0, 0, LOCAL)
+        exdate = datetime(2007, 12, 23, 9, 0, 0, 0, LOCAL)
         exdates = [exdate]
         event = eventcalendar.Event(uid, start, end, content,
             rrules=rrules, exdates=exdates)
@@ -824,12 +866,12 @@ class EventSetTestCase(testsuite.TestCase):
         self.assertEquals(p[0].dt, start)
         self.assertEquals(p[0].which, 'start')
         self.assertEquals(p[1].which, 'end')
-        p = set.getPoints(exdate, datetime.timedelta(days=1))
+        p = set.getPoints(exdate, timedelta(days=1))
         self.failIf(p)
 
     def testGetPointSingle(self):
-        start = datetime.datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
-        end = datetime.datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
+        start = datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
+        end = datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
         uid = 'uid'
         content = 'content'
         event = eventcalendar.Event(uid, start, end, content)
@@ -838,19 +880,19 @@ class EventSetTestCase(testsuite.TestCase):
         p = set.getPoints(start, end - start)
         self.assertEquals(p[0].dt, start)
         self.assertEquals(p[1].dt, end)
-        p = set.getPoints(start - datetime.timedelta(hours=1),
-            datetime.timedelta(hours=3))
+        p = set.getPoints(start - timedelta(hours=1),
+            timedelta(hours=3))
         self.assertEquals(p[0].dt, start)
         self.assertEquals(p[1].dt, end)
-        p = set.getPoints(start + datetime.timedelta(minutes=30),
-            datetime.timedelta(minutes=60))
+        p = set.getPoints(start + timedelta(minutes=30),
+            timedelta(minutes=60))
         self.assertEquals(p[0].dt,
-            start + datetime.timedelta(minutes=30))
-        self.assertEquals(p[1].dt, end - datetime.timedelta(minutes=30))
+            start + timedelta(minutes=30))
+        self.assertEquals(p[1].dt, end - timedelta(minutes=30))
 
     def testGetPointsRecur(self):
-        start = datetime.datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
-        end = datetime.datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
+        start = datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
+        end = datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
         uid = 'uid'
         content = 'content'
         rrules = ["FREQ=DAILY;WKST=MO", ]
@@ -862,18 +904,18 @@ class EventSetTestCase(testsuite.TestCase):
         self.assertEquals(p[0].dt, start)
         self.assertEquals(p[0].which, 'start')
         self.assertEquals(p[1].which, 'end')
-        p = set.getPoints(start + datetime.timedelta(days=2),
+        p = set.getPoints(start + timedelta(days=2),
             end - start)
-        self.assertEquals(p[0].dt, start + datetime.timedelta(days=2))
+        self.assertEquals(p[0].dt, start + timedelta(days=2))
         self.assertEquals(p[0].which, 'start')
         self.assertEquals(p[1].which, 'end')
-        p = set.getPoints(end, datetime.timedelta(days=1))
+        p = set.getPoints(end, timedelta(days=1))
         self.assertEquals(len(p), 2)
         self.assertNotEquals(p[0].dt, end)
 
     def testGetPointsRecurUntil(self):
-        start = datetime.datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
-        end = datetime.datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
+        start = datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
+        end = datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
         event = eventcalendar.Event('uid', start, end, 'content',
             rrules=["FREQ=DAILY;UNTIL=20071224T073000Z;WKST=MO", ])
         set = eventcalendar.EventSet('uid')
@@ -882,23 +924,23 @@ class EventSetTestCase(testsuite.TestCase):
         self.assertEquals(p[0].dt, start)
         self.assertEquals(p[0].which, 'start')
         self.assertEquals(p[1].which, 'end')
-        p = set.getPoints(start, end - start + datetime.timedelta(days=4))
+        p = set.getPoints(start, end - start + timedelta(days=4))
         self.assertEquals(len(p), 4)
         self.assertEquals(p[0].dt, start)
         self.assertEquals(p[0].which, 'start')
-        self.assertEquals(p[3].dt, end + datetime.timedelta(days=1))
+        self.assertEquals(p[3].dt, end + timedelta(days=1))
         self.assertEquals(p[3].which, 'end')
-        p = set.getPoints(start + datetime.timedelta(hours=1),
-            end - start + datetime.timedelta(hours=22))
+        p = set.getPoints(start + timedelta(hours=1),
+            end - start + timedelta(hours=22))
         self.assertEquals(len(p), 4)
-        self.assertEquals(p[0].dt, start + datetime.timedelta(hours=1))
+        self.assertEquals(p[0].dt, start + timedelta(hours=1))
         self.assertEquals(p[0].which, 'start')
-        self.assertEquals(p[1].dt, start + datetime.timedelta(hours=2))
+        self.assertEquals(p[1].dt, start + timedelta(hours=2))
         self.assertEquals(p[1].which, 'end')
         self.assertEquals(p[3].dt,
-            end + datetime.timedelta(days=1) - datetime.timedelta(hours=1))
+            end + timedelta(days=1) - timedelta(hours=1))
         self.assertEquals(p[3].which, 'end')
-        p = set.getPoints(start + datetime.timedelta(days=3),
+        p = set.getPoints(start + timedelta(days=3),
             end - start)
         self.assertEquals(len(p), 0)
 
@@ -922,7 +964,7 @@ class iCalTestCase(testsuite.TestCase):
         if start.tzinfo is None:
             tzinfo = tz.gettz(
                 self._events[1]['dtstart'].params['TZID'])
-            start = datetime.datetime(start.year, start.month, start.day,
+            start = datetime(start.year, start.month, start.day,
                 start.hour, start.minute, start.second,
                 start.microsecond, tzinfo)
         rrulestr = str(self._events[1].get('RRULE'))
@@ -931,8 +973,8 @@ class iCalTestCase(testsuite.TestCase):
         self.failUnless(riddatetime in r)
 
     def testGetPoints(self):
-        start = datetime.datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
-        end = datetime.datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
+        start = datetime(2007, 12, 22, 9, 0, 0, 0, LOCAL)
+        end = datetime(2007, 12, 22, 11, 0, 0, 0, LOCAL)
         eventSet1 = eventcalendar.EventSet('uid1')
         eventSet2 = eventcalendar.EventSet('uid2')
         event1 = eventcalendar.Event('uid1', start, end, 'content')
@@ -948,7 +990,7 @@ class iCalTestCase(testsuite.TestCase):
         if start.tzinfo is None:
             tzinfo = tz.gettz(
                 self._events[1]['dtstart'].params['TZID'])
-            start = datetime.datetime(start.year, start.month, start.day,
+            start = datetime(start.year, start.month, start.day,
                 start.hour, start.minute, start.second,
                 start.microsecond, tzinfo)
         rrulestr = str(self._events[1].get('RRULE'))
@@ -965,8 +1007,8 @@ class CalendarParserTestCase(testsuite.TestCase):
 
     def testExDate(self):
         TZMADRID = tz.gettz('Europe/Madrid')
-        start = datetime.datetime(2007, 11, 1, 0, 0, 0, 0, TZMADRID)
-        end = datetime.datetime(2008, 1, 1, 0, 0, 0, 0, TZMADRID)
+        start = datetime(2007, 11, 1, 0, 0, 0, 0, TZMADRID)
+        end = datetime(2008, 1, 1, 0, 0, 0, 0, TZMADRID)
         calendar = eventcalendar.fromFile(open(self._path, 'r'))
         sets = calendar._eventSets.values()
         self.assertEquals(len(sets), 1)
@@ -974,7 +1016,7 @@ class CalendarParserTestCase(testsuite.TestCase):
         self.assertEquals(set.uid, 'b0s4akee4lbvdnbr1h925vl0i4@google.com')
         points = set.getPoints(start, end - start)
         self.assertEquals(len(points), 44)
-        exdatetime = datetime.datetime(2007, 11, 12, 20, 0, 0, 0, TZMADRID)
+        exdatetime = datetime(2007, 11, 12, 20, 0, 0, 0, TZMADRID)
         for p in points:
             self.assertNotEquals(p.dt, exdatetime)
 
@@ -1058,9 +1100,9 @@ END:VCALENDAR
         '''
         ical = icalendar.Calendar.from_string(data)
         cal = eventcalendar.fromICalendar(ical)
-        dateTime = datetime.datetime(2008, 10, 25, 23, 0, 0, tzinfo=UTC)
+        dateTime = datetime(2008, 10, 25, 23, 0, 0, tzinfo=UTC)
         points = cal.getPoints(dateTime,
-            datetime.timedelta(hours=5))
+            timedelta(hours=5))
         self.assertEquals(len(points), 2)
         delta = points[1].dt - points[0].dt
-        self.assertEquals(delta, datetime.timedelta(hours=4))
+        self.assertEquals(delta, timedelta(hours=4))
