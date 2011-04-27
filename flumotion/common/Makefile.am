@@ -49,6 +49,7 @@ flumotion_PYTHON = \
 	signals.py \
 	startset.py \
 	testsuite.py \
+	tz.py \
 	vfs.py \
 	vfsgio.py \
 	vfsgnome.py \

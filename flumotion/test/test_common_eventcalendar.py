@@ -26,12 +26,13 @@ import time
 import calendar
 import icalendar
 
-from dateutil import parser, rrule, tz
+from dateutil import parser, rrule
 
 from flumotion.common import testsuite
 from flumotion.common import eventcalendar
-from flumotion.common.eventcalendar import (LOCAL, UTC, Event, Calendar,
-                                            DSTTimezone)
+from flumotion.common.eventcalendar import Event, Calendar
+from flumotion.common import tz
+from flumotion.common.tz import LOCAL, UTC, DSTTimezone
 
 attr = testsuite.attr
 
