@@ -6,10 +6,18 @@
                _description="Consumes a feed as a GStreamer TCP server.">
       <source location="flumotion.component.consumers.gdp.gdp" />
       <eater name="default" />
+
+      <wizard type="consumer" feeder="default"
+              _description="Publish to _Flumotion Streaming Server">
+      </wizard>
+
       <entries>
         <entry type="component" location="gdp.py"
                function="GDPConsumer" />
+        <entry type="wizard" location="wizard_gtk.py"
+               function="FGDPConsumerWizardPlugin" />
       </entries>
+
       <properties>
         <property name="mode" type="string"
                   _description="Connection mode between 'push' and 'pull' mode. (default: push)" />
@@ -43,6 +51,19 @@
                 <filename location="__init__.py" />
             </directory>
         </directories>
+    </bundle>
+
+    <bundle name="fgdp-wizard">
+      <dependencies>
+        <dependency name="gdp-consumer-base" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/consumers/gdp">
+          <filename location="wizard.glade" />
+          <filename location="wizard_gtk.py" />
+        </directory>
+      </directories>
     </bundle>
 
     <bundle name="gdp-consumer-component">

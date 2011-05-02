@@ -4,7 +4,9 @@ gdpdir = $(libdir)/flumotion/python/flumotion/component/consumers/gdp
 
 gdp_PYTHON = \
 	__init__.py 	\
-	gdp.py
+	gdp.py \
+	wizard.glade \
+	wizard_gtk.py
 
 gdp_DATA = gdp.xml
 
