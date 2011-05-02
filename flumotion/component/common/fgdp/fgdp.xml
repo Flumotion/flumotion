@@ -1,0 +1,20 @@
+<registry>
+  <bundles>
+
+    <bundle name="fgdp-base">
+      <dependencies>
+        <dependency name="flumotion" />
+      </dependencies>
+
+      <directories>
+          <directory name="flumotion/component/common/fgdp">
+          <filename location="__init__.py" />
+          <filename location="fgdp.py" />
+          <filename location="protocol.py" />
+        </directory>
+      </directories>
+    </bundle>
+
+  </bundles>
+
+</registry>
