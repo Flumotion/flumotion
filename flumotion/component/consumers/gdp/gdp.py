@@ -20,13 +20,25 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
+# register gdpsink
+import flumotion.component.common.fgdp.fgdp
 
 __version__ = "$Rev$"
 
 
 class GDPConsumer(feedcomponent.ParseLaunchComponent):
+    logCategory = 'gdp-consumer'
 
     def get_pipeline_string(self, properties):
-        port = properties['port']
+        return "fgdpsink name=sink"
 
-        return 'gdppay ! tcpserversink port=%d' % port
+    def configure_pipeline(self, pipeline, properties):
+        sink = self.get_element('sink')
+        sink.set_property('mode', properties.get('mode', 'push'))
+        sink.set_property('host', properties.get('host', 'localhost'))
+        sink.set_property('port', properties.get('port', 15000))
+        sink.set_property('username', properties.get('username', 'user'))
+        sink.set_property('password', properties.get('password', 'test'))
+        sink.set_property('version', properties.get('version', '0.1'))
+        sink.set_property('max-reconnection-delay',
+                properties.get('max-reconnection-delay', 5))

@@ -11,8 +11,20 @@
                function="GDPConsumer" />
       </entries>
       <properties>
+        <property name="mode" type="string"
+                  _description="Connection mode between 'push' and 'pull' mode. (default: push)" />
+        <property name="host" type="string"
+                  _description="The host name or IP address of the pull server, only required in push mode." />
         <property name="port" type="int" required="true"
-                  _description="The port of the GStreamer TCP server." />
+                  _description="The port of the peer." />
+        <property name="username" type="string"
+                  _description="User name for the authentication (default: user)" />
+        <property name="password" type="string"
+                  _description="Password used for the authentication (default: test)" />
+        <property name="version" type="string"
+                  _description="Version of the protocol used (default: 0.1)" />
+        <property name="max-reconnection-delay" type="int"
+                  _description="Maximum number of seconds between connection attempt, has only effect in push mode." />
       </properties>
     </component>
 
@@ -23,6 +35,7 @@
     <bundle name="gdp-consumer-base">
         <dependencies>
             <dependency name="component-base" />
+            <dependency name="fgdp-base" />
         </dependencies>
 
         <directories>
