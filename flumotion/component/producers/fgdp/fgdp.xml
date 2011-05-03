@@ -3,7 +3,7 @@
   <components>
 
     <component type="fgdp-producer" base="flumotion/component/producers/fgdp"
-               _description="Produces a feed from a GStreamer TCP server.">
+               _description="Produces a feed from a Flumotion server.">
       <source location="flumotion.component.producers.fgdp.fgdp" />
       <feeder name="default" />
       <entries>

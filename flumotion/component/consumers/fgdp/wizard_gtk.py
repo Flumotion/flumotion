@@ -76,9 +76,9 @@ class FGDPStep(ConsumerStep):
 
 
 class FGDPBothStep(FGDPStep):
-    name = 'FGDP streamer (audio & video)'
-    title = _('FGDP Streamer (Audio and Video)')
-    sidebarName = _('FGDP audio/video')
+    name = 'Flumotion streamer (audio & video)'
+    title = _('Flumotion Streamer (Audio and Video)')
+    sidebarName = _('Audio/video FGDP')
     docSection = 'help-configuration-assistant-fgdp-streaming-both'
     docAnchor = ''
     docVersion = 'local'
@@ -92,7 +92,7 @@ class FGDPBothStep(FGDPStep):
 class FGDPAudioStep(FGDPStep):
     name = 'FGDP streamer (audio only)'
     title = _('FGDP Streamer (Audio Only)')
-    sidebarName = _('FGDP Audio')
+    sidebarName = _('Audio FGDP')
     docSection = 'help-configuration-assistant-fgdp-streaming-audio-only'
     docAnchor = ''
     docVersion = 'local'
@@ -104,9 +104,9 @@ class FGDPAudioStep(FGDPStep):
 
 
 class FGDPVideoStep(FGDPStep):
-    name = 'FGDP streamer (video only)'
-    title = _('FGDP Streamer (Video Only)')
-    sidebarName = _('FGDP Video')
+    name = 'Flumotion streamer (video only)'
+    title = _('Flumotion Streamer (Video Only)')
+    sidebarName = _('Video FGDP')
     docSection = 'help-configuration-assistant-fgdp-streaming-video-only'
     docAnchor = ''
     docVersion = 'local'
