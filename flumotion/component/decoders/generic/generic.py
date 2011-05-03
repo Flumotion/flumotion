@@ -130,12 +130,18 @@ class SyncKeeper(gst.Element):
 
         try:
             self._lock.acquire()
-            try:
-                buf.timestamp += self._syncTimestamp - self._syncOffset
-            except TypeError:
-                buf.timestamp = 0
-            dur = buf.duration != gst.CLOCK_TIME_NONE and buf.duration or 0
-            self._totalTime = max(buf.timestamp + dur, self._totalTime)
+            # Discard buffers outside the configured segment
+            if buf.timestamp < self._syncOffset:
+                self.warning("Could not clip buffer to segment")
+                return gst.FLOW_OK
+            # Get the input stream time of the buffer
+            buf.timestamp -= self._syncOffset
+            # Set the accumulated stream time
+            buf.timestamp += self._syncTimestamp
+            duration = 0
+            if buf.duration != gst.CLOCK_TIME_NONE:
+                duration = buf.duration
+            self._totalTime = max(buf.timestamp + duration, self._totalTime)
 
             self.log("Output %s timestamp: %s, %s" %
                 (srcpad is self.audiosrc and 'audio' or 'video',
