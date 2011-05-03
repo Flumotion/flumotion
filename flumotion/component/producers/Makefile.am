@@ -25,6 +25,6 @@ SUBDIRS = \
 	webcam \
 	looper \
 	unixdomain \
-	gdp
+	fgdp
 
 EXTRA_DIST = $(producers_DATA)

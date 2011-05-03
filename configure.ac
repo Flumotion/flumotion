@@ -174,7 +174,7 @@ flumotion/component/combiners/composite/Makefile
 flumotion/component/combiners/switch/Makefile
 flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile
-flumotion/component/consumers/gdp/Makefile
+flumotion/component/consumers/fgdp/Makefile
 flumotion/component/consumers/httpstreamer/Makefile
 flumotion/component/consumers/pipeline/Makefile
 flumotion/component/consumers/preview/Makefile
@@ -199,7 +199,7 @@ flumotion/component/producers/Makefile
 flumotion/component/producers/audiotest/Makefile
 flumotion/component/producers/bttv/Makefile
 flumotion/component/producers/firewire/Makefile
-flumotion/component/producers/gdp/Makefile
+flumotion/component/producers/fgdp/Makefile
 flumotion/component/producers/icecast/Makefile
 flumotion/component/producers/ivtv/Makefile
 flumotion/component/producers/pipeline/Makefile

@@ -2,13 +2,13 @@
 
   <components>
 
-    <component type="gdp-producer" base="flumotion/component/producers/gdp"
+    <component type="fgdp-producer" base="flumotion/component/producers/fgdp"
                _description="Produces a feed from a GStreamer TCP server.">
-      <source location="flumotion.component.producers.gdp.gdp" />
+      <source location="flumotion.component.producers.fgdp.fgdp" />
       <feeder name="default" />
       <entries>
-        <entry type="component" location="gdp.py"
-               function="GDPProducer" />
+        <entry type="component" location="fgdp.py"
+               function="FGDPProducer" />
       </entries>
       <properties>
         <property name="mode" type="string"
@@ -32,28 +32,28 @@
 
   <bundles>
 
-    <bundle name="gdp-producer-base">
+    <bundle name="fgdp-producer-base">
         <dependencies>
             <dependency name="component-base" />
             <dependency name="fgdp-base" />
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/producers/gdp">
+            <directory name="flumotion/component/producers/fgdp">
                 <filename location="__init__.py" />
             </directory>
         </directories>
     </bundle>
 
-    <bundle name="gdp-producer-component">
+    <bundle name="fgdp-producer-component">
         <dependencies>
             <dependency name="component" />
-            <dependency name="gdp-producer-base" />
+            <dependency name="fgdp-producer-base" />
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/producers/gdp">
-                <filename location="gdp.py" />
+            <directory name="flumotion/component/producers/fgdp">
+                <filename location="fgdp.py" />
             </directory>
         </directories>
     </bundle>

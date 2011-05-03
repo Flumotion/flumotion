@@ -20,25 +20,25 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
-# register gdpsink
+# register gdpsrc
 import flumotion.component.common.fgdp.fgdp
 
 __version__ = "$Rev$"
 
 
-class GDPConsumer(feedcomponent.ParseLaunchComponent):
-    logCategory = 'gdp-consumer'
+class FGDPProducer(feedcomponent.ParseLaunchComponent):
+    logCategory = 'fgdp-producer'
 
     def get_pipeline_string(self, properties):
-        return "fgdpsink name=sink"
+        return "fgdpsrc name=src"
 
     def configure_pipeline(self, pipeline, properties):
-        sink = self.get_element('sink')
-        sink.set_property('mode', properties.get('mode', 'push'))
-        sink.set_property('host', properties.get('host', 'localhost'))
-        sink.set_property('port', properties.get('port', 15000))
-        sink.set_property('username', properties.get('username', 'user'))
-        sink.set_property('password', properties.get('password', 'test'))
-        sink.set_property('version', properties.get('version', '0.1'))
-        sink.set_property('max-reconnection-delay',
-                properties.get('max-reconnection-delay', 5))
+        src = self.get_element('src')
+        src.set_property('mode', properties.get('mode', 'pull'))
+        src.set_property('host', properties.get('host', 'localhost'))
+        src.set_property('port', properties.get('port', 15000))
+        src.set_property('username', properties.get('username', 'user'))
+        src.set_property('password', properties.get('password', 'test'))
+        src.set_property('version', properties.get('version', '0.1'))
+        src.set_property('max-reconnection-delay',
+                properties.get('max-reconnection-delay', 0.5))

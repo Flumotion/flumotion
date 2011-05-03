@@ -2,9 +2,9 @@
 
   <components>
 
-    <component type="gdp-consumer" base="flumotion/component/consumers/gdp"
-               _description="Consumes a feed as a GStreamer TCP server.">
-      <source location="flumotion.component.consumers.gdp.gdp" />
+    <component type="fgdp-consumer" base="flumotion/component/consumers/fgdp"
+               _description="A consumers that streams to Flumotion.">
+      <source location="flumotion.component.consumers.fgdp.fgdp" />
       <eater name="default" />
 
       <wizard type="consumer" feeder="default"
@@ -12,8 +12,8 @@
       </wizard>
 
       <entries>
-        <entry type="component" location="gdp.py"
-               function="GDPConsumer" />
+        <entry type="component" location="fgdp.py"
+               function="FGDPConsumer" />
         <entry type="wizard" location="wizard_gtk.py"
                function="FGDPConsumerWizardPlugin" />
       </entries>
@@ -40,14 +40,14 @@
 
   <bundles>
 
-    <bundle name="gdp-consumer-base">
+    <bundle name="fgdp-consumer-base">
         <dependencies>
             <dependency name="component-base" />
             <dependency name="fgdp-base" />
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/consumers/gdp">
+            <directory name="flumotion/component/consumers/fgdp">
                 <filename location="__init__.py" />
             </directory>
         </directories>
@@ -55,26 +55,26 @@
 
     <bundle name="fgdp-wizard">
       <dependencies>
-        <dependency name="gdp-consumer-base" />
+        <dependency name="fgdp-consumer-base" />
       </dependencies>
 
       <directories>
-        <directory name="flumotion/component/consumers/gdp">
+        <directory name="flumotion/component/consumers/fgdp">
           <filename location="wizard.glade" />
           <filename location="wizard_gtk.py" />
         </directory>
       </directories>
     </bundle>
 
-    <bundle name="gdp-consumer-component">
+    <bundle name="fgdp-consumer-component">
         <dependencies>
             <dependency name="component" />
-            <dependency name="gdp-consumer-base" />
+            <dependency name="fgdp-consumer-base" />
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/consumers/gdp">
-                <filename location="gdp.py" />
+            <directory name="flumotion/component/consumers/fgdp">
+                <filename location="fgdp.py" />
             </directory>
         </directories>
     </bundle>

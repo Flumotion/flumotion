@@ -32,7 +32,7 @@ _ = gettext.gettext
 
 
 class FGDPConsumer(Consumer):
-    componentType = 'gdp-consumer'
+    componentType = 'fgdp-consumer'
     prefix = 'fgdp'
 
     def __init__(self):
