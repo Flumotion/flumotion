@@ -29,6 +29,7 @@ except ImportError:
 
 import os
 import tempfile
+import time
 from datetime import datetime, timedelta
 
 from flumotion.common import testsuite
@@ -309,12 +310,16 @@ class TestIcalBouncerFloating(TestIcalBouncerRunning, RequiredModulesMixin):
                 del os.environ['TZ']
             else:
                 os.environ['TZ'] = oldTZ
+            time.tzset()
+            eventcalendar.tz.LOCAL = tz.LocalTimezone()
             return result
 
         new_end_naive = self.half_an_hour_ago.replace(tzinfo=None)
 
         oldTZ = os.environ.get('TZ', None)
         os.environ['TZ'] = 'US/Pacific'
+        time.tzset()
+        eventcalendar.tz.LOCAL = tz.LocalTimezone()
 
         data = self.ical_from_specs('', self.half_an_hour_ago,
                                     '', new_end_naive)
