@@ -113,7 +113,7 @@ class SyncKeeper(gst.Element):
         if not self._totalTime and not self._resetReceived:
             return
         self._syncTimestamp = self._totalTime
-        self._syncOffset = start + (start - position)
+        self._syncOffset = start + position
         self._resetReceived = False
         self.info("Update sync point to % r, offset to %r" %
             (gst.TIME_ARGS(self._syncTimestamp),
