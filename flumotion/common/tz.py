@@ -149,23 +149,28 @@ class FixedOffsetTimezone(datetime.tzinfo):
 
 class LocalTimezone(datetime.tzinfo):
     """A tzinfo class representing the system's idea of the local timezone"""
-    STDOFFSET = datetime.timedelta(seconds=-time.timezone)
-    if time.daylight:
-        DSTOFFSET = datetime.timedelta(seconds=-time.altzone)
-    else:
-        DSTOFFSET = STDOFFSET
-    DSTDIFF = DSTOFFSET - STDOFFSET
+
+    EPOCHORDINAL = datetime.datetime.utcfromtimestamp(0).toordinal()
     ZERO = datetime.timedelta(0)
+
+    def __init__(self, *args):
+        datetime.tzinfo.__init__(self, args)
+        self._std_offset = datetime.timedelta(seconds=-time.timezone)
+        if time.daylight:
+            self._dst_offset = datetime.timedelta(seconds=-time.altzone)
+        else:
+            self._dst_offset = self._std_offset
+        self._dst_diff = self._dst_offset - self._std_offset
 
     def utcoffset(self, dt):
         if self._isdst(dt):
-            return self.DSTOFFSET
+            return self._dst_offset
         else:
-            return self.STDOFFSET
+            return self._std_offset
 
     def dst(self, dt):
         if self._isdst(dt):
-            return self.DSTDIFF
+            return self._dst_diff
         else:
             return self.ZERO
 
@@ -173,10 +178,11 @@ class LocalTimezone(datetime.tzinfo):
         return time.tzname[self._isdst(dt)]
 
     def _isdst(self, dt):
-        tt = (dt.year, dt.month, dt.day,
-              dt.hour, dt.minute, dt.second,
-              dt.weekday(), 0, -1)
-        return time.localtime(time.mktime(tt)).tm_isdst > 0
+        timestamp = ((dt.toordinal() - self.EPOCHORDINAL) * 86400
+                     + dt.hour * 3600
+                     + dt.minute * 60
+                     + dt.second)
+        return time.localtime(timestamp+time.timezone).tm_isdst
 LOCAL = LocalTimezone()
 
 
