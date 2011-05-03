@@ -595,7 +595,7 @@ def vDDDToDatetime(v, timezones):
             if timezone is None:
                 raise NotCompilantError("You are trying to use a timezone\
                     that is not defined in this calendar")
-            elif timezone != tz.UTC:
+            elif isinstance(timezone, tz.DSTTimezone):
                 timezone = timezone.copy()
         dt = datetime.datetime(dt.year, dt.month, dt.day,
                                dt.hour, dt.minute, dt.second,
@@ -650,7 +650,7 @@ def parseTimezone(vtimezone):
     try:
         daylight = vtimezone.walk('daylight')[0]
     except:
-        return tz.FixedOffsetTimezone(stdoffset.td, stdname)
+        return tz.FixedOffsetTimezone(stdoffset, stdname)
     else:
         dststart, dstoffsetfrom, dstoffset, dstname, dstrrule = \
                 parseObservance(daylight, 'Daylight')
