@@ -11,7 +11,7 @@ clean-local:
 
 SUBDIRS = \
 	disker \
-	gdp \
+	fgdp \
 	httpstreamer \
 	pipeline \
 	preview \

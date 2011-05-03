@@ -20,31 +20,25 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
-from flumotion.common import gstreamer, messages
-from flumotion.common.i18n import N_, gettexter
-
-T_ = gettexter()
+# register gdpsink
+import flumotion.component.common.fgdp.fgdp
 
 __version__ = "$Rev$"
 
 
-class GDPProducer(feedcomponent.ParseLaunchComponent):
-
-    def do_check(self):
-        # handle http://bugzilla.gnome.org/show_bug.cgi?id=532364
-        version = gstreamer.get_plugin_version('tcp')
-        if version >= (0, 10, 18, 0) and version < (0, 10, 19, 2):
-            m = messages.Error(T_(N_(
-                "Version %s of the '%s' GStreamer plug-in contains a bug.\n"),
-                   ".".join([str(x) for x in version]), 'tcp'),
-                mid='tcp-check')
-            m.add(T_(N_("The GDP producer cannot function with this bug.\n")))
-            m.add(T_(N_("Please upgrade '%s' to version %s."),
-                'gst-plugins-base', '0.10.20'))
-            self.addMessage(m)
+class FGDPConsumer(feedcomponent.ParseLaunchComponent):
+    logCategory = 'fgdp-consumer'
 
     def get_pipeline_string(self, properties):
-        host = properties['host']
-        port = properties['port']
+        return "fgdpsink name=sink"
 
-        return 'tcpclientsrc host=%s port=%d ! gdpdepay' % (host, port)
+    def configure_pipeline(self, pipeline, properties):
+        sink = self.get_element('sink')
+        sink.set_property('mode', properties.get('mode', 'push'))
+        sink.set_property('host', properties.get('host', 'localhost'))
+        sink.set_property('port', properties.get('port', 15000))
+        sink.set_property('username', properties.get('username', 'user'))
+        sink.set_property('password', properties.get('password', 'test'))
+        sink.set_property('version', properties.get('version', '0.1'))
+        sink.set_property('max-reconnection-delay',
+                properties.get('max-reconnection-delay', 5))

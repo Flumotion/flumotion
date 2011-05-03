@@ -1,0 +1,63 @@
+<registry>
+
+  <components>
+
+    <component type="fgdp-producer" base="flumotion/component/producers/fgdp"
+               _description="Produces a feed from a Flumotion server.">
+      <source location="flumotion.component.producers.fgdp.fgdp" />
+      <feeder name="default" />
+      <entries>
+        <entry type="component" location="fgdp.py"
+               function="FGDPProducer" />
+      </entries>
+      <properties>
+        <property name="mode" type="string"
+		_description="Connection mode between 'push' and 'pull' mode. (default: pull)" />
+        <property name="host" type="string"
+                  _description="The host name or IP address of the pull server, only required in push mode." />
+        <property name="port" type="int" required="true"
+                  _description="The port of the peer." />
+        <property name="username" type="string"
+                  _description="User name for the authentication (default: user)" />
+        <property name="password" type="string"
+                  _description="Password used for the authentication (default: test)" />
+        <property name="version" type="string"
+                  _description="Version of the protocol used (default: 0.1)" />
+        <property name="max-reconnection-delay" type="int"
+                  _description="Maximum number of seconds between connection attempt, has only effect in push mode. (default: 5)" />
+      </properties>
+    </component>
+
+  </components>
+
+  <bundles>
+
+    <bundle name="fgdp-producer-base">
+        <dependencies>
+            <dependency name="component-base" />
+            <dependency name="fgdp-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/fgdp">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="fgdp-producer-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="fgdp-producer-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/producers/fgdp">
+                <filename location="fgdp.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry>
