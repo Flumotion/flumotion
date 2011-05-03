@@ -31,7 +31,7 @@ from flumotion.common import format as formatting
 from flumotion.component.base.admin_gtk import BaseAdminGtk
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 
-from flumotion.common.eventcalendar import LOCAL, UTC
+from flumotion.common.tz import LOCAL, UTC
 
 _ = gettext.gettext
 

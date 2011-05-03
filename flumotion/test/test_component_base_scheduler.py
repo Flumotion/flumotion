@@ -32,10 +32,8 @@ import icalendar
 from twisted.internet import defer, reactor
 
 from flumotion.common import eventcalendar, testsuite
+from flumotion.common.tz import LOCAL
 from flumotion.component.base import scheduler
-
-LOCAL = eventcalendar.LOCAL
-UTC = eventcalendar.UTC
 
 
 def _now(tz=LOCAL):

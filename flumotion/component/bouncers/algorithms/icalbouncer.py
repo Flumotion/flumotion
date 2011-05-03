@@ -29,7 +29,7 @@ from twisted.internet import defer
 
 from flumotion.common import keycards, messages, errors
 from flumotion.common import log, documentation
-from flumotion.common import eventcalendar
+from flumotion.common import eventcalendar, tz
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component.base import scheduler
 from flumotion.component.bouncers.algorithms import base
@@ -100,7 +100,7 @@ class IcalBouncerAlgorithm(base.BouncerAlgorithm):
 
         # need to check if inside an event time
         cal = self.iCalScheduler.getCalendar()
-        now = datetime.now(eventcalendar.UTC)
+        now = datetime.now(tz.UTC)
         eventInstances = cal.getActiveEventInstances()
         if not eventInstances:
             keycard.state = keycards.REFUSED
@@ -138,7 +138,7 @@ class IcalBouncerAlgorithm(base.BouncerAlgorithm):
 
     def _eventEnded(self, event):
         self.debug("_eventEnded")
-        if not event.start < datetime.now(eventcalendar.UTC) < event.end:
+        if not event.start < datetime.now(tz.UTC) < event.end:
             return
         cal = self.iCalScheduler.getCalendar()
         eventInstances = cal.getActiveEventInstances()
