@@ -151,6 +151,7 @@ class _ProtocolMixin():
     host = None
     port = None
     _listener = None
+    _connector = None
 
     def start(self):
         """
