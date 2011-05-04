@@ -23,7 +23,6 @@ import gobject
 import gst
 
 from twisted.internet import reactor
-from twisted.python import failure
 
 from flumotion.component.common.fgdp import protocol as fgdp
 
@@ -83,7 +82,6 @@ class FDSrc(FDHandler):
             # socket is 0 Bytes. Remove the handler and close the connection
             pad.remove_event_probe(self._handler_id)
             if self.protocol is not None:
-                f = failure.Failure("Lost connection with client")
                 reactor.callFromThread(self.protocol.loseConnection)
             return False
         return True
@@ -123,7 +121,6 @@ class MultiFDSink(FDHandler):
 
     def _on_client_removed(self, a, fd):
         if self.protocol is not None:
-            f = failure.Failure("Lost connection with client")
             reactor.callFromThread(self.protocol.loseConnection)
         self.fdelement.handler_disconnect(self._handler_id)
 
