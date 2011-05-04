@@ -169,10 +169,13 @@ class _ProtocolMixin():
         if self._listener is not None:
             self._listener.stopListening()
 
+        if self._connector is not None:
+            self._connector.disconnect()
+
     def _start_push(self):
         self.info("Starting fgdp client")
         factory = fgdp.FGDPClientFactory(self)
-        self._listener = reactor.connectTCP(self.host, self.port, factory)
+        self._connector = reactor.connectTCP(self.host, self.port, factory)
 
     def _start_pull(self):
         self.info("Starting fgdp server")
