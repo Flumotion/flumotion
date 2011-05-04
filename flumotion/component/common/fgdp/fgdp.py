@@ -188,7 +188,7 @@ class FGDPBase(gst.Bin, _ProtocolMixin):
 
     mode = 'pull'
     host = 'localhost'
-    port = 12000
+    port = 15000
     username = 'user'
     maxDelay = 5
     version = '0.1'
@@ -202,7 +202,7 @@ class FGDPBase(gst.Bin, _ProtocolMixin):
             'localhost', gobject.PARAM_READWRITE),
         'port': (gobject.TYPE_INT, 'port',
             'Connection port',
-            1, 10000, 100, gobject.PARAM_READWRITE),
+            1, 64000, 15000, gobject.PARAM_READWRITE),
         'username': (gobject.TYPE_STRING, 'user name',
             'Username for the authentication',
             'user', gobject.PARAM_READWRITE),
