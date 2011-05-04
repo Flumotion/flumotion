@@ -44,7 +44,7 @@ class FDHandler():
 
     def connectFd(self, fd):
         '''
-        Connect a file descriptor to the gstreamer element that will be
+        Connects a file descriptor to the gstreamer element that will be
         writting to it or reading from it
 
         @type  fd: int
@@ -144,7 +144,7 @@ class _ProtocolMixin():
 
     @type  mode:     str
     @type  host:     str
-    @type  port:     str
+    @type  port:     int
     """
 
     mode = ''
@@ -156,7 +156,6 @@ class _ProtocolMixin():
         """
         Starts a server/client using the FGDP protocol when the element
         is ready.
-
         """
         if self.mode == 'push':
             self._start_push()
@@ -257,7 +256,7 @@ class FGDPBase(gst.Bin, _ProtocolMixin):
     def prepare(self):
         """
         Should be implemented by subclasses that needs to do something
-        befaore starting the server/client
+        before starting the server/client
         """
         pass
 

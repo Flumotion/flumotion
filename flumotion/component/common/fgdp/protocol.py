@@ -201,7 +201,7 @@ class FGDP_0_1():
 
 class FGDPBaseProtocol(LineReceiver, log.Loggable):
     """
-    Base class for the tiwsted side of the FGDP protocol
+    Base class for the twisted side of the FGDP protocol
     """
 
     _transport = None
@@ -215,15 +215,33 @@ class FGDPBaseProtocol(LineReceiver, log.Loggable):
         self._gstElement.protocol = self
 
     def startProtocol(self):
-        raise NotImplemented()
+        """
+        Subclasses must implement this method to start the protocol after a
+        new connection has been made
+        """
+        raise NotImplemented('Subclasses must implement "startProtocol"')
 
     def stopProtocol(self):
-        raise NotImplemented()
+        """
+        Subclasses must implement this method to stop the protocol after the
+        connection has been closed
+        """
+        raise NotImplemented('Subclasses must implement "stopProtocol"')
 
     def lineReceived(self, line):
-        raise NotImplemented()
+        """
+        Subclasess must implement this method to process the messages of the
+        line-based protocol
+
+        @type line: str
+        """
+        raise NotImplemented('Subclasses must implement "lineReceived"')
 
     def makeConnection(self, transport):
+        """
+        Store a reference of the trasport and file descriptor of the
+        used by the new connection
+        """
         self._transport = transport
         self._fd = transport.fileno()
         self.connectionMade()
@@ -238,6 +256,13 @@ class FGDPBaseProtocol(LineReceiver, log.Loggable):
         self.stopProtocol()
 
     def loseConnection(self):
+        """
+        Loses the current connection and triggers the stop of the protocol.
+        Once the authentication has finished, the file descriptor is not
+        handled anymore by the twisted reactor. A disconnection in the
+        gstreamer element handling the file descriptor should call this method
+        to notify the protocol about it.
+        """
         if self._transport is not None:
             self._transport.loseConnection()
 
@@ -286,6 +311,8 @@ class FGDPServer_0_1(FGDP_0_1, FGDPBaseProtocol):
         FGDPBaseProtocol.__init__(self, gstElement)
 
     def makeConnection(self, transport):
+        # The protocol must refuse new connections if a client is already
+        # connected.
         self.factory.clients += 1
         if self.factory.clients > 1:
             r = Response(self.ERROR_RESPONSE, "already connected",
