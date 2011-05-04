@@ -20,12 +20,12 @@
 # Headers in this file shall remain intact.
 
 import base64
+from random import Random
 
 from twisted.internet import reactor
 from twisted.internet.protocol import ReconnectingClientFactory, Factory
 from twisted.protocols.basic import LineReceiver
 
-from Crypto import Random
 from Crypto.Hash import SHA
 
 from flumotion.common import log
@@ -307,7 +307,7 @@ class FGDPServer_0_1(FGDP_0_1, FGDPBaseProtocol):
     def __init__(self, gstElement):
         self._user = gstElement.username
         self._password = gstElement.password
-        self._random = Random.new()
+        self._random = Random()
         FGDPBaseProtocol.__init__(self, gstElement)
 
     def makeConnection(self, transport):
@@ -376,9 +376,10 @@ class FGDPServer_0_1(FGDP_0_1, FGDPBaseProtocol):
     def _challengeClient(self):
         self.info("Challenging client")
         self._state = self.SERVER_STATE_AUTHENTICATE
-        self._challenge = base64.b64encode(self._random.read(1024))
+        self._challenge = base64.b64encode(
+                            str(self._random.getrandbits(1024)))
         response = Response(self.CHALLENGE_RESPONSE, self._challenge,
-                           self._version)
+                            self._version)
         self._sendMessage(response)
 
     def _startStreaming(self):
