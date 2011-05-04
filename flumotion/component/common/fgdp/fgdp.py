@@ -177,7 +177,6 @@ class _ProtocolMixin():
     def _start_pull(self):
         self.info("Starting fgdp server")
         factory = fgdp.FGDPServerFactory(self)
-        # FIXME: Handle port already in use
         self._listener = reactor.listenTCP(self.port, factory)
 
 
@@ -223,13 +222,20 @@ class FGDPBase(gst.Bin, _ProtocolMixin):
                                      gobject.TYPE_NONE,
                                      (gobject.TYPE_STRING, ))}
 
+    def _handle_error(self, message):
+        err = gst.GError(gst.RESOURCE_ERROR,
+                         gst.RESOURCE_ERROR_FAILED, message)
+        m = gst.message_new_error(self, err, message)
+        self.post_message(m)
+        self.error(message)
+
     def do_change_state(self, transition):
         if transition == gst.STATE_CHANGE_READY_TO_PAUSED:
             try:
                 self.prepare()
                 self.start()
             except Exception, e:
-                self.error("Error changing state from READY to PAUSED: %s" % e)
+                self._handle_error(str(e))
                 self.stop()
                 return gst.STATE_CHANGE_FAILURE
         elif transition == gst.STATE_CHANGE_PAUSED_TO_READY:
