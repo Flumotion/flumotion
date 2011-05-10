@@ -46,7 +46,7 @@ class VP8(feedcomponent.EncoderComponent):
                 addMessage(msg)
                 raise errors.ConfigError(msg)
 
-        check_limit('speed', 0, 2)
+        check_limit('speed', 0, 7)
         check_limit('threads', 1, 64)
 
     def get_pipeline_string(self, properties):
