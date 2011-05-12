@@ -339,6 +339,13 @@ class TimeoutException(Exception):
     "Timed out"
 
 
+# effect errors
+
+
+class PropertyNotModifiableError(pb.Error):
+    "The property cannnot be modified with the component already set-up"
+
+
 # serializable GStreamer errors
 
 
