@@ -221,10 +221,12 @@ class FGDPBaseProtocol(LineReceiver, log.Loggable):
         """
         raise NotImplemented('Subclasses must implement "startProtocol"')
 
-    def stopProtocol(self):
+    def stopProtocol(self, reason):
         """
         Subclasses must implement this method to stop the protocol after the
         connection has been closed
+
+        @type reason: L{twsited.python.failure.Failure}
         """
         raise NotImplemented('Subclasses must implement "stopProtocol"')
 
@@ -253,7 +255,7 @@ class FGDPBaseProtocol(LineReceiver, log.Loggable):
     def connectionLost(self, reason):
         self.info("Connection lost with FGDP peer: %s",
                   reason.getErrorMessage())
-        self.stopProtocol()
+        self.stopProtocol(reason)
 
     def loseConnection(self):
         """
@@ -276,9 +278,10 @@ class FGDPBaseProtocol(LineReceiver, log.Loggable):
         self.debug('Sending message: "%s"', message)
         transport.write("%s\r\n" % message)
 
-    def _disconnectFD(self):
+    def _disconnectFD(self, reason):
         if self._fd != None:
             self._gstElement.disconnectFd(self._fd)
+        self._gstElement.emit('disconnected', reason.getErrorMessage())
 
     def _delegateFD(self):
         # Take out the fd from twisted reactor and pass it to element
@@ -286,6 +289,7 @@ class FGDPBaseProtocol(LineReceiver, log.Loggable):
         # See http://twistedmatrix.com/trac/ticket/1796
         reactor.removeReader(self._transport)
         self._gstElement.connectFd(self._fd)
+        self._gstElement.emit('connected')
 
 
 class FGDPServer_0_1(FGDP_0_1, FGDPBaseProtocol):
@@ -327,12 +331,12 @@ class FGDPServer_0_1(FGDP_0_1, FGDPBaseProtocol):
     def startProtocol(self):
         pass
 
-    def stopProtocol(self):
+    def stopProtocol(self, reason):
         self.info("Stopping protocol session")
         self.connected = 0
         self.factory.clients -= 1
         self._state = self.SERVER_STATE_DISCONNECTED
-        self._disconnectFD()
+        self._disconnectFD(reason)
 
     def lineReceived(self, line):
         # Parse command and check state
@@ -421,10 +425,10 @@ class FGDPClient_0_1(FGDP_0_1, FGDPBaseProtocol):
         self.info("Starting protocol session")
         self._login()
 
-    def stopProtocol(self):
+    def stopProtocol(self, reason):
         self.info('Stopping protocol session')
         self._state = self.CLIENT_STATE_DISCONNECTED
-        self._disconnectFD()
+        self._disconnectFD(reason)
 
     def lineReceived(self, line):
         # Parse response and check state

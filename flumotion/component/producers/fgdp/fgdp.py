@@ -42,3 +42,11 @@ class FGDPProducer(feedcomponent.ParseLaunchComponent):
         src.set_property('version', properties.get('version', '0.1'))
         src.set_property('max-reconnection-delay',
                 properties.get('max-reconnection-delay', 0.5))
+        src.connect('connected', self._on_connected)
+        src.connect('disconnected', self._on_disconnected)
+
+    def _on_connected(self, element):
+        self.info("FGDP producer connected")
+
+    def _on_disconnected(self, element, reason):
+        self.info("FGDP producer disconnected: %s", reason)

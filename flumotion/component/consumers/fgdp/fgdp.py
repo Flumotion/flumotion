@@ -42,3 +42,11 @@ class FGDPConsumer(feedcomponent.ParseLaunchComponent):
         sink.set_property('version', properties.get('version', '0.1'))
         sink.set_property('max-reconnection-delay',
                 properties.get('max-reconnection-delay', 5))
+        sink.connect('connected', self._on_connected)
+        sink.connect('disconnected', self._on_disconnected)
+
+    def _on_connected(self, element):
+        self.info("FGDP consumer connected")
+
+    def _on_disconnected(self, element, reason):
+        self.info("FGDP consumer disconnected: %s", reason)
