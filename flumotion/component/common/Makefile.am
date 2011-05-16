@@ -1,6 +1,6 @@
 include $(top_srcdir)/common/python.mk
 
-commondir = $(libdir)/flumotion/python/flumotion/common
+commondir = $(libdir)/flumotion/python/flumotion/component/common
 common_DATA =
 common_PYTHON = \
 	__init__.py
