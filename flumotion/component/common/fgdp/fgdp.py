@@ -193,6 +193,7 @@ class FGDPBase(gst.Bin, _ProtocolMixin):
     host = 'localhost'
     port = 15000
     username = 'user'
+    password = 'test'
     maxDelay = 5
     version = '0.1'
 
