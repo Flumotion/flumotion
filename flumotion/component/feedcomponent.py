@@ -733,7 +733,7 @@ class ReconfigurableComponent(ParseLaunchComponent):
         def input_reset_event(pad, event):
             if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
                 return True
-            if event.get_structure().get_name() != 'flumotion-reset':
+            if gstreamer.event_is_flumotion_reset(event):
                 return True
             if self.disconnectedPads:
                 return False
@@ -794,12 +794,9 @@ class ReconfigurableComponent(ParseLaunchComponent):
             pad.set_blocked_async(False, self._on_eater_blocked)
 
     def _send_reset_event(self):
-        event = gst.event_new_custom(gst.EVENT_CUSTOM_DOWNSTREAM,
-                                     gst.Structure('flumotion-reset'))
-
         for elem in self.get_output_elements():
             pad = elem.get_pad('sink')
-            pad.send_event(event)
+            pad.send_event(gstreamer.flumotion_reset_event())
 
     def _unlink_pads(self, element, directions):
         for pad in element.pads():

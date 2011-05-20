@@ -27,7 +27,7 @@ import gst
 import gst.interfaces
 
 from flumotion.common.i18n import N_, gettexter
-from flumotion.common import errors, messages
+from flumotion.common import errors, messages, gstreamer
 from flumotion.component.effects.audiorate import audiorate
 from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
@@ -64,7 +64,7 @@ class DecoderComponent(fc.ReconfigurableComponent):
     def _depay_reset_event(self, pad, event, eater):
         if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
             return True
-        if event.get_structure().get_name() != 'flumotion-reset':
+        if gstreamer.event_is_flumotion_reset(event):
             return True
         self.info("Received flumotion-reset, not droping buffers anymore")
 

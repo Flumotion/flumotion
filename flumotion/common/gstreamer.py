@@ -166,6 +166,17 @@ def get_state_change(old, new):
     return table.get((old, new), 0)
 
 
+def flumotion_reset_event():
+    ''' Helper method to create a 'flumotion-reset' event '''
+    return gst.event_new_custom(gst.EVENT_CUSTOM_DOWNSTREAM,
+                                gst.Structure('flumotion-reset'))
+
+
+def event_is_flumotion_reset(event):
+    ''' Helper method to check if an event is a 'flumotion-reset' event '''
+    return event.get_structure().get_name() == 'flumotion-reset'
+
+
 class StateChangeMonitor(dict, log.Loggable):
 
     def __init__(self):

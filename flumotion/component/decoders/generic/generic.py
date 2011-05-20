@@ -24,7 +24,7 @@ import gobject
 import threading
 
 from flumotion.component import decodercomponent as dc
-from flumotion.common import messages
+from flumotion.common import messages, gstreamer
 from flumotion.common.i18n import N_, gettexter
 
 T_ = gettexter()
@@ -163,7 +163,7 @@ class SyncKeeper(gst.Element):
             if event.type == gst.EVENT_NEWSEGMENT:
                 u, r, f, start, s, position = event.parse_new_segment()
                 self._update_sync_point(start, position)
-            if event.get_structure().get_name() == 'flumotion-reset':
+            if gstreamer.event_is_flumotion_reset(event):
                 self._resetReceived = True
                 self._send_new_segment = True
         finally:

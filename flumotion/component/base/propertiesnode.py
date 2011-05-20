@@ -40,6 +40,9 @@ class PropertiesAdminGtkNode(BaseAdminGtkNode):
     gladeFile = os.path.join('flumotion', 'component', 'base',
         'properties.glade')
 
+    uiStateHandlers = None
+    _properties = {}
+
     def __init__(self, state, admin):
         BaseAdminGtkNode.__init__(self, state, admin, title=_("Properties"))
 
@@ -54,12 +57,24 @@ class PropertiesAdminGtkNode(BaseAdminGtkNode):
         self.widget.pack_start(self.properties, False, False)
         self.properties.show()
 
-        properties = self.state.get('config')['properties']
+        self._reloadProperties(self.state.get('config')['properties'])
+        return self.widget
+
+    # IStateListener Interface
+
+    def stateSet(self, object, key, value):
+        if key == 'properties':
+            self._reloadProperties(value)
+
+    ### Private methods
+
+    def _reloadProperties(self, properties):
+        if properties is None:
+            return
+        self.properties.clear()
         propertyNames = properties.keys()[:]
         propertyNames.sort()
 
         for name in propertyNames:
             self.properties.append(
                 Settable(name=name, value=properties[name]))
-
-        return self.widget

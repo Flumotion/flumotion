@@ -667,6 +667,82 @@ class FeedComponent(basecomponent.BaseComponent):
 
         return value
 
+    def modify_element_property(self, element_name, property_name, value,
+                                mutable_state=gst.STATE_READY,
+                                needs_reset=False):
+        '''
+        Sets a property on the fly on a gstreamer element
+
+        @param element_name: Name of the gstreamer element
+        @type  element_name: str
+        @param property_name: Name of the property to change
+        @type  property_name: str
+        @param value: Value to set
+        @param mutable_state: Minimum state required to set the property
+        @type  mutable_state: L{gst.Enum}
+        @param needs_reset: Whether setting this property requires sending a
+                            'flumotion-reset' event
+        @type  needs_reset: bool
+        '''
+
+        def drop_stream_headers(pad, buf):
+            if buf.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
+                return False
+            pad.remove_buffer_probe(probes[pad])
+            return True
+
+        probes = {}
+        element = self.get_element(element_name)
+        if not element:
+            self.warning("The property %s cannot be set because the "
+                         "element %s could not be found",
+                         property_name, element_name)
+            return
+
+        state = self.pipeline.get_state(0)[1]
+
+        # get the peer pad for each sink pad
+        sink_pads = [p.get_peer() for p in element.pads()
+                        if p.get_direction() == gst.PAD_SINK]
+        src_pads = [p for p in element.pads()
+                        if p.get_direction() == gst.PAD_SRC]
+
+        # Iterate over all the sink pads and block them
+        for pad in sink_pads:
+            pad.set_blocked(True)
+
+        # If the state of the element is above the mutable state of the
+        # property, we need to change its state to the mutable one, block the
+        # sink pads, set the property, unblock the sink pads and set the
+        # element's state back to its original state
+        if state > mutable_state:
+            element.set_state(mutable_state)
+            element.get_state(0)
+
+        element.set_property(property_name, value)
+
+        # If the property change cause creating new streamheaders,
+        # sending a 'flumotion-reset' event is needed to instruct the
+        # downstream elements like muxers to reset them self
+        if needs_reset:
+            for pad in src_pads:
+                pad.push_event(gstreamer.flumotion_reset_event())
+
+        # If a reset is not needed we must make sure to drop the duplicated
+        # streamheaders, iterating over all the src pads and installing a
+        # pad_probe to drop them. (eg: theora restarted after a bitrate change
+        # re-sending the headers again)
+        else:
+            for pad in src_pads:
+                probes[pad] = pad.add_buffer_probe(drop_stream_headers)
+
+        if state > mutable_state:
+            element.set_state(state)
+
+        # Unblock all sink pads
+        for pad in sink_pads:
+            pad.set_blocked(False)
+
     def set_element_property(self, element_name, property, value):
         'Sets a property on an element in the GStreamer pipeline.'
         self.debug("%s: setting property %s of element %s to %s" % (

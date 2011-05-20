@@ -73,3 +73,9 @@ class VP8(feedcomponent.EncoderComponent):
                 eproperty, value))
 
             element.set_property(eproperty, value)
+
+    def modify_property_Bitrate(self, value):
+        if not self.checkPropertyType('bitrate', value, int):
+            return False
+        self.modify_element_property('encoder', 'bitrate', value)
+        return True

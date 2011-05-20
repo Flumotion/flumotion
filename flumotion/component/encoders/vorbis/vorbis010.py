@@ -83,18 +83,19 @@ class Vorbis(feedcomponent.EncoderComponent):
             in_rate = caps[0]['rate']
 
             # now do necessary filtercaps
-            rate = in_rate
+            self.rate = in_rate
             if self.bitrate > -1:
                 maxsamplerate = get_max_sample_rate(
                     self.bitrate, self.channels)
                 if in_rate > maxsamplerate:
-                    rate = get_preferred_sample_rate(maxsamplerate)
+                    self.rate = get_preferred_sample_rate(maxsamplerate)
                     self.debug(
                         'rate %d > max rate %d (for %d kbit/sec), '
                         'selecting rate %d instead' % (
-                        in_rate, maxsamplerate, self.bitrate, rate))
+                        in_rate, maxsamplerate, self.bitrate, self.rate))
 
-            caps_str = 'audio/x-raw-float, rate=%d, channels=%d' % (rate,
+
+            caps_str = 'audio/x-raw-float, rate=%d, channels=%d' % (self.rate,
                         self.channels)
             cf.set_property('caps',
                             gst.caps_from_string(caps_str))
@@ -102,3 +103,15 @@ class Vorbis(feedcomponent.EncoderComponent):
             return True
 
         handle = pad.add_buffer_probe(buffer_probe)
+
+    def modify_property_Bitrate(self, value):
+        if not self.checkPropertyType('bitrate', value, int):
+            return False
+        maxsamplerate = get_max_sample_rate(value, self.channels)
+        if self.rate > maxsamplerate:
+            self.warning("Could not set property 'bitrate' on the theora "
+                "encoder: rate %d > max rate %d (for %d kbit/sec)" % (
+                self.rate, maxsamplerate, value))
+            return False
+        self.modify_element_property('enc', 'bitrate', value, needs_reset=True)
+        return True

@@ -1294,9 +1294,9 @@ class RegistryDirectory(log.Loggable):
 
     def rebuildNeeded(self, mtime):
 
-        def _rebuildNeeded(file):
+        def _rebuildNeeded(f):
             try:
-                if _getMTime(file) > mtime:
+                if _getMTime(f) > mtime:
                     self.debug("Path %s changed since registry last "
                                "scanned", f)
                     return True
