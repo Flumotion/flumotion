@@ -102,9 +102,7 @@ class VideoscaleBin(gst.Bin):
             # unlink the sink and source pad of the old deinterlacer
             reactor.callFromThread(blockPad.set_blocked, False)
 
-        event = gst.event_new_custom(gst.EVENT_CUSTOM_DOWNSTREAM,
-            gst.Structure('flumotion-reset'))
-        self._sinkPad.send_event(event)
+        self._sinkPad.send_event(gstreamer.flumotion_reset_event())
 
         # We might be called from the streaming thread
         self.info("Replaced capsfilter")
