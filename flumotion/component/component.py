@@ -379,6 +379,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
         self.uiState.addKey('total-memory')
         self.uiState.addKey('num-cpus')
         self.uiState.addKey('flu-debug')
+        self.uiState.addKey('properties')
 
         self.uiState.addHook(self)
 
@@ -794,7 +795,11 @@ class BaseComponent(common.InitMixin, log.Loggable):
         if not hasattr(self, method_name):
             raise errors.PropertyNotModifiableError("%s" % (property_name))
         method = getattr(self, method_name)
-        return method(value)
+        if not method(value):
+            return False
+        self.config['properties'][property_name] = value
+        self.uiState.set('properties', self.config['properties'])
+        return True
 
     def checkPropertyType(self, property_name, value, allowed_type):
         """
