@@ -415,6 +415,16 @@ class ComponentAvatar(base.ManagerAvatar):
         return self.mindCallRemote('feedTo', feederName, fullFeedId,
                                    host, port)
 
+    def modifyProperty(self, property_name, value):
+        """
+        Tell the remote component to modify a property with a new value.
+
+        @param property_name: The name of the property to change
+        @param value: The new value of the property
+        @rtype: L{twisted.internet.defer.Deferred}
+        """
+        return self.mindCallRemote('modifyProperty', property_name, value)
+
     # FIXME: maybe make a BouncerComponentAvatar subclass ?
 
     def authenticate(self, keycard):
