@@ -1,0 +1,80 @@
+<registry>
+  <components>
+    <component type="blackmagic-producer"
+               base="flumotion/component/producers/blackmagic"
+               _description="Produces feeds from a BlackMagic/DV device.">
+      <source location="flumotion.component.producers.blackmagic.blackmagic" />
+      <feeder name="audio" />
+      <feeder name="video" />
+      <feeder name="dv" />
+      <entries>
+        <entry type="component" location="blackmagic.py"
+               function="BlackMagic" />
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
+      </entries>
+
+      <synchronization required="yes" clock-priority="160" />
+
+      <properties>
+        <property name="height" type="int"
+                  _description="The height to scale to." />
+        <property name="width" type="int"
+                  _description="The final width, including correction." />
+        <property name="deinterlace-mode" type="string"
+                  _description="The deinterlacing mode to use.(default=auto)" />
+        <property name="deinterlace-method" type="string"
+                  _description="The deinterlacing method to use.(default=ffmpeg)" />
+      </properties>
+    </component>
+  </components>
+  <bundles>
+    <bundle name="blackmagic-base">
+       <dependencies>
+           <dependency name="component-base" />
+       </dependencies>
+
+       <directories>
+           <directory name="flumotion/component/producers/blackmagic">
+               <filename location="__init__.py" />
+           </directory>
+       </directories>
+    </bundle>
+
+    <bundle name="blackmagic-admin-gtk">
+       <dependencies>
+           <dependency name="blackmagic-base" />
+           <dependency name="base-admin-gtk" />
+           <dependency name="volume-admin-gtk" />
+           <dependency name="deinterlace-admin-gtk" />
+           <dependency name="videoscale-admin-gtk" />
+       </dependencies>
+
+       <directories>
+           <directory name="flumotion/component/producers/blackmagic">
+               <filename location="admin_gtk.py" />
+           </directory>
+       </directories>
+    </bundle>
+
+    <bundle name="blackmagic-component">
+       <dependencies>
+           <dependency name="component" />
+           <dependency name="blackmagic-base" />
+           <dependency name="deinterlace-effect" />
+           <dependency name="videoscale-effect" />
+           <dependency name="videorate-effect" />
+           <dependency name="audiorate-effect" />
+           <dependency name="volume-effect" />
+           <dependency name="producer-checks" />
+       </dependencies>
+
+       <directories>
+           <directory name="flumotion/component/producers/blackmagic">
+               <filename location="blackmagic.py" />
+           </directory>
+       </directories>
+    </bundle>
+
+  </bundles>
+</registry>

@@ -13,6 +13,7 @@ clean-local:
 SUBDIRS = \
 	audiotest \
 	bttv \
+	blackmagic \
 	firewire \
 	icecast \
 	ivtv \
