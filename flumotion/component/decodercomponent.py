@@ -28,7 +28,7 @@ import gst.interfaces
 
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common import errors, messages, gstreamer
-from flumotion.component.effects.audiorate import audiorate
+from flumotion.component.effects.audioconvert import audioconvert
 from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
 from flumotion.component import feedcomponent as fc
@@ -103,8 +103,9 @@ class DecoderComponent(fc.ReconfigurableComponent):
         props = self.config['properties']
         samplerate = props.get('samplerate', 44100)
 
-        self.ar = audiorate.Audiorate('audiorate', None,
-                                      self.pipeline, samplerate)
+        self.ar = audioconvert.Audioconvert('audioconvert', None,
+                                            self.pipeline,
+                                            samplerate=samplerate)
         self.addEffect(self.ar)
 
     def _new_decoded_pad_cb(self, decoder, pad, last):

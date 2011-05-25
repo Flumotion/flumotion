@@ -28,7 +28,7 @@ from flumotion.component import feedcomponent
 from flumotion.component.effects.deinterlace import deinterlace
 from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
-from flumotion.component.effects.audiorate import audiorate
+from flumotion.component.effects.audioconvert import audioconvert
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -156,8 +156,9 @@ class Firewire(feedcomponent.ParseLaunchComponent):
 
         # Setting a tolerance of 20ms should be enough (1/2 frame), but
         # we set it to 40ms to be more conservatives
-        ar = audiorate.Audiorate('audiorate', comp_level.get_pad("src"),
-                                 pipeline, tolerance=40 * gst.MSECOND)
+        ar = audioconvert.Audioconvert('audioconvert',
+                                       comp_level.get_pad("src"),
+                                       pipeline, tolerance=40 * gst.MSECOND)
         self.addEffect(ar)
         ar.plug()
 
