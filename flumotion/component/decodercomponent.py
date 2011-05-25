@@ -102,9 +102,10 @@ class DecoderComponent(fc.ReconfigurableComponent):
         # valid video pad
         props = self.config['properties']
         samplerate = props.get('samplerate', 44100)
+        channels = props.get('channels', 2)
 
         self.ar = audioconvert.Audioconvert('audioconvert', None,
-                                            self.pipeline,
+                                            self.pipeline, channels=channels,
                                             samplerate=samplerate)
         self.addEffect(self.ar)
 

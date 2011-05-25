@@ -28,6 +28,8 @@
                   _description="Output framerate." />
         <property name="samplerate" type="int"
                   _description="Output samplerate." />
+        <property name="channels" type="int"
+                  _description="Number of output audio channels." />
         <property name="is-square" type="bool"
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
         <property name="add-borders" type="bool"
@@ -61,6 +63,8 @@
                   _description="Output framerate." />
         <property name="samplerate" type="int"
                   _description="Output samplerate." />
+        <property name="channels" type="int"
+                  _description="Number of output audio channels." />
         <property name="is-square" type="bool"
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
         <property name="add-borders" type="bool"
