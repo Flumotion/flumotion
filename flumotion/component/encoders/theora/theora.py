@@ -97,5 +97,5 @@ class Theora(feedcomponent.EncoderComponent):
     def modify_property_Bitrate(self, value):
         if not self.checkPropertyType('bitrate', value, int):
             return False
-        self.modify_element_property('encoder', 'bitrate', value)
+        self.modify_element_property('encoder', 'bitrate', value/1000)
         return True
