@@ -17,6 +17,8 @@
       <synchronization required="yes" clock-priority="160" />
 
       <properties>
+        <property name="video-format" type="int"
+                  _description="The incoming SDI video format." />
         <property name="height" type="int"
                   _description="The height to scale to." />
         <property name="width" type="int"

@@ -77,6 +77,7 @@ class BlackMagic(feedcomponent.ParseLaunchComponent):
 
         self.width = props.get('width', 1920)
         self.height = props.get('height', 1080)
+        self.video_format = props.get('video-format', 8)
         decoder = props.get('decoder', 'dvdec')
         self.deintMode = props.get('deinterlace-mode', 'auto')
         self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
@@ -85,13 +86,13 @@ class BlackMagic(feedcomponent.ParseLaunchComponent):
         # replace it with videotestsrc of the same size and PAR, so we can
         # unittest the pipeline
         # need a queue in case tcpserversink blocks somehow
-        template = ('mmtblackmagicsrc name=src'
+        template = ('mmtblackmagicsrc name=src video-format=%s'
                     '  src.src_video ! queue '
                     '    ! @feeder:video@'
                     '  src.src_audio ! queue '
                     '    ! volume name=setvolume'
                     '    ! level name=volumelevel message=true '
-                    '    ! @feeder:audio@')
+                    '    ! @feeder:audio@' % (self.video_format, ))
 
         return template
 
