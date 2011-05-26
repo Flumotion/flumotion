@@ -64,7 +64,7 @@ class DecoderComponent(fc.ReconfigurableComponent):
     def _depay_reset_event(self, pad, event, eater):
         if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
             return True
-        if gstreamer.event_is_flumotion_reset(event):
+        if not gstreamer.event_is_flumotion_reset(event):
             return True
         self.info("Received flumotion-reset, not droping buffers anymore")
 

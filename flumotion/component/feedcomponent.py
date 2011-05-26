@@ -733,7 +733,7 @@ class ReconfigurableComponent(ParseLaunchComponent):
         def input_reset_event(pad, event):
             if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
                 return True
-            if gstreamer.event_is_flumotion_reset(event):
+            if not gstreamer.event_is_flumotion_reset(event):
                 return True
             if self.disconnectedPads:
                 return False
