@@ -35,8 +35,8 @@ class Webcam(feedcomponent.ParseLaunchComponent):
     def get_pipeline_string(self, properties):
         device = properties['device']
 
-        # v4l or v4l2?
-        factory_name = properties.get('element-factory', 'v4lsrc')
+        # v4l was removed from the kernel, so v4l2 is default one
+        factory_name = properties.get('element-factory', 'v4l2src')
 
         # Filtered caps
         mime = properties.get('mime', 'video/x-raw-yuv')
