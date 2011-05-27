@@ -54,7 +54,10 @@ def fetchDevices(mid, factories, parameter):
 
     factory = factories.pop()
 
-    element = gst.element_factory_make(factory)
+    try:
+        element = gst.element_factory_make(factory)
+    except gst.ElementNotFoundError:
+        element = None
 
     if not element:
         log.debug("device-check",
