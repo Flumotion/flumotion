@@ -20,6 +20,7 @@
 # Headers in this file shall remain intact.
 
 from flumotion.component import feedcomponent
+from flumotion.common import gstreamer
 # register gdpsrc
 import flumotion.component.common.fgdp.fgdp
 
@@ -47,6 +48,8 @@ class FGDPProducer(feedcomponent.ParseLaunchComponent):
 
     def _on_connected(self, element):
         self.info("FGDP producer connected")
+        pad = self.get_element('src').get_pad('src')
+        pad.push_event(gstreamer.flumotion_reset_event())
 
     def _on_disconnected(self, element, reason):
         self.info("FGDP producer disconnected: %s", reason)
