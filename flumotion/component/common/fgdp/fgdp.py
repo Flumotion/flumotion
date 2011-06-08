@@ -291,9 +291,9 @@ class FGDPSink(FGDPBase, MultiFDSink):
         # Set default properties
         self.fdelement.set_property('sync', False)
         self.fdelement.set_property('unit-type', 2)
-        self.fdelement.set_property('units-max', 500 * gst.MSECOND)
-        self.fdelement.set_property('units-soft-max', 400 * gst.MSECOND)
-        self.fdelement.set_property('recover-policy', 0)
+        self.fdelement.set_property('units-max', 1 * gst.SECOND)
+        self.fdelement.set_property('units-soft-max', 700 * gst.MSECOND)
+        self.fdelement.set_property('recover-policy', 1)
         # Create fd handler proxy
         MultiFDSink.__init__(self, self.fdelement)
         # Add elements to the bin and link them
