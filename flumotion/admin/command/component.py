@@ -441,5 +441,6 @@ class Component(util.LogCommand):
                 if workerName == w.get('name'):
                     host = w.get('host')
                     break
-            comps.append((c.get('name'), c.get('type'), host))
+            moodName = planet.moods.get(c.get('mood')).name
+            comps.append((c.get('name'), c.get('type'), host, moodName))
         self.pprint(comps)
