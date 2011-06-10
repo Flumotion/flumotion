@@ -45,6 +45,7 @@ class FGDPProducer(feedcomponent.ParseLaunchComponent):
                 properties.get('max-reconnection-delay', 0.5))
         src.connect('connected', self._on_connected)
         src.connect('disconnected', self._on_disconnected)
+        self._pad_monitors.attach(src.get_pad('src'), 'fgdp-src')
 
     def _on_connected(self, element):
         self.info("FGDP producer connected")
