@@ -627,3 +627,33 @@ Then you can just call::
 For a debugging message, or for an info message::
 
   self.info(message)
+
+Manhole
+-------
+
+Twisted enables functionality called a manhole which works like an SSH
+shell into a manager or a component.
+
+Test manhole functionality by starting the manager with the manhole plug
+configuration added::
+
+  flumotion-manager -v -T tcp conf/managers/default/planet.xml conf/managers/default/manhole.xml
+
+Note that the command above needs to be run from the root of you flumotion
+checkout.
+
+Now try and ssh into the manhole::
+
+  ssh -p 2222 localhost
+
+You should be greeted with a Python command prompt::
+
+  >>>
+
+From here you can access the vishnu in the manager; for example::
+
+  >>> w = vishnu.workerHeaven.getAvatars()[0]
+  >>> w.mindCallRemote('getPorts')
+  <Deferred #0>
+  Deferred #0 called back: ([7700, 7701, 7702, 7703, 7704, 7705, 7706, 7707, 7708], None)
+  >>>
