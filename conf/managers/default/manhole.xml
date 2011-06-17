@@ -2,7 +2,7 @@
   <manager name="planet">
     <plugs>
       <plug socket="flumotion.component.plugs.lifecycle.ManagerLifecycle"
-            type="manager-manhole-plug">
+            type="manager-manhole">
         <property name="ssh-authorized-keys-file">~/.ssh/authorized_keys</property>
         <property name="initially-open">true</property>
         <property name="port">2222</property>
