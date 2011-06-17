@@ -26,6 +26,8 @@ import base64
 import binascii
 import os
 
+from twisted import conch
+
 from twisted.conch import error, manhole
 from twisted.conch.insults import insults
 from twisted.conch.ssh import keys
@@ -93,13 +95,22 @@ class SSHPublicKeyChecker(log.Loggable):
             return failure.Failure(error.ValidPublicKey())
         else:
             try:
-                pubKey = keys.getPublicKeyObject(data = credentials.blob)
-                if keys.verifySignature(pubKey, credentials.signature,
-                                        credentials.sigData):
-                    return credentials.username
+                if conch.version.major < 10:
+                    pubKey = keys.getPublicKeyObject(data=credentials.blob)
+                    if keys.verifySignature(pubKey, credentials.signature,
+                                            credentials.sigData):
+                        return credentials.username
+                else:
+                    pubKey = keys.Key.fromString(credentials.blob)
+                    if pubKey.verify(credentials.signature,
+                        credentials.sigData):
+                        return credentials.username
+
             except: # any error should be treated as a failed login
                 f = failure.Failure()
-                log.warning('error checking signature: %r', credentials)
+                log.warning('manhole',
+                    'error checking signature on creds %r: %r',
+                        credentials, log.getFailureMessage(f))
                 return f
         return failure.Failure(UnauthorizedLogin())
 
@@ -121,7 +132,8 @@ class SSHPublicKeyChecker(log.Loggable):
 
     def _ebRequestAvatarId(self, f):
         if not f.check(UnauthorizedLogin, error.ValidPublicKey):
-            log.warning('failed login %r', f)
+            log.warning('manhole', 'failed login: %r',
+                log.getFailureMessage(f))
             return failure.Failure(UnauthorizedLogin())
         return f
 
