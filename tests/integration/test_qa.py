@@ -126,7 +126,7 @@ audioTestXML="""<?xml version="1.0" ?>
                type="audiotest-producer" version="0.3.0.1" worker="default">
 
       <property name="frequency">440</property>
-      <property name="rate">8000</property>
+      <property name="samplerate">8000</property>
       <property name="volume">1.0</property>
     </component>
 
@@ -293,6 +293,7 @@ class TestFlumotion(common.FlumotionManagerWorkerTest):
         testVideoTestNoOverlayWithTokenBouncer)
 
     def testAudioTest(self, plan):
+
         m, w = self.spawnAndWaitManagerWorker(plan)
         httpPort = random.randrange(12800, 12899)
         self.makeFile('audiotest.xml',

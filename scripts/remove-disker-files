@@ -1,5 +1,5 @@
 #!/bin/bash
 manager=$1
 disker=$2
-filename=`flumotion-command -m $manager getprop $2 filename`
+filename=`flumotion-command -m $manager component -i $disker property get filename`
 rm -f $filename

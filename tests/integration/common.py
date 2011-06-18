@@ -89,21 +89,21 @@ class FlumotionManagerWorkerTest(unittest.TestCase):
 
     def loadConfiguration(self, plan, filename):
         c = plan.spawn('flumotion-command', '-m', 'user:test@localhost:%d' %
-            self.managerPort, 'loadconfiguration', filename)
+            self.managerPort, 'manager', 'load', filename)
         plan.wait(c, 0)
 
     def stopAll(self, plan):
         # flumotion-command stop will wait for all components it stops
         # to go sleeping before it exits
-        c = plan.spawn('flumotion-command', '-m', 'user:test@localhost:%d' %
-            self.managerPort, 'stop', '/')
+        c = plan.spawn('wait-for-stop-components', 'user:test@localhost:%d' %
+            self.managerPort)
         plan.wait(c, 0)
 
     def startAll(self, plan):
         # flumotion-command start will wait for all components it starts
         # to go happy or sad before it exits
-        c = plan.spawn('flumotion-command', '-m', 'user:test@localhost:%d' %
-            self.managerPort, 'start', '/')
+        c = plan.spawn('wait-for-start-components', 'user:test@localhost:%d' %
+            self.managerPort)
         plan.wait(c, 0)
 
     def waitForHappyComponent(self, plan, componentName):

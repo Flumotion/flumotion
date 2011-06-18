@@ -29,7 +29,7 @@ audioTestXML="""<?xml version="1.0" ?>
                version="0.3.0.1" worker="default">
 
       <property name="frequency">440</property>
-      <property name="rate">8000</property>
+      <property name="samplerate">8000</property>
       <property name="volume">1.0</property>
     </component>
 

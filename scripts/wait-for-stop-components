@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+manager=$1
+components=`flumotion-command -m $manager component list`
+
+
+for comp in $components;
+do
+   if [ $comp == "atmosphere:" ]; then
+       flow="atmosphere"
+   elif [ $comp == "default" -o $comp == "flow:" ]; then
+       flow="default"
+   else
+       flumotion-command -m $manager component -i /$flow/$comp stop
+   fi
+done

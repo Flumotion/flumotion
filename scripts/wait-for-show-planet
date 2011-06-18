@@ -2,7 +2,7 @@
 set -e
 manager=$1
 while true; do
-  if flumotion-command -m $manager showplanet | grep atmosphere; then
+  if flumotion-command -m $manager manager invoke getConfiguration | grep atmosphere; then
     exit 0
   fi
   sleep 1

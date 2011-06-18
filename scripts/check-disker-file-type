@@ -3,7 +3,7 @@ set -e
 manager=$2
 disker=$3
 filetype=$1
-filename=`flumotion-command -m $manager getprop $disker filename`
+filename=`flumotion-command -m $manager component -i $disker property get filename | cut -f5 -d"'" `
 # make sure file is not empty
 echo "filename $filename"
 echo "args: $@"
