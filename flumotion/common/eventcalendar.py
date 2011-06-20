@@ -643,20 +643,28 @@ def parseTimezone(vtimezone):
         return required + (observance.get('TZNAME', tzname), rr)
 
     tzid = vtimezone.get('tzid')
-    standard = vtimezone.walk('standard')[0]
-    dstend, stdoffsetfrom, stdoffset, stdname, stdrrule = \
-            parseObservance(standard, 'Standard')
-
     try:
-        daylight = vtimezone.walk('daylight')[0]
-    except:
-        return tz.FixedOffsetTimezone(stdoffset, stdname)
-    else:
+        standard = vtimezone.walk('standard')[0]
+        dstend, stdoffsetfrom, stdoffset, stdname, stdrrule = \
+                parseObservance(standard, 'Standard')
+    except KeyError:
+        standard = None
+
+    daylight_w = vtimezone.walk('daylight')
+    if len(daylight_w) != 0:
         dststart, dstoffsetfrom, dstoffset, dstname, dstrrule = \
-                parseObservance(daylight, 'Daylight')
-    return tz.DSTTimezone(tzid, stdname, dstname, stdoffset, dstoffset,
-                       stdoffsetfrom, dstoffsetfrom, dststart, dstend,
-                       stdrrule, dstrrule)
+                parseObservance(daylight_w[0], 'Daylight')
+        if standard is None:
+            return tz.FixedOffsetTimezone(dstoffset, dstname)
+        else:
+            return tz.DSTTimezone(tzid, stdname, dstname, stdoffset, dstoffset,
+                                  stdoffsetfrom, dstoffsetfrom, dststart,
+                                  dstend, stdrrule, dstrrule)
+    else:
+        if standard is None:
+            raise NotCompilantError("One of DAYLIGHT or STANDARD must be "
+                    "defined")
+        return tz.FixedOffsetTimezone(stdoffset, stdname)
 
 
 def fromICalendar(iCalendar):
