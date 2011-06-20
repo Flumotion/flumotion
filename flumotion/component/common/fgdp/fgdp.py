@@ -30,7 +30,7 @@ GDP_TYPE_PRODUCER = "producer-type"
 GDP_TYPE_CONSUMER = "consumer-type"
 
 
-class FDHandler():
+class FDHandler(object):
     """
     Base class for elements handling file descriptors
 
@@ -136,7 +136,7 @@ class MultiFDSink(FDHandler):
             self._activeFD = None
 
 
-class _ProtocolMixin():
+class _ProtocolMixin(object):
     """
     Provides an abstraction for the start and stop of a client or server using
     the FGDP protocol, which depends on the 'mode' selected amongst 'push' or

@@ -80,7 +80,7 @@ class ErrorResponse(ProtocolException):
     error = "Received error response"
 
 
-class Command():
+class Command(object):
     '''
     Command for the FGDP procotol, sent by the client to the server
 
@@ -132,7 +132,7 @@ class Command():
         return (str(self) == str(obj))
 
 
-class Response():
+class Response(object):
     '''
     Response for the FGDP protocol, sent by the server to the client
 
@@ -185,7 +185,7 @@ class Response():
         return (str(self) == str(obj))
 
 
-class FGDP_0_1():
+class FGDP_0_1(object):
     '''
     Definitions for the version 0.1 of the FGDP protocol.
     Future extensions of the protocol should subclass this class.

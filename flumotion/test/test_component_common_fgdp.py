@@ -90,7 +90,7 @@ class ResponseTest(testsuite.TestCase):
                               'FGDP/1.1 TEST test', (1, 0))
 
 
-class DummyTransport():
+class DummyTransport(object):
     lastWrite = ''
     protocol = None
 
