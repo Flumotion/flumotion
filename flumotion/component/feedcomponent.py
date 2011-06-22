@@ -500,6 +500,17 @@ class ParseLaunchComponent(FeedComponent):
             srcpad = identity.get_pad("src")
         return srcpad
 
+    def get_feeder_sinkpad(self, feederAlias):
+        """
+        Method that returns the sink pad of the first element in a feeder
+
+        @returns:   the GStreamer sink pad of the first element in a feeder
+        @rtype:     L{gst.Pad}
+        """
+        e = self.feeders[feederAlias]
+        gdppay = self.get_element(e.elementName + '-pay')
+        return gdppay.get_static_pad("sink")
+
 
 class Effect(log.Loggable):
     """
