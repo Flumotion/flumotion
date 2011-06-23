@@ -1,3 +1,4 @@
+* EASY          rename all plugs to drop -plug
 * EASY          put the type, moduleName, methodName, config set in
 		a dict - or possibly a real object - instead of passing all
                 these around in all functions
