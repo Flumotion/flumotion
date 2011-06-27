@@ -297,7 +297,7 @@ class FGDPSink(FGDPBase, MultiFDSink):
         # Create fd handler proxy
         MultiFDSink.__init__(self, self.fdelement)
         # Add elements to the bin and link them
-        self.add_many(gdppay, self.fdelement)
+        self.add(gdppay, self.fdelement)
         gdppay.link(self.fdelement)
         # Create sink pads
         self._sink_pad = gst.GhostPad('sink', gdppay.get_pad('sink'))
@@ -321,7 +321,7 @@ class FGDPSrc(FGDPBase, FDSrc):
         self.fdelement = gst.element_factory_make('fdsrc')
         gdpdepay = gst.element_factory_make('gdpdepay')
         # Add elements to the bin and link them
-        self.add_many(self.fdelement, gdpdepay)
+        self.add(self.fdelement, gdpdepay)
         self.fdelement.link(gdpdepay)
         # Create fd handler proxy
         FDSrc.__init__(self, self.fdelement)
