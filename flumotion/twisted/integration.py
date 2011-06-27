@@ -81,7 +81,9 @@ import signal
 import tempfile
 
 from twisted.internet import reactor, protocol, defer
+from twisted.internet import error as ierror
 from flumotion.common import log as flog
+from twisted.internet.defer import failure
 
 __version__ = "$Rev$"
 
@@ -221,6 +223,32 @@ class ProcessProtocol(protocol.ProcessProtocol):
             self.exitDeferred.callback(status.value.exitCode)
 
 
+class ThreadProtocol(object):
+
+    def __init__(self):
+        self.exitDeferred = defer.Deferred()
+        self.timedOut = False
+
+    def getDeferred(self):
+        return self.exitDeferred
+
+    def timeout(self, process, status):
+        info('forcing timeout for process protocol %r', self)
+        self.timedOut = True
+        self.exitDeferred.errback(TimeoutException(process, status))
+
+    def processEnded(self, status):
+        info('process ended with status %r, exit code %r',
+             status, status.value.exitCode)
+        if self.timedOut:
+            warning('already timed out??')
+            print 'already timed out quoi?'
+        else:
+            info('process ended with status %r, exit code %r',
+                 status, status.value.exitCode)
+            self.exitDeferred.callback(status.value.exitCode)
+
+
 class Process:
     NOT_STARTED, STARTED, STOPPED = 'NOT-STARTED', 'STARTED', 'STOPPED'
 
@@ -314,6 +342,77 @@ class Process:
 
     def __repr__(self):
         return '<Process %s in state %s>' % (self.name, self.state)
+
+
+class ThreadedMethod:
+    NOT_STARTED, STARTED, STOPPED = 'NOT-STARTED', 'STARTED', 'STOPPED'
+
+    def __init__(self, name, method, argv, testDir):
+        self.name = name
+        self.argv = argv
+        self.testDir = testDir
+
+        self.pid = None
+        self.method = method
+        self.protocol = None
+        self.state = self.NOT_STARTED
+        self._timeoutDC = None
+
+        log('created threaded method object %r', self)
+
+    def method_wrapper(self):
+        self.method(self.argv)
+        info('process %r has stopped', self)
+        return self.protocol.processEnded(
+            failure.Failure(ierror.ProcessDone(0)))
+
+    def start(self):
+        assert self.state == self.NOT_STARTED
+        info('spawning thread %r, argv=%r', self, self.argv)
+        self.protocol = ProcessProtocol()
+        reactor.callFromThread(self.method_wrapper)
+
+        self.state = self.STARTED
+
+        def got_exit(res):
+            self.state = self.STOPPED
+            info('process %r has stopped', self)
+            return res
+        self.protocol.getDeferred().addCallback(got_exit)
+
+    def kill(self, sig=signal.SIGTERM):
+        assert self.state == self.STARTED
+        self.state = self.STOPPED
+        info('killing process %r, signal %d', self, sig)
+
+    def wait(self, status, timeout=20):
+        assert self.state != self.NOT_STARTED
+        info('waiting for thread %r to exit', self)
+        d = self.protocol.getDeferred()
+
+        def got_exit(res):
+            debug('process %r exited with status %r', self, res)
+            if res != status:
+                warning('expected exit code %r for process %r, but got %r',
+                        status, self, res)
+                raise UnexpectedExitCodeException(self, status, res)
+        d.addCallback(got_exit)
+        if self.state == self.STARTED:
+            self._timeoutDC = reactor.callLater(timeout,
+                                                self.protocol.timeout,
+                                                self,
+                                                status)
+
+            def cancel_timeout(res):
+                debug('cancelling timeout for %r', self)
+                if self._timeoutDC.active():
+                    self._timeoutDC.cancel()
+                return res
+            d.addCallbacks(cancel_timeout, cancel_timeout)
+        return d
+
+    def __repr__(self):
+        return '<Thread %s in state %s>' % (self.name, self.state)
 
 
 class PlanExecutor:
@@ -445,6 +544,17 @@ class Plan:
         self.processes[name] = process
         return process
 
+    def _allocThread(self, args):
+        method = args[0]
+        name = method.__name__
+        i = 0
+        while name in self.processes:
+            i += 1
+            name = '%s-%d' % (name, i)
+        process = ThreadedMethod(name, method, args[1:], self.outputDir)
+        self.processes[name] = process
+        return process
+
     def _appendOp(self, *args):
         self.ops.append(args)
 
@@ -455,6 +565,12 @@ class Plan:
         allArgs = (command, ) + args
         process, = self.spawnPar(allArgs)
         return process
+
+    def spawnThread(self, method, *args):
+        self._appendOp(self.vm.checkExits, ())
+        thread = self._allocThread((method, ) + args)
+        self._appendOp(self.vm.spawn, thread)
+        return thread
 
     def spawnPar(self, *argvs):
         processes = []

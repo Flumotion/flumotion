@@ -106,11 +106,14 @@ class FlumotionManagerWorkerTest(unittest.TestCase):
             self.managerPort)
         plan.wait(c, 0)
 
-    def waitForHappyComponent(self, plan, componentName):
+    def waitForComponentMood(self, plan, componentName, mood):
         happy = plan.spawn('wait-for-component-mood',
             'user:test@localhost:%d' % self.managerPort,
-            componentName, 'happy')
-        plan.wait(happy, 0)
+            componentName, mood)
+        return plan.wait(happy, 0)
+
+    def waitForHappyComponent(self, plan, componentName):
+        self.waitForComponentMood(plan, componentName, 'happy')
 
     def setUp(self):
         self.__cleanfiles = []
