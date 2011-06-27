@@ -484,6 +484,7 @@ class FGDPClientFactory(ReconnectingClientFactory, log.Loggable):
     _supportedVersions = ['0.1']
 
     def __init__(self, gstElement):
+        ReconnectingClientFactory.maxDelay = gstElement.maxDelay
         self.gstElement = gstElement
         self._setProtocol(gstElement.version)
 
