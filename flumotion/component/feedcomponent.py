@@ -704,6 +704,7 @@ class ReconfigurableComponent(ParseLaunchComponent):
         self._reset_count = 0
 
         self.uiState.addKey('reset-count', 0)
+        self.not_dropping = False
 
     def setup_completed(self):
         ParseLaunchComponent.setup_completed(self)
@@ -739,7 +740,7 @@ class ReconfigurableComponent(ParseLaunchComponent):
         # FIXME: Add documentation
 
         def output_reset_event(pad, event):
-            if event.type != gst.EVENT_EOS:
+            if event.type != gst.EVENT_FLUSH_START:
                 return True
 
             self.debug('RESET: out reset event received on output pad %r', pad)
@@ -760,7 +761,7 @@ class ReconfigurableComponent(ParseLaunchComponent):
         def got_new_caps(pad, args):
             caps = pad.get_negotiated_caps()
             if not caps:
-                self.debug("Caps unset! Looks like we're stopping")
+                self.debug("RESET: Caps unset! Looks like we're stopping")
                 return
             self.debug("Got new caps at %s: %s",
                       pad.get_name(), caps.to_string())
@@ -780,11 +781,34 @@ class ReconfigurableComponent(ParseLaunchComponent):
             # input queues.
             self._block_eaters()
 
+        def got_new_buffer(pad, buff, element):
+            if self.disconnectedPads:
+                self.info("INCAPS: Got buffer but we're still disconnected.")
+                return True
+
+            if not buff.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
+                self.not_dropping = False
+                return True
+
+            self.info("INCAPS: Got buffer with caps of len %d", buff.size)
+            peer = pad.get_peer()
+            oldcaps = peer.get_negotiated_caps()
+            newcaps = buff.caps
+            self.info("INCAPS: Old caps are: %s", oldcaps and oldcaps.to_string() or "NONE")
+            self.info("INCAPS: NEw caps are: %s", newcaps and newcaps.to_string() or "NONE")
+            if oldcaps and newcaps.is_equal(oldcaps) and not self.not_dropping:
+                self.info("INCAPS: Got same caps as before, dropping")
+                return False
+            self.not_dropping = True
+            return True
+
         self.log('RESET: installing event probes for detecting changes')
         # Listen for incoming flumotion-reset events on eaters
         for elem in self.get_input_elements():
             self.debug('RESET: Add caps monitor for %s', elem.get_name())
-            elem.get_pad('sink').connect("notify::caps", got_new_caps)
+            sink = elem.get_pad('sink')
+            sink.get_peer().add_buffer_probe(got_new_buffer, elem)
+            sink.connect("notify::caps", got_new_caps)
 
         for elem in self.get_output_elements():
             self.debug('RESET: adding event probe for %s', elem.get_name())
@@ -920,7 +944,8 @@ class ReconfigurableComponent(ParseLaunchComponent):
         self._on_pad_blocked(pad, blocked)
         if blocked:
             peer = pad.get_peer()
-            peer.send_event(gst.event_new_eos())
+            peer.send_event(gst.event_new_flush_start())
+            #peer.send_event(gst.event_new_eos())
             #self._unlink_pads(pad.get_parent(), [gst.PAD_SRC])
 
     def _on_pipeline_drained(self):
