@@ -15,6 +15,8 @@
       <properties>
         <property name="url" type="string" required="true"
                   _description="The URL of the Icecast stream from which to produce." />
+        <property name="passthrough" type="bool" required="false"
+                  _description="Whether to operate in passthrough mode that does not parse the audio stream (default:false)" />
       </properties>
     </component>
   </components>

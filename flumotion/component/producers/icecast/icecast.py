@@ -56,8 +56,13 @@ class Icecast(feedcomponent.ParseLaunchComponent):
 
     def _link_parser(self, element, pad, gdp_sink_pad):
         # Append the audio parser to the end of the pipeline
-        capsname = pad.get_caps().get_structure(0).get_name()
+        caps = pad.get_caps()
+        capsname = caps.get_structure(0).get_name()
         parser = None
+        if self.passthrough:
+            self.info("Acting in passthrough mode, not parsing the audio")
+            pad.link(gdp_sink_pad)
+            return
         if capsname == 'application/ogg':
             parser = gst.element_factory_make('oggparse')
         elif capsname == 'audio/mpeg':
@@ -80,6 +85,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         # of the data, we'll rebuild the pipeline.
         self.src = pipeline.get_by_name('src')
         self.url = properties['url']
+        self.passthrough = properties.get('passthrough', False)
         self.src.set_property('location', self.url)
         self.src.set_property('iradio-mode', True)
 
