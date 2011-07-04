@@ -12,6 +12,10 @@
                function="Icecast" />
       </entries>
 
+      <sockets>
+        <socket type="flumotion.component.plugs.tagger.TaggerPlug" />
+      </sockets>
+
       <properties>
         <property name="url" type="string" required="true"
                   _description="The URL of the Icecast stream from which to produce." />
