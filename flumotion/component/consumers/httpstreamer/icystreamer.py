@@ -144,10 +144,17 @@ class ICYStreamer(MultifdSinkStreamer):
         handler_id = self.pipeline.get_by_name('input').get_pad('sink').\
                                 add_buffer_probe(_calculateBitrate)
 
-    def get_content_type(self, serveIcy):
-        sink = self.sinksByID3[serveIcy]
+    def get_content_type(self):
+        # The content type should always be the content type of the stream as
+        # some players do not understand "application/x-icy"
+        sink = self.sinksByID3[False]
         if sink.caps:
-            return sink.caps[0].get_name()
+            self.debug('Caps: %r', sink.caps.to_string())
+            cap = sink.caps[0]
+            if cap.get_name() == 'audio/mpeg':
+                if cap['mpegversion']==2:
+                    return 'audio/aacp'
+            return cap.get_name()
 
     def add_client(self, fd, request):
         sink = self.sinksByID3[request.serveIcy]

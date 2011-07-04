@@ -543,7 +543,7 @@ class ICYStreamingResource(HTTPStreamingResource):
         return HTTPStreamingResource._render(self, request)
 
     def _setRequestHeaders(self, request):
-        content = self.streamer.get_content_type(request.serveIcy)
+        content = self.streamer.get_content_type()
         request.setHeader('Server', HTTP_SERVER)
         request.setHeader('Date', http.datetimeToString())
         request.setHeader('Connection', 'close')
