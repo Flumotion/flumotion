@@ -66,8 +66,13 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         if capsname == 'application/ogg':
             parser = gst.element_factory_make('oggparse')
         elif capsname == 'audio/mpeg':
-            parser = gst.element_factory_make('mp3parse')
-
+            mpegversion = caps[0]['mpegversion']
+            if mpegversion == 1:
+                self.info("Detecting MP3 stream. Adding 'mp3parse'")
+                parser = gst.element_factory_make('mp3parse')
+            elif mpegversion in [2, 4]:
+                self.info("Detecting AAC stream. Adding 'aacparse'")
+                parser = gst.element_factory_make('aacparse')
         if parser:
             parser.set_state(gst.STATE_PLAYING)
             self.pipeline.add(parser)
