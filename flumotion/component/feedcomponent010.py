@@ -46,7 +46,6 @@ class FeedComponent(basecomponent.BaseComponent):
 
     # how often to update the UIState feeder statistics
     FEEDER_STATS_UPDATE_FREQUENCY = 12.5
-    keepStreamheaderForLater = False
     dropStreamHeaders = True
     swallowNewSegment = True
 
@@ -876,20 +875,29 @@ class FeedComponent(basecomponent.BaseComponent):
 
             def remove_in_caps_buffers(pad, buffer, eater):
                 if buffer.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
-                    if self.keepStreamheaderForLater:
-                        self.log("We got buffer with IN_CAPS which we are "
-                                 "keeping for later %r", eater)
-                        eater.streamheader.append(buffer)
+                    if self.dropStreamHeaders:
+                        self.info("We got streamheader buffer which we are "
+                                  "dropping because we do not want this just "
+                                  "after a reconnect because it breaks "
+                                  "everything ")
                         return False
-                    self.info("We got streamheader buffer which " \
-                        "we are dropping because we do not want this just " \
-                        "after a reconnect because it breaks everything ")
-                    return False
-
-                # now we have a buffer with no flag set
-                # we should remove the handler
-                self.log("We got buffer with no in caps flag set on "
-                         "eater %r", eater)
+                    self.info("Got buffer with incaps")
+                    peer = pad.get_peer()
+                    oldcaps = peer.get_negotiated_caps()
+                    newcaps = buffer.caps
+                    if oldcaps and newcaps.is_equal(oldcaps):
+                        self.info("We got streamheader buffer which we are "
+                                  "dropping because we do not want this just "
+                                  "after a reconnect because it breaks "
+                                  "everything ")
+                        return False
+                    self.info("We've been ordered to not drop buffers "
+                              "with new IN_CAPS!")
+                else:
+                    # now we have a buffer with no flag set
+                    # we should remove the handler
+                    self.log("We got buffer with no in caps flag set on "
+                             "eater %r", eater)
                 if eater.streamheaderBufferProbeHandler:
                     self.log("Removing buffer probe on depay src pad on "
                              "eater %r", eater)
@@ -900,13 +908,6 @@ class FeedComponent(basecomponent.BaseComponent):
                     self.warning("buffer probe handler is None, bad news on "
                                  "eater %r", eater)
 
-                if not self.dropStreamHeaders:
-                    self.log("Pushing earlier buffers with IN_CAPS flag")
-                    for buff in eater.streamheader:
-                        pad.push(buff)
-                    self.dropStreamHeaders = True
-
-                eater.streamheader = []
                 return True
 
             if not eater.streamheaderBufferProbeHandler:

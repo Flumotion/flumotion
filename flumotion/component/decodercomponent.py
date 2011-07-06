@@ -36,18 +36,13 @@ T_ = gettexter()
 
 class DecoderComponent(fc.ReconfigurableComponent):
 
-    disconnectedPads = True
-    keepStreamheaderForLater = True
     swallowNewSegment = False
+    disconnectedPads = True
 
     _feeders_info = []
 
     def configure_pipeline(self, pipeline, properties):
         # Handle decoder dynamic pads
-        eater = self.eaters.values()[0]
-        depay = self.get_element(eater.depayName)
-        depay.get_pad("src").add_event_probe(self._depay_reset_event, eater)
-
         decoder = self.pipeline.get_by_name("decoder")
         decoder.connect('new-decoded-pad', self._new_decoded_pad_cb)
 
@@ -57,18 +52,6 @@ class DecoderComponent(fc.ReconfigurableComponent):
     def get_output_elements(self):
         return [self.get_element(i.name + '-output')
                 for i in self._feeders_info.values()]
-
-    def _depay_reset_event(self, pad, event, eater):
-        if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
-            return True
-        if not gstreamer.event_is_flumotion_reset(event):
-            return True
-        self.info("Received flumotion-reset, not droping buffers anymore")
-
-        self.dropStreamHeaders = False
-        if self.disconnectedPads:
-            return False
-        return True
 
     def _add_video_effects(self):
         # Add the effects to the component but don't plug them until we have a
@@ -123,7 +106,6 @@ class DecoderComponent(fc.ReconfigurableComponent):
     def _new_decoded_pad_cb(self, decoder, pad, last):
         self.log("Decoder %s got new decoded pad %s", decoder, pad)
 
-        self.dropStreamHeaders = True
         new_caps = pad.get_caps()
 
         # Select a compatible output element

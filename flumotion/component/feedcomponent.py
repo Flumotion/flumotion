@@ -691,6 +691,7 @@ class MultiInputParseLaunchComponent(ParseLaunchComponent):
 class ReconfigurableComponent(ParseLaunchComponent):
 
     disconnectedPads = False
+    dropStreamHeaders = False
 
     def _get_base_pipeline_string(self):
         """Should be overrided by subclasses to provide the pipeline the
@@ -731,35 +732,17 @@ class ReconfigurableComponent(ParseLaunchComponent):
 
     def _install_changes_probes(self):
         """
-        Add the event probes that will check for the flumotion-reset event.
+        Add the event probes that will check for a caps change.
 
         Those will trigger the pipeline's blocking and posterior reload
         """
         # FIXME: Add documentation
 
-        def input_reset_event(pad, event):
-            if event.type != gst.EVENT_CUSTOM_DOWNSTREAM:
-                return True
-            if not gstreamer.event_is_flumotion_reset(event):
-                return True
-            if self.disconnectedPads:
-                return False
-
-            self.log('RESET: in reset event received on input pad %r', pad)
-            self._reset_count = len(self.feeders)
-            # Block all the eaters and send an eos downstream the pipeline to
-            # drain all the elements. It will also unlink the pipeline from the
-            # input queues.
-            self._block_eaters()
-            # Do not propagate the event. It is sent from the other side of
-            # the pipeline after it has been drained.
-            return False
-
         def output_reset_event(pad, event):
             if event.type != gst.EVENT_EOS:
                 return True
 
-            self.log('RESET: out reset event received on output pad %r', pad)
+            self.debug('RESET: out reset event received on output pad %r', pad)
             # TODO: Can we use EVENT_FLUSH_{START,STOP} for the same purpose?
             # The component only waits for the first eos to come. After that
             # all the elements inside the pipeline will be down and won't
@@ -770,16 +753,38 @@ class ReconfigurableComponent(ParseLaunchComponent):
             if self._reset_count > 0:
                 return False
 
-            self._send_reset_event()
             reactor.callFromThread(self._on_pipeline_drained)
             # Do not let the eos pass.
             return False
 
+        def got_new_caps(pad, args):
+            caps = pad.get_negotiated_caps()
+            if not caps:
+                self.debug("Caps unset! Looks like we're stopping")
+                return
+            self.debug("Got new caps at %s: %s",
+                      pad.get_name(), caps.to_string())
+
+            if self.disconnectedPads:
+                return
+
+            # FIXME: Only reset when the caps change and prevent the headers to
+            # propagate when they are the same
+            #if not self._capsChanged(caps):
+            #    return
+
+            self.debug('RESET: caps changed on input pad %r', pad)
+            self._reset_count = len(self.feeders)
+            # Block all the eaters and send an eos downstream the pipeline to
+            # drain all the elements. It will also unlink the pipeline from the
+            # input queues.
+            self._block_eaters()
+
         self.log('RESET: installing event probes for detecting changes')
         # Listen for incoming flumotion-reset events on eaters
         for elem in self.get_input_elements():
-            self.debug('RESET: adding event probe for %s', elem.get_name())
-            elem.get_pad('sink').add_event_probe(input_reset_event)
+            self.debug('RESET: Add caps monitor for %s', elem.get_name())
+            elem.get_pad('sink').connect("notify::caps", got_new_caps)
 
         for elem in self.get_output_elements():
             self.debug('RESET: adding event probe for %s', elem.get_name())
@@ -799,11 +804,6 @@ class ReconfigurableComponent(ParseLaunchComponent):
             pad = elem.get_pad('src')
             self.debug("RESET: Unblocking pad %s", pad)
             pad.set_blocked_async(False, self._on_eater_blocked)
-
-    def _send_reset_event(self):
-        for elem in self.get_output_elements():
-            pad = elem.get_pad('sink')
-            pad.send_event(gstreamer.flumotion_reset_event())
 
     def _unlink_pads(self, element, directions):
         for pad in element.pads():
