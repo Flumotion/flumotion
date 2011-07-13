@@ -787,19 +787,14 @@ class ReconfigurableComponent(ParseLaunchComponent):
                 return True
 
             if not buff.flag_is_set(gst.BUFFER_FLAG_IN_CAPS):
-                self.not_dropping = False
                 return True
 
             self.info("INCAPS: Got buffer with caps of len %d", buff.size)
-            peer = pad.get_peer()
-            oldcaps = peer.get_negotiated_caps()
-            newcaps = buff.caps
-            self.info("INCAPS: Old caps are: %s", oldcaps and oldcaps.to_string() or "NONE")
-            self.info("INCAPS: NEw caps are: %s", newcaps and newcaps.to_string() or "NONE")
-            if oldcaps and newcaps.is_equal(oldcaps) and not self.not_dropping:
-                self.info("INCAPS: Got same caps as before, dropping")
-                return False
-            self.not_dropping = True
+            if buff.caps:
+                newcaps = buff.caps[0].copy()
+                resets = self.uiState.get('reset-count')
+                newcaps['count'] = resets
+                buff.set_caps(gst.Caps(newcaps))
             return True
 
         self.log('RESET: installing event probes for detecting changes')
