@@ -2,11 +2,11 @@
   <components>
     <component type="blackmagic-producer"
                base="flumotion/component/producers/blackmagic"
-               _description="Produces feeds from a BlackMagic/DV device.">
+               _description="Produces feeds from a BlackMagic device.">
       <source location="flumotion.component.producers.blackmagic.blackmagic" />
       <feeder name="audio" />
       <feeder name="video" />
-      <feeder name="dv" />
+      <feeder name="sdi" />
       <entries>
         <entry type="component" location="blackmagic.py"
                function="BlackMagic" />

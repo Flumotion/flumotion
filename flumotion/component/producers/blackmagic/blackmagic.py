@@ -22,26 +22,23 @@
 import gst
 from twisted.internet import defer
 
-from flumotion.common import errors, messages, gstreamer
+from flumotion.common import errors, messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
+from flumotion.component.producers import checks
 from flumotion.component.effects.deinterlace import deinterlace
-from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
-from flumotion.component.effects.audiorate import audiorate
+from flumotion.component.effects.audioconvert import audioconvert
+from flumotion.component.effects.volume import volume
 
 __version__ = "$Rev$"
 T_ = gettexter()
-
-
-# See comments in gstdvdec.c for details on the dv format.
 
 
 class BlackMagic(feedcomponent.ParseLaunchComponent):
 
     def do_check(self):
         self.debug('running PyGTK/PyGST and configuration checks')
-        from flumotion.component.producers import checks
         d1 = checks.checkTicket347()
         d2 = checks.checkTicket348()
         dl = defer.DeferredList([d1, d2])
@@ -72,20 +69,12 @@ class BlackMagic(feedcomponent.ParseLaunchComponent):
                 self.addMessage(m)
 
     def get_pipeline_string(self, props):
-        if props.get('scaled-width', None) is not None:
-            self.warnDeprecatedProperties(['scaled-width'])
-
         self.width = props.get('width', 1920)
         self.height = props.get('height', 1080)
         self.video_format = props.get('video-format', 8)
-        decoder = props.get('decoder', 'dvdec')
         self.deintMode = props.get('deinterlace-mode', 'auto')
         self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
 
-        # FIXME: might be nice to factor out dv1394src ! dvdec so we can
-        # replace it with videotestsrc of the same size and PAR, so we can
-        # unittest the pipeline
-        # need a queue in case tcpserversink blocks somehow
         template = ('mmtblackmagicsrc name=src video-format=%s'
                     '  src.src_video ! queue '
                     '    ! @feeder:video@'
@@ -98,7 +87,6 @@ class BlackMagic(feedcomponent.ParseLaunchComponent):
 
     def configure_pipeline(self, pipeline, properties):
         self.volume = pipeline.get_by_name("setvolume")
-        from flumotion.component.effects.volume import volume
         comp_level = pipeline.get_by_name('volumelevel')
         vol = volume.Volume('inputVolume', comp_level, pipeline)
         self.addEffect(vol)
@@ -117,8 +105,9 @@ class BlackMagic(feedcomponent.ParseLaunchComponent):
 
         # Setting a tolerance of 20ms should be enough (1/2 frame), but
         # we set it to 40ms to be more conservatives
-        ar = audiorate.Audiorate('audiorate', comp_level.get_pad("src"),
-                                 pipeline, tolerance=40 * gst.MSECOND)
+        ar = audioconvert.Audioconvert('audioconvert',
+                                       comp_level.get_pad("src"), pipeline,
+                                       tolerance=40 * gst.MSECOND)
         self.addEffect(ar)
         ar.plug()
 
