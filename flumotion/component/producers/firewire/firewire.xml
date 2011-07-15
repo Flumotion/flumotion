@@ -10,7 +10,7 @@
       <entries>
         <entry type="component" location="firewire.py"
                function="Firewire" />
-        <entry type="admin/gtk" location="admin_gtk.py"
+        <entry type="admin/gtk" location="firewire.py"
                function="GUIClass" />
         <entry type="wizard" location="wizard_gtk.py"
                function="FireWireWizardPlugin" />
@@ -60,32 +60,11 @@
        </directories>
     </bundle>
 
-    <bundle name="firewire-admin-gtk">
-       <dependencies>
-           <dependency name="firewire-base" />
-           <dependency name="base-admin-gtk" />
-           <dependency name="volume-admin-gtk" />
-           <dependency name="deinterlace-admin-gtk" />
-           <dependency name="videoscale-admin-gtk" />
-       </dependencies>
-
-       <directories>
-           <directory name="flumotion/component/producers/firewire">
-               <filename location="admin_gtk.py" />
-           </directory>
-       </directories>
-    </bundle>
 
     <bundle name="firewire-component">
        <dependencies>
-           <dependency name="component" />
            <dependency name="firewire-base" />
-           <dependency name="deinterlace-effect" />
-           <dependency name="videoscale-effect" />
-           <dependency name="videorate-effect" />
-           <dependency name="audiorate-effect" />
-           <dependency name="volume-effect" />
-           <dependency name="producer-checks" />
+           <dependency name="avproducer" />
        </dependencies>
 
        <directories>
@@ -93,6 +72,12 @@
                <filename location="firewire.py" />
            </directory>
        </directories>
+    </bundle>
+
+    <bundle name="firewire-admin-gtk">
+       <dependencies>
+           <dependency name="avproducer-admin-gtk" />
+       </dependencies>
     </bundle>
 
     <bundle name="firewire-wizard">
