@@ -39,7 +39,7 @@
   <bundles>
     <bundle name="ivtv-component">
         <dependencies>
-            <dependency name="component-base" />
+            <dependency name="avproducer" />
         </dependencies>
         <directories>
             <directory name="flumotion/component/producers/ivtv">

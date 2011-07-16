@@ -15,77 +15,29 @@
 #
 # Headers in this file shall remain intact.
 
-
-from flumotion.component import feedcomponent
-from flumotion.component.effects.deinterlace import deinterlace
-from flumotion.component.effects.videorate import videorate
-from flumotion.component.effects.videoscale import videoscale
+from flumotion.component.common.avproducer import avproducer
 
 __version__ = "$Rev$"
 
 
-class Ivtv(feedcomponent.ParseLaunchComponent):
+class Ivtv(avproducer.AVProducerBase):
 
-    def check_properties(self, props, addMessage):
-        deintMode = props.get('deinterlace-mode', 'auto')
-        deintMethod = props.get('deinterlace-method', 'ffmpeg')
+    decoder = None
+    device = None
 
-        if deintMode not in deinterlace.DEINTERLACE_MODE:
-            msg = messages.Error(T_(N_("Configuration error: '%s' " \
-                "is not a valid deinterlace mode." % deintMode)))
-            addMessage(msg)
-            raise errors.ConfigError(msg)
+    def get_raw_video_element(self):
+        return self.decoder
 
-        if deintMethod not in deinterlace.DEINTERLACE_METHOD:
-            msg = messages.Error(T_(N_("Configuration error: '%s' " \
-                "is not a valid deinterlace method." % deintMethod)))
-            self.debug("'%s' is not a valid deinterlace method",
-                deintMethod)
-            addMessage(msg)
-            raise errors.ConfigError(msg)
+    def get_pipeline_template(self):
+        return ("filesrc name=src location=%s"
+                "   ! decodebin name=dec "
+                "  dec. ! identity silent=true name=video ! @feeder:video@"
+                "  dec. ! audioconvert ! audio/x-raw-int !"
+                "  volume name=setvolume !"
+                "  level name=volumelevel message=true !"
+                "  @feeder:audio@" % self.device)
 
     def get_pipeline_string(self, properties):
-        p = properties
-        device = p.get('device', '/dev/video0')
-        deinterlacer = p.get('deinterlacer', '')
-        self.is_square = p.get('is-square', False)
-        self.width = p.get('width', 0)
-        self.height = p.get('height', 0)
-        if not self.is_square and not self.height:
-            self.height = int(576 * self.width/720.) # assuming PAL
-        self.add_borders = p.get('add-borders', True)
-        self.deintMode = p.get('deinterlace-mode', 'auto')
-        self.deintMethod = p.get('deinterlace-method', 'ffmpeg')
-
-        fr = p.get('framerate', None)
-        if fr is not None:
-            self.framerate = gst.Fraction(fr[0], fr[1])
-        else:
-            self.framerate = None
-
-        template = ("filesrc name=src location=%s"
-                    "   ! decodebin name=dec "
-                    "  dec. ! identity silent=true name=video ! @feeder:video@"
-                    "  dec. ! audioconvert ! audio/x-raw-int "
-                    "   ! @feeder:audio@" % device)
-
-        return template
-
-    def configure_pipeline(self, pipeline, properties):
-        video = pipeline.get_by_name('video')
-        vr = videorate.Videorate('videorate',
-            video.get_pad("src"), pipeline, self.framerate)
-        self.addEffect(vr)
-        vr.plug()
-
-        deinterlacer = deinterlace.Deinterlace('deinterlace',
-            vr.effectBin.get_pad("src"), pipeline,
-            self.deintMode, self.deintMethod)
-        self.addEffect(deinterlacer)
-        deinterlacer.plug()
-
-        videoscaler = videoscale.Videoscale('videoscale', self,
-            deinterlacer.effectBin.get_pad("src"), pipeline,
-            self.width, self.height, self.is_square, self.add_borders)
-        self.addEffect(videoscaler)
-        videoscaler.plug()
+        self.decoder = self.get_element('video')
+        self.device = properties.get('device', '/dev/video0')
+        return avproducer.AVProducerBase.get_pipeline_string(self, properties)
