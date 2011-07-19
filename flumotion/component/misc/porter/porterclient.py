@@ -90,7 +90,13 @@ class PorterMedium(medium.BaseMedium):
         return self.callRemote("deregisterPrefix", prefix)
 
     def getPort(self):
-        return self.callRemote("getPort")
+
+        def handle_error(failure):
+            self.debug('Error getting port from old porter: %r', failure)
+
+        d = self.callRemote("getPort")
+        d.addErrback(handle_error)
+        return d
 
 
 class PorterClientFactory(fpb.ReconnectingPBClientFactory):
