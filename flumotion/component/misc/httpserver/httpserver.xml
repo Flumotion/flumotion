@@ -151,6 +151,7 @@
             <dependency name="component" />
             <dependency name="http-server-base" />
             <dependency name="base-component-http" />
+            <dependency name="porterclient" />
         </dependencies>
 
         <directories>
