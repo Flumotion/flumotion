@@ -92,7 +92,8 @@ class PorterMedium(medium.BaseMedium):
     def getPort(self):
 
         def handle_error(failure):
-            self.debug('Error getting port from old porter: %r', failure)
+            self.warning('Error getting port from old porter: %r', failure)
+            return 80
 
         d = self.callRemote("getPort")
         d.addErrback(handle_error)
