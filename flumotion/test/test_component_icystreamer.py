@@ -170,7 +170,7 @@ class TestIcyStreamer(comptest.CompTestTestCase, log.Loggable):
             self.assertTrue('icy-br' in factory.response_headers)
 
             ct = factory.response_headers['content-type'][0]
-            self.assertEqual('application/x-icy', ct)
+            self.assertEqual('audio/mpeg', ct)
 
             self.assertEqual(1, self.comp.getClients())
 
