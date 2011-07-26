@@ -23,6 +23,8 @@
                   _description="The height to scale to." />
         <property name="width" type="int"
                   _description="The final width, including correction." />
+        <property name="framerate" type="fraction"
+                  _description="The framerate (in fps)."/>
         <property name="deinterlace-mode" type="string"
                   _description="The deinterlacing mode to use.(default=auto)" />
         <property name="deinterlace-method" type="string"

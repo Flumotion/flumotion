@@ -29,6 +29,7 @@ from flumotion.component.producers import checks
 from flumotion.component.effects.deinterlace import deinterlace
 from flumotion.component.effects.videoscale import videoscale
 from flumotion.component.effects.audioconvert import audioconvert
+from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.volume import volume
 
 __version__ = "$Rev$"
@@ -97,8 +98,13 @@ class BlackMagic(feedcomponent.ParseLaunchComponent):
         self.addEffect(deinterlacer)
         deinterlacer.plug()
 
+        rateconverter = videorate.Videorate('videorate',
+            deinterlacer.effectBin.get_pad("src"), pipeline, self.framerate)
+        self.addEffect(rateconverter)
+        rateconverter.plug()
+
         videoscaler = videoscale.Videoscale('videoscale', self,
-            deinterlacer.effectBin.get_pad("src"), pipeline,
+            rateconverter.effectBin.get_pad("src"), pipeline,
             self.width, self.height, True, False)
         self.addEffect(videoscaler)
         videoscaler.plug()
