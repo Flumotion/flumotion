@@ -45,6 +45,12 @@ class VideoscaleBin(gst.Bin):
         'height': (gobject.TYPE_UINT, 'height',
             'Output height',
             1, 10000, 100, gobject.PARAM_READWRITE),
+        'width-correction': (gobject.TYPE_UINT, 'width correction',
+            'Corrects with to be a multiple of this value',
+            0, 64, 8, gobject.PARAM_READWRITE),
+        'height-correction': (gobject.TYPE_UINT, 'height correction',
+            'Corrects height to be a multiple of this value',
+            0, 64, 0, gobject.PARAM_READWRITE),
         'is-square': (gobject.TYPE_BOOLEAN, 'PAR 1/1',
             'Output with PAR 1/1',
             False, gobject.PARAM_READWRITE),
@@ -52,10 +58,13 @@ class VideoscaleBin(gst.Bin):
             'Add black borders to keep DAR if needed',
             False, gobject.PARAM_READWRITE)}
 
-    def __init__(self, width, height, is_square, add_borders):
+    def __init__(self, width, height, is_square, add_borders,
+                 width_correction=8, height_correction=0):
         gst.Bin.__init__(self)
         self._width = width
         self._height = height
+        self._width_correction = width_correction
+        self._height_correction = height_correction
         self._is_square = is_square
         self._add_borders = add_borders
 
@@ -63,28 +72,32 @@ class VideoscaleBin(gst.Bin):
         self._inwidth = None
         self._inheight = None
 
+        self._identity = gst.element_factory_make("identity")
         self._videoscaler = gst.element_factory_make("videoscale")
         self._capsfilter = gst.element_factory_make("capsfilter")
         self._videobox = gst.element_factory_make("videobox")
-        self.add(self._videoscaler, self._capsfilter, self._videobox)
+        self.add(self._identity, self._videoscaler, self._capsfilter,
+                 self._videobox)
 
+        self._identity.link(self._videoscaler)
         self._videoscaler.link(self._capsfilter)
         self._capsfilter.link(self._videobox)
 
         # Create source and sink pads
-        self._sinkPad = gst.GhostPad('sink', self._videoscaler.get_pad('sink'))
+        self._sinkPad = gst.GhostPad('sink', self._identity.get_pad('sink'))
         self._srcPad = gst.GhostPad('src', self._videobox.get_pad('src'))
         self.add_pad(self._sinkPad)
         self.add_pad(self._srcPad)
 
         self._configureOutput()
 
-        # Add setcaps callback in the sink pad
+        self._identity.set_property('silent', True)
+        # Add the setcaps function in the sink pad
         self._sinkPad.set_setcaps_function(self._sinkSetCaps)
         # Add a callback for caps changes in the videoscaler source pad
         # to recalculate the scale correction
         self._videoscaler.get_pad('src').connect(
-            'notify::caps', self._scaleCorrectionCallback)
+            'notify::caps', self._applyScaleCorrection)
 
     def _updateFilter(self, blockPad):
 
@@ -109,19 +122,6 @@ class VideoscaleBin(gst.Bin):
         reactor.callFromThread(blockPad.set_blocked_async,
             True, unlinkAndReplace)
 
-    def _scaleCorrectionCallback(self, pad, param):
-        # the point of width correction is to get to a multiple of 8 for width
-        # so codecs are happy; it's unrelated to the aspect ratio correction
-        # to get to 4:3 or 16:9
-        c = pad.get_negotiated_caps()
-        if c is not None:
-            width = c[0]['width']
-            scale_correction = width % 8
-            if scale_correction and self._width:
-                self.info('"width" given, but output is not a multiple of 8!')
-                return
-            self._videobox.set_property("right", -scale_correction)
-
     def _configureOutput(self):
         p = ""
         if self._is_square:
@@ -137,6 +137,46 @@ class VideoscaleBin(gst.Bin):
         self._capsfilter.set_property("caps", caps)
         if gstreamer.element_has_property(self._videoscaler, 'add-borders'):
             self._videoscaler.set_property('add-borders', self._add_borders)
+
+    def _applyScaleCorrection(self, pad, param):
+        # The point of the width and height correction is adding a padding to
+        # the output frame so that its height and width are multiples of a
+        # given value as many encoders require for instance a width that's a
+        # multiple of 8. It's unrelated to the aspect ratio correction to get
+        # to 4:3 or 16:9
+        # FIXME: Add the option to strech or reduce the image instead of
+        # padding with a black line
+        c = pad.get_negotiated_caps()
+        if c is None:
+            return
+
+        width = c[0]['width']
+        height = c[0]['height']
+
+        def correctScale(value, correction, isWidth, propIsSet):
+            if correction == 0:
+                return
+
+            name = isWidth and "width" or "height"
+            scale_correction = value % correction
+
+            if scale_correction == 0:
+                return
+
+            if propIsSet:
+                self.warning('%s given, but output is not a '
+                             'multiple of %s!' % (name, correction))
+                return
+
+            self.info("Correcting %s with %s pixels to be a multiple "
+                      "of %s" % (name, scale_correction, correction))
+            if isWidth:
+                self._videobox.set_property("right", -scale_correction)
+            else:
+                self._videobox.set_property("top", -scale_correction)
+
+        correctScale(width, self._width_correction, True, self._width)
+        correctScale(height, self._height_correction, False, self._height)
 
     def _sinkSetCaps(self, pad, caps):
         self.info("in:%s" % caps.to_string())
@@ -154,6 +194,10 @@ class VideoscaleBin(gst.Bin):
             self._width = value
         elif property.name == 'height':
             self._height = value
+        elif property.name == 'width-correction':
+            self._width_correction = value
+        elif property.name == 'height-correction':
+            self._height_correction = value
         elif property.name == 'add-borders':
             if not gstreamer.element_has_property(self._videoscaler,
                                                   'add-borders'):
@@ -170,6 +214,10 @@ class VideoscaleBin(gst.Bin):
             return self._width or 0
         elif property.name == 'height':
             return self._height or 0
+        elif property.name == 'width-correction':
+            return self._width_correction
+        elif property.name == 'height-correction':
+            return self._height_correction
         elif property.name == 'add-borders':
             return self._add_borders
         elif property.name == 'is-square':
@@ -190,14 +238,16 @@ class Videoscale(feedcomponent.PostProcEffect):
     logCategory = "videoscale-effect"
 
     def __init__(self, name, component, sourcePad, pipeline,
-                 width, height, is_square, add_borders=False):
+                 width, height, is_square, add_borders=False,
+                 width_correction=8, height_correction=0):
         """
         @param element:     the video source element on which the post
                             processing effect will be added
         @param pipeline:    the pipeline of the element
         """
         feedcomponent.PostProcEffect.__init__(self, name, sourcePad,
-            VideoscaleBin(width, height, is_square, add_borders), pipeline)
+            VideoscaleBin(width, height, is_square, add_borders,
+                          width_correction, height_correction), pipeline)
         self.pipeline = pipeline
         self.component = component
 

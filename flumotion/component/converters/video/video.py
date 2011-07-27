@@ -56,6 +56,8 @@ class Converter(feedcomponent.ParseLaunchComponent):
         self.deintMethod = properties.get('deinterlace-method', "ffmpeg")
         self.width = properties.get('width', None)
         self.height = properties.get('height', None)
+        self.widthCorrection = properties.get('width-correction', 8)
+        self.heightCorrection = properties.get('height-correction', 0)
         self.is_square = properties.get('is-square', False)
         fr = properties.get('framerate', None)
         self.framerate = None
@@ -80,6 +82,7 @@ class Converter(feedcomponent.ParseLaunchComponent):
         # Add videoscale effect
         videoscaler = videoscale.Videoscale('videoscale', self,
             deinterlacer.effectBin.get_pad("src"), pipeline,
-            self.width, self.height, self.is_square)
+            self.width, self.height, self.is_square, False,
+            self.widthCorrection, self.heightCorrection)
         self.addEffect(videoscaler)
         videoscaler.plug()

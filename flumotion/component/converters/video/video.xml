@@ -20,6 +20,10 @@
                   _description="Output height." />
         <property name="width" type="int"
                   _description="Output width." />
+        <property name="height-correction" type="int"
+                  _description="Corrects height to be a multiple of this value (default:0)." />
+        <property name="width-correction" type="int"
+                  _description="Corrects width to be a multiple of this value (default:8)." />
         <property name="is-square" type="bool"
                   _description="Force square pixels (par=1/1)." />
         <property name="framerate" type="fraction"
