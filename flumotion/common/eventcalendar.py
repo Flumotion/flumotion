@@ -765,5 +765,12 @@ def fromFile(file):
     # CREATED:0000XXXXTXXXXXXZ, which means: created in year 0000
     # this breaks the icalendar parsing code. Guard against that.
     data = data.replace('\nCREATED:0000', '\nCREATED:2008')
-    cal = icalendar.Calendar.from_string(data)
+    try:
+        cal = icalendar.Calendar.from_string(data)
+    except ValueError:
+        log.warning("icalendar", "The ics file we've received is not encoded "
+                    "in UTF-8. We'll decode it but some characters may be "
+                    "missing")
+        data = data.decode('utf-8', 'ignore')
+        cal = icalendar.Calendar.from_string(data)
     return fromICalendar(cal)
