@@ -35,7 +35,7 @@ from flumotion.common import log, gstreamer, messages,\
                              errors, common
 from flumotion.common import documentation
 from flumotion.common import format as formatting
-from flumotion.common import eventcalendar, poller
+from flumotion.common import eventcalendar, poller, tz
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common.mimetypes import mimeTypeToExtention
 
@@ -1040,7 +1040,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # so convert all to UTC then remove tzinfo.
 
         def _utcAndStripTZ(dt):
-            return dt.astimezone(eventcalendar.UTC).replace(tzinfo=None)
+            return dt.astimezone(tz.UTC).replace(tzinfo=None)
 
         for p in points:
             dtUTC = _utcAndStripTZ(p.dt)
