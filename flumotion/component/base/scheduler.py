@@ -19,6 +19,7 @@
 
 # Headers in this file shall remain intact.
 
+import os
 import time
 import datetime
 
@@ -293,7 +294,7 @@ class ICalScheduler(Scheduler):
 
         self._parseFromFile(fileObj)
 
-        if hasattr(fileObj, 'name'):
+        if hasattr(fileObj, 'name') and os.path.isfile(fileObj.name):
 
             def fileChanged(filename):
                 self.info("ics file %s changed", filename)
