@@ -24,6 +24,7 @@ import gobject
 from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
+from flumotion.common import gstreamer
 
 __version__ = "$Rev$"
 
@@ -99,6 +100,9 @@ class DeinterlaceBin(gst.Bin):
         # element not-passthrough.
         self._colorfilter.set_property('caps', gst.Caps(
             'video/x-raw-yuv, format=(fourcc)I420'))
+
+        if gstreamer.element_has_property(self._videorate, 'skip-to-first'):
+            self._videorate.set_property('skip-to-first', True)
 
         # Link elements
         self._colorspace.link(self._colorfilter)
