@@ -27,7 +27,7 @@ from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
 
 # register serializables
-from flumotion.common import messages, gstreamer
+from flumotion.common import messages
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -54,10 +54,6 @@ class VideorateBin(gst.Bin):
         self.add(self._videorate, self._capsfilter)
 
         self._videorate.link(self._capsfilter)
-
-        # Set properties
-        if gstreamer.element_has_property(self._videorate, 'skip-to-first'):
-            self._videorate.set_property('skip-to-first', True)
 
         # Create source and sink pads
         self._sinkPad = gst.GhostPad('sink', self._videorate.get_pad('sink'))

@@ -74,9 +74,6 @@ class Vorbis(feedcomponent.EncoderComponent):
         if gstreamer.element_has_property(art, 'tolerance'):
             art.set_property('tolerance', self.DEFAULT_TOLERANCE)
 
-        if gstreamer.element_has_property(art, 'skip-to-first'):
-            art.set_property('skip-to-first', True)
-
         pad = ar.get_pad('sink')
         handle = None
 

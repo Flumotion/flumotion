@@ -86,10 +86,6 @@ class AudioconvertBin(gst.Bin):
         self._audioresample.link(self._capsfilter)
         self._capsfilter.link(self._identity)
 
-        # Set properties
-        if gstreamer.element_has_property(self._audiorate, 'skip-to-first'):
-            self._audiorate.set_property('skip-to-first', True)
-
         # Create source and sink pads
         self._sinkPad = gst.GhostPad('sink', self._audiorate.get_pad('sink'))
         self._srcPad = gst.GhostPad('src', self._identity.get_pad('src'))
