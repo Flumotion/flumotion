@@ -60,16 +60,18 @@ class Converter(feedcomponent.ParseLaunchComponent):
         self.is_square = properties.get('is-square', False)
 
         identity = pipeline.get_by_name("identity")
+        # FIXME: The deinterlace effect uses a videorate which we don't want in
+        # the middle of a flow.
         # Add deinterlace effect. Deinterlacing must always be done
         # before scaling.
-        deinterlacer = deinterlace.Deinterlace('deinterlace',
-            identity.get_pad("src"),
-            pipeline, self.deintMode, self.deintMethod)
-        self.addEffect(deinterlacer)
-        deinterlacer.plug()
+        #deinterlacer = deinterlace.Deinterlace('deinterlace',
+        #    identity.get_pad("src"),
+        #    pipeline, self.deintMode, self.deintMethod)
+        #self.addEffect(deinterlacer)
+        #deinterlacer.plug()
         # Add videoscale effect
         videoscaler = videoscale.Videoscale('videoscale', self,
-            deinterlacer.effectBin.get_pad("src"), pipeline,
+            identity.get_pad("src"), pipeline,
             self.width, self.height, self.is_square, False,
             self.widthCorrection, self.heightCorrection)
         self.addEffect(videoscaler)
