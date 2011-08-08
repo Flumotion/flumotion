@@ -24,7 +24,6 @@ import gst
 from flumotion.common import errors, messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
-from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
 from flumotion.component.effects.deinterlace import deinterlace
 
@@ -59,23 +58,12 @@ class Converter(feedcomponent.ParseLaunchComponent):
         self.widthCorrection = properties.get('width-correction', 8)
         self.heightCorrection = properties.get('height-correction', 0)
         self.is_square = properties.get('is-square', False)
-        fr = properties.get('framerate', None)
-        self.framerate = None
-        if fr is not None:
-            self.framerate = gst.Fraction(fr[0], fr[1])
 
         identity = pipeline.get_by_name("identity")
-        # Add videorate effect. The videorate is usually decreased, so it's
-        # usefull to have this effect always first, because it reduces the
-        # number of frames to process.
-        vr = videorate.Videorate('videorate',
-            identity.get_pad("src"), pipeline, self.framerate)
-        self.addEffect(vr)
-        vr.plug()
         # Add deinterlace effect. Deinterlacing must always be done
         # before scaling.
         deinterlacer = deinterlace.Deinterlace('deinterlace',
-            vr.effectBin.get_pad("src"),
+            identity.get_pad("src"),
             pipeline, self.deintMode, self.deintMethod)
         self.addEffect(deinterlacer)
         deinterlacer.plug()

@@ -26,8 +26,6 @@
                   _description="Corrects width to be a multiple of this value (default:8)." />
         <property name="is-square" type="bool"
                   _description="Force square pixels (par=1/1)." />
-        <property name="framerate" type="fraction"
-                  _description="Output framerate." />
       </properties>
     </component>
   </components>
@@ -53,7 +51,6 @@
             <dependency name="video-converter-base" />
             <dependency name="deinterlace-effect" />
             <dependency name="videoscale-effect" />
-            <dependency name="videorate-effect" />
         </dependencies>
 
         <directories>
