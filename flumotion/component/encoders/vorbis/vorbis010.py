@@ -27,8 +27,6 @@ __version__ = "$Rev$"
 class Vorbis(feedcomponent.EncoderComponent):
     checkTimestamp = True
     checkOffset = True
-    # Add a tolerance of 20ms to audiorate to fix cracking audio
-    DEFAULT_TOLERANCE = 20000000  #20ms
 
     def do_check(self):
         self.debug('running Vorbis check')
@@ -50,25 +48,20 @@ class Vorbis(feedcomponent.EncoderComponent):
         resampler = 'audioresample'
         if gstreamer.element_factory_exists('legacyresample'):
             resampler = 'legacyresample'
-        return ('audiorate name=art ! '
-                '%s name=ar ! audioconvert ! capsfilter name=cf '
+        return ('%s name=ar ! audioconvert ! capsfilter name=cf '
                 '! vorbisenc name=enc' % resampler)
 
     def configure_pipeline(self, pipeline, properties):
         enc = pipeline.get_by_name('enc')
         cf = pipeline.get_by_name('cf')
         ar = pipeline.get_by_name('ar')
-        art = pipeline.get_by_name('art')
 
-        assert enc and cf and ar and art
+        assert enc and cf and ar
 
         if self.bitrate > -1:
             enc.set_property('bitrate', self.bitrate)
         else:
             enc.set_property('quality', self.quality)
-
-        if gstreamer.element_has_property(art, 'tolerance'):
-            art.set_property('tolerance', self.DEFAULT_TOLERANCE)
 
         pad = ar.get_pad('sink')
         handle = None
