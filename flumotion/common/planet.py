@@ -248,6 +248,7 @@ class ManagerComponentState(flavors.StateCacheable):
         self.addKey('moodPending')
         self.addKey('workerRequested')
         self.addKey('config') # dictionary
+        self.addKey('lastKnownPid')
 
         # proxied from job state or combined with our state (mood)
         for k in _jobStateKeys:
@@ -329,6 +330,8 @@ class ManagerComponentState(flavors.StateCacheable):
         for m in self._jobState.get('messages'):
             self.remove('messages', m)
 
+        self.set('lastKnownPid', self._jobState.get('pid'))
+
         self._jobState.removeListener(self)
         self._jobState = None
 
@@ -343,7 +346,8 @@ class ManagerComponentState(flavors.StateCacheable):
             self.setMood(moods.sleeping.value)
         elif self.get('mood') != moods.sad.value:
             log.debug('componentstate', "Shutdown was NOT requested,"
-                      " %s now lost", self.get('name'))
+                      " %s now lost, last know pid is: %r",
+                      self.get('name'), self.get('lastKnownPid'))
             self.setMood(moods.lost.value)
 
 

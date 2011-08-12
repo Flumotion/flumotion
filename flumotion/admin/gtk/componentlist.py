@@ -156,7 +156,7 @@ class ComponentList(log.Loggable, gobject.GObject):
         treeView.append_column(col)
 
         t = gtk.CellRendererText()
-        col = gtk.TreeViewColumn(_('PID'), t, text=COL_PID,
+        col = gtk.TreeViewColumn(_('PID'), t, markup=COL_PID,
                                  foreground=COL_FG,
                                  foreground_set=COL_SAD)
         col.set_sort_column_id(COL_PID)
@@ -330,6 +330,8 @@ class ComponentList(log.Loggable, gobject.GObject):
         self._model.set(titer, COL_NAME, componentName)
 
         pid = component.get('pid')
+        if not pid and component.get('lastKnownPid'):
+            pid = "<i>%d</i>" % component.get('lastKnownPid')
         self._model.set(titer, COL_PID, (pid and str(pid)) or '')
 
         self._updateWorker(titer, component)
