@@ -330,8 +330,9 @@ class ComponentList(log.Loggable, gobject.GObject):
         self._model.set(titer, COL_NAME, componentName)
 
         pid = component.get('pid')
-        if not pid and component.get('lastKnownPid'):
-            pid = "<i>%d</i>" % component.get('lastKnownPid')
+        if not pid and component.hasKey('lastKnownPid'):
+            if component.get('lastKnownPid'):
+                pid = "<i>%d</i>" % component.get('lastKnownPid')
         self._model.set(titer, COL_PID, (pid and str(pid)) or '')
 
         self._updateWorker(titer, component)
