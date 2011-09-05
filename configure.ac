@@ -166,6 +166,7 @@ flumotion/component/effects/audioconvert/Makefile
 flumotion/component/effects/audioresync/Makefile
 flumotion/component/effects/colorbalance/Makefile
 flumotion/component/effects/deinterlace/Makefile
+flumotion/component/effects/kuscheduler/Makefile
 flumotion/component/effects/videorate/Makefile
 flumotion/component/effects/videoscale/Makefile
 flumotion/component/effects/volume/Makefile
