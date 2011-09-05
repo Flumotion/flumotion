@@ -62,6 +62,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         # Append the audio parser to the end of the pipeline
         caps = pad.get_caps()
         capsname = caps.get_structure(0).get_name()
+        self._parser_name = None
         parser = None
         if self.passthrough:
             self.info("Acting in passthrough mode, not parsing the audio")
@@ -86,7 +87,6 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         else:
             # in case we good sth else than mp3 or ogg just connect the
             # gdb back
-            self._parser_name = None
             self.warning("Couldn't find the correct parser for caps: %s",\
                 capsname)
             pad.link(gdp_sink_pad)
