@@ -5,6 +5,7 @@
       <directories>
           <directory name="flumotion/component/common/avproducer">
           <filename location="__init__.py" />
+          <filename location="properties.xml" />
         </directory>
       </directories>
     </bundle>

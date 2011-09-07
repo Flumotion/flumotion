@@ -1,7 +1,7 @@
 include $(top_srcdir)/common/python.mk
 
 avproducerdir = $(libdir)/flumotion/python/flumotion/component/common/avproducer
-avproducer_DATA = avproducer.xml
+avproducer_DATA = avproducer.xml properties.xml
 avproducer_PYTHON = \
 	__init__.py \
 	avproducer.py \
