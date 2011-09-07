@@ -16,19 +16,10 @@
 
       <synchronization required="yes" clock-priority="160" />
 
-      <properties>
+      <properties xmlns:xi="http://www.w3.org/2001/XInclude">
+        <xi:include href="flumotion/component/common/avproducer/properties.xml"/>
         <property name="video-format" type="int"
                   _description="The incoming SDI video format." />
-        <property name="height" type="int"
-                  _description="The height to scale to." />
-        <property name="width" type="int"
-                  _description="The final width, including correction." />
-        <property name="framerate" type="fraction"
-                  _description="The framerate (in fps)."/>
-        <property name="deinterlace-mode" type="string"
-                  _description="The deinterlacing mode to use.(default=auto)" />
-        <property name="deinterlace-method" type="string"
-                  _description="The deinterlacing method to use.(default=ffmpeg)" />
       </properties>
     </component>
   </components>
