@@ -13,4 +13,6 @@
             _description="The deinterlacing mode to use.(default=auto)" />
   <property name="deinterlace-method" type="string"
             _description="The deinterlacing method to use.(default=ffmpeg)" />
+  <property name="keyunits-interval" type="int"
+            _description="Interval of GstForceKeyUnit events in ms (default=0)" />
 </properties>
