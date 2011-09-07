@@ -25,6 +25,7 @@ from flumotion.component.effects.deinterlace import deinterlace
 from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
 from flumotion.component.effects.audioconvert import audioconvert
+from flumotion.component.effects.kuscheduler import kuscheduler
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -79,6 +80,7 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         self.add_borders = props.get('add-borders', True)
         self.deintMode = props.get('deinterlace-mode', 'auto')
         self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
+        self.kuinterval = props.get('keyunits-interval', 0) * gst.MSECOND
         fr = props.get('framerate', None)
         self.framerate = fr and gst.Fraction(fr[0], fr[1]) or None
         return self.get_pipeline_template()
@@ -86,7 +88,7 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
     def configure_pipeline(self, pipeline, properties):
         if self.get_raw_video_element() is not None:
             self._add_video_effects(pipeline)
-        self._add_audio_effects()
+        self._add_audio_effects(pipeline)
 
     def getVolume(self):
         return self.volume.get_property('volume')
@@ -120,6 +122,12 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         self.addEffect(videoscaler)
         videoscaler.plug()
 
+        # Add key units scheduler
+        scheduler = kuscheduler.KeyUnitsScheduler('video-kuscheduler',
+            videoscaler.effectBin.get_pad("src"), pipeline, self.kuinterval)
+        self.addEffect(scheduler)
+        scheduler.plug()
+
     def _add_audio_effects(self, pipeline):
         # Add volume setter
         self.volume = pipeline.get_by_name("setvolume")
@@ -133,3 +141,9 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
             comp_level.get_pad("src"), pipeline, tolerance=40 * gst.MSECOND)
         self.addEffect(audioconverter)
         audioconverter.plug()
+
+        # Add key units scheduler
+        scheduler = kuscheduler.KeyUnitsScheduler('audio-kuscheduler',
+            audioconverter.effectBin.get_pad("src"), pipeline, self.kuinterval)
+        self.addEffect(scheduler)
+        scheduler.plug()
