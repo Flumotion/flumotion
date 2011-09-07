@@ -158,7 +158,7 @@ class Switch(feedcomponent.MultiInputParseLaunchComponent):
             return result.value
 
         self.debug("checking for input-selector element")
-        if (0, 10, 32, 0) >= gst.version():
+        if gst.version() >= (0, 10, 32, 0):
             # In release 0.10.32 input-selector was moved to coreelements.
             d = check.checkPlugin('coreelements', 'gst-plugins',
                 (0, 10, 5, 2), 'input-selector', checkSignal)
