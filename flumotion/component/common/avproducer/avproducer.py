@@ -84,6 +84,21 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         return self.get_pipeline_template()
 
     def configure_pipeline(self, pipeline, properties):
+        if self.get_raw_video_element() is not None:
+            self._add_video_effects(pipeline)
+        self._add_audio_effects()
+
+    def getVolume(self):
+        return self.volume.get_property('volume')
+
+    def setVolume(self, value):
+        """
+        @param value: float between 0.0 and 4.0
+        """
+        self.debug("Setting volume to %f" % (value))
+        self.volume.set_property('volume', value)
+
+    def _add_video_effects(self, pipeline):
         # Add deinterlacer
         deinterlacer = deinterlace.Deinterlace('deinterlace',
             self.get_raw_video_element().get_pad("src"), pipeline,
@@ -105,6 +120,7 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         self.addEffect(videoscaler)
         videoscaler.plug()
 
+    def _add_audio_effects(self, pipeline):
         # Add volume setter
         self.volume = pipeline.get_by_name("setvolume")
         from flumotion.component.effects.volume import volume
@@ -117,13 +133,3 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
             comp_level.get_pad("src"), pipeline, tolerance=40 * gst.MSECOND)
         self.addEffect(audioconverter)
         audioconverter.plug()
-
-    def getVolume(self):
-        return self.volume.get_property('volume')
-
-    def setVolume(self, value):
-        """
-        @param value: float between 0.0 and 4.0
-        """
-        self.debug("Setting volume to %f" % (value))
-        self.volume.set_property('volume', value)
