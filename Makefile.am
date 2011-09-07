@@ -15,8 +15,7 @@ EXTRA_DIST = \
 	env.in \
         .version \
 	RELEASE \
-	LICENSE.GPL \
-	LICENSE.Flumotion \
+	LICENSE.LGPL \
 	flumotion.spec \
 	flumotion.doap \
 	misc/pycheckerhelp.py \

@@ -12,7 +12,7 @@ Release:        @PACKAGE_VERSION_RELEASE@%{?dist}
 Summary:        Streaming Server based on GStreamer and Twisted
 
 Group:          Applications/Internet
-License:        GPL
+License:        LGPL
 URL:            http://www.flumotion.net/
 Source:         http://www.flumotion.net/src/flumotion/@PACKAGE_TARNAME@-@PACKAGE_VERSION@.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -60,7 +60,7 @@ BuildRequires:  intltool
 # BuildArch:    noarch
 
 %description
-Flumotion is a GPL streaming media server written in Python. It is distributed
+Flumotion is a LGPL streaming media server written in Python. It is distributed
 and component-based: every step in the streaming process (production,
 conversion, consumption) can be run inside a separate process on separate
 machines.

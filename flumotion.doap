@@ -14,7 +14,7 @@
 Flumotion is a Free Software streaming server developed by Fluendo.
 </shortdesc>
  <description xml:lang="en">
-Flumotion is a GPL streaming media server written in Python. It is distributed
+Flumotion is a LGPL streaming media server written in Python. It is distributed
 and component-based: every step in the streaming process (production,
 conversion, consumption) can be run inside a separate process on separate
 machines.
@@ -34,7 +34,7 @@ it.
  <screenshots></screenshots>
  <mailing-list rdf:resource="http://lists.fluendo.com/mailman/listinfo/flumotion-devel" />
  <programming-language>python</programming-language>
- <license rdf:resource="http://usefulinc.com/doap/licenses/gpl" />
+ <license rdf:resource="http://usefulinc.com/doap/licenses/lgpl" />
  <download-page rdf:resource="http://www.flumotion.net/download/" />
 
  <repository>

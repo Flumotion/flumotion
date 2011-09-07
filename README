@@ -157,17 +157,9 @@ https://core.fluendo.com/flumotion/trac
 LICENSING
 ---------
 
-This version of the Flumotion Streaming Server is dual-licensed.
-
-The GPL applies to all code files shipped with this version.
-See LICENSE.GPL
-
-The files may only be used together with or as part of the Flumotion
-Advanced Streaming Server:
-- under the terms of the Flumotion Advanced Streaming Server Commercial
-  License Agreement; and
-- when you have purchased or hold a valid Flumotion Advanced Streaming Server
-  license.
+This version of the Flumotion Streaming Server is licensed under the the
+terms of the GNU Lesser General Public License version 2.1 as published
+by the Free Software Foundation. See LICENSE.LGPL
 
 If the conditions of this licensing strategy are not clear to you, please
 contact Thomas Vander Stichele (thomas@fluendo.com).
@@ -179,4 +171,3 @@ to verify if things work as they should.
 
 - multipart/jpeg stream (video only):
   gst-launch -v gnomevfssrc location=http://localhost:8802 ! multipartdemux ! jpegdec ! xvimagesink
-

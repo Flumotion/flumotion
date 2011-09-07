@@ -1,23 +1,19 @@
 # -*- Mode: Python; test-case-name: flumotion.test.test_dialogs -*-
 # -*- coding: UTF-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-#
-# Flumotion - a streaming media server
-# Copyright (C) 2004,2005,2006,2007,2008 Fluendo, S.L. (www.fluendo.com).
-# All rights reserved.
 
+# Flumotion - a streaming media server
+# Copyright (C) 2004,2005,2006,2007,2008,2009 Fluendo, S.L.
+# Copyright (C) 2010,2011 Flumotion Services, S.A.
+# All rights reserved.
+#
 # This file may be distributed and/or modified under the terms of
-# the GNU General Public License version 2 as published by
+# the GNU Lesser General Public License version 2.1 as published by
 # the Free Software Foundation.
 # This file is distributed without any warranty; without even the implied
 # warranty of merchantability or fitness for a particular purpose.
-# See "LICENSE.GPL" in the source distribution for more information.
-
-# Licensees having purchased or holding a valid Flumotion Advanced
-# Streaming Server license may use this file in accordance with the
-# Flumotion Advanced Streaming Server Commercial License Agreement.
-# See "LICENSE.Flumotion" in the source distribution for more information.
-
+# See "LICENSE.LGPL" in the source distribution for more information.
+#
 # Headers in this file shall remain intact.
 
 """new about dialog"""
@@ -77,22 +73,25 @@ class GtkAboutDialog(gtk.AboutDialog):
         self.set_version(configure.version)
 
         comments = _('Flumotion is a streaming media server.\n\n'
-                     '© 2004-2010 Fluendo S.L. (www.fluendo.com)')
+                     '© 2004-2009 Fluendo S.L.\n'
+                     '© 2010-2011 Flumotion Services, S.A.\n')
         self.set_comments(comments)
 
         license = _('Flumotion - a streaming media server\n'
-                    'Copyright (C) 2004-2010 Fluendo, S.L. '
-                    '(www.fluendo.com).\n'
+                    'Copyright (C) 2004-2009 Fluendo, S.L.\n'
+                    'Copyright (C) 2010,2011 Flumotion Services, S.A.\n'
                     'All rights reserved.\n\n'
-                    'This software is available under two license '
-                    'agreements:\n\n'
-                    'The first license agreement is the GPL version 2.\n'
-                    'See "LICENSE.GPL" in the root of this distribution.\n\n'
-                    'The second license is the Flumotion Advanced Commercial '
-                    'License Agreement.\n'
-                    'This license agreement is available to licensees holding '
-                    'valid Flumotion Advanced licenses.\n'
-                    'See "LICENSE.Flumotion" in the root of this '
-                    'distribution.')
+                    'This file may be distributed and/or modified under '
+                    'the terms of\n'
+                    'the GNU Lesser General Public License version 2.1 '
+                    'as published by\n'
+                    'the Free Software Foundation.\n\n'
+                    'This file is distributed without any warranty; '
+                    'without even the implied\n'
+                    'warranty of merchantability or fitness for a particular '
+                    'purpose.\n'
+                    'See "LICENSE.LGPL" in the source distribution for '
+                    'more information.')
+
         self.set_license(license)
         self.set_wrap_license(True)

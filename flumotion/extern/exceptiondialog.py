@@ -1,9 +1,10 @@
 # -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
-#
-# Copyright (C) 2005,2006,2007 by Async Open Source and Sicem S.L.
-#               2008 Fluendo, S.L. (www.fluendo.com).
 
+# Copyright (C) 2005,2006,2007 by Async Open Source and Sicem S.L.
+# Copyright (C) 2008,2009 Fluendo, S.L.
+# Copyright (C) 2010,2011 Flumotion Services, S.A.
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation; either version 2
