@@ -26,6 +26,7 @@ from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
 from flumotion.component.effects.audioconvert import audioconvert
 from flumotion.component.effects.kuscheduler import kuscheduler
+from flumotion.component.effects.volume import volume
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -131,7 +132,6 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
     def _add_audio_effects(self, pipeline):
         # Add volume setter
         self.volume = pipeline.get_by_name("setvolume")
-        from flumotion.component.effects.volume import volume
         comp_level = pipeline.get_by_name('volumelevel')
         vol = volume.Volume('inputVolume', comp_level, pipeline)
         self.addEffect(vol)
