@@ -12,6 +12,7 @@ clean-local:
 SUBDIRS = \
 	disker \
 	fgdp \
+	hlsstreamer \
 	httpstreamer \
 	pipeline \
 	preview \

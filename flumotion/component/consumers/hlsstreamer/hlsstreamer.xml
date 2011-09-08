@@ -1,0 +1,150 @@
+<registry>
+
+  <components>
+    <component type="http-hlsstreamer"
+               base="flumotion/component/consumers/hlsstreamer"
+               _description="A consumer that streams following the HTTP Live Streaming protocol">
+      <source location="flumotion.component.consumers.hlsstreamer.hlsstreamer"/>
+
+      <eater name="default" />
+
+      <!-- entry points for distributable code bundles -->
+      <entries>
+        <entry type="component" location="hlsstreamer.py"
+               function="HLSStreamer" />
+        <entry type="admin/gtk" location="admin_gtk.py"
+               function="GUIClass" />
+      </entries>
+
+      <sockets>
+        <socket type="flumotion.component.plugs.request.RequestLoggerPlug" />
+        <socket type="flumotion.component.plugs.streamdata.StreamDataProviderPlug" />
+        <socket type="flumotion.component.plugs.rrd.ComponentRRDPlug" />
+      </sockets>
+
+      <properties>
+        <property name="description" type="string"
+                  _description="A description of the stream."/>
+
+        <property name="mount-point" type="string"
+                  _description="The mount point on which the playlist and the stream can be accessed." />
+
+        <!-- FIXME, authenticating against remote bouncers should happen through
+             a plug, not this property -->
+        <property name="bouncer" type="string"
+                  _description="The name of a bouncer in the atmosphere to authenticate against." />
+        <property name="issuer-class" type="string"
+                  _description="The Python class of the Keycard issuer to use." />
+
+        <property name="type" type="string"
+                  _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
+
+        <!-- If type is 'master' (default) -->
+        <property name="port" type="int"
+                  _description="The port to listen on (if type is 'master')." />
+
+        <!-- If type is 'slave' -->
+        <property name="porter-socket-path" type="string"
+                  _description="The path to the socket to communicate with the porter." />
+        <property name="porter-username" type="string"
+                  _description="The username to authenticate to the porter." />
+        <property name="porter-password" type="string"
+                  _description="The password to authenticate to the porter." />
+
+        <property name="hostname" type="string"
+                  _description="The server's host name to display." />
+        <property name="domain" type="string"
+                  _description="The domain of the server for authentication." />
+
+        <property name="hls-url" type="string"
+                  _description="The url that will be used to render the playlist entries. If not defined hostname, port will be used to generate the url." />
+
+        <property name="client-limit" type="int"
+                  _description="The maximum number of clients allowed." />
+        <property name="bandwidth-limit" type="int"
+                  _description="The maximum bandwidth usage allowed in bits per second." />
+        <property name="redirect-on-overflow" type="string"
+                  _description="A URL to redirect clients to if either of the limits have been reached." />
+
+        <property name="duration" type="float"
+                  _description="How long to keep clients connected (in seconds)."/>
+
+        <property name="fragment-prefix" type="string"
+                  _description="Fragments prefix name to use in the playlist (default:fragment)" />
+        <property name="main-playlist" type="string"
+                  _description="Main playlist resource name relative to the mount point (default:main.m3u8)" />
+        <property name="stream-playlist" type="string"
+                  _description="Stream playlist resource name relative to the mount point (default:stream.m3u8)" />
+        <property name="stream-bitrate" type="int"
+                  _description="Stream bitrate shown in the playlist in bps (default:300000)" />
+        <property name="keyframes-per-fragment" type="int"
+                  _description="Number of keyframes per fragment (default:10)" />
+        <property name="new-fragment-tolerance" type="float"
+                  _description="Tolerance to automatically add new fragments to the playlist. A 0 value means that the playlist won't be uptdated.(default:0)" />
+        <property name="min-window" type="int"
+                  _description="Minimun number of fragments to start streaming (default:2)" />
+        <property name="max-window" type="int"
+                  _description="Maximum number of fragments to expose in the playlist (default:5)" />
+        <property name="max-extra-buffers" type="int"
+                  _description="Maximum number of extra fragments kept in the ring (default:max-window+1)" />
+        <property name="secret-key" type="string"
+                  _description="Secret key used for HMAC" />
+        <property name="session-timeout" type="int"
+                  _description="Session timeout in seconds (default:30)" />
+        <!--property name="key-rotation" type="int"
+                  _description="Number of fragments sharing the same encryption key. Use 0 for not using encryption (default:0)" />
+        <property name="keys-uri" type="string"
+                  _description="URI used to retrieve the encryption keys" /!-->
+      </properties>
+
+    </component>
+  </components>
+
+  <bundles>
+    <bundle name="hlsstreamer-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/hlsstreamer">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="hlsstreamer">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="hlsstreamer-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/hlsstreamer">
+                <filename location="hlsstreamer.py" />
+                <filename location="hlsring.py" />
+                <filename location="hlssink.py" />
+                <filename location="resources.py" />
+                <filename location="common.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="hlsstreamer-admin">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="base-admin-gtk"/>
+            <dependency name="hlsstreamer-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/consumers/hlsstreamer">
+                <filename location="hlsstreamer.glade" />
+                <filename location="admin_gtk.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry>
