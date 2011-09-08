@@ -101,9 +101,9 @@ class Icecast(feedcomponent.ParseLaunchComponent):
                 self._typefind_have_caps_cb)
 
         if not self.configured:
-            self._pad_monitors.attach(self.src.get_pad('src'), 'souphttp-src')
-            self._pad_monitors['souphttp-src'].addWatch(
-                self._src_connected, self._src_disconnected)
+            self.attachPadMonitorToElement('src',
+                                           self._src_connected,
+                                           self._src_disconnected)
         self.reconnecting = False
         self.reconnector = RetryingDeferred(self.connect)
         self.reconnector.initialDelay = 1.0

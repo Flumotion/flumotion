@@ -166,7 +166,18 @@ class FeedComponent(basecomponent.BaseComponent):
             raise errors.ComponentError("No such feeder %s" % feederName)
 
         pad = element.get_pad('src')
-        self._pad_monitors.attach(pad, elementName)
+        self._pad_monitors.attach(pad, "%s:%s" % (self.name, elementName))
+
+    def attachPadMonitorToElement(self, elementName, setActive, setInactive):
+        element = self.pipeline.get_by_name(elementName)
+        if not element:
+            raise error.ComponentError("No such element %s" % elementName)
+        pad = element.get_pad('src')
+        name = "%s:%s" % (self.name, elementName)
+        self._pad_monitors.attach(pad, name)
+        self._pad_monitors[name].addWatch(
+                setActive,
+                setInactive)
 
     ### FeedComponent methods
 
@@ -422,11 +433,12 @@ class FeedComponent(basecomponent.BaseComponent):
         for eater in self.eaters.values():
             self.install_eater_event_probes(eater)
             pad = self.get_element(eater.elementName).get_pad('src')
-            self._pad_monitors.attach(pad, eater.elementName,
+            name = "%s:%s" % (self.name, eater.elementName)
+            self._pad_monitors.attach(pad, name,
                                       padmonitor.EaterPadMonitor,
                                       self.reconnectEater,
                                       eater.eaterAlias)
-            eater.setPadMonitor(self._pad_monitors[eater.elementName])
+            eater.setPadMonitor(self._pad_monitors[name])
 
     def stop_pipeline(self):
         if not self.pipeline:
@@ -460,7 +472,7 @@ class FeedComponent(basecomponent.BaseComponent):
 
         # clean up checkEater callLaters
         for eater in self.eaters.values():
-            self._pad_monitors.remove(eater.elementName)
+            self._pad_monitors.remove("%s:%s" % (self.name, eater.elementName))
             eater.setPadMonitor(None)
 
     def do_stop(self):
