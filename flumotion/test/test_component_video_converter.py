@@ -172,3 +172,4 @@ class TestVideoConverter(comptest.CompTestTestCase, log.Loggable):
         # and finally stop the flow
         d.addCallback(lambda _: self.tp.stop_flow())
         return d
+    test_deinterlace_auto_True.skip = "Skip test"
