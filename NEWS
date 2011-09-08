@@ -1,4 +1,67 @@
-This is Flumotion 0.8.0 "7 Portes"
+This is Flumotion 0.9.1 "Jazz"
+
+Features since 0.8.1:
+
+  * We have included a producer and a consumer that can comunicate using gdp
+    using authentication. Flumotion can now be used as an external encoder to
+    push to another flow without sharing the manager.
+  * Blackmagic SDI capture cards support.
+  * Modifiable properties: Theora and VP8 encoder's bitrate can now be modified
+    through flumotion-command (admin UI comming soon!).
+    e.g.: flumotion-command component -i "/default/encoder-video" invoke modifyProperty bitrate 400000
+
+Bugs fixed since 0.8.1:
+
+  * #778  : need a way to mark manager and worker as disabled so that service scripts ignore them or report them as disabled
+  * #1004 : When a worker gets stopped, all sad components for that worker should go sleeping
+  * #1403 : ondemand component doesn't act on changes to /etc/mime.types
+  * #1463 : pad monitor does not say which component, only the eater
+  * #1472 : http-streamer admin view not showing the right port when configured in slave mode
+  * #1473 : Webcam test did not work
+  * #1481 : Right-click causes an exception on the flumotion-admin tray icon
+  * #1483 : Write disker indexes progressively
+  * #1484 : identities are logging too much
+  * #1490 : [effects] Rename the audiorate element to audioconvert and add support for audio conversion too
+  * #1501 : Audiorate effect should fallback to audioresample if legacyresample is not available
+  * #1502 : importing kiwi makes the application to crash on newest pygobject
+  * #1507 : Update theora-encoder properties
+  * #1511 : http-server admin view not showing the right port when configured in slave mode
+  * #1512 : Allow parsing timezones with missing TZNAME
+  * #1513 : [ical] The daylight change date is not calculated properly
+  * #1516 : flumotion/extern/command/manholecmd.py should be .gitignored
+  * #1518 : Adding support for Blackmagic Decklink SDI through mmtblackmagicsrc gstreamer component
+  * #1519 : V4l2 should be the default source for the webcam producer
+  * #1522 : Error parsing ical file
+
+Features since 0.8.0:
+
+  * Added Python 2.7 compatibility.
+
+  * The wizard allows serving an HTML page with the video tag (for Ogg
+    and WebM streams). Thanks Zaheer!
+
+  * The wizard and admin now remember the last directory used when
+    exporting/importing a flow file to/from the filesystem.
+
+
+Bugs fixed since 0.8.0:
+
+  * 732  : manager and worker's ideas of registry may become out of sync
+  * 1365 : flumotion-admin doesn't remember the last directory of the flow file
+  * 1379 : flumotion + firewire in Ubuntu 9.10 - strange defaults
+  * 1424 : CPU bar is empty when >100%
+  * 1427 : status icon does not update if component is deleted
+  * 1429 : Shouldn't allow 0h for disker rotation
+  * 1465 : The disker doesn't name properly the first file using an Ical
+  * 1469 : Import Error with python 2.7
+  * 1489 : [effects][audiorate] The audiorate effect is not passthrough and forces a samplerate of 44100
+  * 1491 : ivtv producer crashes when no width, height or deinterlacer are set
+  * 1492 : [flumotion-admin] Improve the way debug levels are set in the admin
+  * 1493 : [config] Check for invalid feederport ranges
+  * 1495 : We should offer an HTML5 page like we do with cortado
+  * 1497 : Consider the fact that a file could have been deleted when creating a bundle
+  * 1498 : wizard_gtk.py:542 AttributeError: "WebcamProducer" object has no attribute "size"
+  * 1499 : The python traceback is not decoded properly in the bug reporter.
 
 Features since 0.6.2:
 

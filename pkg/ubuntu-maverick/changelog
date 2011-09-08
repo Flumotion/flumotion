@@ -1,14 +1,26 @@
-flumotion (0.7.0.1-1flu1~jaunty3) jaunty; urgency=low
+flumotion (0.9.1-1flu1~maverick1) maverick; urgency=low
 
-  * Update to SVN 2010-07-27
+  * New upstream release!
 
- -- Xavier Queralt <xqueralt@flumotion.com>  Tue, 27 Jul 2010 21:52:06 +0200
+ -- Xavier Queralt <xqueralt@flumotion.com>  Thu, 8 Sep 2011 17:30:21 +0200
 
-flumotion (0.7.0.1-1flu1~jaunty2) jaunty; urgency=low
+flumotion (0.8.0-1flu1~lucid1) lucid; urgency=low
 
-  * Update to SVN 2009-10-29
+  * New upstream release!
 
- -- Arek Korbik <arkadini@gmail.com>  Thu, 29 Oct 2009 14:13:06 +0100
+ -- Xavier Queralt <xqueralt@flumotion.com>  Fri, 10 Sep 2010 13:30:21 +0200
+
+flumotion (0.7.0.3-1flu1~lucid1) lucid; urgency=low
+
+  * New pre-release
+
+ -- Xavier Queralt <xqueralt@flumotion.com>  Tue, 31 Aug 2010 17:30:21 +0200
+
+flumotion (0.7.0.2-1flu1~lucid1) lucid; urgency=low
+
+  * Lucid pre-release
+
+ -- Xavier Queralt <xqueralt@flumotion.com>  Fri, 27 Aug 2010 12:30:21 +0200
 
 flumotion (0.7.0.1-1flu1~jaunty1) jaunty; urgency=low
 

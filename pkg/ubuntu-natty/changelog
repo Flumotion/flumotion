@@ -1,26 +1,26 @@
-flumotion (0.8.0-1flu1~lucid1) karmic; urgency=low
+flumotion (0.9.1-1flu1~natty1) natty; urgency=low
+
+  * New upstream release!
+
+ -- Xavier Queralt <xqueralt@flumotion.com>  Thu, 8 Sep 2011 17:30:21 +0200
+
+flumotion (0.8.0-1flu1~lucid1) lucid; urgency=low
 
   * New upstream release!
 
  -- Xavier Queralt <xqueralt@flumotion.com>  Fri, 10 Sep 2010 13:30:21 +0200
 
-flumotion (0.7.0.3-1flu1~karmic1) karmic; urgency=low
+flumotion (0.7.0.3-1flu1~lucid1) lucid; urgency=low
 
   * New pre-release
 
- -- Xavier Queralt <xqueralt@flumotion.com>  Tue, 31 Aug 2010 12:30:21 +0200
+ -- Xavier Queralt <xqueralt@flumotion.com>  Tue, 31 Aug 2010 17:30:21 +0200
 
-flumotion (0.7.0.2-1flu1~karmic1) karmic; urgency=low
+flumotion (0.7.0.2-1flu1~lucid1) lucid; urgency=low
 
-  * New pre-release
+  * Lucid pre-release
 
  -- Xavier Queralt <xqueralt@flumotion.com>  Fri, 27 Aug 2010 12:30:21 +0200
-
-flumotion (0.7.0.1-1flu1~karmic1) karmic; urgency=low
-
-  * Karmic release
-
- -- Arek Korbik <arkadini@gmail.com>  Thu, 29 Oct 2009 14:10:21 +0100
 
 flumotion (0.7.0.1-1flu1~jaunty1) jaunty; urgency=low
 
