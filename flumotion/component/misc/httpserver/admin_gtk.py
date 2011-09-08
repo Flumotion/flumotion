@@ -173,10 +173,11 @@ class ServerStatsAdminGtkNode(StatisticsAdminGtkNode):
         # Update the URI
         uri = state.get('stream-url')
         if uri is not None:
-            if not self._link:
+            if not self._link and uri:
                 self._link = self._createLinkWidget(uri)
-            else:
+            elif self._link:
                 self._link.set_uri(uri)
+                self._link.set_label(uri)
 
         # Update Server Uptime
         uptime = state.get('server-uptime')
