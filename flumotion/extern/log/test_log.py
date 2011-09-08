@@ -68,13 +68,13 @@ class TestLog(unittest.TestCase):
         # test a function object
         (filename, line) = log.getFileLine(where=self.testGetFileLine)
         self.failUnless(filename.endswith('test_log.py'))
-        self.assertEquals(line, 70)
+        self.assertEquals(line, 67)
 
         # test a lambda
         f = lambda x: x + 1
         (filename, line) = log.getFileLine(where=f)
         self.failUnless(filename.endswith('test_log.py'))
-        self.assertEquals(line, 77)
+        self.assertEquals(line, 74)
 
         # test an eval
         f = eval("lambda x: x + 1")
