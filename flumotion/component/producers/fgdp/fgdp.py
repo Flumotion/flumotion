@@ -46,7 +46,7 @@ class FGDPProducer(feedcomponent.ParseLaunchComponent):
                 properties.get('max-reconnection-delay', 0.5))
         src.connect('connected', self._on_connected)
         src.connect('disconnected', self._on_disconnected)
-        self._pad_monitors.attach(src.get_pad('src'), 'fgdp-src')
+        self.attachPadMonitorToElement("src")
 
         # When the streamheaders have not changed, sending a flumotion-reset
         # downstream reinitializes the demuxer, but the headers are not re-sent
