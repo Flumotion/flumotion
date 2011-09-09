@@ -1,0 +1,51 @@
+<registry>
+
+  <components>
+    <component type="keyunits-scheduler"
+               base="flumotion/component/misc/kuscheduler"
+               _description="Schedule GstForceKeyUnit event at a given frequency">
+      <source location="flumotion.component.misc.kuscheduler.kuscheduler" />
+      <eater name="default" />
+      <feeder name="default" />
+      <entries>
+        <entry type="component" location="kuscheduler.py"
+               function="KeyUnitsScheduler" />
+      </entries>
+      <properties>
+        <property name="interval" type="int"
+                  _description="Interval of GstForceKeyUnit events in ms (default=10000)." />
+      </properties>
+    </component>
+  </components>
+
+
+  <bundles>
+
+    <bundle name="keyunits-scheduler-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/misc/kuscheduler">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="keyunits-scheduler-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="keyunits-scheduler-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/misc/kuscheduler">
+                <filename location="kuscheduler.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+
+</registry>

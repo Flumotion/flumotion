@@ -12,6 +12,7 @@ clean-local:
 SUBDIRS = \
 	httpserver \
 	porter \
+	kuscheduler \
 	repeater
 
 EXTRA_DIST = $(misc_DATA)

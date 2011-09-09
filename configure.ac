@@ -191,6 +191,7 @@ flumotion/component/decoders/generic/Makefile
 flumotion/component/misc/Makefile
 flumotion/component/misc/httpserver/Makefile
 flumotion/component/misc/httpserver/httpcached/Makefile
+flumotion/component/misc/kuscheduler/Makefile
 flumotion/component/misc/porter/Makefile
 flumotion/component/misc/repeater/Makefile
 flumotion/component/muxers/Makefile
