@@ -148,8 +148,8 @@ class LocalTimezone(datetime.tzinfo):
     EPOCHORDINAL = datetime.datetime.utcfromtimestamp(0).toordinal()
     ZERO = datetime.timedelta(0)
 
-    def __init__(self, *args):
-        datetime.tzinfo.__init__(self, args)
+    def __init__(self):
+        datetime.tzinfo.__init__(self)
         self._std_offset = datetime.timedelta(seconds=-time.timezone)
         if time.daylight:
             self._dst_offset = datetime.timedelta(seconds=-time.altzone)
