@@ -1,0 +1,49 @@
+<registry>
+  <bundles>
+
+    <bundle name="avproducer-base">
+      <directories>
+          <directory name="flumotion/component/common/avproducer">
+          <filename location="__init__.py" />
+          <filename location="properties.xml" />
+        </directory>
+      </directories>
+    </bundle>
+
+    <bundle name="avproducer">
+      <dependencies>
+           <dependency name="component" />
+           <dependency name="avproducer-base" />
+           <dependency name="deinterlace-effect" />
+           <dependency name="videoscale-effect" />
+           <dependency name="videorate-effect" />
+           <dependency name="audiorate-effect" />
+           <dependency name="volume-effect" />
+           <dependency name="producer-checks" />
+      </dependencies>
+
+      <directories>
+          <directory name="flumotion/component/common/avproducer">
+          <filename location="avproducer.py" />
+        </directory>
+      </directories>
+    </bundle>
+
+    <bundle name="avproducer-admin-gtk">
+       <dependencies>
+           <dependency name="avproducer-base" />
+           <dependency name="base-admin-gtk" />
+           <dependency name="volume-admin-gtk" />
+           <dependency name="deinterlace-admin-gtk" />
+           <dependency name="videoscale-admin-gtk" />
+       </dependencies>
+
+       <directories>
+           <directory name="flumotion/component/common/avproducer">
+               <filename location="admin_gtk.py" />
+           </directory>
+       </directories>
+    </bundle>
+  </bundles>
+
+</registry>

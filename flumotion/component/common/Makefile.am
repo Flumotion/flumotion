@@ -12,6 +12,7 @@ clean-local:
 
 
 SUBDIRS = \
-	fgdp
+	fgdp \
+	avproducer
 
 EXTRA_DIST = $(common_DATA)

@@ -27,7 +27,7 @@ from flumotion.component.effects.videoscale.admin_gtk \
 __version__ = "$Rev$"
 
 
-class BlackMagicAdminGtk(admin_gtk.BaseAdminGtk):
+class AVProducerAdminGtk(admin_gtk.BaseAdminGtk):
 
     def setup(self):
         volume = VolumeAdminGtkNode(self.state, self.admin,
@@ -85,5 +85,3 @@ class BlackMagicAdminGtk(admin_gtk.BaseAdminGtk):
             return
         v = self.nodes['Videoscale']
         v.widthSet(width)
-
-GUIClass = BlackMagicAdminGtk

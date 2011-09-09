@@ -10,25 +10,16 @@
       <entries>
         <entry type="component" location="blackmagic.py"
                function="BlackMagic" />
-        <entry type="admin/gtk" location="admin_gtk.py"
+        <entry type="admin/gtk" location="blackmagic.py"
                function="GUIClass" />
       </entries>
 
       <synchronization required="yes" clock-priority="160" />
 
-      <properties>
+      <properties xmlns:xi="http://www.w3.org/2001/XInclude">
+        <xi:include href="flumotion/component/common/avproducer/properties.xml"/>
         <property name="video-format" type="int"
                   _description="The incoming SDI video format." />
-        <property name="height" type="int"
-                  _description="The height to scale to." />
-        <property name="width" type="int"
-                  _description="The final width, including correction." />
-        <property name="framerate" type="fraction"
-                  _description="The framerate (in fps)."/>
-        <property name="deinterlace-mode" type="string"
-                  _description="The deinterlacing mode to use.(default=auto)" />
-        <property name="deinterlace-method" type="string"
-                  _description="The deinterlacing method to use.(default=ffmpeg)" />
       </properties>
     </component>
   </components>
@@ -47,30 +38,14 @@
 
     <bundle name="blackmagic-admin-gtk">
        <dependencies>
-           <dependency name="blackmagic-base" />
-           <dependency name="base-admin-gtk" />
-           <dependency name="volume-admin-gtk" />
-           <dependency name="deinterlace-admin-gtk" />
-           <dependency name="videoscale-admin-gtk" />
+           <dependency name="avproducer-admin-gtk" />
        </dependencies>
-
-       <directories>
-           <directory name="flumotion/component/producers/blackmagic">
-               <filename location="admin_gtk.py" />
-           </directory>
-       </directories>
     </bundle>
 
     <bundle name="blackmagic-component">
        <dependencies>
-           <dependency name="component" />
            <dependency name="blackmagic-base" />
-           <dependency name="deinterlace-effect" />
-           <dependency name="videoscale-effect" />
-           <dependency name="videorate-effect" />
-           <dependency name="audiorate-effect" />
-           <dependency name="volume-effect" />
-           <dependency name="producer-checks" />
+           <dependency name="avproducer" />
        </dependencies>
 
        <directories>

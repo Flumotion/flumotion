@@ -10,7 +10,7 @@
       <entries>
         <entry type="component" location="firewire.py"
                function="Firewire" />
-        <entry type="admin/gtk" location="admin_gtk.py"
+        <entry type="admin/gtk" location="firewire.py"
                function="GUIClass" />
         <entry type="wizard" location="wizard_gtk.py"
                function="FireWireWizardPlugin" />
@@ -23,27 +23,15 @@
       <wizard type="video-producer" _description="Firewire video"
               feeder="video" />
 
-      <properties>
-        <property name="height" type="int"
-                  _description="The height to scale to." />
-        <property name="width" type="int"
-                  _description="The final width, including correction." />
-        <property name="scaled-width" type="int"
-                  _description="The width to scale to before correcting.(Deprecated)" />
+      <properties xmlns:xi="http://www.w3.org/2001/XInclude">
+        <xi:include href="flumotion/component/common/avproducer/properties.xml"/>
         <property name="decoder" type="string"
-                  _description="The element to decode with (default=dvdec)" />
-        <property name="is-square" type="bool"
-                  _description="Whether to scale to a 1:1 pixel aspect ratio." />
-        <property name="add-borders" type="bool"
-                  _description="Add black borders if DAR can't be kept." />
-        <property name="framerate" type="fraction"
-                  _description="The framerate (in fps)."/>
+                 _description="The element to decode with (default=dvdec)" />
         <property name="guid" type="string"
                   _description="The GUID of the device (a hexadecimal such as 0xhhhhhhhhhhhhhhhh)." />
-        <property name="deinterlace-mode" type="string"
-                  _description="The deinterlacing mode to use.(default=auto)" />
-        <property name="deinterlace-method" type="string"
-                  _description="The deinterlacing method to use.(default=ffmpeg)" />
+        <!-- deprecated properties -->
+        <property name="scaled-width" type="int"
+                  _description="Deprecated" />
       </properties>
     </component>
   </components>
@@ -60,32 +48,11 @@
        </directories>
     </bundle>
 
-    <bundle name="firewire-admin-gtk">
-       <dependencies>
-           <dependency name="firewire-base" />
-           <dependency name="base-admin-gtk" />
-           <dependency name="volume-admin-gtk" />
-           <dependency name="deinterlace-admin-gtk" />
-           <dependency name="videoscale-admin-gtk" />
-       </dependencies>
-
-       <directories>
-           <directory name="flumotion/component/producers/firewire">
-               <filename location="admin_gtk.py" />
-           </directory>
-       </directories>
-    </bundle>
 
     <bundle name="firewire-component">
        <dependencies>
-           <dependency name="component" />
            <dependency name="firewire-base" />
-           <dependency name="deinterlace-effect" />
-           <dependency name="videoscale-effect" />
-           <dependency name="videorate-effect" />
-           <dependency name="audiorate-effect" />
-           <dependency name="volume-effect" />
-           <dependency name="producer-checks" />
+           <dependency name="avproducer" />
        </dependencies>
 
        <directories>
@@ -93,6 +60,12 @@
                <filename location="firewire.py" />
            </directory>
        </directories>
+    </bundle>
+
+    <bundle name="firewire-admin-gtk">
+       <dependencies>
+           <dependency name="avproducer-admin-gtk" />
+       </dependencies>
     </bundle>
 
     <bundle name="firewire-wizard">

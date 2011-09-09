@@ -22,6 +22,7 @@ correspond to data and schema, more or less. This file defines some base
 parsing routines shared between both kinds of XML.
 """
 
+import os
 from xml.dom import minidom, Node
 from xml.parsers import expat
 
@@ -174,10 +175,17 @@ class Parser(log.Loggable):
             if (child.nodeType == Node.TEXT_NODE or
                 child.nodeType == Node.COMMENT_NODE):
                 continue
-            try:
-                parser, handler = parsers[child.nodeName]
-            except KeyError:
-                raise self.parserError("unexpected node in <%s>: %s"
+            if child.nodeName == 'xi:include':
+                p = Parser()
+                path = child.attributes['href'].value
+                children = p.getRoot(resolve_relative_path(path)).childNodes[0]
+                p.parseFromTable(children, parsers)
+                continue
+            else:
+                try:
+                    parser, handler = parsers[child.nodeName]
+                except KeyError:
+                    raise self.parserError("unexpected node in <%s>: %s"
                                        % (parent.nodeName, child))
             handler(parser(child))
 
@@ -211,3 +219,11 @@ class Parser(log.Loggable):
         except Exception, e:
             raise self.parserError('failed to parse %s as %s: %s', node,
                                    type, log.getExceptionMessage(e))
+
+
+def resolve_relative_path(path):
+    # HACK
+    # for xml include, assuming we can only include xml file from where
+    # flumotion installed
+    root = os.path.join(os.path.dirname(__file__), '..', '..')
+    return os.path.join(root, path)

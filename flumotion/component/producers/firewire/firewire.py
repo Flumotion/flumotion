@@ -15,16 +15,10 @@
 #
 # Headers in this file shall remain intact.
 
-import gst
-from twisted.internet import defer
-
-from flumotion.common import errors, messages, gstreamer
+from flumotion.common import messages, gstreamer
 from flumotion.common.i18n import N_, gettexter
-from flumotion.component import feedcomponent
-from flumotion.component.effects.deinterlace import deinterlace
-from flumotion.component.effects.videorate import videorate
-from flumotion.component.effects.videoscale import videoscale
-from flumotion.component.effects.audioconvert import audioconvert
+from flumotion.component.common.avproducer import avproducer
+from flumotion.component.common.avproducer import admin_gtk
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -33,92 +27,45 @@ T_ = gettexter()
 # See comments in gstdvdec.c for details on the dv format.
 
 
-class Firewire(feedcomponent.ParseLaunchComponent):
+class Firewire(avproducer.AVProducerBase):
 
-    def do_check(self):
-        self.debug('running PyGTK/PyGST and configuration checks')
-        from flumotion.component.producers import checks
-        d1 = checks.checkTicket347()
-        d2 = checks.checkTicket348()
-        dl = defer.DeferredList([d1, d2])
-        dl.addCallback(self._checkCallback)
-        return dl
+    decoder = None
+    decoder_str = 'dvdec'
+    guid = 0
 
-    def check_properties(self, props, addMessage):
-        deintMode = props.get('deinterlace-mode', 'auto')
-        deintMethod = props.get('deinterlace-method', 'ffmpeg')
+    def get_raw_video_element(self):
+        return self.decoder
 
-        if deintMode not in deinterlace.DEINTERLACE_MODE:
-            msg = messages.Error(T_(N_("Configuration error: '%s' " \
-                "is not a valid deinterlace mode." % deintMode)))
-            addMessage(msg)
-            raise errors.ConfigError(msg)
-
-        if deintMethod not in deinterlace.DEINTERLACE_METHOD:
-            msg = messages.Error(T_(N_("Configuration error: '%s' " \
-                "is not a valid deinterlace method." % deintMethod)))
-            self.debug("'%s' is not a valid deinterlace method",
-                deintMethod)
-            addMessage(msg)
-            raise errors.ConfigError(msg)
-
-    def _checkCallback(self, results):
-        for (state, result) in results:
-            for m in result.messages:
-                self.addMessage(m)
-
-    def get_pipeline_string(self, props):
-        if props.get('scaled-width', None) is not None:
-            self.warnDeprecatedProperties(['scaled-width'])
-
-        self.is_square = props.get('is-square', False)
-        self.width = props.get('width', 0)
-        self.height = props.get('height', 0)
-        decoder = props.get('decoder', 'dvdec')
-        if not self.is_square and not self.height:
-            self.height = int(576 * self.width/720.) # assuming PAL
-        self.add_borders = props.get('add-borders', True)
-        guid = "guid=%s" % props.get('guid', 0)
-        self.deintMode = props.get('deinterlace-mode', 'auto')
-        self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
-
-        fr = props.get('framerate', None)
-        if fr is not None:
-            self.framerate = gst.Fraction(fr[0], fr[1])
-        else:
-            self.framerate = None
-
+    def get_pipeline_template(self):
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can
         # replace it with videotestsrc of the same size and PAR, so we can
         # unittest the pipeline
         # need a queue in case tcpserversink blocks somehow
-        template = ('dv1394src %s'
-                    '    ! tee name=t'
-                    '    ! queue leaky=2 max-size-time=1000000000'
-                    '    ! dvdemux name=demux'
-                    '  demux. ! queue ! %s name=decoder'
-                    '    ! @feeder:video@'
-                    '  demux. ! queue ! audio/x-raw-int '
-                    '    ! volume name=setvolume'
-                    '    ! level name=volumelevel message=true '
-                    '    ! @feeder:audio@'
-                    '    t. ! queue ! @feeder:dv@' % (guid, decoder))
+        return ('dv1394src %s'
+                '    ! tee name=t'
+                '    ! queue leaky=2 max-size-time=1000000000'
+                '    ! dvdemux name=demux'
+                '  demux. ! queue ! %s name=decoder'
+                '    ! @feeder:video@'
+                '  demux. ! queue ! audio/x-raw-int '
+                '    ! volume name=setvolume'
+                '    ! level name=volumelevel message=true '
+                '    ! @feeder:audio@'
+                '    t. ! queue ! @feeder:dv@' % (self.guid, self.decoder_str))
 
-        return template
+    def get_pipeline_string(self, props):
+        self.decoder_str = props.get('decoder', 'dvdec')
+        self.guid = "guid=%s" % props.get('guid', 0)
+        return avproducer.AVProducerBase.get_pipeline_string(self, props)
 
     def configure_pipeline(self, pipeline, properties):
-        self.volume = pipeline.get_by_name("setvolume")
-        from flumotion.component.effects.volume import volume
-        comp_level = pipeline.get_by_name('volumelevel')
-        vol = volume.Volume('inputVolume', comp_level, pipeline)
         # catch bus message for when camera disappears
         bus = pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect('message::element', self._bus_message_received_cb)
-        self.addEffect(vol)
 
-        decoder = pipeline.get_by_name("decoder")
-        if gstreamer.element_has_property(decoder, 'drop-factor'):
+        self.decoder = pipeline.get_by_name("decoder")
+        if gstreamer.element_has_property(self.decoder, 'drop-factor'):
             if self.framerate:
                 framerate = float(self.framerate.num / self.framerate.denom)
                 if 12.5 < framerate:
@@ -131,42 +78,9 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                     drop_factor = 8
             else:
                 drop_factor = 1
-            decoder.set_property('drop-factor', drop_factor)
-
-        vr = videorate.Videorate('videorate',
-            decoder.get_pad("src"), pipeline, self.framerate)
-        self.addEffect(vr)
-        vr.plug()
-
-        deinterlacer = deinterlace.Deinterlace('deinterlace',
-            vr.effectBin.get_pad("src"), pipeline,
-            self.deintMode, self.deintMethod)
-        self.addEffect(deinterlacer)
-        deinterlacer.plug()
-
-        videoscaler = videoscale.Videoscale('videoscale', self,
-            deinterlacer.effectBin.get_pad("src"), pipeline,
-            self.width, self.height, self.is_square, self.add_borders)
-        self.addEffect(videoscaler)
-        videoscaler.plug()
-
-        # Setting a tolerance of 20ms should be enough (1/2 frame), but
-        # we set it to 40ms to be more conservatives
-        ar = audioconvert.Audioconvert('audioconvert',
-                                       comp_level.get_pad("src"),
-                                       pipeline, tolerance=40 * gst.MSECOND)
-        self.addEffect(ar)
-        ar.plug()
-
-    def getVolume(self):
-        return self.volume.get_property('volume')
-
-    def setVolume(self, value):
-        """
-        @param value: float between 0.0 and 4.0
-        """
-        self.debug("Setting volume to %f" % (value))
-        self.volume.set_property('volume', value)
+            self.decoder.set_property('drop-factor', drop_factor)
+        return avproducer.AVProducerBase.configure_pipeline(self, pipeline,
+                                                            properties)
 
     # detect camera unplugging or other cause of firewire bus reset
 
@@ -203,3 +117,6 @@ class Firewire(feedcomponent.ParseLaunchComponent):
                             mid="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)
+
+
+GUIClass = admin_gtk.AVProducerAdminGtk

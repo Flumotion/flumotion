@@ -160,6 +160,7 @@ flumotion/component/bouncers/Makefile
 flumotion/component/bouncers/algorithms/Makefile
 flumotion/component/common/Makefile
 flumotion/component/common/fgdp/Makefile
+flumotion/component/common/avproducer/Makefile
 flumotion/component/effects/Makefile
 flumotion/component/effects/audioconvert/Makefile
 flumotion/component/effects/audioresync/Makefile
