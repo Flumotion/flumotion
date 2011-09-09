@@ -14,6 +14,7 @@ SUBDIRS = \
 	audioresync \
 	colorbalance \
 	deinterlace  \
+	kuscheduler \
 	videorate \
 	videoscale \
 	volume

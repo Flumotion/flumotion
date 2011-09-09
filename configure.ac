@@ -166,6 +166,7 @@ flumotion/component/effects/audioconvert/Makefile
 flumotion/component/effects/audioresync/Makefile
 flumotion/component/effects/colorbalance/Makefile
 flumotion/component/effects/deinterlace/Makefile
+flumotion/component/effects/kuscheduler/Makefile
 flumotion/component/effects/videorate/Makefile
 flumotion/component/effects/videoscale/Makefile
 flumotion/component/effects/volume/Makefile
@@ -177,6 +178,7 @@ flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile
 flumotion/component/consumers/fgdp/Makefile
 flumotion/component/consumers/httpstreamer/Makefile
+flumotion/component/consumers/hlsstreamer/Makefile
 flumotion/component/consumers/pipeline/Makefile
 flumotion/component/consumers/preview/Makefile
 flumotion/component/consumers/shout2/Makefile
@@ -189,6 +191,7 @@ flumotion/component/decoders/generic/Makefile
 flumotion/component/misc/Makefile
 flumotion/component/misc/httpserver/Makefile
 flumotion/component/misc/httpserver/httpcached/Makefile
+flumotion/component/misc/kuscheduler/Makefile
 flumotion/component/misc/porter/Makefile
 flumotion/component/misc/repeater/Makefile
 flumotion/component/muxers/Makefile

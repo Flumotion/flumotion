@@ -1,0 +1,30 @@
+<registry>
+  <bundles>
+
+    <bundle name="kuscheduler-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/kuscheduler">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="kuscheduler-effect">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="kuscheduler-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/effects/kuscheduler">
+                <filename location="kuscheduler.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry>
