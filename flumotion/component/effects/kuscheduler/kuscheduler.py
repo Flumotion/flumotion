@@ -78,7 +78,7 @@ class GstKeyUnitsScheduler(gst.Element):
         s.set_value('stream-time', timestamp, 'uint64')
         s.set_value('running-time', running_time, 'uint64')
         s.set_value('all-headers', True)
-        s.set_value('count', self._count / self.interval)
+        s.set_value('count', self._count)
         return self.srcpad.push_event(
             gst.event_new_custom(gst.EVENT_CUSTOM_DOWNSTREAM, s))
 
