@@ -24,7 +24,7 @@ from zope.interface import implements
 from flumotion.common import interfaces
 from flumotion.component.base import http
 from flumotion.component.common.streamer.multifdsinkstreamer import \
-        MultifdSinkStreamer
+        MultifdSinkStreamer, Stats
 from flumotion.component.consumers.icystreamer import resources
 
 # this import registers the gstreamer icymux element, don't remove it
@@ -53,7 +53,7 @@ class ICYStreamer(MultifdSinkStreamer):
     defaultMetadataInterval = 2
 
     def init(self):
-        httpstreamer.MultifdSinkStreamer.init(self)
+        MultifdSinkStreamer.init(self)
 
         # fd -> sink
         self.sinkConnections = {}
@@ -75,7 +75,7 @@ class ICYStreamer(MultifdSinkStreamer):
         self.sinksByID3 =\
                 {False: self.get_element('sink-without-id3'),
                  True: self.get_element('sink-with-id3')}
-        httpstreamer.Stats.__init__(self, self.sinksByID3.values())
+        Stats.__init__(self, self.sinksByID3.values())
 
         self._updateCallLaterId = reactor.callLater(10, self._updateStats)
 
@@ -174,7 +174,7 @@ class ICYStreamer(MultifdSinkStreamer):
         return self.icyHeaders
 
     def updateState(self, set):
-        httpstreamer.Stats.updateState(self, set)
+        Stats.updateState(self, set)
 
         set('icy-title', self.muxer.get_property('iradio-title'))
         timestamp = time.strftime("%c", time.localtime(\
@@ -184,5 +184,5 @@ class ICYStreamer(MultifdSinkStreamer):
     def do_pipeline_playing(self):
         # change the component mood to happy after we receive first data block
         # so that we can calculate the bitrate and configure muxer
-        d = httpstreamer.MultifdSinkStreamer.do_pipeline_playing(self)
+        d = MultifdSinkStreamer.do_pipeline_playing(self)
         return defer.DeferredList([d, self._muxerConfiguredDeferred])

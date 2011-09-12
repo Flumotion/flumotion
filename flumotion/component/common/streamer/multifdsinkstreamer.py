@@ -21,7 +21,10 @@ from twisted.internet import reactor
 
 from flumotion.common import gstreamer
 from flumotion.common import messages
+from flumotion.component.base import http
 from flumotion.component.common.streamer import streamer
+from flumotion.component.common.streamer.mfdsresources import \
+    MultiFdSinkStreamingResource
 
 from flumotion.common.i18n import N_, gettexter
 
@@ -166,6 +169,10 @@ class MultifdSinkStreamer(streamer.Streamer, Stats):
             m.add(T_(N_("Please upgrade '%s' to version %s."),
                 'gst-plugins-base', '0.10.10'))
             addMessage(m)
+
+    def configureAuthAndResource(self):
+        self.httpauth = http.HTTPAuthentication(self)
+        self.resource = MultiFdSinkStreamingResource(self, self.httpauth)
 
     def configure_pipeline(self, pipeline, properties):
         sink = self.get_element('sink')

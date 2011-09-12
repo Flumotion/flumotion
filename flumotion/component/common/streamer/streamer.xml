@@ -51,6 +51,7 @@
         <directories>
             <directory name="flumotion/component/common/streamer">
                 <filename location="multifdsinkstreamer.py" />
+                <filename location="mfdsresources.py" />
             </directory>
         </directories>
     </bundle>

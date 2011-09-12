@@ -31,7 +31,7 @@ from flumotion.common import format as formatting
 from flumotion.component import feedcomponent
 from flumotion.component.base import http
 from flumotion.component.component import moods
-from flumotion.component.common.streamer import resources
+from flumotion.component.common.streamer.resources import HTTPRoot
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
 
@@ -331,9 +331,8 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
                                      'set, cannot satisfy')
 
     def configureAuthAndResource(self):
-        self.httpauth = http.HTTPAuthentication(self)
-        self.resource = resources.HTTPStreamingResource(self,
-                                                        self.httpauth)
+        raise NotImplementedError("configureAuthAndResource must be "
+                                  "implemented by subclasses")
 
     def parseProperties(self, properties):
         mountPoint = properties.get('mount-point', '')
@@ -422,7 +421,6 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def configure_pipeline(self, pipeline, properties):
         self._updateCallLaterId = reactor.callLater(10, self._updateStats)
-
         self.configureAuthAndResource()
         self.parseProperties(properties)
 
@@ -575,7 +573,7 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
         return d
 
     def do_setup(self):
-        root = resources.HTTPRoot()
+        root = HTTPRoot()
         # TwistedWeb wants the child path to not include the leading /
         mount = self.mountPoint[1:]
         root.putChild(mount, self.resource)

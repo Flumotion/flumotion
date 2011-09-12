@@ -15,23 +15,24 @@
 #
 # Headers in this file shall remain intact.
 
-from flumotion.component.common.streamer import resources
+from flumotion.component.common.streamer.mfdsresources import \
+    MultiFdSinkStreamingResource
 
 
 __all__ = ['ICYStreamingResource']
 __version__ = "$Rev$"
 
 
-class ICYStreamingResource(resources.HTTPStreamingResource):
+class ICYStreamingResource(MultiFdSinkStreamingResource):
 
     def _render(self, request):
         headerValue = request.getHeader('Icy-MetaData')
         request.serveIcy = (headerValue == '1')
 
-        return resources.HTTPStreamingResource._render(self, request)
+        return MultiFdSinkStreamingResource._render(self, request)
 
     def _setRequestHeaders(self, request):
-        resources.HTTPStreamingResource._setRequestHeaders(self, request)
+        MultiFdSinkStreamingResource._setRequestHeaders(self, request)
         if request.serveIcy:
             additionalHeaders = self.streamer.get_icy_headers()
 

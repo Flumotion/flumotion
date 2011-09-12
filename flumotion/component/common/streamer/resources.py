@@ -15,15 +15,10 @@
 #
 # Headers in this file shall remain intact.
 
-import os
 import socket
-import time
-import errno
 import string
 import resource
-import fcntl
-
-import gst
+import time
 
 try:
     from twisted.web import http
@@ -31,7 +26,7 @@ except ImportError:
     from twisted.protocols import http
 
 from twisted.web import server, resource as web_resource
-from twisted.internet import reactor, defer
+from twisted.internet import defer
 
 from flumotion.configure import configure
 from flumotion.common import log
@@ -40,7 +35,7 @@ from flumotion.common import log
 from flumotion.common import keycards
 
 
-__all__ = ['HTTPStreamingResource', 'HTTPStreamer']
+__all__ = ['HTTPStreamingResource']
 __version__ = "$Rev$"
 
 
@@ -59,6 +54,7 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 ### the Twisted resource that handles the base URL
 
 HTTP_VERSION = configure.version
+
 
 class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     HTTP_NAME = 'FlumotionHTTPServer'
@@ -81,14 +77,13 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.httpauth = httpauth
 
         self._requests = {}            # request fd -> Request
+        self._removing = {} # Optional deferred notification of client removals
 
         self.maxclients = self.getMaxAllowedClients(-1)
         self.maxbandwidth = -1 # not limited by default
 
         # If set, a URL to redirect a user to when the limits above are reached
         self._redirectOnFull = None
-
-        self._removing = {} # Optional deferred notification of client removals
 
         socket = 'flumotion.component.plugs.request.RequestLoggerPlug'
         self.loggers = streamer.plugs.get(socket, [])
@@ -100,15 +95,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.logfilter = None
 
         web_resource.Resource.__init__(self)
-
-    def clientRemoved(self, sink, fd, reason, stats):
-        # this is the callback attached to our flumotion component,
-        # not the GStreamer element
-        if fd in self._requests:
-            request = self._requests[fd]
-            self._removeClient(request, fd, stats)
-        else:
-            self.warning('[fd %5d] not found in _requests' % fd)
 
     def removeAllClients(self):
         l = []
@@ -133,18 +119,10 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             self.debug('rotating logger %r' % logger)
             logger.rotate()
 
-    def logWrite(self, fd, ip, request, stats):
-
+    def logWrite(self, request, bytes_sent, time_connected):
         headers = request.getAllHeaders()
 
-        if stats:
-            bytes_sent = stats[0]
-            time_connected = int(stats[3] / gst.SECOND)
-        else:
-            bytes_sent = -1
-            time_connected = -1
-
-        args = {'ip': ip,
+        args = {'ip': request.getClientIP(),
                 'time': time.gmtime(),
                 'method': request.method,
                 'uri': request.uri,
@@ -156,6 +134,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 'referer': headers.get('referer', None),
                 'user-agent': headers.get('user-agent', None),
                 'time-connected': time_connected}
+
+        args.update(self._getExtraLogArgs(request))
 
         l = []
         for logger in self.loggers:
@@ -177,84 +157,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def setRedirectionOnLimits(self, url):
         self._redirectOnFull = url
 
-    def _setRequestHeaders(self, request):
-        content = self.streamer.get_content_type()
-        request.setHeader('Server', self.HTTP_SERVER)
-        request.setHeader('Date', http.datetimeToString())
-        request.setHeader('Connection', 'close')
-        request.setHeader('Cache-Control', 'no-cache')
-        request.setHeader('Cache-Control', 'private')
-        request.setHeader('Content-type', content)
-
-    def _formatHeaders(self, request):
-        # Mimic Twisted as close as possible
-        headers = []
-        for name, value in request.headers.items():
-            headers.append('%s: %s\r\n' % (name, value))
-        for cookie in request.cookies:
-            headers.append('%s: %s\r\n' % ("Set-Cookie", cookie))
-        return headers
-
-    # FIXME: rename to writeHeaders
-
-    def _writeHeaders(self, request):
-        """
-        Write out the HTTP headers for the incoming HTTP request.
-
-        @rtype:   boolean
-        @returns: whether or not the file descriptor can be used further.
-        """
-        fd = request.transport.fileno()
-        fdi = request.fdIncoming
-
-        # the fd could have been closed, in which case it will be -1
-        if fd == -1:
-            self.info('[fd %5d] Client gone before writing header' % fdi)
-            # FIXME: do this ? del request
-            return False
-        if fd != request.fdIncoming:
-            self.warning('[fd %5d] does not match current fd %d' % (fdi, fd))
-            # FIXME: do this ? del request
-            return False
-
-        self._setRequestHeaders(request)
-
-        # Call request modifiers
-        for modifier in self.modifiers:
-            modifier.modify(request)
-
-        headers = self._formatHeaders(request)
-
-        ### FIXME: there's a window where Twisted could have removed the
-        # fd because the client disconnected.  Catch EBADF correctly here.
-        try:
-            # TODO: This is a non-blocking socket, we really should check
-            # return values here, or just let twisted handle all of this
-            # normally, and not hand off the fd until after twisted has
-            # finished writing the headers.
-            os.write(fd, 'HTTP/1.0 200 OK\r\n%s\r\n' % ''.join(headers))
-            # tell TwistedWeb we already wrote headers ourselves
-            request.startedWriting = True
-            return True
-        except OSError, (no, s):
-            if no == errno.EBADF:
-                self.info('[fd %5d] client gone before writing header' % fd)
-            elif no == errno.ECONNRESET:
-                self.info(
-                    '[fd %5d] client reset connection writing header' % fd)
-            else:
-                self.info(
-                    '[fd %5d] unhandled write error when writing header: %s'
-                    % (fd, s))
-        # trigger cleanup of request
-        del request
-        return False
-
     def isReady(self):
-        if not self.streamer.hasCaps():
-            self.debug('We have no caps yet')
-            return False
-        return True
+        raise NotImplementedError("isReady must be implemented by "
+                                  "subclasses")
 
     def getMaxAllowedClients(self, maxclients):
         """
@@ -288,6 +193,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             return softmax - self.__reserve_fds__
 
     def reachedServerLimits(self):
+        """
+        Check whether or not the server reached the limit of concurrent client
+        """
         if self.maxclients >= 0 and len(self._requests) >= self.maxclients:
             return True
         elif self.maxbandwidth >= 0:
@@ -297,6 +205,25 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 return True
         return False
 
+    def _getExtraLogArgs(self, request):
+        """
+        Extra arguments for logging. Should be overriden by subclasses
+        that provide extra arguments for logging
+
+        @rtype: dict
+        @returns: A dictionary with the extra arguments
+        """
+        return {}
+
+    def _setRequestHeaders(self, request):
+        content = self.streamer.get_content_type()
+        request.setHeader('Server', self.HTTP_SERVER)
+        request.setHeader('Date', http.datetimeToString())
+        request.setHeader('Connection', 'close')
+        request.setHeader('Cache-Control', 'no-cache')
+        request.setHeader('Cache-Control', 'private')
+        request.setHeader('Content-type', content)
+
     def _addClient(self, request):
         """
         Add a request, so it can be used for statistics.
@@ -304,9 +231,18 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         @param request: the request
         @type request: twisted.protocol.http.Request
         """
-
         fd = request.transport.fileno()
         self._requests[fd] = request
+
+    def _removeClient(self, request):
+        """
+        Delete a request from the list
+
+        @param request: the request
+        @type request: twisted.protocol.http.Request
+        """
+        fd = request.transport.fileno()
+        del self._requests[fd]
 
     def _logRequestFromIP(self, ip):
         """
@@ -318,109 +254,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         else:
             return True
 
-    def _removeClient(self, request, fd, stats):
-        """
-        Removes a request and add logging.
-        Note that it does not disconnect the client; it is called in reaction
-        to a client disconnecting.
-        It also removes the keycard if one was created.
-
-        @param request: the request
-        @type request: L{twisted.protocols.http.Request}
-        @param fd: the file descriptor for the client being removed
-        @type fd: L{int}
-        @param stats: the statistics for the removed client
-        @type stats: GValueArray
-        """
-
-        # PROBE: finishing request; see httpserver.httpserver
-        self.debug('[fd %5d] (ts %f) finishing request %r',
-                   request.transport.fileno(), time.time(), request)
-
-        ip = request.getClientIP()
-        if self._logRequestFromIP(ip):
-            d = self.logWrite(fd, ip, request, stats)
-        else:
-            d = defer.succeed(True)
-        self.info('[fd %5d] Client from %s disconnected' % (fd, ip))
-
-        # We can't call request.finish(), since we already "stole" the fd, we
-        # just loseConnection on the transport directly, and delete the
-        # Request object, after cleaning up the bouncer bits.
-        self.httpauth.cleanupAuth(fd)
-
-        self.debug('[fd %5d] (ts %f) closing transport %r', fd, time.time(),
-            request.transport)
-        # This will close the underlying socket. We first remove the request
-        # from our fd->request map, since the moment we call this the fd might
-        # get re-added.
-        del self._requests[fd]
-        request.transport.loseConnection()
-
-        self.debug('[fd %5d] closed transport %r' % (fd, request.transport))
-
-        def _done(_):
-            if fd in self._removing:
-                self.debug("client is removed; firing deferred")
-                removeD = self._removing.pop(fd)
-                removeD.callback(None)
-
-            # PROBE: finished request; see httpserver.httpserver
-            self.debug('[fd %5d] (ts %f) finished request %r',
-                       fd, time.time(), request)
-
-        d.addCallback(_done)
-        return d
-
-    def handleAuthenticatedRequest(self, res, request):
-        # PROBE: authenticated request; see httpserver.httpfile
-        self.debug('[fd %5d] (ts %f) authenticated request %r',
-                   request.transport.fileno(), time.time(), request)
-
-        if request.method == 'GET':
-            self._handleNewClient(request)
-        elif request.method == 'HEAD':
-            self.debug('handling HEAD request')
-            self._writeHeaders(request)
-            request.finish()
-        else:
-            raise AssertionError
-
-        return res
-
     ### resource.Resource methods
-
-    # this is the callback receiving the request initially
-
-    def _render(self, request):
-        fd = request.transport.fileno()
-        # we store the fd again in the request using it as an id for later
-        # on, so we can check when an fd went away (being -1) inbetween
-        request.fdIncoming = fd
-
-        # PROBE: incoming request; see httpserver.httpfile
-        self.debug('[fd %5d] (ts %f) incoming request %r',
-                   fd, time.time(), request)
-
-        self.info('[fd %5d] Incoming client connection from %s' % (
-            fd, request.getClientIP()))
-        self.debug('[fd %5d] _render(): request %s' % (
-            fd, request))
-
-        if not self.isReady():
-            return self._handleNotReady(request)
-        elif self.reachedServerLimits():
-            return self._handleServerFull(request)
-
-        self.debug('_render(): asked for (possible) authentication')
-        d = self.httpauth.startAuthentication(request)
-        d.addCallback(self.handleAuthenticatedRequest, request)
-        # Authentication has failed and we've written a response; nothing
-        # more to do
-        d.addErrback(lambda x: None)
-
-        # we MUST return this from our _render.
-        return server.NOT_DONE_YET
 
     def _handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
@@ -444,55 +278,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         return ERROR_TEMPLATE % {'code': error_code,
                                  'error': http.RESPONSES[error_code]}
-
-    def _handleNewClient(self, request):
-        # everything fulfilled, serve to client
-        fdi = request.fdIncoming
-        if not self._writeHeaders(request):
-            self.debug("[fd %5d] not adding as a client" % fdi)
-            return
-
-        # take over the file descriptor from Twisted by removing them from
-        # the reactor
-        # spiv told us to remove* on request.transport, and that works
-        # then we figured out that a new request is only a Reader, so we
-        # remove the removedWriter - this is because we never write to the
-        # socket through twisted, only with direct os.write() calls from
-        # _writeHeaders.
-
-        # see http://twistedmatrix.com/trac/ticket/1796 for a guarantee
-        # that this is a supported way of stealing the socket
-        fd = fdi
-        self.debug("[fd %5d] taking away from Twisted" % fd)
-        reactor.removeReader(request.transport)
-        #reactor.removeWriter(request.transport)
-
-        # check if it's really an open fd (i.e. that twisted didn't close it
-        # before the removeReader() call)
-        try:
-            fcntl.fcntl(fd, fcntl.F_GETFL)
-        except IOError, e:
-            if e.errno == errno.EBADF:
-                self.warning("[fd %5d] is not actually open, ignoring" % fd)
-            else:
-                self.warning("[fd %5d] error during check: %s (%d)" % (
-                    fd, e.strerror, e.errno))
-            return
-
-        self._addClient(request)
-
-        # hand it to multifdsink
-        self.streamer.add_client(fd, request)
-        ip = request.getClientIP()
-
-        # PROBE: started request; see httpfile.httpfile
-        self.debug('[fd %5d] (ts %f) started request %r',
-                   fd, time.time(), request)
-
-        self.info('[fd %5d] Started streaming to %s' % (fd, ip))
-
-    render_GET = _render
-    render_HEAD = _render
 
 
 class HTTPRoot(web_resource.Resource, log.Loggable):
