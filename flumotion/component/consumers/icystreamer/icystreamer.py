@@ -23,8 +23,9 @@ from zope.interface import implements
 
 from flumotion.common import interfaces
 from flumotion.component.base import http
-from flumotion.component.common.streamer import streamer
-from flumotion.component.consumers.httpstreamer import resources, httpstreamer
+from flumotion.component.common.streamer.multifdsinkstreamer import \
+        MultifdSinkStreamer
+from flumotion.component.consumers.icystreamer import resources
 
 # this import registers the gstreamer icymux element, don't remove it
 import icymux
@@ -34,7 +35,7 @@ __all__ = ['ICYStreamer']
 __version__ = "$Rev$"
 
 
-class ICYStreamer(httpstreamer.MultifdSinkStreamer):
+class ICYStreamer(MultifdSinkStreamer):
     implements(interfaces.IStreamingComponent)
 
     checkOffset = True
@@ -109,7 +110,7 @@ class ICYStreamer(httpstreamer.MultifdSinkStreamer):
         return True
 
     def parseProperties(self, properties):
-        httpstreamer.MultifdSinkStreamer.parseProperties(self, properties)
+        MultifdSinkStreamer.parseProperties(self, properties)
 
         self._frameSize = properties.get('frame-size', self.defaultFrameSize)
         self._metadataInterval = properties.get('metadata-interval', \
