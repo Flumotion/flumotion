@@ -22,52 +22,11 @@
         <socket type="flumotion.component.plugs.rrd.ComponentRRDPlug" />
       </sockets>
 
-      <properties>
-        <property name="description" type="string"
-                  _description="A description of the stream."/>
-
-        <property name="mount-point" type="string"
-                  _description="The mount point on which the playlist and the stream can be accessed." />
-
-        <!-- FIXME, authenticating against remote bouncers should happen through
-             a plug, not this property -->
-        <property name="bouncer" type="string"
-                  _description="The name of a bouncer in the atmosphere to authenticate against." />
-        <property name="issuer-class" type="string"
-                  _description="The Python class of the Keycard issuer to use." />
-
-        <property name="type" type="string"
-                  _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
-
-        <!-- If type is 'master' (default) -->
-        <property name="port" type="int"
-                  _description="The port to listen on (if type is 'master')." />
-
-        <!-- If type is 'slave' -->
-        <property name="porter-socket-path" type="string"
-                  _description="The path to the socket to communicate with the porter." />
-        <property name="porter-username" type="string"
-                  _description="The username to authenticate to the porter." />
-        <property name="porter-password" type="string"
-                  _description="The password to authenticate to the porter." />
-
-        <property name="hostname" type="string"
-                  _description="The server's host name to display." />
-        <property name="domain" type="string"
-                  _description="The domain of the server for authentication." />
+      <properties xmlns:xi="http://www.w3.org/2001/XInclude">
+        <xi:include href="flumotion/component/common/streamer/properties.xml"/>
 
         <property name="hls-url" type="string"
                   _description="The url that will be used to render the playlist entries. If not defined hostname, port will be used to generate the url." />
-
-        <property name="client-limit" type="int"
-                  _description="The maximum number of clients allowed." />
-        <property name="bandwidth-limit" type="int"
-                  _description="The maximum bandwidth usage allowed in bits per second." />
-        <property name="redirect-on-overflow" type="string"
-                  _description="A URL to redirect clients to if either of the limits have been reached." />
-
-        <property name="duration" type="float"
-                  _description="How long to keep clients connected (in seconds)."/>
 
         <property name="fragment-prefix" type="string"
                   _description="Fragments prefix name to use in the playlist (default:fragment)" />
@@ -132,14 +91,11 @@
 
     <bundle name="hlsstreamer-admin">
         <dependencies>
-            <dependency name="component" />
-            <dependency name="base-admin-gtk"/>
-            <dependency name="hlsstreamer-base" />
+            <dependency name="streamer-admin-gtk"/>
         </dependencies>
 
         <directories>
             <directory name="flumotion/component/consumers/hlsstreamer">
-                <filename location="hlsstreamer.glade" />
                 <filename location="admin_gtk.py" />
             </directory>
         </directories>

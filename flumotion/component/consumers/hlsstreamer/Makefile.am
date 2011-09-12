@@ -10,8 +10,7 @@ component_PYTHON = __init__.py \
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/hlsstreamer
 component_DATA = \
-	hlsstreamer.xml \
-	hlsstreamer.glade
+	hlsstreamer.xml
 
 clean-local:
 	rm -rf *.pyc *.pyo
