@@ -4,6 +4,7 @@ streamerdir = $(libdir)/flumotion/python/flumotion/component/common/streamer
 streamer_DATA = streamer.xml streamer.glade properties.xml
 streamer_PYTHON = \
 	__init__.py \
+	multifdsinkstreamer.py \
 	streamer.py \
 	resources.py \
 	admin_gtk.py

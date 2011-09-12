@@ -43,5 +43,17 @@
         </directories>
     </bundle>
 
+    <bundle name="multifdsink-streamer-component">
+        <dependencies>
+            <dependency name="streamer-component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/common/streamer">
+                <filename location="multifdsinkstreamer.py" />
+            </directory>
+        </directories>
+    </bundle>
+
   </bundles>
 </registry>

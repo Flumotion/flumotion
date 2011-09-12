@@ -14,7 +14,7 @@
       <!-- entry points for distributable code bundles -->
       <entries>
         <entry type="component" location="httpstreamer.py"
-               function="MultifdSinkStreamer" />
+               function="HTTPStreamer" />
         <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
         <entry type="wizard" location="wizard_gtk.py"
@@ -94,14 +94,13 @@
 
     <bundle name="httpstreamer-component">
         <dependencies>
-            <dependency name="streamer-component" />
+            <dependency name="multifdsink-streamer-component" />
             <dependency name="httpstreamer-base" />
         </dependencies>
 
         <directories>
             <directory name="flumotion/component/consumers/httpstreamer">
                 <filename location="httpstreamer.py" />
-                <filename location="resources.py" />
             </directory>
         </directories>
     </bundle>
