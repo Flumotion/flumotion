@@ -166,7 +166,7 @@ class HLSRing(Playlister):
     PADDING = '0'
 
     def __init__(self, mainPlaylist, streamPlaylist,
-            streamBitrate=300000, title='', fragmentPrefix='mpegts',
+            streamBitrate=300000, title='', fragmentPrefix='fragment',
             newFragTolerance = 0, window=5, maxExtraBuffers=None,
             keyInterval=0, keysURI=None):
         '''
