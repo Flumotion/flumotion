@@ -1,10 +1,10 @@
 <registry>
   <components>
     <component type="icy-streamer"
-               base="flumotion/component/consumers/httpstreamer"
+               base="flumotion/component/consumers/icystreamer"
                _description="A consumer that streams ICY stream over HTTP.">
 <!-- old way of specifying component source -->
-      <source location="flumotion.component.consumers.httpstreamer.icystreamer" />
+      <source location="flumotion.component.consumers.icystreamer.icystreamer" />
 
       <eater name="default" />
       
@@ -63,7 +63,7 @@
       </dependencies>
 
       <directories>
-        <directory name="flumotion/component/consumers/httpstreamer">
+        <directory name="flumotion/component/consumers/icystreamer">
 	  <filename location="icytab.glade" />
         </directory>
       </directories>
@@ -75,7 +75,7 @@
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/consumers/httpstreamer">
+            <directory name="flumotion/component/consumers/icystreamer">
                 <filename location="icymux.py" />
                 <filename location="icystreamer.py" />
             </directory>

@@ -12,6 +12,7 @@ clean-local:
 SUBDIRS = \
 	disker \
 	fgdp \
+	icystreamer \
 	hlsstreamer \
 	httpstreamer \
 	pipeline \

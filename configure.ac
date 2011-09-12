@@ -178,6 +178,7 @@ flumotion/component/combiners/switch/Makefile
 flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile
 flumotion/component/consumers/fgdp/Makefile
+flumotion/component/consumers/icystreamer/Makefile
 flumotion/component/consumers/httpstreamer/Makefile
 flumotion/component/consumers/hlsstreamer/Makefile
 flumotion/component/consumers/pipeline/Makefile
