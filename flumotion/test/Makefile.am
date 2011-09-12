@@ -68,6 +68,8 @@ EXTRA_DIST = 					\
 	test_flavors.py				\
 	test_greeter.py				\
 	test_htpasswdcrypt.py			\
+	test_hls_resource.py			\
+	test_hls_ring.py			\
 	test_http.py				\
 	test_i18n.py				\
 	test_import.py				\
