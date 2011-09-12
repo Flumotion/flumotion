@@ -43,11 +43,12 @@ class PlaylistResource(Resource):
     receive a playlist where the first element has a lower bitrate.
     """
 
-    def __init__(self, entries, target_bitrate=200000):
+    def __init__(self, entries, target_bitrate=200000, min_bitrate=96000):
         Resource.__init__(self)
 
         self._entries = entries
         self._target_bitrate = target_bitrate
+        self._min_bitrate = min_bitrate
 
     def render_GET(self, request):
         playlist = [HEADER]
@@ -62,6 +63,10 @@ class PlaylistResource(Resource):
         self._entries.sort(key=lambda x: abs(x['bitrate'] -
                                          self._target_bitrate))
 
+        # Check first entry's bitrate for the minimum bitrate as we might not
+        # want to have audio streams in the first position.
+        if self._entries[0]['bitrate'] < self._min_bitrate:
+            self._entries.append(self._entries.pop(0))
         for entry in self._entries:
             playlist.append(ENTRY_TEMPLATE % entry)
 
