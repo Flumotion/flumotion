@@ -34,16 +34,19 @@ ENTRY_TEMPLATE = \
 %(stream-url)s"""
 
 CONTENT_TYPE = "application/vnd.apple.mpegurl"
+IPAD_TARGET = 600000
+IPHONE_TARGET = 200000
+AUDIO_TARGET = 96000
 
 
 class PlaylistResource(Resource):
     """I am a resource for m3u8 playlists, rendering multibitrate playlists
     based on the user-agent, so that IPad clients gets a variant playlist in
-    which the first element correspond to the higher bitrate, whilst IPhone ones
-    receive a playlist where the first element has a lower bitrate.
+    which the first element correspond to the higher bitrate, whilst IPhone
+    ones receive a playlist where the first element has a lower bitrate.
     """
 
-    def __init__(self, entries, target_bitrate=200000, min_bitrate=96000):
+    def __init__(self, entries, target_bitrate=None, min_bitrate=AUDIO_TARGET):
         Resource.__init__(self)
 
         self._entries = entries
@@ -53,13 +56,15 @@ class PlaylistResource(Resource):
     def render_GET(self, request):
         playlist = [HEADER]
 
+        # If the target bitrate was not set, sort by user-agent
         agent = request.getHeader('User-Agent')
-        if agent:
+        if agent and not target_bitrate:
             if 'ipad' in agent.lower():
-                self._target_bitrate = 600000
+                self._target_bitrate = IPAD_TARGET
             else:
-                self._target_bitrate = 200000
+                self._target_bitrate = IPHONE_TARGET
 
+        # Sort playlist entries by proximity to the target bitrate
         self._entries.sort(key=lambda x: abs(x['bitrate'] -
                                          self._target_bitrate))
 
@@ -67,16 +72,17 @@ class PlaylistResource(Resource):
         # want to have audio streams in the first position.
         if self._entries[0]['bitrate'] < self._min_bitrate:
             self._entries.append(self._entries.pop(0))
+
         for entry in self._entries:
             playlist.append(ENTRY_TEMPLATE % entry)
 
-        request.setHeader('Content-type', 'application/vnd.apple.mpegurl')
+        request.setHeader('Content-type', CONTENT_TYPE)
         return "\n".join(playlist)
 
 
 class MultibiratePlaylistPlug(ComponentPlug):
     """I am a component plug for a http-server which plugs in a
-    http resource containing a main.m3u8 iphone multibitrate playlsit.
+    http resource containing a HLS variant playlist.
     """
 
     def start(self, component):
@@ -93,7 +99,7 @@ class MultibiratePlaylistPlug(ComponentPlug):
         props = self.args['properties']
         resource = Resource()
         playlist = PlaylistResource(props.get('playlist-entry', []),
-                                    props.get('target-bitrate', 200000))
+                                    props.get('target-bitrate', None))
 
         resource.putChild(props.get('playlist-name', 'main.m3u8'), playlist)
         component.setRootResource(resource)
@@ -122,7 +128,7 @@ def test():
     root = Resource()
     mount_point = Resource()
     playlist = PlaylistResource(properties['playlist-entry'])
-    root.putChild('test', mount_point,)
+    root.putChild('test', mount_point)
     mount_point.putChild('main.m3u8', playlist)
     site = Site(root)
 
