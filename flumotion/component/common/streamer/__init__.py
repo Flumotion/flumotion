@@ -14,8 +14,3 @@
 # See "LICENSE.LGPL" in the source distribution for more information.
 #
 # Headers in this file shall remain intact.
-
-from flumotion.component.common.streamer import admin_gtk
-
-
-GUIClass = admin_gtk.StreamerAdminGtk

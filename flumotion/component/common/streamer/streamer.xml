@@ -1,0 +1,47 @@
+<registry>
+  <bundles>
+
+    <bundle name="streamer-base">
+        <dependencies>
+            <dependency name="component-base" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/common/streamer">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+    <bundle name="streamer-admin-gtk">
+      <dependencies>
+        <dependency name="streamer-base" />
+        <dependency name="base-admin-gtk" />
+      </dependencies>
+
+      <directories>
+        <directory name="flumotion/component/common/streamer">
+          <filename location="streamer.glade" />
+          <filename location="admin_gtk.py" />
+        </directory>
+      </directories>
+    </bundle>
+
+    <bundle name="streamer-component">
+        <dependencies>
+            <dependency name="component" />
+            <dependency name="streamer-base" />
+            <dependency name="base-component-http" />
+            <dependency name="porterclient" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/common/streamer">
+                <filename location="streamer.py" />
+                <filename location="resources.py" />
+            </directory>
+        </directories>
+    </bundle>
+
+  </bundles>
+</registry>

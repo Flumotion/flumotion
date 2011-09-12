@@ -1,0 +1,54 @@
+<properties>
+    <!-- FIXME, authenticating against remote bouncers should happen through
+         a plug, not this property -->
+    <property name="bouncer" type="string"
+              _description="The name of a bouncer in the atmosphere to authenticate against." />
+    <property name="issuer-class" type="string"
+              _description="The Python class of the Keycard issuer to use." />
+    <property name="allow-default" type="bool"
+    	  _description="Whether failure to communicate with the bouncer should make the component accept the connection." />
+    <property name="mount-point" type="string"
+      _description="The mount point on which the stream can be accessed." />
+
+    <property name="type" type="string"
+              _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
+
+    <!-- If type is 'master' (default) -->
+    <property name="port" type="int"
+              _description="The port to listen on (if type is 'master')." />
+
+    <!-- If type is 'slave' -->
+    <property name="porter-socket-path" type="string"
+              _description="The path to the socket to communicate with the porter." />
+    <property name="porter-username" type="string"
+              _description="The username to authenticate to the porter." />
+    <property name="porter-password" type="string"
+              _description="The password to authenticate to the porter." />
+
+    <!-- Hostname currently for display purposes -->
+    <property name="hostname" type="string"
+              _description="The server's host name to display." />
+    <property name="domain" type="string"
+              _description="The domain of the server for authentication." />
+
+    <property name="client-limit" type="int"
+              _description="The maximum number of clients allowed." />
+    <property name="bandwidth-limit" type="int"
+              _description="The maximum bandwidth usage allowed in bits per second." />
+    <property name="redirect-on-overflow" type="string"
+              _description="A URL to redirect clients to if either of the limits have been reached." />
+
+    <property name="duration" type="float"
+              _description="How long to keep clients connected (in seconds)."/>
+    <property name="description" type="string"
+              _description="A description of the stream."/>
+
+    <!-- IP-based filtering for logs; commonly used to filter out
+         automated-tester IPs from the logs. Values should be of the form
+         network-address/prefix-length, e.g. "192.168.1.0/24" -->
+    <property name="ip-filter" type="string" multiple="yes"
+              _description="The IP network-address/prefix-length to filter out of logs." />
+
+    <property name="timeout" type="int"
+              _description="Disconnect inactive clients after this timeout. Default is 0, for an infinite timeout (in seconds)." />
+</properties>

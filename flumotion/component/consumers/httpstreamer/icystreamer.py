@@ -23,9 +23,8 @@ from zope.interface import implements
 
 from flumotion.common import interfaces
 from flumotion.component.base import http
-from flumotion.component.consumers.httpstreamer import resources
-
-from httpstreamer import MultifdSinkStreamer, Stats
+from flumotion.component.common.streamer import streamer
+from flumotion.component.consumers.httpstreamer import resources, httpstreamer
 
 # this import registers the gstreamer icymux element, don't remove it
 import icymux
@@ -35,7 +34,7 @@ __all__ = ['ICYStreamer']
 __version__ = "$Rev$"
 
 
-class ICYStreamer(MultifdSinkStreamer):
+class ICYStreamer(httpstreamer.MultifdSinkStreamer):
     implements(interfaces.IStreamingComponent)
 
     checkOffset = True
@@ -53,7 +52,7 @@ class ICYStreamer(MultifdSinkStreamer):
     defaultMetadataInterval = 2
 
     def init(self):
-        MultifdSinkStreamer.init(self)
+        httpstreamer.MultifdSinkStreamer.init(self)
 
         # fd -> sink
         self.sinkConnections = {}
@@ -75,7 +74,7 @@ class ICYStreamer(MultifdSinkStreamer):
         self.sinksByID3 =\
                 {False: self.get_element('sink-without-id3'),
                  True: self.get_element('sink-with-id3')}
-        Stats.__init__(self, self.sinksByID3.values())
+        httpstreamer.Stats.__init__(self, self.sinksByID3.values())
 
         self._updateCallLaterId = reactor.callLater(10, self._updateStats)
 
@@ -110,7 +109,7 @@ class ICYStreamer(MultifdSinkStreamer):
         return True
 
     def parseProperties(self, properties):
-        MultifdSinkStreamer.parseProperties(self, properties)
+        httpstreamer.MultifdSinkStreamer.parseProperties(self, properties)
 
         self._frameSize = properties.get('frame-size', self.defaultFrameSize)
         self._metadataInterval = properties.get('metadata-interval', \
@@ -174,7 +173,7 @@ class ICYStreamer(MultifdSinkStreamer):
         return self.icyHeaders
 
     def updateState(self, set):
-        Stats.updateState(self, set)
+        httpstreamer.Stats.updateState(self, set)
 
         set('icy-title', self.muxer.get_property('iradio-title'))
         timestamp = time.strftime("%c", time.localtime(\
@@ -184,5 +183,5 @@ class ICYStreamer(MultifdSinkStreamer):
     def do_pipeline_playing(self):
         # change the component mood to happy after we receive first data block
         # so that we can calculate the bitrate and configure muxer
-        d = MultifdSinkStreamer.do_pipeline_playing(self)
+        d = httpstreamer.MultifdSinkStreamer.do_pipeline_playing(self)
         return defer.DeferredList([d, self._muxerConfiguredDeferred])

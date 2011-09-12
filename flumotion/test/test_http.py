@@ -19,7 +19,7 @@ from twisted.internet import defer
 from twisted.web import http, server
 
 from flumotion.component.base.http import HTTPAuthentication
-from flumotion.component.consumers.httpstreamer import resources
+from flumotion.component.common.streamer import resources
 from flumotion.common import keycards, log, errors
 from flumotion.common import testsuite
 

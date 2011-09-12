@@ -6,13 +6,12 @@ component_PYTHON = 		\
 	icystreamer.py  	\
 	icymux.py 		\
 	resources.py 		\
-	admin_gtk.py		\
+	admin_gtk.py 		\
 	wizard_gtk.py
 
 componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/httpstreamer
 component_DATA = 			\
 	httpstreamer.xml 		\
-	httpstreamer.glade		\
 	icytab.glade			\
 	wizard.glade
 
