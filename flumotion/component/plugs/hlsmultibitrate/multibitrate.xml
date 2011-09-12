@@ -1,0 +1,39 @@
+<registry>
+  <plugs>
+    <plug socket="flumotion.component.plugs.base.ComponentPlug"
+          type="multibitrate-playlist-plug"
+          _description="Serves an variant playlist for HLS multibitrate flows.">
+      <entries>
+        <entry type="default"
+               location="flumotion/component/plugs/hlsmultibitrate/multibitrate.py"
+               function="MultibiratePlaylistPlug" />
+      </entries>
+      <properties>
+        <property name="playlist-name" type="string"
+                  _description="Name of the playlist (default main.m3u8)."/>
+        <property name="target-bitrate" type="int" required="no"
+                  _description="The bitrate that should be listed first in the playlist."/>
+        <compound-property name="playlist-entry" multiple="yes"
+                           _description="Playlist entry">
+          <property name="stream-url" type="string" required="yes"
+                    _description="The url of the iphone stream"/>
+          <property name="bitrate" type="int" required="yes"
+                    _description="Bitrate configured for the stream"/>
+        </compound-property>
+      </properties>
+    </plug>
+  </plugs>
+  <bundles>
+    <bundle name="multibitrate-playlist-plug">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs/hlsmultibitrate">
+          <filename location="__init__.py" />
+          <filename location="multibitrate.py" />
+        </directory>
+      </directories>
+    </bundle>
+  </bundles>
+</registry>

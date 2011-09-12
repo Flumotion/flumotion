@@ -1,6 +1,6 @@
 include $(top_srcdir)/common/python.mk
 
-SUBDIRS = cortado html5
+SUBDIRS = cortado hlsmultibitrate html5
 
 component_PYTHON = \
 	__init__.py \
