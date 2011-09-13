@@ -56,5 +56,18 @@
         </directories>
     </bundle>
 
+    <bundle name="fragmented-streamer-component">
+        <dependencies>
+            <dependency name="streamer-component" />
+        </dependencies>
+
+        <directories>
+            <directory name="flumotion/component/common/streamer">
+                <filename location="fragmentedstreamer.py" />
+                <filename location="fragmentedresource.py" />
+            </directory>
+        </directories>
+    </bundle>
+
   </bundles>
 </registry>

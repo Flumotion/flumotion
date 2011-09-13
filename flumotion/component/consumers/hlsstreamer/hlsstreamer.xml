@@ -74,8 +74,8 @@
 
     <bundle name="hlsstreamer">
         <dependencies>
-            <dependency name="component" />
             <dependency name="hlsstreamer-base" />
+            <dependency name="fragmented-streamer-component" />
         </dependencies>
 
         <directories>
