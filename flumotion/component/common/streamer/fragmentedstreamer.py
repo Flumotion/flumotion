@@ -96,14 +96,14 @@ class FragmentedStreamer(Streamer, Stats):
         self._maxWindow = props.get('max-window', self.DEFAULT_MAX_WINDOW)
 
         self.sink = pipeline.get_by_name('sink')
-        self._configureSink()
-        self._connectSinkSignals()
+        self._configure_sink()
+        self._connect_sink_signals()
 
         Streamer.configure_pipeline(self, pipeline, props)
         Stats.__init__(self, self.resource)
         self.resource.setMountPoint(self.mountPoint)
 
-    def updateBytesReceived(self, length):
+    def update_bytes_received(self, length):
         self.resource.bytesReceived += length
 
     def __repr__(self):
@@ -112,21 +112,21 @@ class FragmentedStreamer(Streamer, Stats):
     def _get_root(self):
         return self.resource
 
-    def _configureSink(self):
+    def _configure_sink(self):
         '''
         Configure sink properties. Can be used by subclasses to set
         configuration parameters in the element
         '''
         pass
 
-    def _connectSinkSignals(self):
+    def _connect_sink_signals(self):
         self.sink.get_pad("sink").add_buffer_probe(self._sink_pad_probe, None)
         self.sink.connect('eos', self._eos)
 
     ### START OF THREAD-AWARE CODE (called from non-reactor threads)
 
     def _sink_pad_probe(self, pad, buffer, none):
-        reactor.callFromThread(self.updateBytesReceived, len(buffer.data))
+        reactor.callFromThread(self.update_bytes_received, len(buffer.data))
         return True
 
     def _eos(self, appsink):

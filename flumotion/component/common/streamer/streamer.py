@@ -326,8 +326,8 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
             raise errors.ConfigError('both burst-size and burst-time '
                                      'set, cannot satisfy')
 
-    def configureAuthAndResource(self):
-        raise NotImplementedError("configureAuthAndResource must be "
+    def configure_auth_and_resource(self):
+        raise NotImplementedError("configure_auth_and_resource must be "
                                   "implemented by subclasses")
 
     def parseProperties(self, properties):
@@ -417,7 +417,7 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
 
     def configure_pipeline(self, pipeline, properties):
         self._updateCallLaterId = reactor.callLater(10, self._updateStats)
-        self.configureAuthAndResource()
+        self.configure_auth_and_resource()
         self.parseProperties(properties)
 
     def getMaxClients(self):

@@ -64,7 +64,7 @@ class HLSStreamer(FragmentedStreamer, Stats):
             hlssink.register()
         return "hlssink name=sink sync=false"
 
-    def configureAuthAndResource(self):
+    def configure_auth_and_resource(self):
         self.httpauth = http.HTTPAuthentication(self)
         self.resource = HTTPLiveStreamingResource(self, self.httpauth,
                 self.secret_key, self.session_timeout)
@@ -103,7 +103,7 @@ class HLSStreamer(FragmentedStreamer, Stats):
 
         self.hlsring.setHostname(self.hls_url)
 
-    def softRestart(self):
+    def soft_restart(self):
         """Stops serving fragments, resets the playlist and starts
         waiting for new segments to become happy again
         """
@@ -113,15 +113,15 @@ class HLSStreamer(FragmentedStreamer, Stats):
         self._fragmentsCount = 0
         self.hlsring.reset()
 
-    def _configureSink(self):
+    def _configure_sink(self):
         self.sink.set_property('write-to-disk', False)
         self.sink.set_property('playlist-max-window', 5)
 
-    def _connectSinkSignals(self):
-        FragmentedStreamer._connectSinkSignals(self)
+    def _connect_sink_signals(self):
+        FragmentedStreamer._connect_sink_signals(self)
         self.sink.connect("new-fragment", self._new_fragment)
 
-    def _processFragment(self, fragment):
+    def _process_fragment(self, fragment):
         self._fragmentsCount = self._fragmentsCount + 1
 
         # Wait hls-min-window fragments to set the component 'happy'
@@ -148,6 +148,6 @@ class HLSStreamer(FragmentedStreamer, Stats):
             fragment = hlssink.get_property('fragment')
         except:
             fragment = hlssink.emit('pull-fragment')
-        reactor.callFromThread(self._processFragment, fragment)
+        reactor.callFromThread(self._process_fragment, fragment)
 
     ### END OF THREAD-AWARE CODE

@@ -133,7 +133,7 @@ class MultifdSinkStreamer(streamer.Streamer, Stats):
         self.burst_size = properties.get('burst-size', 0)
         self.burst_time = properties.get('burst-time', 0.0)
 
-    def configureSink(self, sink):
+    def _configure_sink(self, sink):
         self.setup_burst_mode(sink)
 
         if gstreamer.element_factory_has_property('multifdsink',
@@ -170,7 +170,7 @@ class MultifdSinkStreamer(streamer.Streamer, Stats):
                 'gst-plugins-base', '0.10.10'))
             addMessage(m)
 
-    def configureAuthAndResource(self):
+    def configure_auth_and_resource(self):
         self.httpauth = http.HTTPAuthentication(self)
         self.resource = MultiFdSinkStreamingResource(self, self.httpauth)
 
@@ -180,7 +180,7 @@ class MultifdSinkStreamer(streamer.Streamer, Stats):
 
         streamer.Streamer.configure_pipeline(self, pipeline, properties)
         self.parseExtraProperties(properties)
-        self.configureSink(sink)
+        self._configure_sink(sink)
 
     def _get_root(self):
         root = HTTPRoot()
