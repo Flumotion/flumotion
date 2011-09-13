@@ -41,10 +41,6 @@ class HTTPLiveStreamingResource(FragmentedResource):
         FragmentedResource.__init__(self, streamer, httpauth, secretKey,
             sessionTimeout)
 
-    def _logWrite(self, request):
-        return self.logWrite(request, request.getBytesSent(),
-                             request.getDuration())
-
     def _renderKey(self, res, request):
         self._writeHeaders(request, 'binary/octect-stream')
         if request.method == 'GET':

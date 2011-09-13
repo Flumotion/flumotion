@@ -347,6 +347,10 @@ class FragmentedResource(HTTPStreamingResource, log.Loggable):
         request.notifyFinish().addCallback(self._logRequest, request)
         return HTTPStreamingResource.render(self, request)
 
+    def _logWrite(self, request):
+        return self.logWrite(request, request.getBytesSent(),
+                             request.getDuration())
+
     def _logRequest(self, error, request):
         if error:
             self.info("%s %s error:%s", request.getClientIP(), request, error)
