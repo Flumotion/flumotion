@@ -84,7 +84,6 @@
                 <filename location="hlsring.py" />
                 <filename location="hlssink.py" />
                 <filename location="resources.py" />
-                <filename location="common.py" />
             </directory>
         </directories>
     </bundle>

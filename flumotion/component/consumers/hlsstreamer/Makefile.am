@@ -1,7 +1,6 @@
 include $(top_srcdir)/common/python.mk
 
 component_PYTHON = __init__.py \
-		   common.py \
 		   resources.py \
 		   hlsstreamer.py \
 		   hlsring.py \
