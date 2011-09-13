@@ -15,6 +15,8 @@
 #
 # Headers in this file shall remain intact.
 
+import time
+
 from twisted.internet import reactor
 from twisted.web import server
 
@@ -79,11 +81,27 @@ class FragmentedStreamer(Streamer, Stats):
 
     def init(self):
         self.debug("HTTP live fragmented streamer initialising")
+        self._fragmentsCount = 0
 
     def do_pipeline_playing(self):
         # The component must stay 'waiking' until it receives at least
         # the number of segments defined by the min-window property
         pass
+
+    def configure_pipeline(self, pipeline, props):
+        self.secret_key = props.get('secret-key', self.DEFAULT_SECRET_KEY)
+        self.session_timeout = props.get('session-timeout',
+                                         self.DEFAULT_SESSION_TIMEOUT)
+        self._minWindow = props.get('min-window', self.DEFAULT_MIN_WINDOW)
+        self._maxWindow = props.get('max-window', self.DEFAULT_MAX_WINDOW)
+
+        self.sink = pipeline.get_by_name('sink')
+        self._configureSink()
+        self._connectSinkSignals()
+
+        Streamer.configure_pipeline(self, pipeline, props)
+        Stats.__init__(self, self.resource)
+        self.resource.setMountPoint(self.mountPoint)
 
     def updateBytesReceived(self, length):
         self.resource.bytesReceived += length
@@ -91,13 +109,26 @@ class FragmentedStreamer(Streamer, Stats):
     def __repr__(self):
         return '<FragmentedStreamer (%s)>' % self.name
 
+    def _configureSink(self):
+        '''
+        Configure sink properties. Can be used by subclasses to set
+        configuration parameters in the element
+        '''
+        pass
+
     def _connectSinkSignals(self):
         self.sink.get_pad("sink").add_buffer_probe(self._sink_pad_probe, None)
+        self.sink.connect('eos', self._eos)
 
     ### START OF THREAD-AWARE CODE (called from non-reactor threads)
 
     def _sink_pad_probe(self, pad, buffer, none):
         reactor.callFromThread(self.updateBytesReceived, len(buffer.data))
         return True
+
+    def _eos(self, appsink):
+        #FIXME: How do we handle this for live?
+        self.log('appsink received an eos')
+
 
     ### END OF THREAD-AWARE CODE

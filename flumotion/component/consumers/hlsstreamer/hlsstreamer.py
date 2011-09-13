@@ -61,7 +61,7 @@ class HLSStreamer(FragmentedStreamer, Stats):
         # Check of the hlssink is available or use the python one
         if not gstreamer.element_factory_exists('hlssink'):
             hlssink.register()
-        return "hlssink name=hlssink sync=false"
+        return "hlssink name=sink sync=false"
 
     def configureAuthAndResource(self):
         self.httpauth = http.HTTPAuthentication(self)
@@ -72,10 +72,6 @@ class HLSStreamer(FragmentedStreamer, Stats):
         return self.hlsring
 
     def configure_pipeline(self, pipeline, props):
-        self.secret_key = props.get('secret-key', self.DEFAULT_SECRET_KEY)
-        self.session_timeout = props.get('session-timeout',
-                                         self.DEFAULT_SESSION_TIMEOUT)
-
         self.hlsring = HLSRing(
             props.get('main-playlist', self.DEFAULT_MAIN_PLAYLIST),
             props.get('stream-playlist', self.DEFAULT_STREAM_PLAYLIST),
@@ -91,14 +87,6 @@ class HLSStreamer(FragmentedStreamer, Stats):
         # Call the base class after initializing the ring and getting
         # the secret key and the session timeout
         FragmentedStreamer.configure_pipeline(self, pipeline, props)
-        Stats.__init__(self, self.resource)
-
-        self.resource.setMountPoint(self.mountPoint)
-
-        self.sink = pipeline.get_by_name('hlssink')
-        self.sink.set_property('write-to-disk', False)
-        self.sink.set_property('playlist-max-window', 5)
-        self._connectSinkSignals()
 
         self.hls_url = props.get('hls-url', None)
         if self.hls_url:
@@ -114,13 +102,6 @@ class HLSStreamer(FragmentedStreamer, Stats):
 
         self.hlsring.setHostname(self.hls_url)
 
-    def remove_client(self, fd):
-        '''
-        Keycards expiration is checked by the twisted resource. Keep this
-        method for compatibility with the httpstreamer
-        '''
-        pass
-
     def softRestart(self):
         """Stops serving fragments, resets the playlist and starts
         waiting for new segments to become happy again
@@ -131,10 +112,13 @@ class HLSStreamer(FragmentedStreamer, Stats):
         self._fragmentsCount = 0
         self.hlsring.reset()
 
+    def _configureSink(self):
+        self.sink.set_property('write-to-disk', False)
+        self.sink.set_property('playlist-max-window', 5)
+
     def _connectSinkSignals(self):
         FragmentedStreamer._connectSinkSignals(self)
         self.sink.connect("new-fragment", self._new_fragment)
-        self.sink.connect("eos", self._eos)
 
     def _processFragment(self, fragment):
         self._fragmentsCount = self._fragmentsCount + 1
@@ -164,9 +148,5 @@ class HLSStreamer(FragmentedStreamer, Stats):
         except:
             fragment = hlssink.emit('pull-fragment')
         reactor.callFromThread(self._processFragment, fragment)
-
-    def _eos(self, appsink):
-        #FIXME: How do we handle this for live?
-        self.log('appsink received an eos')
 
     ### END OF THREAD-AWARE CODE
