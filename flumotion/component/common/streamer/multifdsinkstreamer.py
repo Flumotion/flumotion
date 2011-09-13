@@ -198,21 +198,6 @@ class MultifdSinkStreamer(streamer.Streamer, Stats):
             mime += ";boundary=ThisRandomString"
         return mime
 
-    def getUrl(self):
-        port = self.port
-
-        if self.type == 'slave' and self._pbclient:
-            if not self._pbclient.remote_port:
-                return ""
-            port = self._pbclient.remote_port
-
-        if (not port) or (port == 80):
-            port_str = ""
-        else:
-            port_str = ":%d" % port
-
-        return "http://%s%s%s" % (self.hostname, port_str, self.mountPoint)
-
     def add_client(self, fd, request):
         sink = self.get_element('sink')
         sink.emit('add', fd)
