@@ -75,6 +75,7 @@ class FragmentedStreamer(Streamer, Stats):
     DEFAULT_SESSION_TIMEOUT = 30
 
     logCategory = 'fragmented-streamer'
+    siteClass = Site
 
     def init(self):
         self.debug("HTTP live fragmented streamer initialising")

@@ -262,6 +262,7 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
     pipe_template = 'multifdsink name=sinksync=false recover-policy=3'
 
     componentMediumClass = HTTPMedium
+    siteClass = server.Site
 
     def init(self):
         reactor.debug = True
@@ -602,7 +603,7 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
             self._porterDeferred = d = defer.Deferred()
             mountpoints = [self.mountPoint]
             self._pbclient = porterclient.HTTPPorterClientFactory(
-                server.Site(resource=root), mountpoints, d)
+                self.siteClass(resource=root), mountpoints, d)
 
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
@@ -620,7 +621,7 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
                 self.info('Listening on port %d, interface=%r',
                           self.port, iface)
                 self._tport = reactor.listenTCP(
-                    self.port, server.Site(resource=root),
+                    self.port, self.siteClass(resource=root),
                     interface=iface)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
