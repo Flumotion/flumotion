@@ -66,10 +66,6 @@ class Stats(object):
         self.average_client_number = 0
         self.average_time = self.start_time
 
-        self.hostname = "localhost"
-        self.port = 0
-        self.mountPoint = "/"
-
     def _updateAverage(self):
         # update running average of clients connected
         now = time.time()
@@ -142,6 +138,9 @@ class Stats(object):
         raise NotImplemented("getBytesReceived must be implemented by "
                              "subclasses")
 
+    def getUrl(self):
+        raise NotImplementedError("getUrl must be implemented by subclasses")
+
     def getUptime(self):
         return time.time() - self.start_time
 
@@ -156,9 +155,6 @@ class Stats(object):
 
     def getAverageClients(self):
         return self.average_client_number
-
-    def getUrl(self):
-        return "http://%s:%d%s" % (self.hostname, self.port, self.mountPoint)
 
     def getLoadDeltas(self):
         return self.load_deltas
