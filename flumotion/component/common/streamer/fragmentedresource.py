@@ -129,12 +129,12 @@ class FragmentedResource(HTTPStreamingResource, log.Loggable):
     def isReady(self):
         return self.streamer.isReady()
 
-    def _addClient(self, request):
-        HTTPStreamingResource._addClient(self, request)
+    def _addClient(self, id):
+        HTTPStreamingResource._addClient(self, id)
         self.streamer.clientAdded()
 
-    def _removeClient(self, uid, request):
-        HTTPStreamingResource._removeClient(self, request)
+    def _removeClient(self, uid):
+        HTTPStreamingResource._removeClient(self, uid)
         self.log("session %s expired", uid)
         self.streamer.clientRemoved()
 
@@ -241,8 +241,8 @@ class FragmentedResource(HTTPStreamingResource, log.Loggable):
             request.session.sessionTimeout = self.sessionTimeout
             request.session.startCheckingExpiration()
             request.session.notifyOnExpire(lambda:
-                    self._removeClient(sessionID, request))
-            self._addClient(request)
+                    self._removeClient(sessionID))
+            self._addClient(request.session.uid)
         request.addCookie(COOKIE_NAME, token, path=self.mountPoint)
 
         self.debug('added new client with session id: "%s"' %

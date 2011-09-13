@@ -223,25 +223,26 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         request.setHeader('Cache-Control', 'private')
         request.setHeader('Content-type', content)
 
-    def _addClient(self, request):
+    def _addClient(self, id):
         """
         Add a request, so it can be used for statistics.
 
-        @param request: the request
-        @type request: twisted.protocol.http.Request
+        @param id: the of the client (fd or session id)
+        @type request: int
         """
-        fd = request.transport.fileno()
-        self._requests[fd] = request
+        self._requests[id] = id
 
-    def _removeClient(self, request):
+    def _removeClient(self, id):
         """
         Delete a request from the list
 
-        @param request: the request
-        @type request: twisted.protocol.http.Request
+        @param request: the id of the client
+        @type request: int
         """
-        fd = request.transport.fileno()
-        del self._requests[fd]
+        try:
+            del self._requests[id]
+        except Exception:
+            self.warning("Error removing request: %s", id)
 
     def _logRequestFromIP(self, ip):
         """
