@@ -16,7 +16,6 @@
 # Headers in this file shall remain intact.
 
 import socket
-import string
 import resource
 import time
 
@@ -278,20 +277,3 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         return ERROR_TEMPLATE % {'code': error_code,
                                  'error': http.RESPONSES[error_code]}
-
-
-class HTTPRoot(web_resource.Resource, log.Loggable):
-    logCategory = "httproot"
-
-    def getChildWithDefault(self, path, request):
-        # we override this method so that we can look up tree resources
-        # directly without having their parents.
-        # There's probably a more Twisted way of doing this, but ...
-        fullPath = path
-        if request.postpath:
-            fullPath += '/' + string.join(request.postpath, '/')
-        self.debug("[fd %5d] Incoming request %r for path %s",
-            request.transport.fileno(), request, fullPath)
-        r = web_resource.Resource.getChildWithDefault(self, fullPath, request)
-        self.debug("Returning resource %r" % r)
-        return r

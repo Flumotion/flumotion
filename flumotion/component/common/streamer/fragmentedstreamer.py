@@ -109,6 +109,9 @@ class FragmentedStreamer(Streamer, Stats):
     def __repr__(self):
         return '<FragmentedStreamer (%s)>' % self.name
 
+    def _get_root(self):
+        return self.resource
+
     def _configureSink(self):
         '''
         Configure sink properties. Can be used by subclasses to set

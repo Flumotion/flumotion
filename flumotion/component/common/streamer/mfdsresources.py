@@ -19,10 +19,11 @@ import os
 import time
 import errno
 import fcntl
+import string
 
 import gst
 
-from twisted.web import server
+from twisted.web import server, resource as web_resource
 from twisted.internet import reactor, defer
 
 from flumotion.common import log
@@ -269,3 +270,20 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
 
     render_GET = _render
     render_HEAD = _render
+
+
+class HTTPRoot(web_resource.Resource, log.Loggable):
+    logCategory = "httproot"
+
+    def getChildWithDefault(self, path, request):
+        # we override this method so that we can look up tree resources
+        # directly without having their parents.
+        # There's probably a more Twisted way of doing this, but ...
+        fullPath = path
+        if request.postpath:
+            fullPath += '/' + string.join(request.postpath, '/')
+        self.debug("[fd %5d] Incoming request %r for path %s",
+            request.transport.fileno(), request, fullPath)
+        r = web_resource.Resource.getChildWithDefault(self, fullPath, request)
+        self.debug("Returning resource %r" % r)
+        return r

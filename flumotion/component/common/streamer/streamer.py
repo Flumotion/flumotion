@@ -31,7 +31,6 @@ from flumotion.common import format as formatting
 from flumotion.component import feedcomponent
 from flumotion.component.base import http
 from flumotion.component.component import moods
-from flumotion.component.common.streamer.resources import HTTPRoot
 from flumotion.component.misc.porter import porterclient
 from flumotion.twisted import fdserver
 
@@ -581,11 +580,11 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
             self))
         return d
 
+    def _get_root():
+        raise NotImplementedError("getRoot must be implemented by subclasses")
+
     def do_setup(self):
-        root = HTTPRoot()
-        # TwistedWeb wants the child path to not include the leading /
-        mount = self.mountPoint[1:]
-        root.putChild(mount, self.resource)
+        root = self._get_root()
         if self.type == 'slave':
             # Streamer is slaved to a porter.
 

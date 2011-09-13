@@ -24,7 +24,7 @@ from flumotion.common import messages
 from flumotion.component.base import http
 from flumotion.component.common.streamer import streamer
 from flumotion.component.common.streamer.mfdsresources import \
-    MultiFdSinkStreamingResource
+    MultiFdSinkStreamingResource, HTTPRoot
 
 from flumotion.common.i18n import N_, gettexter
 
@@ -181,6 +181,13 @@ class MultifdSinkStreamer(streamer.Streamer, Stats):
         streamer.Streamer.configure_pipeline(self, pipeline, properties)
         self.parseExtraProperties(properties)
         self.configureSink(sink)
+
+    def _get_root(self):
+        root = HTTPRoot()
+        # TwistedWeb wants the child path to not include the leading /
+        mount = self.mountPoint[1:]
+        root.putChild(mount, self.resource)
+        return root
 
     def __repr__(self):
         return '<MultifdSinkStreamer (%s)>' % self.name
