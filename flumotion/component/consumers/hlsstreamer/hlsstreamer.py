@@ -49,10 +49,11 @@ class HLSStreamer(FragmentedStreamer, Stats):
     def init(self):
         self.debug("HTTP live streamer initialising")
         self.hlsring = None
+        self._ready = False
         self._fragmentsCount = 0
 
     def isReady(self):
-        return self.ready
+        return self._ready
 
     def get_mime(self):
         return 'video/webm'
@@ -108,7 +109,7 @@ class HLSStreamer(FragmentedStreamer, Stats):
         """
         self.info("Soft restart, resetting playlist and waiting to fill "
                   "the initial fragments window")
-        self.ready = False
+        self._ready = False
         self._fragmentsCount = 0
         self.hlsring.reset()
 
@@ -128,7 +129,7 @@ class HLSStreamer(FragmentedStreamer, Stats):
             self.info("%d fragments received. Changing mood to 'happy'",
                     self._fragmentsCount)
             self.setMood(moods.happy)
-            self.ready = True
+            self._ready = True
 
         b = fragment.get_property('buffer')
         index = fragment.get_property('index')
