@@ -949,6 +949,7 @@ class MuxerComponent(MultiInputParseLaunchComponent):
     """
 
     LINK_MUXER = False
+    dropAudioKuEvents = True
 
     def get_link_pad(self, muxer, srcpad, caps):
         return muxer.get_compatible_pad(srcpad, caps)
@@ -982,6 +983,17 @@ class MuxerComponent(MultiInputParseLaunchComponent):
             srcpad_to_link.set_blocked_async(True, self.is_blocked_cb)
         return True
 
+    def event_probe_cb(self, pad, event, depay, eaterAlias):
+        caps = pad.get_negotiated_caps()
+        if caps is None:
+            return True
+        # if this pad doesn't push audio, remove the probe
+        if 'audio' not in caps[0].to_string():
+            depay.get_pad("src").remove_buffer_probe(self._eprobes[eaterAlias])
+        if event.get_structure().get_name() == 'GstForceKeyUnit':
+            return False
+        return True
+
     def configure_pipeline(self, pipeline, properties):
         """
         Method not overridable by muxer subclasses.
@@ -992,12 +1004,19 @@ class MuxerComponent(MultiInputParseLaunchComponent):
         # muxers
         self.fired_eaters = 0
         self._probes = {} # depay element -> id
+        self._eprobes = {} # depay element -> id
 
         for e in self.eaters:
             depay = self.get_element(self.eaters[e].depayName)
             self._probes[e] = \
                 depay.get_pad("src").add_buffer_probe(
                     self.buffer_probe_cb, depay, e)
+            # Add an event probe to drop GstForceKeyUnit events
+            # in audio pads
+            if self.dropAudioKuEvents:
+                self._eprobes[e] = \
+                    depay.get_pad("src").add_event_probe(
+                        self.event_probe_cb, depay, e)
 
     def is_blocked_cb(self, pad, is_blocked):
         if is_blocked:
