@@ -580,6 +580,9 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
             self))
         return d
 
+    def remove_all_clients(self):
+        self.resource.removeAllClients()
+
     def _get_root():
         raise NotImplementedError("getRoot must be implemented by subclasses")
 
