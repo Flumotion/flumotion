@@ -706,6 +706,15 @@ class BaseComponent(common.InitMixin, log.Loggable):
             if self._haveError:
                 self._haveError(message)
 
+    def removeMessage(self, mid):
+        """
+        Remove a message with a given id from the component.
+        @type  mid: str
+        """
+        for msg in self.state.get('messages', []):
+            if msg.id == mid:
+                self.state.remove('messages', msg)
+
     def warnDeprecatedProperties(self, list):
         """
         Add a warning messages for deprecated properties.
