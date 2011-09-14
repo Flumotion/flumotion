@@ -25,6 +25,7 @@ import gst.interfaces
 from flumotion.common.i18n import N_, gettexter
 from flumotion.common import errors, messages, gstreamer
 from flumotion.component.effects.audioconvert import audioconvert
+from flumotion.component.effects.kuscheduler import kuscheduler
 from flumotion.component.effects.videorate import videorate
 from flumotion.component.effects.videoscale import videoscale
 from flumotion.component import feedcomponent as fc
@@ -77,6 +78,8 @@ class DecoderComponent(fc.ReconfigurableComponent):
         add_borders = props.get('add-borders', False)
         width = props.get('width', None)
         height = props.get('height', None)
+        # Expressed in ms
+        interval = props.get('keyunits-interval', 10000) / gst.MSECOND
         fr = props.get('framerate', (25, 2))
         framerate = gst.Fraction(fr[0], fr[1])
 
@@ -93,18 +96,29 @@ class DecoderComponent(fc.ReconfigurableComponent):
         #self.videoscaler.effectBin.set_state(gst.STATE_PLAYING)
         self.debug("Videoscaler  added")
 
+        self.vkuscheduler = kuscheduler.KeyUnitsScheduler('keyunits-scheduler',
+            None, self.pipeline, interval)
+        self.addEffect(self.vkuscheduler)
+        self.debug("KeyUnitsScheduler added")
+
     def _add_audio_effects(self):
         # Add the effects to the component but don't plug them until we have a
         # valid video pad
         props = self.config['properties']
         samplerate = props.get('samplerate', 44100)
         channels = props.get('channels', 2)
+        interval = props.get('keyunits-interval', 10000) / gst.MSECOND
 
         self.ar = audioconvert.Audioconvert('audioconvert', None,
                                             self.pipeline, channels=channels,
                                             samplerate=samplerate,
                                             use_audiorate=False)
         self.addEffect(self.ar)
+
+        self.akuscheduler = kuscheduler.KeyUnitsScheduler('keyunits-scheduler',
+            None, self.pipeline, interval)
+        self.addEffect(self.akuscheduler)
+        self.debug("KeyUnitsScheduler added")
 
     def _new_decoded_pad_cb(self, decoder, pad, last):
         self.log("Decoder %s got new decoded pad %s", decoder, pad)
@@ -142,7 +156,11 @@ class DecoderComponent(fc.ReconfigurableComponent):
         self.vr.plug()
         self.videoscaler.sourcePad = self.vr.effectBin.get_pad("src")
         self.videoscaler.plug()
+        self.vkuscheduler.sourcePad = self.videoscaler.effectBin.get_pad("src")
+        self.vkuscheduler.plug()
 
     def _plug_audio_effects(self, pad):
         self.ar.sourcePad = pad
         self.ar.plug()
+        self.akuscheduler.sourcePad = self.ar.effectBin.get_pad("src")
+        self.akuscheduler.plug()
