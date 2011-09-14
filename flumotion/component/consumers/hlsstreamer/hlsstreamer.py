@@ -49,11 +49,6 @@ class HLSStreamer(FragmentedStreamer, Stats):
     def init(self):
         self.debug("HTTP live streamer initialising")
         self.hlsring = None
-        self._ready = False
-        self._fragmentsCount = 0
-
-    def isReady(self):
-        return self._ready
 
     def get_mime(self):
         return 'video/webm'

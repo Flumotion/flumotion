@@ -82,6 +82,10 @@ class FragmentedStreamer(Streamer, Stats):
     def init(self):
         self.debug("HTTP live fragmented streamer initialising")
         self._fragmentsCount = 0
+        self._ready = False
+
+    def isReady(self):
+        return self._ready
 
     def do_pipeline_playing(self):
         # The component must stay 'waiking' until it receives at least
