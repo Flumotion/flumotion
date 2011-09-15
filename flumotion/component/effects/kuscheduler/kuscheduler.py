@@ -36,7 +36,7 @@ class GstKeyUnitsScheduler(gst.Element):
             'interval': (gobject.TYPE_UINT64,
             'Key Unit Interval',
             'Key Unit interval in ns',
-            0, gobject.G_MAXUINT64, DEFAULT_INTERVAL,
+            0, gst.CLOCK_TIME_NONE, DEFAULT_INTERVAL,
             gobject.PARAM_READWRITE)}
 
     __gstdetails__ = ('FluKeyUnitsScheduler', 'Converter',

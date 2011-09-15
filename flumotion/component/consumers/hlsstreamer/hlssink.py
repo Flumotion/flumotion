@@ -44,7 +44,7 @@ class Fragment(gobject.GObject):
             'fragment', gobject.PARAM_READABLE),
         'duration': (gobject.TYPE_UINT64, 'duration',
             'Duration of the fragment in ns',
-            0, gobject.G_MAXUINT64, 0, gobject.PARAM_READABLE)}
+            0, gst.CLOCK_TIME_NONE, 0, gobject.PARAM_READABLE)}
 
     def __init__(self, index, buf):
         gobject.GObject.__init__(self)
