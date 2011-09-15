@@ -90,6 +90,7 @@
 
     <bundle name="hlsstreamer-admin">
         <dependencies>
+            <dependency name="hlsstreamer-base" />
             <dependency name="streamer-admin-gtk"/>
         </dependencies>
 
