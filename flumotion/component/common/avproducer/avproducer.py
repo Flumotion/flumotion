@@ -47,7 +47,9 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         from flumotion.component.producers import checks
         d1 = checks.checkTicket347()
         d2 = checks.checkTicket348()
-        dl = defer.DeferredList([d1, d2])
+        l = self._do_extra_checks()
+        l.extend([d1, d2])
+        dl = defer.DeferredList(l)
         dl.addCallback(self._checkCallback)
         return dl
 
@@ -69,11 +71,6 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
             addMessage(msg)
             raise errors.ConfigError(msg)
 
-    def _checkCallback(self, results):
-        for (state, result) in results:
-            for m in result.messages:
-                self.addMessage(m)
-
     def get_pipeline_string(self, props):
         self.is_square = props.get('is-square', False)
         self.width = props.get('width', None)
@@ -84,6 +81,7 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         self.kuinterval = props.get('keyunits-interval', 0) * gst.MSECOND
         fr = props.get('framerate', None)
         self.framerate = fr and gst.Fraction(fr[0], fr[1]) or None
+        self._parse_aditional_properties(props)
         return self.get_pipeline_template()
 
     def configure_pipeline(self, pipeline, properties):
@@ -100,6 +98,26 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         """
         self.debug("Setting volume to %f" % (value))
         self.volume.set_property('volume', value)
+
+    def _checkCallback(self, results):
+        for (state, result) in results:
+            for m in result.messages:
+                self.addMessage(m)
+
+    def _do_extra_checks(self):
+        '''
+        Subclasses should override this method to perform aditional checks
+
+        @returns: A list of checks' defers
+        @rtype: list
+        '''
+        return []
+
+    def _parse_aditional_properties(self, props):
+        '''
+        Subclasses should overrride this method to parse aditional properties
+        '''
+        pass
 
     def _add_video_effects(self, pipeline):
         # Add deinterlacer

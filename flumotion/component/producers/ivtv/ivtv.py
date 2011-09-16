@@ -37,7 +37,6 @@ class Ivtv(avproducer.AVProducerBase):
                 "  level name=volumelevel message=true !"
                 "  @feeder:audio@" % self.device)
 
-    def get_pipeline_string(self, properties):
+    def _parse_aditional_properties(self, properties):
         self.decoder = self.get_element('video')
         self.device = properties.get('device', '/dev/video0')
-        return avproducer.AVProducerBase.get_pipeline_string(self, properties)

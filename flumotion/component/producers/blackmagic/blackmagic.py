@@ -34,8 +34,7 @@ class BlackMagic(avproducer.AVProducerBase):
                     '    ! level name=volumelevel message=true '
                     '    ! @feeder:audio@' % (self.video_format, ))
 
-    def get_pipeline_string(self, props):
+    def _parse_aditional_properties(self, props):
         self.video_format = props.get('video-format', 8)
-        return avproducer.AVProducerBase.get_pipeline_string(self, props)
 
 GUIClass = admin_gtk.AVProducerAdminGtk
