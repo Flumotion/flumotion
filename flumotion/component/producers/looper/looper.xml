@@ -20,13 +20,8 @@ looping continuously.">
 
       <synchronization required="yes" clock-priority="110" />
 
-      <properties>
-        <property name="height" type="int"
-                  _description="The height to scale the video to." />
-        <property name="width" type="int"
-                  _description="The width to scale the video to." />
-        <property name="framerate" type="fraction"
-                  _description="Framerate to output" />
+      <properties xmlns:xi="http://www.w3.org/2001/XInclude">
+        <xi:include href="flumotion/component/common/avproducer/properties.xml"/>
         <property name="location" type="string" required="yes"
                   _description="The location of the source file to loop." />
       </properties>
