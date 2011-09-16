@@ -18,7 +18,6 @@
 from flumotion.common import messages, gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component.common.avproducer import avproducer
-from flumotion.component.common.avproducer import admin_gtk
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -116,6 +115,3 @@ class Firewire(avproducer.AVProducerBase):
                             mid="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)
-
-
-GUIClass = admin_gtk.AVProducerAdminGtk

@@ -17,7 +17,6 @@
 
 from flumotion.common.i18n import gettexter
 from flumotion.component.common.avproducer import avproducer
-from flumotion.component.common.avproducer import admin_gtk
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -36,5 +35,3 @@ class BlackMagic(avproducer.AVProducerBase):
 
     def _parse_aditional_properties(self, props):
         self.video_format = props.get('video-format', 8)
-
-GUIClass = admin_gtk.AVProducerAdminGtk
