@@ -147,6 +147,11 @@ class Icecast(feedcomponent.ParseLaunchComponent):
 
     def _reset(self, pad):
         # remove all the elements downstream souphttpsrc.
+        if not self._parser_name:
+            self.reconnecting = True
+            self.reconnector.start()
+            return
+
         tf = self.get_element('tf')
         pad.unlink(tf.get_pad('sink'))
 
