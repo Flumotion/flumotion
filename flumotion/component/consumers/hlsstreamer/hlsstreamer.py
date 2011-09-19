@@ -97,6 +97,7 @@ class HLSStreamer(FragmentedStreamer, Stats):
             self.hls_url = self.getUrl()
 
         self.hlsring.setHostname(self.hls_url)
+        self.soft_restart()
 
     def soft_restart(self):
         """Stops serving fragments, resets the playlist and starts
@@ -106,6 +107,7 @@ class HLSStreamer(FragmentedStreamer, Stats):
                   "the initial fragments window")
         self._ready = False
         self._fragmentsCount = 0
+        self._last_index = 0
         self.hlsring.reset()
 
     def _configure_sink(self):
@@ -129,6 +131,11 @@ class HLSStreamer(FragmentedStreamer, Stats):
         b = fragment.get_property('buffer')
         index = fragment.get_property('index')
         duration = fragment.get_property('duration')
+
+        if index < self._last_index:
+            self.warning("Found a discontinuity last index is %s but current "
+                         "one is %s", self._last_index, index)
+            self.soft_restart()
 
         fragName = self.hlsring.addFragment(b.data, index,
                 round(duration / float(gst.SECOND)))
