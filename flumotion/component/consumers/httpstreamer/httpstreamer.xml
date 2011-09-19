@@ -70,6 +70,7 @@
 
     <bundle name="httpstreamer-admin-gtk">
         <dependencies>
+            <dependency name="httpstreamer-base" />
             <dependency name="streamer-admin-gtk" />
         </dependencies>
         <directories>
