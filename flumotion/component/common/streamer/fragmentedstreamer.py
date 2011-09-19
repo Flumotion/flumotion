@@ -78,6 +78,7 @@ class FragmentedStreamer(Streamer, Stats):
 
     logCategory = 'fragmented-streamer'
     siteClass = Site
+    multi_files = True
 
     def init(self):
         self.debug("HTTP live fragmented streamer initialising")

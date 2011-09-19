@@ -262,6 +262,7 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
 
     componentMediumClass = HTTPMedium
     siteClass = server.Site
+    multi_files = False
 
     def init(self):
         reactor.debug = True
@@ -604,8 +605,12 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
 
             self._porterDeferred = d = defer.Deferred()
             mountpoints = [self.mountPoint]
-            self._pbclient = porterclient.HTTPPorterClientFactory(
-                self.siteClass(resource=root), mountpoints, d)
+            if self.multi_files:
+                self._pbclient = porterclient.HTTPPorterClientFactory(
+                    self.siteClass(resource=root), [], d, prefixes=mountpoints)
+            else:
+                self._pbclient = porterclient.HTTPPorterClientFactory(
+                    self.siteClass(resource=root), mountpoints, d)
 
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
