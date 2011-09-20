@@ -26,15 +26,15 @@ from flumotion.component.common.streamer.streamer import \
 
 class Stats(Statistics):
 
-    def __init__(self, request):
+    def __init__(self, resource):
         Statistics.__init__(self)
-        self.request = request
+        self.resource = resource
 
     def getBytesSent(self):
-        return self.request.getBytesSent()
+        return self.resource.getBytesSent()
 
     def getBytesReceived(self):
-        return self.request.getBytesReceived()
+        return self.resource.getBytesReceived()
 
 
 class LoggableRequest(server.Request):
