@@ -134,6 +134,10 @@ class FragmentedResource(HTTPStreamingResource, log.Loggable):
         self.streamer.clientAdded()
 
     def _removeClient(self, uid):
+        if uid in self._removing:
+            self.debug("client is removed; firing deferred")
+            removeD = self._removing.pop(uid)
+            removeD.callback(None)
         HTTPStreamingResource._removeClient(self, uid)
         self.log("session %s expired", uid)
         self.streamer.clientRemoved()

@@ -94,7 +94,6 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
         # This will close the underlying socket. We first remove the request
         # from our fd->request map, since the moment we call this the fd might
         # get re-added.
-        resources.HTTPStreamingResource._removeClient(self, fd)
         request.transport.loseConnection()
 
         self.debug('[fd %5d] closed transport %r' % (fd, request.transport))
@@ -105,6 +104,7 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
                 removeD = self._removing.pop(fd)
                 removeD.callback(None)
 
+            resources.HTTPStreamingResource._removeClient(self, fd)
             # PROBE: finished request; see httpserver.httpserver
             self.debug('[fd %5d] (ts %f) finished request %r',
                        fd, time.time(), request)

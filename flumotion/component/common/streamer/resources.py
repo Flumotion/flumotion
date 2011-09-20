@@ -97,7 +97,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
     def removeAllClients(self):
         l = []
-        for fd in self._requests:
+        for fd in self._requests.keys():
             self._removing[fd] = defer.Deferred()
             l.append(self._removing[fd])
             self.streamer.remove_client(fd)

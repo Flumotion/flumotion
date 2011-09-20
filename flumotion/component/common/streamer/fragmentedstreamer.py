@@ -108,6 +108,11 @@ class FragmentedStreamer(Streamer, Stats):
         Stats.__init__(self, self.resource)
         self.resource.setMountPoint(self.mountPoint)
 
+    def remove_client(self, session_id):
+        session = self._site.sessions.get(session_id, None)
+        if session is not None:
+            session.expire()
+
     def update_bytes_received(self, length):
         self.resource.bytesReceived += length
 

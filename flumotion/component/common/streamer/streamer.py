@@ -582,13 +582,19 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
         return d
 
     def remove_all_clients(self):
-        self.resource.removeAllClients()
+        """ Remove all the the clients
+
+        Returns a deferred fired once all clients have been removed
+        """
+        if self.resource:
+            return self.resource.removeAllClients()
 
     def _get_root():
         raise NotImplementedError("getRoot must be implemented by subclasses")
 
     def do_setup(self):
         root = self._get_root()
+        self._site = self.siteClass(resource=root)
         if self.type == 'slave':
             # Streamer is slaved to a porter.
 
@@ -607,10 +613,10 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
             mountpoints = [self.mountPoint]
             if self.multi_files:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    self.siteClass(resource=root), [], d, prefixes=mountpoints)
+                    self._site, [], d, prefixes=mountpoints)
             else:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    self.siteClass(resource=root), mountpoints, d)
+                    self._site, mountpoints, d)
 
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
@@ -628,8 +634,7 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
                 self.info('Listening on port %d, interface=%r',
                           self.port, iface)
                 self._tport = reactor.listenTCP(
-                    self.port, self.siteClass(resource=root),
-                    interface=iface)
+                    self.port, self._site, interface=iface)
             except error.CannotListenError:
                 t = 'Port %d is not available.' % self.port
                 self.warning(t)
