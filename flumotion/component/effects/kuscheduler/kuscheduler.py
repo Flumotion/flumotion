@@ -62,7 +62,7 @@ class GstKeyUnitsScheduler(gst.Element):
         self.srcpad = gst.Pad(self._srcpadtemplate, "src")
         self.add_pad(self.srcpad)
 
-        self._last_ts = 0
+        self._last_ts = 0L
         self._count = 0
         self.interval = DEFAULT_INTERVAL
 
@@ -93,7 +93,7 @@ class GstKeyUnitsScheduler(gst.Element):
 
     def do_change_state(self, transition):
         if transition == gst.STATE_CHANGE_PAUSED_TO_READY:
-            self._last_ts = 0
+            self._last_ts = 0L
             self._count = 0
         return gst.Element.do_change_state(self, transition)
 
