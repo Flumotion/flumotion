@@ -87,7 +87,7 @@ class Looper(avproducer.AVProducerBase):
         return [checks.checkTicket349()]
 
     def get_raw_video_element(self):
-        return self.pipeline.get_by_name('theoradec')
+        return self.pipeline.get_by_name('vident')
 
     def get_pipeline_template(self):
         template = (
