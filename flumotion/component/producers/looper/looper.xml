@@ -48,7 +48,7 @@ looping continuously.">
     <bundle name="looper-admin-gtk">
       <dependencies>
         <dependency name="looper-base" />
-        <dependency name="base-admin-gtk" />
+        <dependency name="avproducer-admin-gtk" />
       </dependencies>
 
       <directories>

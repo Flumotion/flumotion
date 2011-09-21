@@ -20,8 +20,8 @@ import gettext
 
 import gst
 
-from flumotion.component.base.admin_gtk import BaseAdminGtk
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
+from flumotion.component.common.avproducer.admin_gtk import AVProducerAdminGtk
 from flumotion.ui.glade import GladeWidget
 
 __version__ = "$Rev$"
@@ -119,12 +119,12 @@ class LooperNode(BaseAdminGtkNode):
             handler(value)
 
 
-class LooperAdminGtk(BaseAdminGtk):
+class LooperAdminGtk(AVProducerAdminGtk):
 
     def setup(self):
         looper = LooperNode(self.state, self.admin, title=_("Looper"))
         self.nodes['Looper'] = looper
 
-        return BaseAdminGtk.setup(self)
+        return AVProducerAdminGtk.setup(self)
 
 GUIClass = LooperAdminGtk
