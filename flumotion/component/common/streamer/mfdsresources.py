@@ -226,7 +226,7 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
                     fd, e.strerror, e.errno))
             return
 
-        self._addClient(fd)
+        self._addClient(fd, request)
 
         # hand it to multifdsink
         self.streamer.add_client(fd, request)
