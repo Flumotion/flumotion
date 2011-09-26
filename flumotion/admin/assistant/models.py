@@ -329,6 +329,13 @@ class AudioProducer(Producer):
     """I am a component which produces audio
     """
 
+    def getSamplerate(self):
+        """Get the samplerate audio producer
+        @returns: the samplerate
+        @rtype: int
+        """
+        return self.getProperties().samplerate
+
 
 class VideoProducer(Producer):
     """I am a component which produces video
