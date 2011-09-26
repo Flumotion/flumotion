@@ -1,4 +1,19 @@
-This is Flumotion 0.9.1 "Jazz"
+This is Flumotion 0.10.0 "Shunka"
+
+Features since 0.9.1:
+
+  * Flumotion now supports HTTP Live Streaming with fragmented webm
+
+Bugs fixed since 0.9.1:
+
+  * #1127 : flumotion-admin: The License page is obscure and maybe useless
+  * #1205 : wizard's file selector dialog doesn't display current directory
+  * #1211 : Flumotion admin segfaults when it is called on a console without a display
+  * #1402 : BaseComponent.removeMessage
+  * #1416 : registry cache should be updated atomically
+  * #1527 : Create a base class for Audio/Video producers
+  * #1528 : Add support for XIncllude in the components XML
+  * #1531 : Compound properties are not properly formatted when exporting configuration using the admin
 
 Features since 0.8.1:
 

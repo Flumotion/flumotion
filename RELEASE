@@ -1,7 +1,7 @@
-Release notes for Flumotion 0.9.1 "Jazz"
+Release notes for Flumotion Flash 0.10.0 "Shunka"
         
 The Flumotion team announces
-a new release of the development 0.9 branch
+a new release of the stable 0.10 branch
 of the Flumotion Streaming Server.
 
 Flumotion is a streaming media server created with the backing of
@@ -12,37 +12,24 @@ even novice system administrators. Flumotion is released under the LGPL.
 
 Features of this release
 
-      * We have included a producer and a consumer that can comunicate using
-        gdp using authentication. Flumotion can now be used as an external
-        encoder to qpush to another flow without sharing the manager.
-      * Blackmagic SDI capture cards support.
-      * Modifiable properties: Theora and VP8 encoder's bitrate can now be
-        modified through flumotion-command (admin UI comming soon!).
-        e.g. flumotion-command component -i "/default/encoder-video" invoke modifyProperty bitrate 400
-
+      * Flumotion now supports HTTP Live Streaming with webm
 
 Bugs fixed in this release
 
-      * #778 : need a way to mark manager and worker as disabled so that service scripts ignore them or report them as disabled
-      * #1004 : When a worker gets stopped, all sad components for that worker should go sleeping
-      * #1403 : ondemand component doesn't act on changes to /etc/mime.types
-      * #1463 : pad monitor does not say which component, only the eater
-      * #1472 : http-streamer admin view not showing the right port when configured in slave mode
-      * #1473 : Webcam test did not work
-      * #1481 : Right-click causes an exception on the flumotion-admin tray icon
-      * #1483 : Write disker indexes progressively
-      * #1484 : identities are logging too much
-      * #1490 : [effects] Rename the audiorate element to audioconvert and add support for audio conversion too
-      * #1501 : Audiorate effect should fallback to audioresample if legacyresample is not available
-      * #1502 : importing kiwi makes the application to crash on newest pygobject
-      * #1507 : Update theora-encoder properties
-      * #1511 : http-server admin view not showing the right port when configured in slave mode
-      * #1512 : Allow parsing timezones with missing TZNAME
-      * #1513 : [ical] The daylight change date is not calculated properly
-      * #1516 : flumotion/extern/command/manholecmd.py should be .gitignored
-      * #1518 : Adding support for Blackmagic Decklink SDI through mmtblackmagicsrc gstreamer component
-      * #1519 : V4l2 should be the default source for the webcam producer
-      * #1522 : Error parsing ical file
+      * #1127 : flumotion-admin: The License page is obscure and maybe useless
+      * #1205 : wizard's file selector dialog doesn't display current directory
+      * #1211 : Flumotion admin segfaults when it is called on a console without a display
+      * #1402 : BaseComponent.removeMessage
+      * #1416 : registry cache should be updated atomically
+      * #1527 : Create a base class for Audio/Video producers
+      * #1528 : Add support for XIncllude in the components XML
+      * #1531 : Compound properties are not properly formatted when exporting configuration using the admin
+
+
+Notes
+
+It has been decided to move the SDI producer component to a separate
+project due to licensing concerns of the GStreamer plugin it uses.
 
 
 Download
@@ -50,7 +37,7 @@ Download
 You can find source releases of flumotion in the download directory:
 http://flumotion.net/src/flumotion/
 
-You can also find deb packages for lucid in our ppa:
+You can also find deb packages for ubuntu/debian in our ppa:
 https://launchpad.net/~flumotion-dev
 
 Flumotion Homepage
@@ -60,14 +47,14 @@ More details can be found on the project's website: http://flumotion.net/
 Support and Bugs
 
 We use an issue tracker for bug reports and feature requests (requires login):
-https://code.fluendo.com/flumotion/trac/newticket
+https://code.flumotion.com/flumotion/trac/newticket?component=flumotion
 
 Developers
 
-You can browse the repository of SVN code from our tracker.
+You can browse the repository of git code from our tracker.
 
-All code is in SVN and can be checked out from there.
-It is hosted on https://code.fluendo.com/flumotion/svn/
+All code is in git and can be checked out from there.
+It is hosted on https://code.flumotion.com/cgit/flumotion/
 
 
 Contributors to this release

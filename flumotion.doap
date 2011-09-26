@@ -369,4 +369,13 @@ differences that were added after 0.6.1.
    <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.9.1.tar.bz2" />
   </Version>
  </release>
+ <release>
+  <Version>
+   <revision>0.10.0</revision>
+   <branch>0.10</branch>
+   <name>Shunka</name>
+   <created>2011-10-05</created>
+   <file-release rdf:resource="http://www.flumotion.net/src/flumotion/flumotion-0.10.0.tar.bz2" />
+  </Version>
+ </release>
 </Project>
