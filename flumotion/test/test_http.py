@@ -20,9 +20,9 @@ from twisted.web import http, server
 
 from flumotion.component.base.http import HTTPAuthentication
 from flumotion.component.common.streamer.resources import HTTP_VERSION,\
-        ERROR_TEMPLATE, HTTPRoot
+        ERROR_TEMPLATE
 from flumotion.component.common.streamer.mfdsresources import \
-        MultiFdSinkStreamingResource
+        MultiFdSinkStreamingResource, HTTPRoot
 from flumotion.common import keycards, log, errors
 from flumotion.common import testsuite
 

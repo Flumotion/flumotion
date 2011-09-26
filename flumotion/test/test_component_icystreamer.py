@@ -16,17 +16,14 @@
 # Headers in this file shall remain intact.
 
 import gst
-import re
 
-from twisted.python import failure
-from twisted.internet import defer, reactor, interfaces, gtk2reactor
-from twisted.web import client, error
+from twisted.internet import reactor
+from twisted.web import client
 
 from flumotion.common import testsuite, netutils
-from flumotion.common import log, errors
+from flumotion.common import log
 from flumotion.common.planet import moods
-from flumotion.component.consumers.httpstreamer import icystreamer, icymux
-from flumotion.common import gstreamer
+from flumotion.component.consumers.icystreamer import icystreamer
 
 from flumotion.test import comptest
 

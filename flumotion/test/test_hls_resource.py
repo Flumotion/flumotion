@@ -221,6 +221,7 @@ class TestAppleStreamerSessions(unittest.TestCase):
         self.streamer = FakeStreamer()
         self.resource = resources.HTTPLiveStreamingResource(
                 self.streamer, self.streamer.httpauth, 'secret', 0.001)
+        self.resource.setMountPoint(self.streamer.mountPoint)
         self.site = server.Site(self.resource)
 
     def testNotReady(self):
