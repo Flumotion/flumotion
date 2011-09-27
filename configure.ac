@@ -161,6 +161,7 @@ flumotion/component/bouncers/algorithms/Makefile
 flumotion/component/common/Makefile
 flumotion/component/common/fgdp/Makefile
 flumotion/component/common/avproducer/Makefile
+flumotion/component/common/streamer/Makefile
 flumotion/component/effects/Makefile
 flumotion/component/effects/audioconvert/Makefile
 flumotion/component/effects/audioresync/Makefile
@@ -177,6 +178,7 @@ flumotion/component/combiners/switch/Makefile
 flumotion/component/consumers/Makefile
 flumotion/component/consumers/disker/Makefile
 flumotion/component/consumers/fgdp/Makefile
+flumotion/component/consumers/icystreamer/Makefile
 flumotion/component/consumers/httpstreamer/Makefile
 flumotion/component/consumers/hlsstreamer/Makefile
 flumotion/component/consumers/pipeline/Makefile

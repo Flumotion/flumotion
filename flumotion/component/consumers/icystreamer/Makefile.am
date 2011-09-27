@@ -2,14 +2,15 @@ include $(top_srcdir)/common/python.mk
 
 component_PYTHON = 		\
 	__init__.py 		\
-	httpstreamer.py 	\
-	admin_gtk.py 		\
-	wizard_gtk.py
+	icystreamer.py  	\
+	icymux.py 		\
+	resources.py 		\
+	admin_gtk.py
 
-componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/httpstreamer
+componentdir = $(libdir)/flumotion/python/flumotion/component/consumers/icystreamer
 component_DATA = 			\
-	httpstreamer.xml 		\
-	wizard.glade
+	icystreamer.xml 		\
+	icytab.glade
 
 clean-local:
 	rm -rf *.pyc *.pyo

@@ -18,7 +18,6 @@
 from flumotion.common import messages, gstreamer
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component.common.avproducer import avproducer
-from flumotion.component.common.avproducer import admin_gtk
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -53,11 +52,6 @@ class Firewire(avproducer.AVProducerBase):
                 '    ! @feeder:audio@'
                 '    t. ! queue ! @feeder:dv@' % (self.guid, self.decoder_str))
 
-    def get_pipeline_string(self, props):
-        self.decoder_str = props.get('decoder', 'dvdec')
-        self.guid = "guid=%s" % props.get('guid', 0)
-        return avproducer.AVProducerBase.get_pipeline_string(self, props)
-
     def configure_pipeline(self, pipeline, properties):
         # catch bus message for when camera disappears
         bus = pipeline.get_bus()
@@ -81,6 +75,10 @@ class Firewire(avproducer.AVProducerBase):
             self.decoder.set_property('drop-factor', drop_factor)
         return avproducer.AVProducerBase.configure_pipeline(self, pipeline,
                                                             properties)
+
+    def _parse_aditional_properties(self, props):
+        self.decoder_str = props.get('decoder', 'dvdec')
+        self.guid = "guid=%s" % props.get('guid', 0)
 
     # detect camera unplugging or other cause of firewire bus reset
 
@@ -117,6 +115,3 @@ class Firewire(avproducer.AVProducerBase):
                             mid="firewire-bus-reset-%d" % s['nodecount'],
                             priority=40)
                         self.state.append('messages', m)
-
-
-GUIClass = admin_gtk.AVProducerAdminGtk

@@ -25,6 +25,9 @@ except ImportError:
     from twisted.protocols import http
 
 from flumotion.common import keycards, errors
+import flumotion.component.common.streamer.fragmentedresource as fresources
+from flumotion.component.common.streamer.resources import ERROR_TEMPLATE,\
+    HTTP_VERSION
 from flumotion.component.consumers.hlsstreamer import resources, hlsring
 from flumotion.component.base.http import HTTPAuthentication
 
@@ -182,11 +185,10 @@ class TestAppleStreamerSessions(unittest.TestCase):
             errorCode = http.UNAUTHORIZED
             self.assertEquals(request.headers.get('content-type', ''),
                 'text/html')
-            self.assertEquals(request.headers.get('server', ''),
-                resources.HTTP_VERSION)
+            self.assertEquals(request.headers.get('server', ''), HTTP_VERSION)
             self.assertEquals(request.response, errorCode)
 
-            expected = resources.ERROR_TEMPLATE % {
+            expected = ERROR_TEMPLATE % {
                 'code': errorCode,
                 'error': http.RESPONSES[errorCode]}
             self.checkResponse(request, expected)
@@ -219,6 +221,7 @@ class TestAppleStreamerSessions(unittest.TestCase):
         self.streamer = FakeStreamer()
         self.resource = resources.HTTPLiveStreamingResource(
                 self.streamer, self.streamer.httpauth, 'secret', 0.001)
+        self.resource.setMountPoint(self.streamer.mountPoint)
         self.site = server.Site(self.resource)
 
     def testNotReady(self):
@@ -236,14 +239,14 @@ class TestAppleStreamerSessions(unittest.TestCase):
     def testForbiddenRequest(self):
         request = FakeRequest(self.site, "GET", "test.m3u8")
         self.resource.render_GET(request)
-        expected = resources.ERROR_TEMPLATE % {
+        expected = ERROR_TEMPLATE % {
                 'code': http.FORBIDDEN,
                 'error': http.RESPONSES[http.FORBIDDEN]}
         self.assertEquals(expected, request.data)
 
     def testPlaylistNotFound(self):
         d = self.processRequest("GET", "/localhost/test.m3u8")
-        expected = resources.ERROR_TEMPLATE % {
+        expected = ERROR_TEMPLATE % {
                 'code': http.NOT_FOUND,
                 'error': http.RESPONSES[http.NOT_FOUND]}
         d.addCallback(self.checkResponse, expected)
@@ -251,7 +254,7 @@ class TestAppleStreamerSessions(unittest.TestCase):
 
     def testFragmentNotFound(self):
         d = self.processRequest("GET", "/localhost/test.ts")
-        expected = resources.ERROR_TEMPLATE % {
+        expected = ERROR_TEMPLATE % {
                 'code': http.NOT_FOUND,
                 'error': http.RESPONSES[http.NOT_FOUND]}
         d.addCallback(self.checkResponse, expected)
@@ -270,7 +273,7 @@ class TestAppleStreamerSessions(unittest.TestCase):
     def testNewSession(self):
 
         def checkSessionCreated(request):
-            cookie = request.getCookie(resources.COOKIE_NAME)
+            cookie = request.getCookie(fresources.COOKIE_NAME)
             self.failIf(cookie is None)
             sessionID = base64.b64decode(cookie).split(':')[0]
             session = self.site.sessions.get(sessionID, None)
@@ -290,7 +293,7 @@ class TestAppleStreamerSessions(unittest.TestCase):
                 d.cancel()
 
         def checkSessionExpired(request):
-            cookie = request.getCookie(resources.COOKIE_NAME)
+            cookie = request.getCookie(fresources.COOKIE_NAME)
             self.failIf(cookie is None)
             sessionID = base64.b64decode(cookie).split(':')[0]
             session = self.site.sessions.get(sessionID, None)
@@ -299,7 +302,7 @@ class TestAppleStreamerSessions(unittest.TestCase):
             session.notifyOnExpire(lambda: d1.callback(''))
             return d1
 
-        resources.SESSION_TIMEOUT = 1
+        fresources.SESSION_TIMEOUT = 1
         d = self.processRequest("GET", "/localhost/stream.m3u8")
         d.addCallback(checkSessionExpired)
         return d
@@ -312,20 +315,20 @@ class TestAppleStreamerSessions(unittest.TestCase):
         cookie = self.resource._generateToken(SESSIONID, IP1, 0)
         # Test wrong IP
         self.assertEquals(self.resource._cookieIsValid(
-            cookie, IP2, SESSIONID)[0], resources.NOT_VALID)
+            cookie, IP2, SESSIONID)[0], fresources.NOT_VALID)
         # Test Bad Signature
         cookie = self.resource._generateToken(SESSIONID, IP1, 0)
         self.resource.secretKey= 'bad-secret'
         self.assertEquals(self.resource._cookieIsValid(
-            cookie, IP1, SESSIONID)[0], resources.NOT_VALID)
+            cookie, IP1, SESSIONID)[0], fresources.NOT_VALID)
         # Test authentication expired
         cookie = self.resource._generateToken(SESSIONID, IP1, 1)
         self.assertEquals(self.resource._cookieIsValid(
-            cookie, IP1, SESSIONID)[0], resources.RENEW_AUTH)
+            cookie, IP1, SESSIONID)[0], fresources.RENEW_AUTH)
         # Test different sessions ID
         cookie = self.resource._generateToken(SESSIONID, IP1, 1)
         self.assertEquals(self.resource._cookieIsValid(
-            cookie, IP1, SESSIONID+'1')[0], resources.NOT_VALID)
+            cookie, IP1, SESSIONID+'1')[0], fresources.NOT_VALID)
 
     def testRenderHTTPAuthUnauthorized(self):
         self.streamer.httpauth.setBouncerName('fakebouncer')
@@ -345,17 +348,17 @@ class TestAppleStreamerSessions(unittest.TestCase):
         def checkSessionID(request):
             # The auth is not valid anymore and has been renewed,
             # but the session should stay the same
-            cookie = request.getCookie(resources.COOKIE_NAME)
+            cookie = request.getCookie(fresources.COOKIE_NAME)
             self.failIf(cookie is None)
             sessionID, authExpiracy, none = \
                    base64.b64decode(cookie).split(':')
-            self.assertEquals(authExpiracy, '10')
+            self.assertEquals(authExpiracy, '0')
             self.assertEquals(sessionID, self.sessionID)
             for d in reactor.getDelayedCalls():
                 d.cancel()
 
         def resendRequest(request):
-            cookie = request.getCookie(resources.COOKIE_NAME)
+            cookie = request.getCookie(fresources.COOKIE_NAME)
             self.failIf(cookie is None)
             self.sessionID = base64.b64decode(cookie).split(':')[0]
             cookie = self.resource._generateToken(

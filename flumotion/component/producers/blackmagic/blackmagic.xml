@@ -10,7 +10,7 @@
       <entries>
         <entry type="component" location="blackmagic.py"
                function="BlackMagic" />
-        <entry type="admin/gtk" location="blackmagic.py"
+        <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
       </entries>
 
@@ -40,6 +40,11 @@
        <dependencies>
            <dependency name="avproducer-admin-gtk" />
        </dependencies>
+       <directories>
+           <directory name="flumotion/component/producers/blackmagic">
+               <filename location="admin_gtk.py" />
+           </directory>
+       </directories>
     </bundle>
 
     <bundle name="blackmagic-component">

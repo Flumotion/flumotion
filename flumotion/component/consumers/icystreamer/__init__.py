@@ -1,4 +1,4 @@
-# -*- Mode: Python; test-case-name: flumotion.test.test_http -*-
+# -*- Mode: Python -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
 # Flumotion - a streaming media server
@@ -15,12 +15,4 @@
 #
 # Headers in this file shall remain intact.
 
-from flumotion.component.common.streamer.multifdsinkstreamer import \
-        MultifdSinkStreamer
-
-__all__ = ['HTTPStreamer']
 __version__ = "$Rev$"
-
-
-class HTTPStreamer(MultifdSinkStreamer):
-    pass

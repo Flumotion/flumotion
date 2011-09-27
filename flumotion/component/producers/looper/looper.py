@@ -21,6 +21,7 @@ import gobject
 from flumotion.common import errors, messages
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
+from flumotion.component.common.avproducer import avproducer
 
 __version__ = "$Rev$"
 T_ = gettexter()
@@ -52,7 +53,7 @@ class LooperMedium(feedcomponent.FeedComponentMedium):
 # asynchronously, just do a new segment seek.
 
 
-class Looper(feedcomponent.ParseLaunchComponent):
+class Looper(avproducer.AVProducerBase):
 
     componentMediumClass = LooperMedium
 
@@ -71,12 +72,7 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.uiState.addKey('num-iterations', 0)
         self.uiState.addKey('position', 0)
 
-    def do_check(self):
-
-        def on_result(result):
-            for m in result.messages:
-                self.addMessage(m)
-
+    def _do_extra_checks(self):
         from flumotion.component.producers import checks
         version = checks.get_pygst_version(gst)
         if version >= (0, 10, 11, 0) and version < (0, 10, 14, 0):
@@ -88,46 +84,26 @@ class Looper(feedcomponent.ParseLaunchComponent):
                          'update to the latest release')
             self.warning('... just so you know, in case it crashes')
 
-        d = checks.checkTicket349()
-        d.addCallback(on_result)
-        return d
+        return [checks.checkTicket349()]
 
-    def get_pipeline_string(self, properties):
-        # setup the properties
-        self.bus = None
-        self.videowidth = properties.get('width', 240)
-        self.videoheight = properties.get(
-            'height', int(576 * self.videowidth/720.))
-        self.videoframerate = properties.get('framerate', (25, 2))
-        self.filelocation = properties.get('location')
+    def get_raw_video_element(self):
+        return self.pipeline.get_by_name('vident')
 
-        vstruct = gst.structure_from_string(
-            "video/x-raw-yuv,width=%(width)d,height=%(height)d" %
-            dict(width=self.videowidth, height=self.videoheight))
-        vstruct['framerate'] = gst.Fraction(self.videoframerate[0],
-                                            self.videoframerate[1])
-
-        vcaps = gst.Caps(vstruct)
-
-        self.run_discoverer()
-
+    def get_pipeline_template(self):
         template = (
             'filesrc location=%(location)s'
             '       ! oggdemux name=demux'
             '    demux. ! queue ! theoradec name=theoradec'
-            '       ! identity name=videolive single-segment=true silent=true'
-            '       ! videorate name=videorate'
-            '       ! videoscale'
-            '       ! %(vcaps)s'
-            '       ! identity name=vident sync=true silent=true'
+            '       ! identity name=vident single-segment=true sync=true '
+            '                  silent=true'
             '       ! @feeder:video@'
             '    demux. ! queue ! vorbisdec name=vorbisdec'
-            '       ! identity name=audiolive single-segment=true silent=true'
-            '       ! audioconvert'
-            '       ! audio/x-raw-int,width=16,depth=16,signed=(boolean)true'
-            '       ! identity name=aident sync=true silent=true'
+            '       ! volume name=setvolume'
+            '       ! level name=volumelevel message=true '
+            '       ! identity name=aident single-segment=true sync=true '
+            '                  silent=true'
             '       ! @feeder:audio@'
-            % dict(location=self.filelocation, vcaps=vcaps))
+            % dict(location=self.filelocation))
 
         return template
 
@@ -178,6 +154,8 @@ class Looper(feedcomponent.ParseLaunchComponent):
         self.uiState.set('num-iterations', self.nbiterations)
 
     def configure_pipeline(self, pipeline, properties):
+        avproducer.AVProducerBase.configure_pipeline(self, pipeline,
+                                                     properties)
 
         def on_message(bus, message):
             handlers = {(pipeline, gst.MESSAGE_SEGMENT_DONE):
@@ -252,3 +230,9 @@ class Looper(feedcomponent.ParseLaunchComponent):
             self.timeoutid = 0
 
         self.nbiterations = 0
+
+    def _parse_aditional_properties(self, properties):
+        # setup the properties
+        self.bus = None
+        self.filelocation = properties.get('location')
+        self.run_discoverer()

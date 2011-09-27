@@ -10,7 +10,7 @@
       <entries>
         <entry type="component" location="firewire.py"
                function="Firewire" />
-        <entry type="admin/gtk" location="firewire.py"
+        <entry type="admin/gtk" location="admin_gtk.py"
                function="GUIClass" />
         <entry type="wizard" location="wizard_gtk.py"
                function="FireWireWizardPlugin" />
@@ -66,6 +66,11 @@
        <dependencies>
            <dependency name="avproducer-admin-gtk" />
        </dependencies>
+        <directories>
+            <directory name="flumotion/component/producers/firewire">
+                <filename location="admin_gtk.py" />
+            </directory>
+        </directories>
     </bundle>
 
     <bundle name="firewire-wizard">

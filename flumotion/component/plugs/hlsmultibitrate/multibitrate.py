@@ -58,7 +58,7 @@ class PlaylistResource(Resource):
 
         # If the target bitrate was not set, sort by user-agent
         agent = request.getHeader('User-Agent')
-        if agent and not target_bitrate:
+        if agent and not self._target_bitrate:
             if 'ipad' in agent.lower():
                 self._target_bitrate = IPAD_TARGET
             else:

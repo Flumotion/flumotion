@@ -1,24 +1,19 @@
 <registry>
   <components>
-    <component type="http-streamer"
-               base="flumotion/component/consumers/httpstreamer"
-               _description="A consumer that streams over HTTP.">
+    <component type="icy-streamer"
+               base="flumotion/component/consumers/icystreamer"
+               _description="A consumer that streams ICY stream over HTTP.">
 <!-- old way of specifying component source -->
-      <source location="flumotion.component.consumers.httpstreamer.httpstreamer" />
+      <source location="flumotion.component.consumers.icystreamer.icystreamer" />
 
       <eater name="default" />
-
-      <wizard type="consumer" feeder="default"
-              _description="S_tream over HTTP" rank="128"/>
-
+      
       <!-- entry points for distributable code bundles -->
-      <entries>
-        <entry type="component" location="httpstreamer.py"
-               function="HTTPStreamer" />
+     <entries>
+        <entry type="component" location="icystreamer.py"
+               function="ICYStreamer" />
         <entry type="admin/gtk" location="admin_gtk.py"
-               function="GUIClass" />
-        <entry type="wizard" location="wizard_gtk.py"
-               function="HTTPStreamerWizardPlugin" />
+               function="ICYStreamerAdminGtk" />
       </entries>
 
       <sockets>
@@ -49,6 +44,10 @@
                   _description="How much data to burst (in KB)." />
         <property name="burst-time" type="float"
                   _description="How much data to burst (in seconds)." />
+	<property name="frame-size" type="int"
+		  _description="Size of the frame in bytes." />
+	<property name="metadata-interval" type="float"
+		  _description="How offten to send the stream title changes (in seconds)." />
       </properties>
     </component>
 
@@ -56,52 +55,29 @@
 
   <bundles>
 
-    <bundle name="httpstreamer-base">
-        <dependencies>
-            <dependency name="streamer-base" />
-        </dependencies>
-
-        <directories>
-            <directory name="flumotion/component/consumers/httpstreamer">
-                <filename location="__init__.py" />
-            </directory>
-        </directories>
-    </bundle>
-
-    <bundle name="httpstreamer-admin-gtk">
-        <dependencies>
-            <dependency name="httpstreamer-base" />
-            <dependency name="streamer-admin-gtk" />
-        </dependencies>
-        <directories>
-            <directory name="flumotion/component/consumers/httpstreamer">
-                <filename location="admin_gtk.py" />
-            </directory>
-        </directories>
-    </bundle>
-
-    <bundle name="httpstreamer-wizard">
+    <bundle name="icystreamer-admin-gtk">
       <dependencies>
         <dependency name="httpstreamer-base" />
+	<dependency name="httpstreamer-admin-gtk" />
+        <dependency name="base-admin-gtk" />
       </dependencies>
 
       <directories>
-        <directory name="flumotion/component/consumers/httpstreamer">
-          <filename location="wizard.glade" />
-          <filename location="wizard_gtk.py" />
+        <directory name="flumotion/component/consumers/icystreamer">
+	  <filename location="icytab.glade" />
         </directory>
       </directories>
     </bundle>
 
-    <bundle name="httpstreamer-component">
+    <bundle name="icystreamer-component">
         <dependencies>
-            <dependency name="multifdsink-streamer-component" />
-            <dependency name="httpstreamer-base" />
+            <dependency name="httpstreamer-component" />
         </dependencies>
 
         <directories>
-            <directory name="flumotion/component/consumers/httpstreamer">
-                <filename location="httpstreamer.py" />
+            <directory name="flumotion/component/consumers/icystreamer">
+                <filename location="icymux.py" />
+                <filename location="icystreamer.py" />
             </directory>
         </directories>
     </bundle>

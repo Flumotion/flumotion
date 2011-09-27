@@ -108,6 +108,7 @@ class HLSSink(gst.Element):
 
         self._reset_fragment()
         self._last_fragment = None
+        self._last_event_ts = gst.CLOCK_TIME_NONE
 
         self.sinkpad = gst.Pad(self._sinkpadtemplate, "sink")
         self.sinkpad.set_chain_function(self.chainfunc)
@@ -119,9 +120,6 @@ class HLSSink(gst.Element):
             self._in_caps = True
             return gst.FLOW_OK
 
-        if buf.timestamp != gst.CLOCK_TIME_NONE and \
-                self._first_ts == gst.CLOCK_TIME_NONE:
-            self._first_ts = buf.timestamp
         self._fragment.append(buf)
         return gst.FLOW_OK
 
@@ -147,10 +145,10 @@ class HLSSink(gst.Element):
         # of the original sink
         pass
 
-    def _reset_fragment(self):
+    def _reset_fragment(self, last_event_ts = gst.CLOCK_TIME_NONE):
         self._fragment = []
         self._in_caps = False
-        self._first_ts = gst.CLOCK_TIME_NONE
+        self._last_event_ts = last_event_ts
 
     def _finish_fragment(self, timestamp, index):
         # Write streamheaders at the beginning of each fragment
@@ -160,19 +158,25 @@ class HLSSink(gst.Element):
             frag = list(s['streamheader'])
         frag.extend(self._fragment)
 
+        # Check for discontinuities
+        if self._last_event_ts == gst.CLOCK_TIME_NONE or\
+                timestamp <= self._last_event_ts:
+            self._reset_fragment(timestamp)
+            self._last_fragment = None
+            return
+
         # Create the GstBuffer
         data = ''.join([b.data for b in frag])
         buf = gst.Buffer(data)
-        buf.timestamp = self._first_ts
-        if buf.timestamp != gst.CLOCK_TIME_NONE:
-            buf.duration = timestamp - buf.timestamp
+        buf.timestamp = self._last_event_ts
+        buf.duration = timestamp - buf.timestamp
         if self._in_caps:
             buf.flag_set(gst.BUFFER_FLAG_IN_CAPS)
 
         # Create the GstFragment and emit the new-fragment signal
         self._last_fragment = Fragment(index, buf)
         self.emit('new-fragment')
-        self._reset_fragment()
+        self._reset_fragment(timestamp)
 
 
 def register():

@@ -21,7 +21,8 @@ from collections import deque
 from Crypto.Cipher import AES
 
 from twisted.internet import reactor
-from flumotion.component.consumers.hlsstreamer import common
+from flumotion.component.common.streamer.fragmentedresource import\
+    FragmentNotAvailable, FragmentNotFound, PlaylistNotFound, KeyNotFound
 
 
 class Playlister:
@@ -153,7 +154,7 @@ class Playlister:
             return self._renderMainPlaylist(args)
         elif playlist == self.streamPlaylist:
             return self._renderStreamPlaylist(args)
-        raise common.PlaylistNotFound()
+        raise PlaylistNotFound()
 
 
 class HLSRing(Playlister):
@@ -292,8 +293,8 @@ class HLSRing(Playlister):
         if fragmentName in self._fragmentsDict:
             return self._fragmentsDict[fragmentName]
         if fragmentName in self._dummyFragments:
-            raise common.FragmentNotAvailable()
-        raise common.FragmentNotFound()
+            raise FragmentNotAvailable()
+        raise FragmentNotFound()
 
     def getEncryptionKey(self, key):
         '''
@@ -309,4 +310,4 @@ class HLSRing(Playlister):
 
         if key in self._keysDict:
             return self._keysDict[key]
-        raise common.KeyNotFound()
+        raise KeyNotFound()

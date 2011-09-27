@@ -6,6 +6,7 @@ component_DATA = 		\
 
 component_PYTHON = 		\
 	__init__.py 		\
+	admin_gtk.py 		\
 	blackmagic.py
 
 clean-local:

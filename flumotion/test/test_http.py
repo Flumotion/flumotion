@@ -19,7 +19,10 @@ from twisted.internet import defer
 from twisted.web import http, server
 
 from flumotion.component.base.http import HTTPAuthentication
-from flumotion.component.consumers.httpstreamer import resources
+from flumotion.component.common.streamer.resources import HTTP_VERSION,\
+        ERROR_TEMPLATE
+from flumotion.component.common.streamer.mfdsresources import \
+        MultiFdSinkStreamingResource, HTTPRoot
 from flumotion.common import keycards, log, errors
 from flumotion.common import testsuite
 
@@ -188,11 +191,10 @@ class TestHTTPStreamingResource(testsuite.TestCase):
             errorCode = http.UNAUTHORIZED
             self.assertEquals(request.headers.get('content-type', ''),
                 'text/html')
-            self.assertEquals(request.headers.get('server', ''),
-                resources.HTTP_VERSION)
+            self.assertEquals(request.headers.get('server', ''), HTTP_VERSION)
             self.assertEquals(request.response, errorCode)
 
-            expected = resources.ERROR_TEMPLATE % {
+            expected = ERROR_TEMPLATE % {
                 'code': errorCode,
                 'error': http.RESPONSES[errorCode]}
             self.assertEquals(request.data, expected)
@@ -231,7 +233,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
     def testRenderNotReady(self):
         streamer = FakeStreamer()
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         self.failIf(resource.isReady())
         status = resource.render(FakeRequest(ip=''))
         self.assertEquals(status, server.NOT_DONE_YET)
@@ -239,7 +241,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
     def testRenderReachedMaxClients(self):
         streamer = FakeStreamer()
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         self.failIf(resource.isReady())
         streamer.caps = True
         self.failUnless(resource.isReady())
@@ -253,11 +255,10 @@ class TestHTTPStreamingResource(testsuite.TestCase):
         data = resource.render(request)
         error_code = http.SERVICE_UNAVAILABLE
         self.assertEquals(request.headers.get('content-type', ''), 'text/html')
-        self.assertEquals(request.headers.get('server', ''),
-            resources.HTTP_VERSION)
+        self.assertEquals(request.headers.get('server', ''), HTTP_VERSION)
         self.assertEquals(request.response, error_code)
 
-        expected = resources.ERROR_TEMPLATE % {
+        expected = ERROR_TEMPLATE % {
             'code': error_code,
             'error': http.RESPONSES[error_code]}
         self.assertEquals(data, expected)
@@ -265,7 +266,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
     def testRenderHTTPAuthUnauthorized(self):
         streamer = FakeStreamer()
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         httpauth.setBouncerName('fakebouncer')
         httpauth.setDomain('FakeDomain')
 
@@ -278,7 +279,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
     def testRenderHTTPTokenUnauthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         # override issuer
         httpauth.setBouncerName('fakebouncer')
         httpauth.setDomain('FakeDomain')
@@ -311,7 +312,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
     def testRenderHTTPTokenAuthorized(self):
         streamer = FakeStreamer(mediumClass=FakeTokenMedium)
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         # override issuer
         httpauth.setBouncerName('fakebouncer')
         httpauth.setDomain('FakeDomain')
@@ -339,7 +340,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
     def testRenderHTTPAllowDefault(self):
         streamer = FakeStreamer(mediumClass=FakeAuthFailingMedium)
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         httpauth.setBouncerName('fakebouncer')
 
         streamer.caps = True
@@ -374,7 +375,7 @@ class TestHTTPStreamingResource(testsuite.TestCase):
     def testRenderNew(self):
         streamer = FakeStreamer()
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         streamer.caps = True
         streamer.mime = 'application/x-ogg'
 
@@ -391,12 +392,12 @@ class TestHTTPRoot(testsuite.TestCase):
 
     def testRenderRootStreamer(self):
         # a streamer that is at /
-        root = resources.HTTPRoot()
+        root = HTTPRoot()
         site = server.Site(resource=root)
 
         streamer = FakeStreamer()
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         root.putChild('', resource)
 
         log.debug('unittest', 'requesting /, should work')
@@ -415,12 +416,12 @@ class TestHTTPRoot(testsuite.TestCase):
 
     def testRenderTopStreamer(self):
         # a streamer that is at /a
-        root = resources.HTTPRoot()
+        root = HTTPRoot()
         site = server.Site(resource=root)
 
         streamer = FakeStreamer()
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         root.putChild('a', resource)
 
         # a request for / should give 404
@@ -447,12 +448,12 @@ class TestHTTPRoot(testsuite.TestCase):
 
     def testRenderTreeStreamer(self):
         # a streamer that is at /a/b
-        root = resources.HTTPRoot()
+        root = HTTPRoot()
         site = server.Site(resource=root)
 
         streamer = FakeStreamer()
         httpauth = HTTPAuthentication(streamer)
-        resource = resources.HTTPStreamingResource(streamer, httpauth)
+        resource = MultiFdSinkStreamingResource(streamer, httpauth)
         root.putChild('a/b', resource)
 
         # a request for / should give 404

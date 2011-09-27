@@ -23,9 +23,9 @@ from zope.interface import implements
 
 from flumotion.common import interfaces
 from flumotion.component.base import http
-from flumotion.component.consumers.httpstreamer import resources
-
-from httpstreamer import MultifdSinkStreamer, Stats
+from flumotion.component.common.streamer.multifdsinkstreamer import \
+        MultifdSinkStreamer, Stats
+from flumotion.component.consumers.icystreamer import resources
 
 # this import registers the gstreamer icymux element, don't remove it
 import icymux
@@ -66,7 +66,7 @@ class ICYStreamer(MultifdSinkStreamer):
         # fired after we receive first datablock and configure muxer
         self._muxerConfiguredDeferred = defer.Deferred()
 
-    def configureAuthAndResource(self):
+    def configure_auth_and_resource(self):
         self.httpauth = http.HTTPAuthentication(self)
         self.resource = resources.ICYStreamingResource(self,
                                                         self.httpauth)
@@ -79,11 +79,11 @@ class ICYStreamer(MultifdSinkStreamer):
 
         self._updateCallLaterId = reactor.callLater(10, self._updateStats)
 
-        self.configureAuthAndResource()
+        self.configure_auth_and_resource()
         self.parseProperties(properties)
 
         for sink in self.sinks:
-            self.configureSink(sink)
+            self._configure_sink(sink)
 
         pad = pipeline.get_by_name('tee').get_pad('sink')
         pad.add_event_probe(self._tag_event_cb)
