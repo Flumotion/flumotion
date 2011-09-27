@@ -102,7 +102,8 @@ class DecoderComponent(fc.ReconfigurableComponent):
 
         self.ar = audioconvert.Audioconvert('audioconvert', None,
                                             self.pipeline, channels=channels,
-                                            samplerate=samplerate)
+                                            samplerate=samplerate,
+                                            use_audiorate=False)
         self.addEffect(self.ar)
 
     def _new_decoded_pad_cb(self, decoder, pad, last):

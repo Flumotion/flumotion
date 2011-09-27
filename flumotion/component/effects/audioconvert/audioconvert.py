@@ -54,14 +54,19 @@ class AudioconvertBin(gst.Bin):
                        gobject.PARAM_READWRITE)}
 
     def __init__(self, channels=None, samplerate=None,
-                 tolerance=DEFAULT_TOLERANCE):
+                 tolerance=DEFAULT_TOLERANCE, use_audiorate=True):
         gst.Bin.__init__(self)
         self._samplerate = samplerate
         self._samplerate_caps = ''
         self._channels = channels
         self._channels_caps = ''
 
-        self._audiorate = gst.element_factory_make("audiorate")
+        if use_audiorate:
+            self._audiorate = gst.element_factory_make("audiorate")
+        else:
+            self._audiorate = gst.element_factory_make("identity")
+            self._audiorate.set_property("silent", True)
+
         self._audioconv = gst.element_factory_make("audioconvert")
 
         resampler = 'audioresample'
@@ -116,7 +121,7 @@ class AudioconvertBin(gst.Bin):
             self._audiorate.set_property('tolerance', self._tolerance)
         else:
             self.warning("The 'tolerance' property could not be set in the "
-                        "audiorate element.")
+                         "audiorate element.")
 
     def do_set_property(self, property, value):
         if property.name == 'channels':
@@ -147,7 +152,8 @@ class Audioconvert(feedcomponent.PostProcEffect):
     logCategory = "audioconvert-effect"
 
     def __init__(self, name, sourcePad, pipeline, channels=None,
-                 samplerate=None, tolerance=DEFAULT_TOLERANCE):
+                 samplerate=None, tolerance=DEFAULT_TOLERANCE,
+                 use_audiorate=True):
         """
         @param element:     the video source element on which the post
                             processing effect will be added
@@ -158,7 +164,8 @@ class Audioconvert(feedcomponent.PostProcEffect):
         @param tolerance:   tolerance to correct imperfect timestamps
         """
         feedcomponent.PostProcEffect.__init__(self, name, sourcePad,
-            AudioconvertBin(channels, samplerate, tolerance), pipeline)
+            AudioconvertBin(channels, samplerate, tolerance, use_audiorate),
+                            pipeline)
 
     def effect_setTolerance(self, tolerance):
         self.effectBin.set_property("tolerance", tolerance)
