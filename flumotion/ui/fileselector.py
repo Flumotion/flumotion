@@ -57,6 +57,7 @@ class FileSelector(ObjectList):
     """
 
     gsignal('selected', object)
+    gsignal('dir_changed', object)
 
     def __init__(self, parent, adminModel):
         """Creates a new FileSelector
@@ -135,6 +136,7 @@ class FileSelector(ObjectList):
         vfsFiles.sort(cmp=lambda a, b: cmp(a.filename, b.filename))
         self._populateList(vfsFiles)
         self._path = path
+        self.emit('dir_changed', path)
 
     def _on__row_activated(self, objectList, vfsFile):
         self._rowActivated(vfsFile)
@@ -198,11 +200,16 @@ class FileSelectorDialog(gtk.Dialog):
         self.selector = FileSelector(parent, adminModel)
         self.selector.connect(
             'selected', self._on_file_selector__selected)
+        self.selector.connect(
+            'dir_changed', self._on_file_selector__dir_changed)
         self.vbox.add(self.selector)
         self.selector.show()
 
     def _on_file_selector__selected(self, selector, vfsFile):
         self.response(gtk.RESPONSE_OK)
+
+    def _on_file_selector__dir_changed(self, selector, path):
+        self.set_title(path)
 
     def getFilename(self):
         """Returns the currently selected filename
