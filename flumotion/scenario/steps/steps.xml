@@ -13,7 +13,6 @@
                     <filename location="loadflowstep.py"/>
                     <filename location="productionsteps.py"/>
                     <filename location="summarysteps.py"/>
-                    <filename location="licensestep.py"/>
                 </directory>
             </directories>
         </bundle>

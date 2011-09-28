@@ -6,7 +6,6 @@ component_PYTHON = \
 	consumptionsteps.py \
 	conversionsteps.py \
 	loadflowstep.py \
-	licensestep.py \
 	ondemandstep.py \
 	productionsteps.py \
 	summarysteps.py

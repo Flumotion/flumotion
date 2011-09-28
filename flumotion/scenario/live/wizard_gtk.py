@@ -27,7 +27,6 @@ from flumotion.scenario.steps.productionsteps import SelectProducersStep, \
 from flumotion.scenario.steps.consumptionsteps import ConsumptionStep
 from flumotion.scenario.steps.conversionsteps import ConversionStep, \
         SelectFormatStep
-from flumotion.scenario.steps.licensestep import LicenseStep
 from flumotion.scenario.steps.summarysteps import LiveSummaryStep
 
 _ = gettext.gettext
@@ -68,8 +67,6 @@ class LiveAssistantPlugin(object):
             wizard.addStepSection(ConversionStep)
             wizard.addStepSection(ConsumptionStep)
 
-        if self._mode == 'normal':
-            wizard.addStepSection(LicenseStep)
         wizard.addStepSection(LiveSummaryStep)
 
     def save(self, wizard, saver):
@@ -111,11 +108,6 @@ class LiveAssistantPlugin(object):
                 self._defaultConsumer = consumer
             for server in step.getServerConsumers():
                 saver.addServerConsumer(server, consumerType)
-
-        if wizard.hasStep('ContentLicense'):
-            licenseStep = wizard.getStep('ContentLicense')
-            if licenseStep.getLicenseType() == 'CC':
-                saver.setUseCCLicense(True)
 
     def getSelectComponentName(self):
         return self._defaultConsumer.name
