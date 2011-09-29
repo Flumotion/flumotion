@@ -73,7 +73,6 @@ class GstKeyUnitsScheduler(gst.Element):
         else:
             running_time = 0
         s = gst.Structure("GstForceKeyUnit")
-        #FIXME: A bug in pygst doesn't let us set a long in a structure
         s.set_value('timestamp', timestamp, 'uint64')
         s.set_value('stream-time', timestamp, 'uint64')
         s.set_value('running-time', running_time, 'uint64')
