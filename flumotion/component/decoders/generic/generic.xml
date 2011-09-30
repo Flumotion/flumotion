@@ -81,7 +81,7 @@
     <bundle name="generic-decoder-component">
         <dependencies>
             <dependency name="decoders-base" />
-            <dependency name="audiorate-effect" />
+            <dependency name="audioconvert-effect" />
             <dependency name="videoscale-effect" />
             <dependency name="videorate-effect" />
         </dependencies>

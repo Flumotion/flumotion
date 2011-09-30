@@ -17,7 +17,7 @@
            <dependency name="deinterlace-effect" />
            <dependency name="videoscale-effect" />
            <dependency name="videorate-effect" />
-           <dependency name="audiorate-effect" />
+           <dependency name="audioconvert-effect" />
            <dependency name="volume-effect" />
            <dependency name="producer-checks" />
       </dependencies>
