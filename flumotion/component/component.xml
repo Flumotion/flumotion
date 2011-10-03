@@ -32,6 +32,7 @@
       <directories>
         <directory name="flumotion/component">
           <filename location="component.py" />
+          <filename location="decodercomponent.py" />
           <filename location="eater.py" />
           <filename location="feed.py" />
           <filename location="feeder.py" />
