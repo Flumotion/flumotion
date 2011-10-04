@@ -22,6 +22,7 @@ import os
 import stat
 import errno
 import sys
+import tempfile
 from StringIO import StringIO
 
 from xml.sax import saxutils
@@ -1763,8 +1764,13 @@ class ComponentRegistry(log.Loggable):
         if not os.path.isdir(directory):
             self.error('Registry directory %s is not a directory !')
         try:
-            fd = open(self.filename, 'w')
+            # According to doc http://docs.python.org/library/os.html#os.rename
+            # If successful, the renaming will be an atomic operation (this is
+            # a POSIX requirement).
+            tmp = tempfile.mktemp(dir=directory)
+            fd = open(tmp, 'w')
             self.dump(fd)
+            os.rename(tmp, self.filename)
         except IOError, e:
             if e.errno == errno.EACCES:
                 self.error('Registry file %s could not be created !' %
