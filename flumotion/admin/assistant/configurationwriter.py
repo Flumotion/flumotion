@@ -107,13 +107,23 @@ class ConfigurationWriter(XMLWriter):
         self.writeLine()
         propertyNames = properties.keys()
         propertyNames.sort()
-        for name in propertyNames:
-            value = properties[name]
-            # Fractions, perhaps we should do type introspection here?
-            if isinstance(value, tuple):
-                assert len(value) == 2
-                value = '%d/%d' % value
-            self.writeTag('property', [('name', name)], value)
+
+        def serialize(propVal):
+            if isinstance(propVal, tuple):
+                return ["%d/%d" % propVal]
+            elif isinstance(propVal, list):
+                return propVal
+            else:
+                return [propVal]
+        for name, value in properties.items():
+            attrs = [('name', name)]
+            for value in serialize(value):
+                if isinstance(value, dict):
+                    self.pushTag('compound-property', attrs)
+                    self._writeProperties(value)
+                    self.popTag()
+                else:
+                    self.writeTag('property', attrs, value)
 
     def _writeComponentPlugs(self, plugs):
         if not plugs:

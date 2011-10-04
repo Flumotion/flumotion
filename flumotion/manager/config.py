@@ -848,7 +848,12 @@ class PlanetXMLWriter(XMLWriter):
         for name, value in properties:
             attrs = [('name', name)]
             for value in serialise(value):
-                self.writeTag('property', attrs, value)
+                if isinstance(value, dict):
+                    self.pushTag('compound-property', attrs)
+                    self._writeProperties(value.items())
+                    self.popTag()
+                else:
+                    self.writeTag('property', attrs, value)
 
     def _writePlugs(self, plugs):
         if not plugs:
