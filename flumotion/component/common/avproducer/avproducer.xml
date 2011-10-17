@@ -15,6 +15,7 @@
            <dependency name="component" />
            <dependency name="avproducer-base" />
            <dependency name="deinterlace-effect" />
+           <dependency name="kuscheduler-effect" />
            <dependency name="videoscale-effect" />
            <dependency name="videorate-effect" />
            <dependency name="audioconvert-effect" />
