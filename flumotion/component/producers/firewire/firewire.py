@@ -35,7 +35,7 @@ class Firewire(avproducer.AVProducerBase):
     def get_raw_video_element(self):
         return self.decoder
 
-    def get_pipeline_template(self):
+    def get_pipeline_template(self, props):
         # FIXME: might be nice to factor out dv1394src ! dvdec so we can
         # replace it with videotestsrc of the same size and PAR, so we can
         # unittest the pipeline

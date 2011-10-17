@@ -89,7 +89,7 @@ class Looper(avproducer.AVProducerBase):
     def get_raw_video_element(self):
         return self.pipeline.get_by_name('vident')
 
-    def get_pipeline_template(self):
+    def get_pipeline_template(self, props):
         template = (
             'filesrc location=%(location)s'
             '       ! oggdemux name=demux'

@@ -38,7 +38,7 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         raise NotImplementedError("Subclasses must implement "
                                   "'get_raw_video_element'")
 
-    def get_pipeline_template(self):
+    def get_pipeline_template(self, props):
         raise NotImplementedError("Subclasses must implement "
                                   "'get_pipeline_template'")
 
@@ -82,7 +82,7 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         fr = props.get('framerate', None)
         self.framerate = fr and gst.Fraction(fr[0], fr[1]) or None
         self._parse_aditional_properties(props)
-        return self.get_pipeline_template()
+        return self.get_pipeline_template(props)
 
     def configure_pipeline(self, pipeline, properties):
         if self.get_raw_video_element() is not None:

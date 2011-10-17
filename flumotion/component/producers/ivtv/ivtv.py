@@ -28,7 +28,7 @@ class Ivtv(avproducer.AVProducerBase):
     def get_raw_video_element(self):
         return self.decoder
 
-    def get_pipeline_template(self):
+    def get_pipeline_template(self, props):
         return ("filesrc name=src location=%s"
                 "   ! decodebin name=dec "
                 "  dec. ! identity silent=true name=video ! @feeder:video@"
