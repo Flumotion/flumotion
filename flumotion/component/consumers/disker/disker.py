@@ -986,7 +986,7 @@ class Disker(feedcomponent.ParseLaunchComponent, log.Loggable):
         # if we don't sync on TDT and this is a keyframe, add it to the index
         elif not buf.flag_is_set(gst.BUFFER_FLAG_DELTA_UNIT):
             reactor.callFromThread(self._updateIndex,
-                self._offset, buf.timestamp, True)
+                self._offset, buf.timestamp, True, time.time())
         self._offset += buf.size
         return True
 
