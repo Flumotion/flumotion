@@ -61,7 +61,7 @@ class Webcam(feedcomponent.ParseLaunchComponent):
         # pipeline = 'v4lsrc name=source %s copy-mode=1 device=%s ! ' \
         #           'ffmpegcolorspace ! "%s" ! videorate ! "%s"' \
         #           % (autoprobe, device, caps, caps)
-        return ('%s name=source device=%s ! %s ! videorate'
+        return ('%s name=source device=%s ! videorate ! %s'
                 % (factory_name, device, string))
 
     def configure_pipeline(self, pipeline, properties):
