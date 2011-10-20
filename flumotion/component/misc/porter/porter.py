@@ -256,12 +256,8 @@ class Porter(component.BaseComponent, log.Loggable):
         """
         Generate a random US-ASCII string of length numchars
         """
-        string = ""
-        chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-        for _ in range(numchars):
-            string += chars[random.randint(0, len(chars) - 1)]
-
-        return string
+        return ''.join(random.choice(string.ascii_letters)
+                       for x in range(numchars))
 
     def have_properties(self):
         props = self.config['properties']
