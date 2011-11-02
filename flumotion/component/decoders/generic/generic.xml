@@ -34,7 +34,7 @@
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
         <property name="add-borders" type="bool"
                   _description="Add black borders if DAR can't be kept." />
-        <property name="keyunits-interval" type="bool"
+        <property name="keyunits-interval" type="int"
                   _description="Interval of GstForceKeyUnit events in ms (default=0)" />
       </properties>
     </component>
@@ -71,7 +71,7 @@
                   _description="Whether to scale to a 1:1 pixel aspect ratio." />
         <property name="add-borders" type="bool"
                   _description="Add black borders if DAR can't be kept." />
-        <property name="keyunits-interval" type="bool"
+        <property name="keyunits-interval" type="int"
                   _description="Interval of GstForceKeyUnit events in ms (default=0)" />
       </properties>
     </component>
