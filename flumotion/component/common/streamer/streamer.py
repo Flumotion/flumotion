@@ -258,7 +258,7 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
     # this object is given to the HTTPMedium as comp
     logCategory = 'cons-http'
 
-    pipe_template = 'multifdsink name=sinksync=false recover-policy=3'
+    pipe_template = 'multifdsink name=sink sync=false recover-policy=3'
 
     componentMediumClass = HTTPMedium
     siteClass = server.Site
