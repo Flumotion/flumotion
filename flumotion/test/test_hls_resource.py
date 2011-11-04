@@ -60,6 +60,9 @@ class FakeStreamer:
                 'flumotion.component.plugs.request.RequestLoggerPlug': {}}
         self.httpauth = HTTPAuthentication(self)
 
+    def get_content_type(self):
+        return "video/webm"
+
     def clientAdded(self):
         self.clients += 1
 

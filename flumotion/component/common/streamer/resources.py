@@ -214,13 +214,13 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         """
         return {}
 
-    def _setRequestHeaders(self, request):
-        content = self.streamer.get_content_type()
+    def _setRequestHeaders(self, request, content=None, allow_cache=False):
+        content = content or self.streamer.get_content_type()
         request.setHeader('Server', self.HTTP_SERVER)
         request.setHeader('Date', http.datetimeToString())
-        request.setHeader('Connection', 'close')
-        request.setHeader('Cache-Control', 'no-cache')
-        request.setHeader('Cache-Control', 'private')
+        if not allow_cache:
+            request.setHeader('Cache-Control', 'no-cache')
+            request.setHeader('Cache-Control', 'private')
         request.setHeader('Content-type', content)
 
     def _addClient(self, id, request=None):

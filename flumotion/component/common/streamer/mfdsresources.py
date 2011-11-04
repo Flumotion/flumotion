@@ -160,6 +160,7 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
             return False
 
         self._setRequestHeaders(request)
+        request.setHeader('Connection', 'close')
 
         # Call request modifiers
         for modifier in self.modifiers:
