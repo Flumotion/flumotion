@@ -898,6 +898,9 @@ class FeedComponent(basecomponent.BaseComponent):
                 return True
 
             if not eater.streamheaderBufferProbeHandler:
+                # FIXME: Handle the case when the component went hungry before
+                # receiving data and this probe is installed, dropping the
+                # first streamheader.
                 if self.dropStreamHeaders:
                     self.log("Adding buffer probe on depay src pad on "
                              "eater %r", eater)
