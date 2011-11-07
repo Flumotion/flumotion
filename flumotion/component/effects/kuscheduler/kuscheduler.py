@@ -82,8 +82,10 @@ class GstKeyUnitsScheduler(gst.Element):
             gst.event_new_custom(gst.EVENT_CUSTOM_DOWNSTREAM, s))
 
     def chainfunc(self, pad, buf):
-        if self.interval != 0 and (self._last_ts == 0 or \
-                buf.timestamp >= self._last_ts + self.interval):
+        if self.interval == 0 or buf.timestamp == gst.CLOCK_TIME_NONE:
+            pass
+        elif self._last_ts == 0 or \
+                buf.timestamp >= self._last_ts + self.interval:
             self._count += 1
             self._last_ts = buf.timestamp
             if not self._send_event(buf.timestamp):

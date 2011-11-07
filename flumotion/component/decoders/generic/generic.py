@@ -133,6 +133,8 @@ class SyncKeeper(gst.Element):
             if buf.timestamp < self._syncOffset:
                 self.warning("Could not clip buffer to segment")
                 return gst.FLOW_OK
+            if buf.timestamp == gst.CLOCK_TIME_NONE:
+                return gst.FLOW_OK
             # Get the input stream time of the buffer
             buf.timestamp -= self._syncOffset
             # Set the accumulated stream time
