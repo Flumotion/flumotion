@@ -8,7 +8,7 @@
       <eater name="default" />
 
       <wizard type="consumer" feeder="default"
-              _description="Publish to _Flumotion Streaming Server">
+              _description="_Publish to Flumotion Streaming Server">
       </wizard>
 
       <entries>
