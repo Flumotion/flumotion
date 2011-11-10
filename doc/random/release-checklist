@@ -35,6 +35,8 @@ Things to do before the release
  * start flowtesting
  * execute the rest of the tests
  * start looking at milestone bugs
+ * run through the default wizard scenario, once with the mouse, and
+   once usuing only the keyboard (Make sure forward works on every page)
 
 3 days before the release
 -------------------------
