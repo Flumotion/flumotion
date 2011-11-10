@@ -21,7 +21,6 @@ Requires:       python >= 2.4
 Requires:       %{gstreamer} >= %{gst_minver}
 Requires:       %{gstreamer}-plugins-base >= %{gstpb_minver}
 Requires:       %{gstreamer}-python >= %{gstpy_minver}
-Requires:       %{gstreamer}-ffmpeg
 Requires:       python-twisted-core >= 2.5.0
 Requires:       python-twisted-names
 Requires:       python-twisted-web
