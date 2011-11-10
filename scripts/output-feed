@@ -49,8 +49,13 @@ def gotFeed(res, partial_pipeline):
         return
     (feedId, fd) = res
     log.debug("output-feed","Got feed on fd %r for feedId %s" % (fd, feedId))
-    pipe = gst.parse_launch("fdsrc fd=%d ! %s" % (fd, partial_pipeline))
-    pipe.set_state(gst.STATE_PLAYING)
+    try:
+        pipe = gst.parse_launch("fdsrc fd=%d ! %s" % (fd, partial_pipeline))
+        pipe.set_state(gst.STATE_PLAYING)
+    except Exception, e:
+        print "There is an error in the provided pipeline: %s" % e.message
+        reactor.stop()
+        return
 
 def main(args):
     log.init()
