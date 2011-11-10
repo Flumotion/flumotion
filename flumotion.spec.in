@@ -28,7 +28,6 @@ Requires:       python-twisted-conch
 Requires:       python-dateutil
 Requires:       pygtk2-libglade
 Requires:       pygtk2 >= %{pygtk_minver}
-Requires:       pycairo
 Requires:       pyOpenSSL
 Requires:       pkgconfig
 Requires:       pyparsing
