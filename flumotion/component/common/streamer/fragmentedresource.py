@@ -324,16 +324,13 @@ class FragmentedResource(HTTPStreamingResource, log.Loggable):
         request.finish()
         return ''
 
-    def _writeHeaders(self, request, content, code=200):
+    def _writeHeaders(self, request, content=None, code=200):
         """
         Write out the HTTP headers for the incoming HTTP request.
         """
         request.setResponseCode(code)
-        request.setHeader('Server', self.HTTP_SERVER)
-        request.setHeader('Date', http.datetimeToString())
-        request.setHeader('Cache-Control', 'no-cache')
-        if content:
-            request.setHeader('Content-type', content)
+
+        self._setRequestHeaders(request, content)
 
         # Call request modifiers
         for modifier in self.modifiers:

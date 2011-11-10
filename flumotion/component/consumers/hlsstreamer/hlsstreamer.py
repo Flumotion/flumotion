@@ -36,6 +36,10 @@ __version__ = ""
 T_ = gettexter()
 
 
+SUPPORTED_FORMATS = {"video/mpegts": ("video/mpegts", "video/mpegts", "ts"),
+                     "video/webm": ("video/webm", "video/webm", "webm")}
+
+
 class HLSStreamer(FragmentedStreamer, Stats):
     DEFAULT_SESSION_TIMEOUT = 30
     DEFAULT_FRAGMENT_PREFIX = 'fragment'
@@ -46,12 +50,19 @@ class HLSStreamer(FragmentedStreamer, Stats):
 
     logCategory = 'hls-streamer'
 
+    _mime_type = None
+    _content_type = None
+    _stream_setup = False
+
     def init(self):
         self.debug("HTTP live streamer initialising")
         self.hlsring = None
 
     def get_mime(self):
-        return 'video/webm'
+        return self._mime_type
+
+    def get_content_type(self):
+        return self._content_type
 
     def get_pipeline_string(self, properties):
         # Check of the hlssink is available or use the python one
@@ -110,6 +121,14 @@ class HLSStreamer(FragmentedStreamer, Stats):
         self._last_index = 0
         self.hlsring.reset()
 
+    def _setup_stream_type(self, stream_type):
+        self.info("Setting up streamer for stream type %s", stream_type)
+        mime_type, content_type, frag_ext = SUPPORTED_FORMATS[stream_type]
+        self._mime_type = mime_type
+        self._content_type = content_type
+        self.hlsring.filenameExt = frag_ext
+        self._stream_setup = True
+
     def _configure_sink(self):
         self.sink.set_property('write-to-disk', False)
         self.sink.set_property('playlist-max-window', 5)
@@ -119,6 +138,14 @@ class HLSStreamer(FragmentedStreamer, Stats):
         self.sink.connect("new-fragment", self._new_fragment)
 
     def _process_fragment(self, fragment):
+
+        if not self._stream_setup:
+            sink = self.get_element("sink")
+            pad = sink.get_pad("sink")
+            caps = pad.get_negotiated_caps()
+            name = caps.get_structure(0).get_name()
+            self._setup_stream_type(name)
+
         self._fragmentsCount = self._fragmentsCount + 1
 
         # Wait hls-min-window fragments to set the component 'happy'

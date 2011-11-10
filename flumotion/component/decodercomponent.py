@@ -62,7 +62,7 @@ class DecoderComponent(fc.ReconfigurableComponent):
         width = props.get('width', None)
         height = props.get('height', None)
         # Expressed in ms
-        interval = props.get('keyunits-interval', 10000) / gst.MSECOND
+        interval = props.get('keyunits-interval', 10000) * gst.MSECOND
         fr = props.get('framerate', (25, 2))
         framerate = gst.Fraction(fr[0], fr[1])
 
@@ -90,7 +90,7 @@ class DecoderComponent(fc.ReconfigurableComponent):
         props = self.config['properties']
         samplerate = props.get('samplerate', 44100)
         channels = props.get('channels', 2)
-        interval = props.get('keyunits-interval', 10000) / gst.MSECOND
+        interval = props.get('keyunits-interval', 10000) * gst.MSECOND
 
         self.ar = audioconvert.Audioconvert('audioconvert', None,
                                             self.pipeline, channels=channels,

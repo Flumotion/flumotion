@@ -70,7 +70,7 @@ class HTTPLiveStreamingResource(FragmentedResource):
     def _renderFragment(self, res, request, resource):
         self.debug('_render(): asked for fragment %s', resource)
         request.setHeader('Connection', 'close')
-        self._writeHeaders(request, 'video/mpeg')
+        self._writeHeaders(request)
         if request.method == 'GET':
             data = self.ring.getFragment(resource)
             request.setHeader('content-length', len(data))
