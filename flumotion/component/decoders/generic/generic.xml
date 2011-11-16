@@ -84,6 +84,7 @@
             <dependency name="audioconvert-effect" />
             <dependency name="videoscale-effect" />
             <dependency name="videorate-effect" />
+            <dependency name="kuscheduler-effect" />
         </dependencies>
         <directories>
             <directory name="flumotion/component/decoders/generic">
