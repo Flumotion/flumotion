@@ -37,6 +37,7 @@
         <dependencies>
             <dependency name="component" />
             <dependency name="keyunits-scheduler-base" />
+            <dependency name="kuscheduler-effect" />
         </dependencies>
 
         <directories>
