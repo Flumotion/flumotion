@@ -64,6 +64,7 @@
 
     <bundle name="firewire-admin-gtk">
        <dependencies>
+           <dependency name="firewire-base" />
            <dependency name="avproducer-admin-gtk" />
        </dependencies>
         <directories>
