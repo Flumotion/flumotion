@@ -149,7 +149,7 @@ class CheckBase(util.LogCommand):
             action='store', dest='timestamp',
             help='Check if timestamp is higher that this value.')
         self.parser.add_option('-D', '--duration',
-            action='store', dest='duration', default='5',
+            action='store', dest='duration', default=5, type='int',
             help='Minimum duration of decoded data (default 5 seconds)')
         self.parser.add_option('-t', '--timeout',
             action='store', dest='timeout', default='10',
@@ -292,7 +292,7 @@ class CheckBase(util.LogCommand):
                     return self.critical(
                         '%s fail: EXPECTED: %s, ACTUAL: %s' %
                         (i, expected, current))
-        return self.ok('Got %s seconds of audio and video.' %
+        return self.ok('Got %d seconds of audio and video.' %
             self.options.duration)
 
     def critical(self, message):
@@ -410,6 +410,7 @@ class GstInfo:
 
         if options.timeout:
             gobject.timeout_add(int(options.timeout) * 1000, self.timedOut)
+        self.duration = options.duration
         self.mainloop = gobject.MainLoop()
         self.pipeline = gst.parse_launch(PIPELINE)
         self.dbin = self.pipeline.get_by_name('dbin')
@@ -436,7 +437,7 @@ class GstInfo:
         timestamp = buffer.timestamp / gst.SECOND
         if not self.audio_ts:
             self.audio_ts = timestamp
-        if (self.audio_ts + TIMEOUT) < timestamp:
+        if (self.audio_ts + self.duration) < timestamp:
             # get audio info
             caps = sink.sink_pads().next().get_negotiated_caps()
             for s in caps:
@@ -451,7 +452,7 @@ class GstInfo:
         timestamp = buffer.timestamp / gst.SECOND
         if not self.video_ts:
             self.video_ts = timestamp
-        if (self.video_ts + TIMEOUT) < timestamp:
+        if (self.video_ts + self.duration) < timestamp:
             # get video info
             caps = sink.sink_pads().next().get_negotiated_caps()
             for s in caps:
