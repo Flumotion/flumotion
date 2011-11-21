@@ -54,15 +54,16 @@ class AudioconvertBin(gst.Bin):
                        gobject.PARAM_READWRITE)}
 
     def __init__(self, channels=None, samplerate=None,
-                 tolerance=DEFAULT_TOLERANCE, use_audiorate=True):
+                 tolerance=DEFAULT_TOLERANCE):
         gst.Bin.__init__(self)
         self._samplerate = samplerate
         self._samplerate_caps = ''
         self._channels = channels
         self._channels_caps = ''
 
-        if use_audiorate:
+        if self._use_audiorate():
             self._audiorate = gst.element_factory_make("audiorate")
+            self._audiorate.set_property("skip-to-first", True)
         else:
             self._audiorate = gst.element_factory_make("identity")
             self._audiorate.set_property("silent", True)
@@ -96,6 +97,10 @@ class AudioconvertBin(gst.Bin):
         self._setSamplerate(samplerate)
         self._setChannels(channels)
         self._setTolerance(tolerance)
+
+    def _use_audiorate(self):
+        return gstreamer.element_factory_has_property('audiorate',
+                                                      'skip-to-first')
 
     def _getCapsString(self):
         extra_caps = ' '.join([self._samplerate_caps, self._channels_caps])
@@ -164,7 +169,7 @@ class Audioconvert(feedcomponent.PostProcEffect):
         @param tolerance:   tolerance to correct imperfect timestamps
         """
         feedcomponent.PostProcEffect.__init__(self, name, sourcePad,
-            AudioconvertBin(channels, samplerate, tolerance, use_audiorate),
+            AudioconvertBin(channels, samplerate, tolerance),
                             pipeline)
 
     def effect_setTolerance(self, tolerance):

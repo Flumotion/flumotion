@@ -94,8 +94,7 @@ class DecoderComponent(fc.ReconfigurableComponent):
 
         self.ar = audioconvert.Audioconvert('audioconvert', None,
                                             self.pipeline, channels=channels,
-                                            samplerate=samplerate,
-                                            use_audiorate=False)
+                                            samplerate=samplerate)
         self.addEffect(self.ar)
 
         self.akuscheduler = kuscheduler.KeyUnitsScheduler('keyunits-scheduler',
