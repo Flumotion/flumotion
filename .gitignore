@@ -10,6 +10,7 @@
 *Makefile.in
 
 # Ignore autocrap
+*~
 .version
 ABOUT-NLS
 CangeLog.tmp
