@@ -79,6 +79,7 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         self.deintMode = props.get('deinterlace-mode', 'auto')
         self.deintMethod = props.get('deinterlace-method', 'ffmpeg')
         self.kuinterval = props.get('keyunits-interval', 0) * gst.MSECOND
+        self.volume_level = props.get('volume', 1)
         fr = props.get('framerate', None)
         self.framerate = fr and gst.Fraction(fr[0], fr[1]) or None
         self._parse_aditional_properties(props)
@@ -153,6 +154,7 @@ class AVProducerBase(feedcomponent.ParseLaunchComponent):
         comp_level = pipeline.get_by_name('volumelevel')
         vol = volume.Volume('inputVolume', comp_level, pipeline)
         self.addEffect(vol)
+        self.setVolume(self.volume_level)
 
         # Add audio converter
         audioconverter = audioconvert.Audioconvert('audioconvert',

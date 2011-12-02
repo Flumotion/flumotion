@@ -15,4 +15,6 @@
             _description="The deinterlacing method to use.(default=ffmpeg)" />
   <property name="keyunits-interval" type="int"
             _description="Interval of GstForceKeyUnit events in ms (default=0)" />
+  <property name="volume" type="float"
+            _description="Volume factor (2 = 200%) - (default=1)" />
 </properties>
