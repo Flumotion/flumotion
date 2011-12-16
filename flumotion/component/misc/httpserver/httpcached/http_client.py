@@ -285,21 +285,37 @@ class StreamGetter(protocol.ClientFactory, http.HTTPClient, log.Loggable):
     def handleEndHeaders(self):
         self._keepActive()
         self.info = StreamInfo(self.headers)
+        self._remaining = self.info.size
+
         if self.size and self.size < self.info.size:
             self.warning("Response size bigger than the requested size, "
                          "expecting %s bytes and response length is %s",
                          self.size, self.info.size)
-        self._remaining = self.info.size
+            # We asked for a range but the proxy answered with the whole
+            # file. We're only interested on the first self.size bytes.
+            self._remaining = self.size
+
         self._onInfo(self.info)
 
     def handleResponsePart(self, data):
         self._keepActive()
         size = len(data)
+
         if self._remaining > 0 and self._remaining < size:
             self.warning("More than %s bytes have been received",
                          self.info.size)
-        self._remaining -= size
-        self._onData(data)
+
+        # Keep just the bytes needed to fulfill the original range request,
+        # discard the rest because they will be in the next request after
+        # this one is cancelled.
+        if self._remaining < size:
+            data = data[:self._remaining]
+            self._remaining = 0
+            self._onData(data)
+            self.cancel()
+        else:
+            self._remaining -= size
+            self._onData(data)
 
     def handleResponseEnd(self):
         if self.info is not None:
