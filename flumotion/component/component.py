@@ -699,6 +699,7 @@ class BaseComponent(common.InitMixin, log.Loggable):
 
         @type  message: L{flumotion.common.messages.Message}
         """
+        self.removeMessage(message.id)
         self.state.append('messages', message)
         if message.level == messages.ERROR:
             self.debug('error message, turning sad')
