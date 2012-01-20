@@ -38,7 +38,7 @@ __version__ = "$Rev$"
 class _SocketMaybeCloser(tcp._SocketCloser):
     keepSocketAlive = False
 
-    def _closeSocket(self):
+    def _closeSocket(self, orderly=False):
         # We override this (from tcp._SocketCloser) so that we can close
         # sockets properly in the normal case, but once we've passed our
         # socket on via the FD-channel, we just close() it (not calling
@@ -50,7 +50,11 @@ class _SocketMaybeCloser(tcp._SocketCloser):
             except socket.error:
                 pass
         else:
-            tcp._SocketCloser._closeSocket(self)
+            args = []
+            from twisted import version as v
+            if (v.major, v.minor, v.micro) > (11, 0, 0):
+                args.append(orderly)
+            tcp.Server._closeSocket(self, *args)
 
 
 class PassableClientConnection(_SocketMaybeCloser, tcp.Client):
