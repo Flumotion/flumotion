@@ -65,9 +65,10 @@ class HLSStreamer(FragmentedStreamer, Stats):
         return self._content_type
 
     def get_pipeline_string(self, properties):
-        # Check of the hlssink is available or use the python one
-        if not gstreamer.element_factory_exists('hlssink'):
-            hlssink.register()
+        # Always use the python element for now. The C element will be used
+        # when it is mature enough.
+        # if not gstreamer.element_factory_exists('hlssink'):
+        hlssink.register()
         return "hlssink name=sink sync=false"
 
     def configure_auth_and_resource(self):
