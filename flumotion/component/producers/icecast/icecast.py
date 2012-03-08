@@ -195,5 +195,6 @@ class Icecast(feedcomponent.ParseLaunchComponent):
 
     def _retry(self):
         assert self.attemptD
-        self.debug('Retrying connection to icecast server on %s', self.url)
-        self.attemptD.errback(errors.ConnectionError)
+        if not self.attemptD.called:
+            self.debug('Retrying connection to icecast server on %s', self.url)
+            self.attemptD.errback(errors.ConnectionError)
