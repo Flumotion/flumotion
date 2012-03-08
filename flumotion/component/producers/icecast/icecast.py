@@ -107,6 +107,7 @@ class Icecast(feedcomponent.ParseLaunchComponent):
         self.reconnecting = False
         self.reconnector = RetryingDeferred(self.connect)
         self.reconnector.initialDelay = 1.0
+        self.reconnector.maxDelay = 300
         self.attemptD = None
 
         def _drop_eos(pad, event):
