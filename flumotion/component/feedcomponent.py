@@ -1010,6 +1010,8 @@ class MuxerComponent(MultiInputParseLaunchComponent):
         # if this pad doesn't push audio, remove the probe
         if 'audio' not in caps[0].to_string():
             depay.get_pad("src").remove_buffer_probe(self._eprobes[eaterAlias])
+        if event.get_structure() is None:
+            return True
         if event.get_structure().get_name() == 'GstForceKeyUnit':
             return False
         return True

@@ -171,7 +171,7 @@ class FeedComponent(basecomponent.BaseComponent):
                                   setActive=None, setInactive=None):
         element = self.pipeline.get_by_name(elementName)
         if not element:
-            raise error.ComponentError("No such element %s" % elementName)
+            raise errors.ComponentError("No such element %s" % elementName)
         pad = element.get_pad('src')
         name = "%s:%s" % (self.name, elementName)
         self._pad_monitors.attach(pad, name)
