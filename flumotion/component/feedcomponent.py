@@ -959,7 +959,20 @@ class EncoderComponent(ParseLaunchComponent):
     Component that is reconfigured when new changes arrive through the
     flumotion-reset event (sent by the fms producer).
     """
-    pass
+
+    def setup_completed(self):
+        ParseLaunchComponent.setup_completed(self)
+
+        encoder = self.get_element('encoder')
+        encoder.get_pad('sink').add_event_probe(self.handle_reset_event)
+
+    def handle_reset_event(self, pad, event):
+        if gstreamer.event_is_flumotion_reset(event):
+            self.debug("Got reset event in the encoder... reseting it!")
+            encoder = self.get_element('encoder')
+            encoder.set_state(gst.STATE_READY)
+            self.try_start_pipeline(force=True)
+        return True
 
 
 class MuxerComponent(MultiInputParseLaunchComponent):
