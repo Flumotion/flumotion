@@ -170,6 +170,8 @@ def flumotion_reset_event():
 
 def event_is_flumotion_reset(event):
     ''' Helper method to check if an event is a 'flumotion-reset' event '''
+    if event.get_structure() is None:
+        return False
     return event.get_structure().get_name() == 'flumotion-reset'
 
 
