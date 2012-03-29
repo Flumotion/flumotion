@@ -15,18 +15,13 @@
 #
 # Headers in this file shall remain intact.
 
-from twisted.internet import reactor
 import gobject
 import gst
 
-from flumotion.common.i18n import N_, gettexter
 from flumotion.component import feedcomponent
-
-# register serializables
-from flumotion.common import messages
+from flumotion.common import gstreamer
 
 __version__ = "$Rev$"
-T_ = gettexter()
 
 
 class VideorateBin(gst.Bin):
@@ -51,11 +46,17 @@ class VideorateBin(gst.Bin):
 
         self._videorate.link(self._capsfilter)
 
+        # Set properties
+        if gstreamer.element_has_property(self._videorate, 'skip-to-first'):
+            self._videorate.set_property('skip-to-first', True)
+
         # Create source and sink pads
         self._sinkPad = gst.GhostPad('sink', self._videorate.get_pad('sink'))
         self._srcPad = gst.GhostPad('src', self._capsfilter.get_pad('src'))
         self.add_pad(self._sinkPad)
         self.add_pad(self._srcPad)
+
+        self._sinkPad.set_event_function(self.eventfunc)
 
         self._setFramerate(framerate)
 
@@ -75,6 +76,13 @@ class VideorateBin(gst.Bin):
             return self._framerate
         else:
             raise AttributeError('unknown property %s' % property.name)
+
+    def eventfunc(self, pad, event):
+        self.debug("Received event %r from %s" % (event, event.src))
+        if gstreamer.event_is_flumotion_reset(event):
+            self._videorate.set_state(gst.STATE_READY)
+            self._videorate.set_state(gst.STATE_PLAYING)
+        return self._srcPad.push_event(event)
 
     def framerateToString(self):
         if self._framerate is None:

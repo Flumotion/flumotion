@@ -20,6 +20,7 @@ import gobject
 from twisted.internet import reactor
 
 from flumotion.component import feedcomponent
+from flumotion.common import gstreamer
 
 __version__ = "$Rev$"
 
@@ -96,6 +97,9 @@ class DeinterlaceBin(gst.Bin):
         self._colorfilter.set_property('caps', gst.Caps(
             'video/x-raw-yuv, format=(fourcc)I420'))
 
+        if gstreamer.element_has_property(self._videorate, 'skip-to-first'):
+            self._videorate.set_property('skip-to-first', True)
+
         # Link elements
         self._colorspace.link(self._colorfilter)
         self._colorfilter.link(self._deinterlacer)
@@ -114,6 +118,7 @@ class DeinterlaceBin(gst.Bin):
 
         # Add setcaps callback in the sink pad
         self._sinkPad.set_setcaps_function(self._sinkSetCaps)
+        self._sinkPad.set_event_function(self.eventfunc)
 
         # Set the mode and method in the deinterlacer
         self._setMethod(method)
@@ -185,6 +190,13 @@ class DeinterlaceBin(gst.Bin):
             (self.deinterlacerName, deinterlacerName, self.method))
         reactor.callFromThread(blockPad.set_blocked_async,
             True, unlinkAndReplace, deinterlacerName)
+
+    def eventfunc(self, pad, event):
+        self.debug("Received event %r from %s" % (event, event.src))
+        if gstreamer.event_is_flumotion_reset(event):
+            self._videorate.set_state(gst.STATE_READY)
+            self._videorate.set_state(gst.STATE_PLAYING)
+        return self._srcPad.push_event(event)
 
     def _setMode(self, mode):
         if mode not in DEINTERLACE_MODE:
