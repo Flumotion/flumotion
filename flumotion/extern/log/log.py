@@ -882,7 +882,13 @@ def getFailureMessage(failure):
     if len(failure.frames) == 0:
         return "failure %(exc)s: %(msg)s" % locals()
 
-    (func, filename, line, some, other) = failure.frames[-1]
+    # when using inlineCallbacks, a traceback coming from unwindGenerator
+    # is actually provoked one frame down
+    for frame in failure.frames[::-1]:
+        (func, filename, line, some, other) = frame
+        if func not in ['unwindGenerator', ]:
+            break
+
     filename = scrubFilename(filename)
     return "failure %(exc)s at %(filename)s:%(line)s: %(func)s(): %(msg)s" \
         % locals()
