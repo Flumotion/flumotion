@@ -49,10 +49,10 @@ class Vorbis(feedcomponent.EncoderComponent):
         if gstreamer.element_factory_exists('legacyresample'):
             resampler = 'legacyresample'
         return ('%s name=ar ! audioconvert ! capsfilter name=cf '
-                '! vorbisenc name=enc' % resampler)
+                '! vorbisenc name=encoder' % resampler)
 
     def configure_pipeline(self, pipeline, properties):
-        enc = pipeline.get_by_name('enc')
+        enc = pipeline.get_by_name('encoder')
         cf = pipeline.get_by_name('cf')
         ar = pipeline.get_by_name('ar')
 
