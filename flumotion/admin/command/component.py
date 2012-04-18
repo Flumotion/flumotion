@@ -18,12 +18,12 @@
 """
 component commands
 """
+from twisted.internet import defer
 
+from flumotion.admin.command import common
 from flumotion.common import errors, planet, log
 from flumotion.monitor.nagios import util
 from flumotion.common.planet import moods
-
-from flumotion.admin.command import common
 
 __version__ = "$Rev: 6562 $"
 
@@ -197,6 +197,53 @@ with types and worker hosts."""
         self.parentCommand.print_components(comps, workers)
 
 
+class DownstreamList(common.AdminCommand):
+    description = """List a component and its downstream components along
+with types and worker hosts."""
+
+    components = []
+
+    def doCallback(self, args):
+        p = self.parentCommand
+        s = p.workerHeavenState
+        workers = s.get('workers')
+
+        if not p.componentId:
+            common.errorRaise("Please specify a component id "
+                "with 'component -i [component-id]'")
+
+        self.stdout.write('Downstream Components:\n')
+
+        d = defer.maybeDeferred(self.getUIState, p.componentState)
+        d.addCallback(self.parentCommand.print_components, workers)
+        return d
+
+    def getUIState(self, state):
+        p = self.parentCommand
+        admin = p.parentCommand.medium
+
+        self.components.append(state)
+        d = admin.componentCallRemote(state, 'getUIState')
+        d.addCallback(self.gotUIState)
+        return d
+
+    def gotUIState(self, state):
+        p = self.parentCommand
+
+        dList = []
+        for f in state.get('feeders'):
+            for c in f['clients']:
+                feeder_id = c['client-id'].split(':')[0]
+                compState = util.findComponent(p.planetState, feeder_id)
+                if compState in self.components:
+                    continue
+                d = defer.maybeDeferred(self.getUIState, compState)
+                dList.append(d)
+        d = defer.DeferredList(dList)
+        d.addCallback(lambda result: self.components)
+        return d
+
+
 class Mood(common.AdminCommand):
     description = "Check the mood of a component."
 
@@ -364,8 +411,8 @@ class Component(util.LogCommand):
     description = "Act on a component."
     usage = "-i [component id]"
 
-    subCommandClasses = [Delete, Invoke, List, DetailedList,
-                         UpstreamList, Mood, Property, Start, Stop]
+    subCommandClasses = [Delete, Invoke, List, DetailedList, UpstreamList,
+                         DownstreamList, Mood, Property, Start, Stop]
 
     componentId = None
     componentState = None
