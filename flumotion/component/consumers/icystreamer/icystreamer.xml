@@ -54,9 +54,19 @@
   </components>
 
   <bundles>
-
+    <bundle name="icystreamer-base">
+        <dependencies>
+            <dependency name="component" />
+        </dependencies>
+        <directories>
+            <directory name="flumotion/component/consumers/icystreamer">
+                <filename location="__init__.py" />
+            </directory>
+        </directories>
+    </bundle>
     <bundle name="icystreamer-admin-gtk">
       <dependencies>
+        <dependency name="icystreamer-base" />
         <dependency name="httpstreamer-base" />
 	<dependency name="httpstreamer-admin-gtk" />
         <dependency name="base-admin-gtk" />
@@ -65,6 +75,7 @@
       <directories>
         <directory name="flumotion/component/consumers/icystreamer">
 	  <filename location="icytab.glade" />
+	  <filename location="admin_gtk.py" />
         </directory>
       </directories>
     </bundle>
@@ -72,6 +83,7 @@
     <bundle name="icystreamer-component">
         <dependencies>
             <dependency name="httpstreamer-component" />
+            <dependency name="icystreamer-base" />
         </dependencies>
 
         <directories>
