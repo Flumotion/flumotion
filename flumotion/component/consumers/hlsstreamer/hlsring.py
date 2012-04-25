@@ -72,7 +72,7 @@ class Playlister:
         if self._counter == count:
             self._isAutoUpdate = True
             self._dummyFragments.append(self._getFragmentName(count))
-            self._addPlaylistFragment(count, self._duration, False)
+            self._addPlaylistFragment(count, self._getTargetDuration(), False)
 
     def _addPlaylistFragment(self, sequenceNumber, duration, encrypted):
         # Add the fragment to the playlist if it wasn't added before
