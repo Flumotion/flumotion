@@ -29,6 +29,8 @@ class MimeTypes(object):
         d['.flv'] = 'video/x-flv'
         d['.mp4'] = 'video/mp4'
         d['.webm'] = 'video/webm'
+        d['.ts'] = 'video/MP2T'
+        d['.m3u8'] = 'application/vnd.apple.mpegurl'
         return d
 
     def __init__(self):
