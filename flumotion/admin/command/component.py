@@ -235,7 +235,7 @@ with types and worker hosts."""
             for c in f['clients']:
                 feeder_id = c['client-id'].split(':')[0]
                 compState = util.findComponent(p.planetState, feeder_id)
-                if compState in self.components:
+                if compState is None or compState in self.components:
                     continue
                 d = defer.maybeDeferred(self.getUIState, compState)
                 dList.append(d)
