@@ -66,13 +66,7 @@ doc/reference/html/
 
 # Ignore external command
 flumotion/extern/command.revision
-flumotion/extern/command/ChangeLog
-flumotion/extern/command/README
-flumotion/extern/command/__init__.py
-flumotion/extern/command/command.py
-flumotion/extern/command/help2man.py
-flumotion/extern/command/manholecmd.py
-flumotion/extern/command/test_command.py
+flumotion/extern/command/*
 
 # Misc ignores
 data/flumotion-admin.desktop
