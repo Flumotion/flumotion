@@ -106,7 +106,11 @@ def defer_generator(proc):
                 # exception class is in our namespace, and it only takes
                 # one string argument. if either condition is not true,
                 # we wrap the strings in a default Exception.
-                k, v = failure.parents[-1], failure.value
+                from twisted import version
+                if version.major > 11:
+                    k, v = failure.parents[0], failure.value
+                else:
+                    k, v = failure.parents[-1], failure.value
                 try:
                     if isinstance(k, str):
                         k = reflect.namedClass(k)

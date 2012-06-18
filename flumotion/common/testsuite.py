@@ -19,7 +19,7 @@
 """
 
 from twisted.spread import pb
-from twisted.internet import reactor, defer, selectreactor
+from twisted.internet import reactor, defer, selectreactor, pollreactor
 from twisted.scripts import trial
 from twisted.trial import unittest, util
 
@@ -57,7 +57,7 @@ class TestCase(unittest.TestCase, log.Loggable):
     # A sequence of reactors classes that this test supports, can be
     # overridden in subclasses. You can also set this to an empty
     # sequence, which means "any reactor"
-    supportedReactors = [selectreactor.SelectReactor]
+    supportedReactors = [selectreactor.SelectReactor, pollreactor.PollReactor]
 
     # TestCase in Twisted 2.0 doesn't define failUnlessFailure method.
     if not hasattr(unittest.TestCase, 'failUnlessFailure'):
@@ -74,6 +74,7 @@ class TestCase(unittest.TestCase, log.Loggable):
             return deferred.addCallbacks(_cb, _eb)
         assertFailure = failUnlessFailure
 
+
     # notice the two spaces and read the following comment
 
     def __init__(self, methodName=' impossible-name '):
@@ -82,6 +83,7 @@ class TestCase(unittest.TestCase, log.Loggable):
         # reactor.__class__ rather than type(reactor), because in old
         # Twisted the reactor was not a new-style class and
         # type(reactor) returns 'instance'
+        reactor.killed = False
         if (self.supportedReactors and
             reactor.__class__ not in self.supportedReactors):
             # Set the 'skip' attribute on the class rather than on the
