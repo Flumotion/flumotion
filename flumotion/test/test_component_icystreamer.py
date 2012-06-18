@@ -238,7 +238,7 @@ class StreamDownloader(client.HTTPDownloader):
             self.finished = True
             log.debug('stream-downloader',\
                 'Calling callback of StreamDownloader')
-            self.deferred.addCallback(self.connector.transport.loseConnection)
+            self.connector.transport.loseConnection()
             self.deferred.callback(self)
 
     def pageStart(self, partialContent):
