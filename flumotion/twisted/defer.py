@@ -107,7 +107,7 @@ def defer_generator(proc):
                 # one string argument. if either condition is not true,
                 # we wrap the strings in a default Exception.
                 from twisted import version
-                if version.major > 11:
+                if version.short() >= "11.1.0":
                     k, v = failure.parents[0], failure.value
                 else:
                     k, v = failure.parents[-1], failure.value
