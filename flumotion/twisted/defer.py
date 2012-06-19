@@ -17,11 +17,12 @@
 
 import random
 
+from twisted import version
 from twisted.internet import defer, reactor
 from twisted.python import reflect
 
 # FIXME: this is for HandledException - maybe it should move here instead ?
-from flumotion.common import errors
+from flumotion.common import errors, common
 
 __version__ = "$Rev$"
 
@@ -106,8 +107,7 @@ def defer_generator(proc):
                 # exception class is in our namespace, and it only takes
                 # one string argument. if either condition is not true,
                 # we wrap the strings in a default Exception.
-                from twisted import version
-                if version.short() >= "11.1.0":
+                if common.versionStringToTuple(version.short()) >= (11, 1, 0):
                     k, v = failure.parents[0], failure.value
                 else:
                     k, v = failure.parents[-1], failure.value

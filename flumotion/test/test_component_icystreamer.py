@@ -195,7 +195,6 @@ class TestIcyStreamer(comptest.CompTestTestCase, log.Loggable):
         d.addCallback(assertsOnStream)
         d.addCallback(lambda _: comptest.delayed_d(0.1, _))
         d.addCallback(lambda _: self.assertEqual(0, self.comp.getClients()))
-
         d.addCallback(lambda _: self.tp.stop_flow())
         return d
 
