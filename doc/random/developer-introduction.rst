@@ -1,12 +1,12 @@
 
 .. contents:: Table of Contents
 
-.. _Open a new Ticket: https://code.flumotion.com/trac/newticket 
+.. _Open a new Ticket: https://code.flumotion.com/trac/newticket
 .. _Wiki: https://code.flumotion.com/trac/wiki
-.. _Code Browser: https://code.flumotion.com/trac/browser 
+.. _Code Browser: https://code.flumotion.com/trac/browser
 .. _Timeline: https://code.flumotion.com/trac/timeline
 .. _Style guide: https://code.flumotion.com/trac/browser/flumotion/doc/random/styleguide
-.. _Existing tickets: https://code.flumotion.com/trac/report 
+.. _Existing tickets: https://code.flumotion.com/trac/report
 .. _Buildbot: http://build.fluendo.com:8070/
 .. _Trial: http://twistedmatrix.com/trac/wiki/TwistedTrial
 .. _Twisted: http://twistedmatrix.com/
@@ -35,8 +35,7 @@ contribute to the Flumotion project.
 Getting started
 ===============
 
-This section describes how you'll get started as a developer. It means fetching the sources, 
-building, and running.
+This section describes how you'll get started as a developer. It means fetching the sources, building, and running.
 
 Getting your git environment configured
 ---------------------------------------
@@ -74,9 +73,17 @@ You should also configure the following options and aliases to help you in the d
 Getting your development environment installed
 ----------------------------------------------
 
-Once you have gstreamer installed on an uninstalled directory, you need to install flumotion the
-same way. This time though, you get the code from git directly as this is the most 
-up to date code. So, let's start. create a folder and check it out::
+Once you have gstreamer installed on an uninstalled directory, you need to
+install flumotion the same way. This time though, you get the code from git
+directly as this is the most up to date code. So, let's start. Create a folder
+and check it out.
+
+If you don't have a git account with us::
+
+  git clone git://code.flumotion.com/flumotion.git
+
+
+If you do have a git account with us::
 
    git clone git@code.flumotion.com:flumotion.git
 
@@ -84,7 +91,8 @@ First the build environment needs to be prepared::
 
   ./autogen.sh
 
-Autogen might fail if you miss some dependencies. Normally you need the following:
+Autogen might fail if you miss some dependencies. Normally you need the
+following:
 
 - C compiler
 - make
@@ -103,8 +111,9 @@ When the autogen script runs, you're almost ready, you just need to type::
 
   make
 
-This will do a bunch of stuff, one of them is creating a script called **env** that 
-is a small shell script which prepares the environment to run flumotion properly.
+This will do a bunch of stuff, one of them is creating a script called **env**
+that is a small shell script which prepares the environment to run flumotion
+properly.
 
 So, once make is finished, type::
 
