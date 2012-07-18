@@ -43,7 +43,7 @@ class LoggableRequest(server.Request):
         server.Request.__init__(self, channel, queued)
         now = time.time()
         self._startTime = now
-        self._completionTime = now
+        self._completionTime = None
         self._bytesWritten = 0L
 
     def write(self, data):
@@ -58,6 +58,9 @@ class LoggableRequest(server.Request):
 
     def getDuration(self):
         return (self._completionTime or time.time()) - self._startTime
+
+    def setDuration(self, duration):
+        self._completionTime = self._startTime + duration
 
     def getBytesSent(self):
         return self._bytesWritten
