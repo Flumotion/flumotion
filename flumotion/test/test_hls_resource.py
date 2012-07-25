@@ -128,6 +128,7 @@ class FakeRequest:
         self.sitepath = []
         self.prepath = []
         self.postpath = ['']
+        self.duration = 0
 
     def setResponseCode(self, code):
         self.response = code
@@ -148,12 +149,15 @@ class FakeRequest:
         if isinstance(self.onFinish, defer.Deferred):
             self.onFinish.callback(self)
 
+    def setDuration(self, duration):
+        self.duration = duration
+
     getUser = lambda s: s.user
     getPassword = lambda s: s.passwd
     getClientIP = lambda s: s.ip
     getAllHeaders = lambda s: s.headers
     getBytesSent = lambda s: ''
-    getDuration = lambda s: 0
+    getDuration = lambda s: s.duration
 
 
 class FakeAuthMedium:
