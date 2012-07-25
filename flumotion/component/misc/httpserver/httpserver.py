@@ -651,7 +651,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
 
     def getStreamData(self):
         socket = 'flumotion.component.plugs.streamdata.StreamDataProviderPlug'
-        if self.plugs[socket]:
+        if socket in self.plugs:
             plug = self.plugs[socket][-1]
             return plug.getStreamData()
         else:
