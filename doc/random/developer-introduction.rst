@@ -666,3 +666,40 @@ From here you can access the vishnu in the manager; for example::
   <Deferred #0>
   Deferred #0 called back: ([7700, 7701, 7702, 7703, 7704, 7705, 7706, 7707, 7708], None)
   >>>
+
+Additional topics
+=================
+
+Admin UI's
+----------
+
+Flumotion uses a view architecture to display the UI for components.
+When you click on a component in flumotion-admin, it loads bundles for
+the component's GTK admin view on the fly and loads it.
+
+As a consequence, you can make changes to the code and see the result of
+those changes immediately without restarting Flumotion.
+
+As an example, set up a flow that includes the videotest-producer, and click
+on its tab.
+
+Open up flumotion/component/producers/videotest/admin_gtk.py and change the
+label called 'Pattern' to something else.  Click again on the component
+to reload the UI and note that its label has changed.
+
+
+Internationalization
+--------------------
+
+Flumotion handles translations lazily, translating messages generated on
+managers and workers only when displaying them in admin clients.
+
+See flumotion.common.i18n for where this is defined, and
+flumotion.component.producers.videotest.admin_gtk for an example use
+(look for the example messages).
+
+To test translations, run the admin in a different locale; for example::
+
+  LANG=nl_NL flumotion-admin
+
+See `Updating translation`_ for more information.
