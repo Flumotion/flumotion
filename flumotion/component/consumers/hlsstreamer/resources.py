@@ -73,12 +73,6 @@ class HTTPLiveStreamingResource(FragmentedResource):
         self._writeHeaders(request)
         if request.method == 'GET':
             data = self.ring.getFragment(resource)
-            # FIXME: The duration of the session is taken from
-            # the duration of the fragments viewed, thus an
-            # imperfect value is almost always recorded on the
-            # last fragment.
-            duration = self.ring.getFragmentDuration(resource)
-            request.setDuration(duration)
             request.setHeader('content-length', len(data))
             request.write(data)
             self.bytesSent += len(data)

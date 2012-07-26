@@ -226,9 +226,6 @@ class HLSRing(Playlister):
         cipher = AES.new(secret, AES.MODE_CBC, left_pad(str(IV)))
         return EncodeAES(cipher, fragment)
 
-    def _getSequenceNumber(self, name):
-        return int(name.split('-')[1].split('.')[0])
-
     def reset(self):
         self._fragmentsDict = {}
         self._keysDict = {}
@@ -298,22 +295,6 @@ class HLSRing(Playlister):
         if fragmentName in self._dummyFragments:
             raise FragmentNotAvailable()
         raise FragmentNotFound()
-
-    def getFragmentDuration(self, fragmentName):
-        '''
-        Returns the duration of a fragment of the playlist
-
-        @param fragmentName:    name of the fragment to retrieve
-        @type  fragmentName:    str
-
-        @return:                the duration of the fragment
-        @rtype:                 int
-        '''
-
-        if fragmentName in self._fragmentsDict:
-            return [frag[1] for frag in self._fragments if
-                    frag[0] == self._getSequenceNumber(fragmentName)][0]
-        return 0
 
     def getEncryptionKey(self, key):
         '''
