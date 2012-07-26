@@ -617,6 +617,25 @@ to run cannot be run, you need to specify the reactor, for instance::
 
   trial -r gtk2 flumotion.test.test_component_disker
 
+Unit test coverage
+------------------
+
+You can get coverage data for the unit tests::
+
+  make coverage
+
+This will give you a breakdown per module, showing coverage percentage as well
+as lines covered.  At the bottom, you'll see the total coverage.
+
+
+You can also see which lines of each file get covered.
+Under _trial_coverage/coverage, one file is generated per module.
+
+For example:
+  less _trial_coverage/coverage/flumotion.common.formatting.cover
+
+Lines marked with >>>>>>>> are not covered by the tests.
+
 Debugging
 ---------
 
