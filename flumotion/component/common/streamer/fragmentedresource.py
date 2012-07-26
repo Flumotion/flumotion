@@ -167,7 +167,7 @@ class FragmentedResource(HTTPStreamingResource, log.Loggable):
 
     def _getExtraLogArgs(self, request):
         uid = request.session and request.session.uid or None
-        return {'uid': uid}
+        return {'session-id': uid}
 
     def _checkSession(self, request):
         """
