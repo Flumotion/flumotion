@@ -423,9 +423,13 @@ class Component(util.LogCommand):
         self.parser.add_option('-i', '--component-id',
             action="store", dest="componentId",
             help="component id of the component")
+        self.parser.add_option('-e', '--extra-attrs',
+            action="store", dest="extraAttributes", default="",
+            help="comma-separated extra attributes for the component list")
 
     def handleOptions(self, options):
         self.componentId = options.componentId
+        self.extraAttributes = options.extraAttributes.split(",")
         # call our callback after connecting
         self.getRootCommand().loginDeferred.addCallback(self._callback)
 
@@ -485,5 +489,9 @@ class Component(util.LogCommand):
                     host = w.get('host')
                     break
             moodName = planet.moods.get(c.get('mood')).name
-            comps.append((c.get('name'), c.get('type'), host, moodName))
+            componentAttrs = [c.get('name'), c.get('type'), host, moodName]
+            for attr in self.extraAttributes:
+                if c.hasKey(attr):
+                    componentAttrs.append(str(c.get(attr)))
+            comps.append(componentAttrs)
         self.pprint(comps)
