@@ -29,9 +29,6 @@ import urlparse
 import urllib2
 import cookielib
 
-import gst
-import gobject
-
 from twisted.internet import reactor, defer
 
 from flumotion.admin import admin, connections
@@ -404,22 +401,31 @@ class GstInfo:
     error = None
 
     def __init__(self, uri, options, tmpfile):
+
+        # if we import gst globally, it overrides our --help output
+        import gobject
+        import gst
+
+        self.gobject = gobject
+        self.gst = gst
+
         PIPELINE = '%s ! tee name = t ! \
             queue ! decodebin name=dbin t. ! \
             queue ! filesink location=%s' % (uri, tmpfile)
 
         if options.timeout:
-            gobject.timeout_add(int(options.timeout) * 1000, self.timedOut)
+            self.gobject.timeout_add(int(options.timeout) * 1000,
+                self.timedOut)
         self.duration = options.duration
-        self.mainloop = gobject.MainLoop()
-        self.pipeline = gst.parse_launch(PIPELINE)
+        self.mainloop = self.gobject.MainLoop()
+        self.pipeline = self.gst.parse_launch(PIPELINE)
         self.dbin = self.pipeline.get_by_name('dbin')
         self.bus = self.pipeline.get_bus()
         self.bus.add_watch(self.onBusMessage)
         self.dbin.connect('new-decoded-pad', self.demux_pad_added)
 
     def run(self):
-        self.pipeline.set_state(gst.STATE_PLAYING)
+        self.pipeline.set_state(self.gst.STATE_PLAYING)
 
         self.mainloop.run()
         return self.have_audio, self.have_video, self.info, self.error
@@ -427,14 +433,14 @@ class GstInfo:
     def launch_eos(self):
         if self.have_audio and self.have_video:
             if self.audio_done and self.video_done:
-                self.bus.post(gst.message_new_eos(self.pipeline))
+                self.bus.post(self.gst.message_new_eos(self.pipeline))
         else:
             if self.audio_done or self.video_done:
-                self.bus.post(gst.message_new_eos(self.pipeline))
+                self.bus.post(self.gst.message_new_eos(self.pipeline))
 
     def get_audio_info_cb(self, sink, buffer, pad):
         '''Callback to get audio info'''
-        timestamp = buffer.timestamp / gst.SECOND
+        timestamp = buffer.timestamp / self.gst.SECOND
         if not self.audio_ts:
             self.audio_ts = timestamp
         if (self.audio_ts + self.duration) < timestamp:
@@ -449,7 +455,7 @@ class GstInfo:
 
     def get_video_info_cb(self, sink, buffer, pad):
         '''Callback to get video info'''
-        timestamp = buffer.timestamp / gst.SECOND
+        timestamp = buffer.timestamp / self.gst.SECOND
         if not self.video_ts:
             self.video_ts = timestamp
         if (self.video_ts + self.duration) < timestamp:
@@ -507,37 +513,38 @@ class GstInfo:
         stream_type = structure.get_name()
         if stream_type.startswith('video'):
             self.have_video = True
-            colorspace = gst.element_factory_make('ffmpegcolorspace')
+            colorspace = self.gst.element_factory_make('ffmpegcolorspace')
             self.pipeline.add(colorspace)
-            colorspace.set_state(gst.STATE_PLAYING)
+            colorspace.set_state(self.gst.STATE_PLAYING)
             pad.link(colorspace.get_pad('sink'))
-            self.video = gst.element_factory_make('fakesink')
+            self.video = self.gst.element_factory_make('fakesink')
             self.video.props.signal_handoffs = True
             self.pipeline.add(self.video)
-            self.video.set_state(gst.STATE_PLAYING)
+            self.video.set_state(self.gst.STATE_PLAYING)
             colorspace.link(self.video)
             self.video_cb = self.video.connect('handoff',
                 self.get_video_info_cb)
         elif stream_type.startswith('audio'):
             self.have_audio = True
-            self.audio = gst.element_factory_make('fakesink')
+            self.audio = self.gst.element_factory_make('fakesink')
             self.audio.props.signal_handoffs = True
             self.pipeline.add(self.audio)
-            self.audio.set_state(gst.STATE_PLAYING)
+            self.audio.set_state(self.gst.STATE_PLAYING)
             pad.link(self.audio.get_pad('sink'))
             self.audio_cb = self.audio.connect('handoff',
                 self.get_audio_info_cb)
 
     def quit(self):
         self.get_mime()
-        self.pipeline.set_state(gst.STATE_NULL)
+        self.pipeline.set_state(self.gst.STATE_NULL)
         self.pipeline.get_state()
         self.mainloop.quit()
 
     def onBusMessage(self, bus, message):
-        if message.src == self.pipeline and message.type == gst.MESSAGE_EOS:
+        if message.src == self.pipeline \
+            and message.type == self.gst.MESSAGE_EOS:
             self.quit()
-        elif message.type == gst.MESSAGE_ERROR:
+        elif message.type == self.gst.MESSAGE_ERROR:
             self.error = message.parse_error()
             self.mainloop.quit()
         return True
