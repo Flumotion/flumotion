@@ -18,10 +18,24 @@ Other specific code guidelines:
 
 [1]: http://www.python.org/peps/pep-0008.html
 
-ChangeLog
----------
-All checkins should add an appropriate entry in the ChangeLog.
-Exceptions for repository ignore files and metadata.
+IMPORT
+------
+
+In Flumotion code, don't import objects directly; import the module name.
+This makes it easier to see which names are local to the current module,
+and which come from another module.  This matches Twisted's style.
+
+For example, use
+
+    from flumotion.component import component
+
+    c = component.BaseComponent(...)
+
+Instead of doing
+
+    from flumotion.component.component import BaseComponent
+
+    c = BaseComponent(...)
 
 UI
 --
