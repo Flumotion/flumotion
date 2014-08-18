@@ -29,6 +29,7 @@
         <socket type="flumotion.component.plugs.requestmodifier.RequestModifierPlug"/>
         <socket type="flumotion.component.bouncers.plug.BouncerPlug" />
         <socket type="flumotion.component.bouncers.algorithms.BouncerAlgorithm" />
+        <socket type="flumotion.component.plugs.streamerdata.StreamerInfoPlug" />
       </sockets>
 
       <properties xmlns:xi="http://www.w3.org/2001/XInclude">

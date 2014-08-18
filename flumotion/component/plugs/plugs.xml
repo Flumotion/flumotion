@@ -122,6 +122,26 @@
       </properties>
     </plug>
 
+    <plug socket="flumotion.component.plugs.streamerdata.StreamerInfoPlug"
+          type="streamerdata-info"
+          _description="Prints data of a provided stream">
+      <entries>
+        <entry type="default"
+               location="flumotion/component/plugs/streamerdata.py"
+               function="StreamerInfoPlug" />
+        <entry type="wizard"
+               location="flumotion/component/plugs/wizard_gtk.py"
+               function="StreamerInfoPlugWizardPlugin" />
+      </entries>
+
+     <wizard _description="Force browsers to ask for download." type="httpserver-plug"/>
+
+      <properties>
+        <property name="feed-id" type="string" required="true"
+                  _description="feed id" />
+      </properties>
+    </plug>
+
    <plug socket="flumotion.component.plugs.base.ComponentPlug"
           type="component-manhole"
           _description="Creates a manhole to a component to which you can log in over telnet or ssh.">
@@ -220,6 +240,16 @@
       <directories>
         <directory name="flumotion/component/plugs">
           <filename location="requestmodifier.py" />
+        </directory>
+      </directories>
+    </bundle>
+    <bundle name="base-plugs-streamerdata">
+      <dependencies>
+        <dependency name="base-plugs" />
+      </dependencies>
+      <directories>
+        <directory name="flumotion/component/plugs">
+          <filename location="streamerdata.py" />
         </directory>
       </directories>
     </bundle>

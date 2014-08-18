@@ -87,6 +87,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         socket = 'flumotion.component.plugs.request.RequestLoggerPlug'
         self.loggers = streamer.plugs.get(socket, [])
 
+        socket_two = 'flumotion.component.plugs.streamerdata.StreamerInfoPlug'
+        self.loggers.extend(streamer.plugs.get(socket_two, []))
+
         socket = \
             'flumotion.component.plugs.requestmodifier.RequestModifierPlug'
         self.modifiers = streamer.plugs.get(socket, [])
@@ -142,6 +145,32 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 logger.event, 'http_session_completed', args))
 
         return defer.DeferredList(l)
+
+    def logWriteStarted(self, request, bytes_sent, time_connected):
+        headers = request.getAllHeaders()
+
+        args = {'ip': request.getClientIP(),
+                'time': time.gmtime(),
+                'method': request.method,
+                'uri': request.uri,
+                'username': '-', # FIXME: put the httpauth name
+                'get-parameters': request.args,
+                'clientproto': request.clientproto,
+                'response': request.code,
+                'bytes-sent': bytes_sent,
+                'referer': headers.get('referer', None),
+                'user-agent': headers.get('user-agent', None),
+                'time-connected': time_connected}
+
+        args.update(self._getExtraLogArgs(request))
+
+        l = []
+        for logger in self.loggers:
+            l.append(defer.maybeDeferred(
+                logger.event, 'http_session_started', args))
+
+        return defer.DeferredList(l)
+
 
     def setUserLimit(self, limit):
         self.info('setting maxclients to %d' % limit)

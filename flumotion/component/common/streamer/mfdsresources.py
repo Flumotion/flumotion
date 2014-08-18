@@ -60,6 +60,16 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
             time_connected = -1
         return self.logWrite(request, bytes_sent, time_connected)
 
+    def _logWriteStarted(self, request, stats):
+        if stats:
+            bytes_sent = stats[0]
+            time_connected = int(stats[3] / gst.SECOND)
+        else:
+            bytes_sent = -1
+            time_connected = -1
+        return self.logWriteStarted(request, bytes_sent, time_connected)
+
+
     def _removeClient(self, request, fd, stats):
         """
         Removes a request and add logging.
@@ -195,6 +205,13 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
 
     def _handleNewClient(self, request):
         # everything fulfilled, serve to client
+        ip = request.getClientIP()
+        if self._logRequestFromIP(ip):
+            d = self._logWriteStarted(request, stats)
+        else:
+            d = defer.succeed(True)
+
+
         fdi = request.fdIncoming
         if not self._writeHeaders(request):
             self.debug("[fd %5d] not adding as a client" % fdi)

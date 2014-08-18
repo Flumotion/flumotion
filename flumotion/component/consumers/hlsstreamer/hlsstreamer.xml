@@ -20,6 +20,7 @@
         <socket type="flumotion.component.plugs.request.RequestLoggerPlug" />
         <socket type="flumotion.component.plugs.streamdata.StreamDataProviderPlug" />
         <socket type="flumotion.component.plugs.rrd.ComponentRRDPlug" />
+        <socket type="flumotion.component.plugs.streamerdata.StreamerInfoPlug" />
       </sockets>
 
       <properties xmlns:xi="http://www.w3.org/2001/XInclude">
