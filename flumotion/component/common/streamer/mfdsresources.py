@@ -69,7 +69,6 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
             time_connected = -1
         return self.logWriteStarted(request, bytes_sent, time_connected)
 
-
     def _removeClient(self, request, fd, stats):
         """
         Removes a request and add logging.

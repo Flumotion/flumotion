@@ -53,7 +53,9 @@ class GraphiteHelper(log.Loggable):
 
     def open(self, server, port):
         if self.state == self.CLOSED:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+            self.socket = socket.socket(socket.AF_INET,
+                                        socket.SOCK_DGRAM,
+                                        socket.IPPROTO_UDP)
             try:
                 self.socket.connect((server, port))
                 self.state = self.OPEN
@@ -73,15 +75,15 @@ class GraphiteHelper(log.Loggable):
             self.state = self.CLOSED
 
     def send_measures(self, feed_id, user_agent, session_started=False):
-        #if self.state == self.OPEN:
-    
-        user_agent = parse_user_agent(user_agent)
-        inc = "-1"
-        if session_started:
-            inc = "+1"         
-        message = "flumotion.streamer.%s.sessions.%s:%s|g" % (feed_id, user_agent, inc)
-        self.debug("Graphite DATA sent %s" % message)
-        self.sent = self.socket.send(message)
+        if self.state == self.OPEN:
+            user_agent = parse_user_agent(user_agent)
+            inc = "-1"
+            if session_started:
+                inc = "+1"
+            message = "flumotion.streamer.%s.sessions.%s:%s|g" \
+                % (feed_id, user_agent, inc)
+            self.debug("Graphite DATA sent %s" % message)
+            self.sent = self.socket.send(message)
 
 STATS_SERVER = 'cassidy01dev.bt.bcn.flumotion.net'
 STATS_PORT = 8125
@@ -99,7 +101,8 @@ class StreamerInfoPlug(request.RequestLoggerPlug, log.Loggable):
         self.debug("Start..")
 
         if 'feed-id' in self.args['properties']:
-            self.debug("Plugin started. Feed id -> %s" % self.args['properties']['feed-id'])
+            self.debug("Plugin started. Feed id -> %s" \
+                % self.args['properties']['feed-id'])
             self.feed_id = self.args['properties']['feed-id']
             self.activated = True
         self.debug("starting plugin....")
@@ -123,13 +126,12 @@ class StreamerInfoPlug(request.RequestLoggerPlug, log.Loggable):
 
         # Send metrics.
         self.helper.send_measures(self.feed_id, args['user-agent'], False)
-        return     
+        return
 
     def event_http_session_started(self, args):
         if not self.activated:
             return
         self.debug("Session started")
-        
+
         # Send metrics.
         self.helper.send_measures(self.feed_id, args['user-agent'], True)
-

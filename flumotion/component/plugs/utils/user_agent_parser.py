@@ -24,7 +24,8 @@ THE SOFTWARE.
 
 """
 Extract client information from http user agent
-The module does not try to detect all capabilities of browser in current form (it can easily be extended though).
+The module does not try to detect all capabilities of browser in current
+form (it can easily be extended though).
 Tries to
     * be fast
     * very easy to extend
@@ -55,7 +56,9 @@ class DetectorsHub(dict):
         return iter(self._known_types)
 
     def registerDetectors(self):
-        detectors = [v() for v in globals().values() if DetectorBase in getattr(v, '__mro__', [])]
+        mro = getattr(v, '__mro__', [])
+        detectors = \
+            [v() for v in globals().values() if DetectorBase in mro]
         for d in detectors:
             if d.can_register:
                 self.register(d)
@@ -90,7 +93,8 @@ class DetectorBase(object):
             if version:
                 result[self.info_type]['version'] = version
             if self.platform:
-                result['platform'] = {'name': self.platform, 'version': version}
+                result['platform'] = \
+                    {'name': self.platform, 'version': version}
             return True
 
     def checkWords(self, agent):
@@ -110,7 +114,8 @@ class DetectorBase(object):
         => version string /None
         """
         version_markers = self.version_markers if \
-            isinstance(self.version_markers[0], (list, tuple)) else [self.version_markers]
+            isinstance(self.version_markers[0], (list, tuple)) else \
+                [self.version_markers]
         version_part = agent.split(word, 1)[-1]
         for start, end in version_markers:
             if version_part.startswith(start) and end in version_part:
@@ -215,7 +220,8 @@ class Trident(Browser):
     }
 
     def getVersion(self, agent, word):
-        return self.trident_to_ie_versions.get(super(Trident, self).getVersion(agent, word))
+        return self.trident_to_ie_versions.get( \
+            super(Trident, self).getVersion(agent, word))
 
 
 class MSIE(Browser):
@@ -253,7 +259,8 @@ class Safari(Browser):
         if "Safari/" in agent:
             return agent.split('Safari/')[-1].split(' ')[0].strip()
         else:
-            return agent.split('Safari ')[-1].split(' ')[0].strip()  # Mobile Safari
+            # Mobile Safari
+            return agent.split('Safari ')[-1].split(' ')[0].strip()
 
 class GoogleBot(Browser):
     # https://support.google.com/webmasters/answer/1061943
@@ -298,7 +305,8 @@ class YandexBot(Browser):
     bot = True
 
     def getVersion(self, agent, word):
-        return agent[agent.index('Yandex'):].split('/')[-1].split(')')[0].strip()
+        return agent[agent.index('Yandex'):] \
+            .split('/')[-1].split(')')[0].strip()
 
 class BingBot(Browser):
     look_for = "bingbot"
@@ -560,7 +568,8 @@ class ChromeOS(OS):
         version_markers = self.version_markers
         if word + '+' in agent:
             version_markers = ['+', '+']
-        return agent.split(word + version_markers[0])[-1].split(version_markers[1])[1].strip()[:-1]
+        return agent.split(word \
+            + version_markers[0])[-1].split(version_markers[1])[1].strip()[:-1]
 
 
 class Android(Dist):
@@ -622,7 +631,8 @@ detectorshub = DetectorsHub()
 
 def detect(agent, fill_none=False):
     """
-    fill_none: if name/version is not detected respective key is still added to the result with value None
+    fill_none: if name/version is not detected respective
+    key is still added to the result with value None
     """
     result = dict(platform=dict(name=None, version=None))
     _suggested_detectors = []
@@ -661,10 +671,14 @@ def simple_detect(agent):
         os_list.append(result['os']['name'])
 
     os = os_list and " ".join(os_list) or "Unknown OS"
-    os_version = os_list and (result.get('flavor') and result['flavor'].get('version')) or \
-        (result.get('dist') and result['dist'].get('version')) or (result.get('os') and result['os'].get('version')) or ""
-    browser = 'browser' in result and result['browser'].get('name') or 'Unknown Browser'
-    browser_version = 'browser' in result and result['browser'].get('version') or ""
+    os_version = os_list and (result.get('flavor') and \
+        result['flavor'].get('version')) or \
+            (result.get('dist') and result['dist'].get('version')) or \
+                (result.get('os') and result['os'].get('version')) or ""
+    browser = 'browser' in result and result['browser'].get('name') or \
+         'Unknown Browser'
+    browser_version = 'browser' in result and \
+        result['browser'].get('version') or ""
     if browser_version:
         browser = " ".join((browser, browser_version))
     if os_version:
