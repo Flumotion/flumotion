@@ -53,7 +53,7 @@ class GraphiteHelper(log.Loggable):
 
     def open(self, server, port):
         if self.state == self.CLOSED:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             try:
                 self.socket.connect((server, port))
                 self.state = self.OPEN

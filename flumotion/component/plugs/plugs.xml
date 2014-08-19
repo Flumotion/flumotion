@@ -129,12 +129,7 @@
         <entry type="default"
                location="flumotion/component/plugs/streamerdata.py"
                function="StreamerInfoPlug" />
-        <entry type="wizard"
-               location="flumotion/component/plugs/wizard_gtk.py"
-               function="StreamerInfoPlugWizardPlugin" />
       </entries>
-
-     <wizard _description="Force browsers to ask for download." type="httpserver-plug"/>
 
       <properties>
         <property name="feed-id" type="string" required="true"
