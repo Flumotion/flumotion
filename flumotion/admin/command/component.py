@@ -18,6 +18,8 @@
 """
 component commands
 """
+import simplejson
+
 from twisted.internet import defer
 
 from flumotion.admin.command import common
@@ -296,6 +298,19 @@ class PropertyList(common.AdminCommand):
 
 # FIXME: why is this called property when it really is about ui state ?
 
+class PropertyAll(common.AdminCommand):
+    description = "List all properties of a component with their values."
+    name = 'all'
+
+    def doCallback(self, args):
+        l = self.parentCommand.uiState.keys()
+        all_props = {}
+        l.sort()
+        for p in l:
+            if p not in ['feeders', 'eaters', 'next_points']:
+                all_props[p] = self.parentCommand.uiState[p]
+        self.stdout.write(simplejson.dumps(all_props))
+
 
 class Property(util.LogCommand):
     """
@@ -304,7 +319,7 @@ class Property(util.LogCommand):
 
     description = "Act on properties of a component."
 
-    subCommandClasses = [PropertyGet, PropertyList]
+    subCommandClasses = [PropertyGet, PropertyList, PropertyAll]
 
     def handleOptions(self, options):
         if not self.parentCommand.componentId:

@@ -222,6 +222,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             request.setHeader('Cache-Control', 'no-cache')
             request.setHeader('Cache-Control', 'private')
         request.setHeader('Content-type', content)
+        request.setHeader('Access-Control-Allow-Origin', '*')
 
     def _addClient(self, id, request=None):
         """
