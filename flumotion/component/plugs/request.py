@@ -71,8 +71,8 @@ class RequestLoggerFilePlug(RequestLoggerPlug):
             self.file = open(self.filename, 'a')
         except IOError, data:
             raise errors.PropertyError('could not open log file %s '
-                                         'for writing (%s)'
-                                         % (self.filename, data[1]))
+                                       'for writing (%s)'
+                                       % (self.filename, data[1]))
 
     def stop(self, component=None):
         if self.file:

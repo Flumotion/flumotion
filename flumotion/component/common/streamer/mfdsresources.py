@@ -99,7 +99,7 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
         self.httpauth.cleanupAuth(fd)
 
         self.debug('[fd %5d] (ts %f) closing transport %r', fd, time.time(),
-            request.transport)
+                   request.transport)
         # This will close the underlying socket. We first remove the request
         # from our fd->request map, since the moment we call this the fd might
         # get re-added.
@@ -121,7 +121,7 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
         d.addCallback(_done)
         return d
 
-    ### resource.Resource methods
+    #  resource.Resource methods
 
     def handleAuthenticatedRequest(self, res, request):
         # PROBE: authenticated request; see httpserver.httpfile
@@ -177,7 +177,7 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
 
         headers = self._formatHeaders(request)
 
-        ### FIXME: there's a window where Twisted could have removed the
+        #  FIXME: there's a window where Twisted could have removed the
         # fd because the client disconnected.  Catch EBADF correctly here.
         try:
             # TODO: This is a non-blocking socket, we really should check
@@ -210,7 +210,6 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
         else:
             d = defer.succeed(True)
 
-
         fdi = request.fdIncoming
         if not self._writeHeaders(request):
             self.debug("[fd %5d] not adding as a client" % fdi)
@@ -229,9 +228,9 @@ class MultiFdSinkStreamingResource(resources.HTTPStreamingResource,
         fd = fdi
         self.debug("[fd %5d] taking away from Twisted" % fd)
         reactor.removeReader(request.transport)
-        #reactor.removeWriter(request.transport)
+        #  reactor.removeWriter(request.transport)
 
-        # check if it's really an open fd (i.e. that twisted didn't close it
+        #  check if it's really an open fd (i.e. that twisted didn't close it
         # before the removeReader() call)
         try:
             fcntl.fcntl(fd, fcntl.F_GETFL)
@@ -300,7 +299,7 @@ class HTTPRoot(web_resource.Resource, log.Loggable):
         if request.postpath:
             fullPath += '/' + string.join(request.postpath, '/')
         self.debug("[fd %5d] Incoming request %r for path %s",
-            request.transport.fileno(), request, fullPath)
+                   request.transport.fileno(), request, fullPath)
         r = web_resource.Resource.getChildWithDefault(self, fullPath, request)
         self.debug("Returning resource %r" % r)
         return r

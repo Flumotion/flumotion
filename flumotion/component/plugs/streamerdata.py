@@ -25,11 +25,12 @@ import traceback
 from flumotion.common import python, log
 from flumotion.component.plugs import request
 from flumotion.component.base.http import LogFilter as logfilter
-#from flumotion.component.plugs import user_agent_parser as parser
+#  from flumotion.component.plugs import user_agent_parser as parser
 
 from twisted.internet import task
 
 __version__ = "$Rev$"
+
 
 def parse_user_agent(user_agent):
     """ Helper to parse user agent into mobile or pc. """
@@ -38,6 +39,7 @@ def parse_user_agent(user_agent):
     if "iPhone" in user_agent[0] or "Android" in user_agent[0]:
         return "mobile"
     return "pc"
+
 
 class GraphiteHelper(log.Loggable):
     """ Helper to send statistics to graphite. """
@@ -88,6 +90,7 @@ class GraphiteHelper(log.Loggable):
 STATS_SERVER = 'cassidy01dev.bt.bcn.flumotion.net'
 STATS_PORT = 8125
 
+
 class StreamerInfoPlug(request.RequestLoggerPlug, log.Loggable):
     """
     Base class for obtain information associated to a streamer.
@@ -101,8 +104,8 @@ class StreamerInfoPlug(request.RequestLoggerPlug, log.Loggable):
         self.debug("Start..")
 
         if 'feed-id' in self.args['properties']:
-            self.debug("Plugin started. Feed id -> %s" \
-                % self.args['properties']['feed-id'])
+            self.debug("Plugin started. Feed id -> %s"
+                       % self.args['properties']['feed-id'])
             self.feed_id = self.args['properties']['feed-id']
             self.activated = True
         self.debug("starting plugin....")

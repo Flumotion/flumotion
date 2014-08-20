@@ -50,7 +50,7 @@ ERROR_TEMPLATE = """<!doctype html public "-//IETF//DTD HTML 2.0//EN">
 """
 
 
-### the Twisted resource that handles the base URL
+# the Twisted resource that handles the base URL
 
 HTTP_VERSION = configure.version
 
@@ -59,7 +59,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     HTTP_NAME = 'FlumotionHTTPServer'
     HTTP_SERVER = '%s/%s' % (HTTP_NAME, HTTP_VERSION)
 
-    __reserve_fds__ = 50 # number of fd's to reserve for non-streaming
+    __reserve_fds__ = 50  # number of fd's to reserve for non-streaming
 
     logCategory = 'httpstreamer'
 
@@ -76,10 +76,11 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         self.httpauth = httpauth
 
         self._requests = {}            # request fd -> Request
-        self._removing = {} # Optional deferred notification of client removals
 
+        # Optional deferred notification of client removals
+        self._removing = {}
         self.maxclients = self.getMaxAllowedClients(-1)
-        self.maxbandwidth = -1 # not limited by default
+        self.maxbandwidth = -1  # not limited by default
 
         # If set, a URL to redirect a user to when the limits above are reached
         self._redirectOnFull = None
@@ -128,7 +129,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 'time': time.gmtime(),
                 'method': request.method,
                 'uri': request.uri,
-                'username': '-', # FIXME: put the httpauth name
+                'username': '-',  # FIXME: put the httpauth name
                 'get-parameters': request.args,
                 'clientproto': request.clientproto,
                 'response': request.code,
@@ -153,7 +154,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 'time': time.gmtime(),
                 'method': request.method,
                 'uri': request.uri,
-                'username': '-', # FIXME: put the httpauth name
+                'username': '-',  # FIXME: put the httpauth name
                 'get-parameters': request.args,
                 'clientproto': request.clientproto,
                 'response': request.code,
@@ -170,7 +171,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 logger.event, 'http_session_started', args))
 
         return defer.DeferredList(l)
-
 
     def setUserLimit(self, limit):
         self.info('setting maxclients to %d' % limit)
@@ -206,7 +206,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             # http://sourceforge.net/tracker/index.php?func=detail&
             #   aid=1494314&group_id=5470&atid=105470
             if version[:3] == (2, 4, 3) and \
-                not hasattr(socket, "has_2_4_3_patch"):
+                    not hasattr(socket, "has_2_4_3_patch"):
                 self.warning(
                     'Setting hardmax to 1024 due to python 2.4.3 bug')
                 hardmax = 1024
@@ -283,7 +283,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         else:
             return True
 
-    ### resource.Resource methods
+    # resource.Resource methods
 
     def _handleNotReady(self, request):
         self.debug('Not sending data, it\'s not ready')
@@ -292,12 +292,12 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
     def _handleServerFull(self, request):
         if self._redirectOnFull:
             self.debug("Redirecting client, client limit %d reached",
-                self.maxclients)
+                       self.maxclients)
             error_code = http.FOUND
             request.setHeader('location', self._redirectOnFull)
         else:
             self.debug('Refusing clients, client limit %d reached' %
-                self.maxclients)
+                       self.maxclients)
             error_code = http.SERVICE_UNAVAILABLE
 
         request.setHeader('content-type', 'text/html')
