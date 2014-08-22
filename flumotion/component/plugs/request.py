@@ -83,10 +83,6 @@ class RequestLoggerFilePlug(RequestLoggerPlug):
         self.file.write(_http_session_completed_to_apache_log(args))
         self.file.flush()
 
-    def event_http_session_started(self, args):
-        self.file.write(_http_session_completed_to_apache_log(args))
-        self.file.flush()
-
     def rotate(self):
         self.stop()
         self.start()

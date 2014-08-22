@@ -25,7 +25,7 @@ import traceback
 from flumotion.common import python, log
 from flumotion.component.plugs import request
 from flumotion.component.base.http import LogFilter as logfilter
-#  from flumotion.component.plugs import user_agent_parser as parser
+from flumotion.component.plugs.utils import user_agent_parser as parser
 
 from twisted.internet import task
 
@@ -121,16 +121,6 @@ class StreamerInfoPlug(request.RequestLoggerPlug, log.Loggable):
         # Close helper.
         self.helper.close()
 
-    def event_http_session_completed(self, args):
-        self.debug("Session completed")
-
-        if not self.activated:
-            return
-
-        # Send metrics.
-        self.helper.send_measures(self.feed_id, args['user-agent'], False)
-        return
-
     def event_http_session_started(self, args):
         if not self.activated:
             return
@@ -138,3 +128,11 @@ class StreamerInfoPlug(request.RequestLoggerPlug, log.Loggable):
 
         # Send metrics.
         self.helper.send_measures(self.feed_id, args['user-agent'], True)
+
+    def event_http_session_disconnected(self, args):
+        if not self.activated:
+            return
+        self.debug("Session disconnected")
+
+        # Send metrics.
+        self.helper.send_measures(self.feed_id, args['user-agent'], False)

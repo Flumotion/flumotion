@@ -147,7 +147,7 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         return defer.DeferredList(l)
 
-    def logWriteStarted(self, request, bytes_sent, time_connected):
+    def logWriteStarted(self, request):
         headers = request.getAllHeaders()
 
         args = {'ip': request.getClientIP(),
@@ -158,10 +158,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
                 'get-parameters': request.args,
                 'clientproto': request.clientproto,
                 'response': request.code,
-                'bytes-sent': bytes_sent,
                 'referer': headers.get('referer', None),
-                'user-agent': headers.get('user-agent', None),
-                'time-connected': time_connected}
+                'user-agent': headers.get('user-agent', None)}
 
         args.update(self._getExtraLogArgs(request))
 
@@ -169,6 +167,21 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         for logger in self.loggers:
             l.append(defer.maybeDeferred(
                 logger.event, 'http_session_started', args))
+
+        return defer.DeferredList(l)
+
+    def logSessionDisconnected(self, request):
+        headers = request.getAllHeaders()
+
+        args = {'user-agent': headers.get('user-agent', None)}
+
+        args.update(self._getExtraLogArgs(request))
+
+        l = []
+        for logger in self.loggers:
+            self.debug("Loggers %s" % logger)
+            l.append(defer.maybeDeferred(
+                logger.event, 'http_session_disconnected', args))
 
         return defer.DeferredList(l)
 
@@ -259,6 +272,8 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         @param id: the of the client (fd or session id)
         @type request: int
         """
+        if id not in self._requests:
+            self.logWriteStarted(request=request and request or id)
         self._requests[id] = request and request or id
 
     def _removeClient(self, id):
@@ -269,7 +284,9 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
         @type request: int
         """
         try:
+            aux_request = self._requests[id]
             del self._requests[id]
+            self.logSessionDisconnected(aux_request)
         except Exception:
             self.warning("Error removing request: %s", id)
 
