@@ -1,6 +1,6 @@
 include $(top_srcdir)/common/python.mk
 
-SUBDIRS = cortado hlsmultibitrate html5
+SUBDIRS = cortado hlsmultibitrate html5 utils
 
 component_PYTHON = \
 	__init__.py \
@@ -12,6 +12,7 @@ component_PYTHON = \
 	requestmodifier.py \
 	rrd.py \
 	streamdata.py \
+  streamerdata.py \
         wizard.glade \
         wizard_gtk.py
 
