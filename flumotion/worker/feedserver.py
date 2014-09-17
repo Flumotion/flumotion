@@ -61,8 +61,9 @@ class FeedServer(log.Loggable):
         factory = pb.PBServerFactory(portal,
                                      unsafeTracebacks=unsafeTracebacks)
 
-        tport = reactor.listenWith(fdserver.PassableServerPort, portNum,
-                                   factory)
+        tport = fdserver.PassableServerPort(portNum,
+                                   factory, reactor=reactor)
+        tport.startListening()
 
         self._tport = tport
         self.debug('Listening for feed requests on TCP port %d',

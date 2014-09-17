@@ -408,8 +408,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             self._pbclient.startLogin(creds, self._pbclient.medium)
             self.info("Logging to porter on socketPath %s", self._porterPath)
             # This will eventually cause d to fire
-            reactor.connectWith(fdserver.FDConnector, self._porterPath,
-                self._pbclient, 10, checkPID=False)
+            c = fdserver.FDConnector( self._porterPath,
+                self._pbclient, 10, checkPID=False, reactor=reactor)
+            c.connect()
         else:
             # File Streamer is standalone.
             try:
@@ -500,8 +501,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         self._pbclient.stopTrying()
 
         self._pbclient.resetDelay()
-        reactor.connectWith(fdserver.FDConnector, self._porterPath,
-                            self._pbclient, 10, checkPID=False)
+        c = fdserver.FDConnector( self._porterPath,
+                            self._pbclient, 10, checkPID=False, reactor=reactor)
+        c.connect()
 
     def _timeoutRequests(self):
         self._timeoutRequestsCallLater = None

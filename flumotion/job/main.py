@@ -52,8 +52,9 @@ def main(args):
     log.info('job', 'Connecting to worker on socket %s' % (socket))
 
     job_factory = job.JobClientFactory(avatarId)
-    reactor.connectWith(fdserver.FDConnector, socket, job_factory,
-        10, checkPID=False)
+    c = fdserver.FDConnector( socket, job_factory,
+        10, checkPID=False, reactor=reactor)
+    c.connect()
 
     reactor.addSystemEventTrigger('before', 'shutdown',
         job_factory.medium.shutdownHandler)

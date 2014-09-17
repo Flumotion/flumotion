@@ -135,8 +135,9 @@ class FeedMedium(fpb.Referenceable):
         """
         assert self._factory is None
         self._factory = FeedClientFactory(self)
-        reactor.connectWith(PassableClientConnector, host, port,
-                            self._factory, timeout, bindAddress)
+        c = PassableClientConnector( host, port,
+                            self._factory, timeout, bindAddress, reactor=reactor)
+        c.connect()
         return self._factory.login(authenticator)
 
     def requestFeed(self, host, port, authenticator, fullFeedId):
