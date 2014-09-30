@@ -86,12 +86,22 @@ class GladeBacked(GladeDelegate):
     def __init__(self):
         GladeDelegate.__init__(self, gladefile=self.gladeFile)
 
+        # The following code has already been monkeypatched in kiwipatches.py
         wtree = self.get_glade_adaptor()
         wtree.signal_autoconnect(self)
         self.widgets = {}
         for widget in wtree.get_widgets():
             self.widgets[widget.get_name()] = widget
         self._window = self.widgets[self.toplevel_name]
+
+
+    def get_glade_adaptor():
+        """ 
+            Port the monkeypatched code from kiwi patches! 
+            Change this class to inherit from object....
+            Remove the kiwi imports.
+            Watch the errors fly
+        """
 
 
 class GladeWidget(gtk.VBox, GladeBacked):

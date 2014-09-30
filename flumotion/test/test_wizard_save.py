@@ -17,7 +17,6 @@
 
 import unittest
 
-from kiwi.python import Settable
 
 from flumotion.admin.assistant.configurationwriter import ConfigurationWriter
 from flumotion.admin.assistant.models import Component, Plug, Porter, \

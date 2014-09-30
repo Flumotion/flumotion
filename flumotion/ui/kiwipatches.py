@@ -42,6 +42,7 @@ class FluLibgladeWidgetTree(glade.XML):
             setattr(self._view, widget.get_name(), widget)
 
     def get_widget(self, name):
+        print("Just been asked for this widget: %s" % name)
         name = name.replace('.', '_')
         widget = glade.XML.get_widget(self, name)
         if widget is None:

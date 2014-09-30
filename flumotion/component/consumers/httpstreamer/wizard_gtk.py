@@ -36,7 +36,6 @@ import re
 import os
 
 import gobject
-from kiwi.utils import gsignal
 import gtk
 from twisted.internet import defer
 from zope.interface import implements

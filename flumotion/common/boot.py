@@ -25,7 +25,6 @@ from flumotion.common.log import safeprintf
 __version__ = "$Rev$"
 # Keep in sync with configure.ac
 PYGTK_REQ = (2, 10, 0)
-KIWI_REQ = (1, 9, 13)
 GST_REQ = {'0.10': {'gstreamer': (0, 10, 10),
                     'gst-python': (0, 10, 4)}}
 USE_GOPTION_PARSER = False
@@ -128,45 +127,6 @@ def init_gst():
     return gst_majorminor
 
 
-def init_kiwi():
-    import gobject
-
-    try:
-        from kiwi.__version__ import version as kiwi_version
-    except ImportError:
-        return False
-
-    if kiwi_version < KIWI_REQ:
-        raise SystemExit('ERROR: Kiwi %s or higher is required'
-                         % '.'.join(map(str, KIWI_REQ)))
-    elif gobject.pygobject_version > (2, 26, 0):
-        # Kiwi is not compatible yet with the changes introduced in
-        # http://git.gnome.org/browse/pygobject/commit/?id=84d614
-        # Basically, what we do is to revert the changes in _type_register of
-        # GObjectMeta at least until kiwi works properly with new pygobject
-        from gobject._gobject import type_register
-
-        def _type_register(cls, namespace):
-            ## don't register the class if already registered
-            if '__gtype__' in namespace:
-                return
-
-            if not ('__gproperties__' in namespace or
-                    '__gsignals__' in namespace or
-                    '__gtype_name__' in namespace):
-                return
-
-            # Do not register a new GType for the overrides, as this would sort
-            # of defeat the purpose of overrides...
-            if cls.__module__.startswith('gi.overrides.'):
-                return
-
-            type_register(cls, namespace.get('__gtype_name__'))
-
-        gobject.GObjectMeta._type_register = _type_register
-
-    return True
-
 
 def init_option_parser(gtk, gst):
     # We should only use the GOption parser if we are already going to
@@ -247,8 +207,6 @@ def boot(path, gtk=False, gst=True, installReactor=True):
     if gtk or gst:
         init_gobject()
 
-    if gtk:
-        init_kiwi()
 
     if gst:
         from flumotion.configure import configure

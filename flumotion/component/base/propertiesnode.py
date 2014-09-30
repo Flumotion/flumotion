@@ -23,8 +23,7 @@ import gettext
 import os
 
 import gtk
-from kiwi.python import Settable
-from kiwi.ui.objectlist import ObjectList, Column
+import gobject
 
 from flumotion.component.base.baseadminnode import BaseAdminGtkNode
 
@@ -46,12 +45,12 @@ class PropertiesAdminGtkNode(BaseAdminGtkNode):
         self.widget = gtk.VBox()
         self.widget.set_border_width(6)
 
-        self.properties = ObjectList(
-            [Column('name'),
-             Column('value')])
-        self.properties.set_size_request(-1, 200)
+        self.properties = gtk.TreeView(gtk.TreeStore(
+            gobject.TYPE_STRING, gobject.TYPE_STRING))
+            #[Column('name'),
+            # Column('value')])
+        #self.properties.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
         self.widget.pack_start(self.properties, False, False)
-        self.properties.show()
 
         self._reloadProperties(self.state.get('config')['properties'])
         return self.widget
@@ -67,10 +66,13 @@ class PropertiesAdminGtkNode(BaseAdminGtkNode):
     def _reloadProperties(self, properties):
         if properties is None:
             return
-        self.properties.clear()
         propertyNames = properties.keys()[:]
         propertyNames.sort()
-
-        for name in propertyNames:
-            self.properties.append(
-                Settable(name=name, value=properties[name]))
+        properties_model = self.properties.get_model()
+        tIter = properties_model.get_iter_first()
+        for ind, name in enumerate(propertyNames):
+            if tIter is not None:
+                properties_model.set_value(tIter, ind, properties[name])
+                tIter = properties_model.iter_next(tIter)
+            else:
+                properties_model.append(None, [name, properties[name]])

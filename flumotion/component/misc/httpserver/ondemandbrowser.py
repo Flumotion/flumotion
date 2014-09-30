@@ -26,12 +26,6 @@ import gtk
 import urlparse
 import os
 
-try:
-    from kiwi.ui.widgets import contextmenu
-except:
-    # kiwi < 1.9.22
-    contextmenu = None
-
 from flumotion.ui.fileselector import FileSelector
 from flumotion.common.interfaces import IDirectory
 
@@ -56,9 +50,10 @@ class OnDemandBrowser(FileSelector):
         FileSelector.__init__(self, parent, adminModel)
         self._base_uri = None
         self._root = None
-        if contextmenu:
-            self._popupmenu = self._create_popup_menu()
-            self.set_context_menu(self._popupmenu)
+        # Was only enabled if the version of kiwi was high enough.
+        # Redo in pure pygtk??
+        #self._popupmenu = self._create_popup_menu()
+        #self.set_context_menu(self._popupmenu)
 
     def setBaseUri(self, base_uri):
         self._base_uri = base_uri

@@ -20,16 +20,12 @@ I am a collection of extended GTK widgets for use in Flumotion.
 """
 
 import gobject
-from kiwi.ui.widgets.checkbutton import ProxyCheckButton
-from kiwi.ui.widgets.combo import ProxyComboBox
-from kiwi.ui.widgets.entry import ProxyEntry
-from kiwi.ui.widgets.radiobutton import ProxyRadioButton
-from kiwi.ui.widgets.spinbutton import ProxySpinButton
+import gtk
 
 __version__ = "$Rev$"
 
 
-class FProxyComboBox(ProxyComboBox):
+class FProxyComboBox(gtk.ComboBox):
 
     def set_enum(self, enum_class, value_filter=()):
         """
@@ -39,13 +35,64 @@ class FProxyComboBox(ProxyComboBox):
         """
 
         values = []
+        liststore = gtk.ListStore(str, str)  
+        self.set_model(liststore)
+        cell_nick = gtk.CellRendererText()
+        cell_name = gtk.CellRendererText()
+        self.pack_start(cell_nick, True)
+        self.pack_start(cell_name, True)
+        self.add_attribute(cell_nick, 'text', 0)
+        self.add_attribute(cell_name, 'text', 1)
         for enum in enum_class:
             # If values are specified, filter them out
             if value_filter and not enum in value_filter:
                 continue
             values.append((enum.nick, enum))
+        
         self.prefill(values)
+        self.set_active(0)
+        self.emit('changed')
 
+    def create_model(self, itemdata):
+        """ """
+        if len(itemdata) < 1 or type(itemdata[0]) not in (list, tuple):
+            liststore = gtk.ListStore(str)
+        else:
+            liststore = gtk.ListStore(*[type(x) for x in itemdata[0]])
+        #import pdb; pdb.set_trace()     
+        for ind, item in enumerate(itemdata):
+            if type(item) not in (list, tuple):
+                item = [item]
+            liststore.insert(ind, item)
+        self.set_model(liststore)
+        return liststore
+        
+
+    def prefill(self, itemdata):
+        model = self.get_model()
+        if model is None:
+            model = self.create_model(itemdata)
+        values = set()
+        is_tuple = False
+        for item in itemdata:
+            if type(item) == str:
+                text = item
+                data = None  
+            else:
+                text, data = item
+                is_tuple = True
+            orig = text
+            count = 1
+            while text in values:
+                text = orig + ' (%d)' % count
+                count += 1
+            values.add(text)
+            if is_tuple:
+                model.append((text, data))
+            else:
+                model.append((text,))
+
+gobject.type_register(FProxyComboBox)
 
 class ProxyWidgetMapping:
     # In PyGTK 2.4.0 gtk.glade.XML type_dict parameter is buggy
@@ -55,11 +102,7 @@ class ProxyWidgetMapping:
     # as it is internally, eg failback to the real GType, by doing
     # this PyMapping_GetItemString will never set the error.
 
-    types = {'GtkCheckButton': ProxyCheckButton,
-             'GtkComboBox': FProxyComboBox,
-             'GtkEntry': ProxyEntry,
-             'GtkRadioButton': ProxyRadioButton,
-             'GtkSpinButton': ProxySpinButton}
+    types = {'GtkComboBox': FProxyComboBox}
 
     def __getitem__(self, name):
         if name in self.types:

@@ -150,6 +150,7 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
 
         if isinstance(self.state.get('parent'), AdminFlowState):
             self.gst_profile.prefill(default)
+            x = 2
         else:
             self.gst_profile.hide()
             self.gst_label.hide()
@@ -174,18 +175,36 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
             self._label_uptime.set_text(_("not available"))
 
     def _setGstDebug(self, value):
+        """ The below lines are commented out because we need
+            to rip out kiwi - Here is the kiwi code that needs to be 
+            implemented hee:
+            def select_item_by_data(self, data):
+                if self.mode != ComboMode.DATA:
+                    raise TypeError("select_item_by_data can only be used in data mode")
+                model = self._combobox.get_model()
+                for row in model:
+                    if row[ComboColumn.DATA] == data:
+                        self._combobox.set_active_iter(row.iter)
+                        break
+                    else:
+                        raise KeyError("No item correspond to data %r in the combo %s"
+                            % (data, self._combobox.get_name()))
+        """
         self.gst_mask.set_text(value)
         try:
-            self.gst_profile.select_item_by_data(value)
+            a = 1#self.gst_profile.select_item_by_data(value)
         except KeyError:
-            self.gst_profile.select_item_by_data(None)
+            pass
+            #self.gst_profile.select_item_by_data(None)
 
     def _setFluDebug(self, value):
         self.flu_mask.set_text(value)
         try:
-            self.flu_profile.select_item_by_data(value)
+            b = 2
+            #self.flu_profile.select_item_by_data(value)
         except KeyError:
-            self.flu_profile.select_item_by_data(None)
+            pass
+            #self.flu_profile.select_item_by_data(None)
 
     def _updateCPU(self, cpu):
         # given float for cpu, update the label

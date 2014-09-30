@@ -308,7 +308,8 @@ class BrowserAdminGtkNode(BaseAdminGtkNode):
         browser = OnDemandBrowser(self.widget, self.admin)
         worker_name = self.state.get('workerRequested')
         browser.setWorkerName(worker_name)
-        browser.connect('selected', self._on_file_selector__selected)
+        selection = browser.get_selection()
+        selection.connect('changed', self._on_file_selector__selected)
         return browser
 
     def _configure_browser(self):

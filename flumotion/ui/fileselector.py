@@ -28,8 +28,6 @@ import os
 
 import gtk
 from gtk import gdk
-from kiwi.ui.objectlist import ObjectList, Column
-from kiwi.utils import gsignal
 from zope.interface import implements
 
 from flumotion.admin.gtk.dialogs import ErrorDialog
@@ -51,13 +49,13 @@ class _File(object):
         return self.original.getPath()
 
 
-class FileSelector(ObjectList):
+class FileSelector(gtk.TreeView):
     """I am a widget which can be embedded to display a file selector
     dialog.
     """
 
-    gsignal('selected', object)
-    gsignal('dir_changed', object)
+    #gsignal('selected', object)
+    #gsignal('dir_changed', object)
 
     def __init__(self, parent, adminModel):
         """Creates a new FileSelector
@@ -66,13 +64,9 @@ class FileSelector(ObjectList):
         @param adminModel: the admin model
         @type adminModel: L{AdminModel}
         """
-        ObjectList.__init__(self,
-                            [Column("icon", title=' ',
-                                    data_type=gdk.Pixbuf),
-                             Column("filename", expand=True),
-                             ])
+        gtk.TreeView.__init__(self, gtk.TreeStore(gdk.Pixbuf, str))
         self.connect('row-activated', self._on__row_activated)
-        self.set_size_request(400, 300)
+        #self.set_size_request(400, 300)
 
         self._adminModel = adminModel
         self._parent = parent
@@ -112,7 +106,7 @@ class FileSelector(ObjectList):
             if not IDirectory.providedBy(vfsFile) and self._onlyDirectories:
                 continue
             icon = self._renderIcon(vfsFile.iconNames)
-            self.append(_File(vfsFile, icon))
+            self.append((icon, vfsFile.getPath()))
 
     # Callbacks
 
@@ -149,11 +143,12 @@ class FileSelector(ObjectList):
         @returns: the directory
         @rtype: str
         """
-        selected = self.get_selected()
+        model, selected = self.get_selection()
         if selected is None:
             return self._path
-
-        return selected.getPath()
+        store = self.get_model()
+        store.get_value(selected, 1)
+        return ()
 
     def setDirectory(self, path):
         """Change directory of the file chooser
