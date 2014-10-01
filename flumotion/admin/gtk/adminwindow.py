@@ -65,7 +65,6 @@ import gobject
 import gtk
 from gtk import gdk
 from gtk import keysyms
-from kiwi.ui.delegates import GladeDelegate
 from kiwi.ui.dialogs import yesno
 from twisted.internet import defer, reactor
 from zope.interface import implements
@@ -95,6 +94,7 @@ from flumotion.configure import configure
 from flumotion.manager import admin # Register types
 from flumotion.twisted.flavors import IStateListener
 from flumotion.ui.trayicon import FluTrayIcon
+from flumotion.ui.glade import GladeBacked
 
 admin # pyflakes
 
@@ -172,13 +172,13 @@ RECENT_UI_TEMPLATE = '''<ui>
 MAX_RECENT_ITEMS = 4
 
 
-class AdminWindow(Loggable, GladeDelegate):
+class AdminWindow(Loggable, GladeBacked):
     '''Creates the GtkWindow for the user interface.
     Also connects to the manager on the given host and port.
     '''
 
-    # GladeDelegate
-    gladefile = 'admin.glade'
+    # GladeBacked (GladeDelegate replacement)
+    gladeFile = 'admin.glade'
     toplevel_name = 'main_window'
 
     # Loggable
@@ -191,7 +191,7 @@ class AdminWindow(Loggable, GladeDelegate):
     gsignal('connected')
 
     def __init__(self):
-        GladeDelegate.__init__(self)
+        GladeBacked.__init__(self)
 
         self._adminModel = None
         self._currentComponentStates = None
@@ -342,7 +342,7 @@ class AdminWindow(Loggable, GladeDelegate):
         self.debug('creating UI')
 
         # Widgets created in admin.glade
-        self._window = self.toplevel
+        #self._window = self.toplevel
         self._componentList = ComponentList(self.component_list)
         del self.component_list
         self._componentView = self.component_view

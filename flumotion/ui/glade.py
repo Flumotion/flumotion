@@ -14,24 +14,25 @@
 # See "LICENSE.LGPL" in the source distribution for more information.
 #
 # Headers in this file shall remain intact.
+import os
 
 import gtk
 from gtk import glade
 import gobject
 
-from kiwi.environ import environ
-from kiwi.ui.delegates import GladeDelegate
+#from kiwi.environ import environ
+#from kiwi.ui.delegates import GladeDelegate
 
 from twisted.python.reflect import namedAny
 
 from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
-from flumotion.ui.kiwipatches import install_patches
+from flumotion.ui.kiwipatches import install_patches, FluLibgladeWidgetTree
 
 __version__ = "$Rev$"
 
 # FIXME: Move to kiwi initialization
-environ.add_resource('glade', configure.gladedir)
+#environ.add_resource('glade', configure.gladedir)
 
 install_patches()
 
@@ -64,7 +65,7 @@ def _flumotion_glade_custom_handler(xml, proc, name, *args):
 glade.set_custom_handler(_flumotion_glade_custom_handler)
 
 
-class GladeBacked(GladeDelegate):
+class GladeBacked(gobject.GObject):
     """
     Base class for objects backed by glade interface definitions.
     The glade file should have exactly one Window.
@@ -84,24 +85,45 @@ class GladeBacked(GladeDelegate):
     _window = None # the gtk.Window of the glade file
 
     def __init__(self):
-        GladeDelegate.__init__(self, gladefile=self.gladeFile)
-
+        #GladeDelegate.__init__(self, gladefile=self.gladeFile)
+        gobject.GObject.__init__(self)
         # The following code has already been monkeypatched in kiwipatches.py
         wtree = self.get_glade_adaptor()
         wtree.signal_autoconnect(self)
         self.widgets = {}
         for widget in wtree.get_widgets():
+            print("Parsing widget tree, widget is: %s" % widget.get_name())
             self.widgets[widget.get_name()] = widget
         self._window = self.widgets[self.toplevel_name]
 
 
-    def get_glade_adaptor():
+    def get_glade_adaptor(self):
         """ 
             Port the monkeypatched code from kiwi patches! 
             Change this class to inherit from object....
             Remove the kiwi imports.
-            Watch the errors fly
+            Watch the errors fly.
+            This step validates the gladefile.... Will be runtime error
+            aspect orientated programming, DI, ....shudder....
+
         """
+        if not self.gladeFile:
+            raise ValueError("A gladefile wasn't provided.")
+        elif not isinstance(self.gladeFile, basestring):
+            raise TypeError(
+                  "gladefile should be a string, found %s" % type(self.gladeFile))
+
+        if not os.path.sep in self.gladeFile:
+            glade_filename = os.path.splitext(os.path.basename(self.gladeFile))[0]
+            self.gladeFile = os.path.join(configure.gladedir, glade_filename + '.glade')
+        else:
+            # environ.find_resources raises EnvironmentError if the file
+            # is not found, do the same here.
+            if not os.path.exists(self.gladeFile):
+                raise EnvironmentError("glade file %s does not exist" % (
+                    self.gladeFile, ))
+        domain = "" # Translation domain, empty string means default
+        return FluLibgladeWidgetTree(self, self.gladeFile, self.toplevel_name, domain)
 
 
 class GladeWidget(gtk.VBox, GladeBacked):
@@ -177,6 +199,7 @@ class GladeWindow(GladeBacked):
         self.show = self.window.show
         self.hide = self.window.hide
         self.present = self.window.present
+        #self.connect = self.window.connect
 
     def destroy(self):
         self.window.destroy()

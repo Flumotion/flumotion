@@ -74,17 +74,17 @@ class AudioTestAdminGtkNode(BaseAdminGtkNode):
         self._spinbutton.set_range(1, samplerate)
 
     def frequencySet(self, value):
-        #self._scale.handler_block(self._scale_change_id)
+        self._scale.handler_block(self._scale_change_id)
         self._scale.set_value(value)
-        #self._scale.handler_unblock(self._scale_change_id)
-        #self._spinbutton.handler_block(self._spinbutton_change_id)
+        self._scale.handler_unblock(self._scale_change_id)
+        self._spinbutton.handler_block(self._spinbutton_change_id)
         self._spinbutton.set_value(value)
-        #self._spinbutton.handler_unblock(self._spinbutton_change_id)
+        self._spinbutton.handler_unblock(self._spinbutton_change_id)
 
     def waveSet(self, value):
-        #self._combobox.handler_block(self._combobox_change_id)
+        self._combobox.handler_block(self._combobox_change_id)
         self._combobox.set_active(value)
-        #self._combobox.handler_unblock(self._combobox_change_id)
+        self._combobox.handler_unblock(self._combobox_change_id)
 
 
 class AudioTestAdminGtk(BaseAdminGtk):
