@@ -27,14 +27,10 @@ from twisted.python.reflect import namedAny
 
 from flumotion.common.pygobject import gsignal
 from flumotion.configure import configure
-from flumotion.ui.kiwipatches import install_patches, FluLibgladeWidgetTree
+from flumotion.ui.kiwipatches import FluLibgladeWidgetTree
 
 __version__ = "$Rev$"
 
-# FIXME: Move to kiwi initialization
-#environ.add_resource('glade', configure.gladedir)
-
-install_patches()
 
 
 def _unbrokenNamedAny(qual):

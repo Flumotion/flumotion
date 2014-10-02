@@ -23,18 +23,10 @@ import gtk
 import gettext
 from gtk import glade
 
-from kiwi.environ import environ
-from kiwi.__version__ import version as kiwi_version
-from kiwi.ui import views
-from kiwi.ui.widgets.entry import ProxyEntry
 
 __version__ = "$Rev$"
 
 _ = gettext.gettext
-
-# Kiwi monkey patch, allows us to specify a
-# gladeTypedict on the View.
-
 
 class FluLibgladeWidgetTree(glade.XML):
 
@@ -63,45 +55,8 @@ class FluLibgladeWidgetTree(glade.XML):
         return []
 
 
-def _open_glade(view, gladefile, domain):
-    if not gladefile:
-        raise ValueError("A gladefile wasn't provided.")
-    elif not isinstance(gladefile, basestring):
-        raise TypeError(
-              "gladefile should be a string, found %s" % type(gladefile))
-
-    if not os.path.sep in gladefile:
-        filename = os.path.splitext(os.path.basename(gladefile))[0]
-        gladefile = environ.find_resource("glade", filename + '.glade')
-    else:
-        # environ.find_resources raises EnvironmentError if the file
-        # is not found, do the same here.
-        if not os.path.exists(gladefile):
-            raise EnvironmentError("glade file %s does not exist" % (
-                gladefile, ))
-    return FluLibgladeWidgetTree(view, gladefile, domain)
-
-# Fixing bug #3259, fixed in kiwi 1.99.15
-old_proxy_entry_init = ProxyEntry.__init__
-
-
-def proxy_entry_init(*args, **kwargs):
-    try:
-        old_proxy_entry_init(*args, **kwargs)
-    except TypeError:
-        pass
-
-
-def install_patches():
-    views._open_glade = _open_glade
-
-    if kiwi_version <= (1, 99, 14):
-        ProxyEntry.__init__ = proxy_entry_init
-
-
 
 # HIGAlertDialog, taken from KIWI: http://www.async.com.br/projects/kiwi/
-
 
 _IMAGE_TYPES = {
     gtk.MESSAGE_INFO: gtk.STOCK_DIALOG_INFO,

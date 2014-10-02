@@ -41,8 +41,6 @@ __version__ = "$Rev$"
     COLUMN_LOCATION,
 ) = range(5)
 
-from kiwi.ui import objectlist
-
 
 class Point:
 
@@ -62,31 +60,51 @@ class Point:
         self.what = what
 
 
-class PointList(objectlist.ObjectList):
+class PointList(gtk.ScrolledWindow):
 
     def __init__(self, parent, uiState):
-        objectlist.ObjectList.__init__(self, [
-            objectlist.Column("whenLocal", title=_("When")),
-            objectlist.Column("which", title=_("Which")),
-            objectlist.Column("what", title=_("What")),
-        ])
+        gtk.ScrolledWindow.__init__()
+        self.points = []
+        self.points_model = gtk.TreeStore(str, str, str)
+        self.points_columns = ["When", "Which", "What"]
+        self.points_view = gtk.TreeView(self.points_model)
+
+        for ind, col_name in enumerate(self.points_columns):
+            col = gtk.TreeViewColumn(col_name)
+            col.set_resizable(True)
+            cell_renderer = gtk.CellRendererText()
+            col.pack_start(cell_renderer, True)
+            col.add_attribute(cell_renderer, 'text', ind)
+            col.set_sort_column_id(ind)
+            self.points_view.append_column(col)
+       
         self._parent = parent
         self.setUIState(uiState)
 
     def setUIState(self, uiState):
         self._uiState = uiState
-        self.clear()
+        self.points_model.clear()
         for pointTuple in uiState.get('next-points'):
             self.appendTuple(pointTuple)
 
     def appendTuple(self, pointTuple):
         point = Point(*pointTuple)
-        self.append(point)
+        self.points.append(point)
+        self.points_model.append(pointTuple)
+
+
+    @staticmethod
+    def removePointFromView(model, path, tIter, pointTuple):
+        row = model.get(tIter, *range(len(pointTuple)))
+        if row == pointTuple:
+            model.remove(row)
+            return True
 
     def removeTuple(self, pointTuple):
-        for point in self:
-            if (point.when, point.which, point.what) == pointTuple:
-                self.remove(point)
+        for point in self.points:
+            if (point.when, point.which, point.what) == pointTuple:  
+                self.points_model.remove(point)
+                self.points_model.foreach(PointList.removePointFromView)
 
 
 class FilenameNode(BaseAdminGtkNode):
