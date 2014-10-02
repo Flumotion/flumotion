@@ -22,10 +22,21 @@
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>
       <child>
-        <widget class="Custom" id="connections">
-          <property name="creation_function">kiwi.ui.objectlist.ObjectList</property>
-          <signal name="row-activated" handler="_on_connections_row_activated"/>
-          <signal name="selection-changed" handler="_on_connections_selection_changed"/>
+        <widget class="GtkScrolledWindow" id="connections">
+          <property name="visible">True</property>
+          <property name="can_focus">True</property>
+          <property name="hscrollbar_policy">automatic</property>
+          <property name="vscrollbar_policy">automatic</property>
+          <property name="shadow_type">etched-in</property>
+          <child>
+            <widget class="GtkTreeView" id="connections_tree">
+              <property name="visible">True</property>
+              <property name="can_focus">True</property>
+              <property name="has_focus">True</property>
+              <signal name="row-activated" handler="_on_connections_row_activated"/>
+              <signal name="selection-changed" handler="_on_connections_selection_changed"/>
+            </widget>
+          </child>
         </widget>
         <packing>
             <property name="expand">True</property>

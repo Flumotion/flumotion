@@ -46,6 +46,8 @@ class ConnectionInfo(object):
         self.user = user
         self.passwd = passwd
         self.manager = manager
+        self.model_index = -1
+        self.model_index_hash = ''
 
     def asPBConnectionInfo(self):
         """
@@ -105,12 +107,14 @@ class RecentConnection(object):
 
 
 def _getRecentFilenames():
+    print("This is the registry dir: %s" % configure.registrydir)
     # DSU, or as perl folks call it, a Schwartz Transform
     common.ensureDir(configure.registrydir, "registry dir")
 
     for filename in os.listdir(configure.registrydir):
         filename = os.path.join(configure.registrydir, filename)
         if filename.endswith('.connection'):
+            print("Yield this: %s" % filename)
             yield filename
 
 
@@ -141,6 +145,8 @@ def _parseConnection(element):
 
 def _parseSingleConnectionFile(filename):
     tree = minidom.parse(filename)
+
+    print("Got the tree parsed: %s" % tree)
     return _parseConnection(tree.documentElement)
 
 
@@ -160,6 +166,7 @@ def getRecentConnections():
     recentConnections = []
     for filename in sorted(recentFilenames, reverse=True):
         try:
+            print("Try parsing this connection file: %s" % filename)
             state = _parseSingleConnectionFile(filename)
             recentConnections.append(
                 RecentConnection(str(state),
@@ -167,6 +174,7 @@ def getRecentConnections():
                                  info=state))
         except Exception, e:
             log.warning('connections', 'Error parsing %s: %r', filename, e)
+    print("Returning recent connections: %s" % recentConnections)
     return recentConnections
 
 

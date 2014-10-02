@@ -22,7 +22,7 @@ import gettext
 
 import gobject
 import gtk
-from kiwi.ui.objectlist import Column
+#from kiwi.ui.objectlist import Column
 from pango import ELLIPSIZE_MIDDLE, ELLIPSIZE_END
 
 from flumotion.admin.connections import getRecentConnections, \
@@ -48,6 +48,34 @@ class Connections(GladeWidget):
     def __init__(self):
         GladeWidget.__init__(self)
 
+        self.connections_model = gtk.TreeStore(str, str, str)
+        host_column = gtk.TreeViewColumn('Host')
+        manager_column = gtk.TreeViewColumn('Manager')
+        timestamp_column = gtk.TreeViewColumn('Timestamp')
+        
+        self.connections_tree.set_model(self.connections_model)
+        self.connections_tree.append_column(host_column)
+        self.connections_tree.append_column(manager_column)
+        self.connections_tree.append_column(timestamp_column)
+        for i, c in enumerate([host_column, manager_column, timestamp_column]):
+            c.set_resizable(True)
+            cell_renderer = gtk.CellRendererText()
+            c.pack_start(cell_renderer, True)
+            c.add_attribute(cell_renderer, 'text', i)
+        c.set_sort_column_id(i) # Sort by last column above - timestamp
+
+        self.connection_objects = getRecentConnections();
+        for ind, c in enumerate(self.connection_objects):
+            print("Inserting row: host: %s, manager: %s, timestamp: %s" % (c.host, c.manager, c.timestamp))
+            self.connections_model.insert(None, ind, (c.host, c.manager, c.timestamp.strftime('%Y-%m-%d %H:%M')))
+            c.model_index = ind
+            c.model_index_hash = '%s%s%s' % (c.host, c.manager, c.timestamp.strftime('%Y-%m-%d %H:%M'))
+        
+        #self.connections_tree.add_attribute(cell_renderer, 'text', 0)
+
+        
+
+        """
         self.connections.set_columns(
                   [Column("host", title=_("Hostname"), searchable=True,
                           ellipsize=ELLIPSIZE_MIDDLE, expand=True, width=100),
@@ -58,13 +86,14 @@ class Connections(GladeWidget):
                           order=gtk.SORT_DESCENDING,
                           format_func=format_timestamp),
                    ])
+        
         self.connections.add_list(getRecentConnections())
-        self.connections.get_treeview().set_search_equal_func(
-            self._searchEqual)
+        """
+        self.connections_tree.set_search_equal_func(self._searchEqual)
         self.connections.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.connections.set_property('selection-mode', gtk.SELECTION_SINGLE)
+        self.connections_selection = self.connections_tree.get_selection()
+        self.connections_selection.set_mode(gtk.SELECTION_SINGLE)
         self.connections.set_size_request(-1, 160)
-
         self._updateButtons()
 
     def _updateButtons(self):
@@ -76,16 +105,17 @@ class Connections(GladeWidget):
 
     def _searchEqual(self, model, column, key, iter):
         connection = model.get(iter, 0)[0]
-        if key in connection.manager:
+        if key in connection:
             return False
 
         # True means doesn't match
         return True
 
     def _clear_all(self):
-        for conn in self.connections:
+        for conn in self.connection_objects:
             os.unlink(conn.filename)
-        self.connections.clear()
+        self.connections_model.clear()
+        self.connection_objects = []
 
     def _clear(self, conn):
         self.connections.remove(conn)
@@ -95,11 +125,16 @@ class Connections(GladeWidget):
 
     def grab_focus(self):
         if len(self.connections):
-            self.connections.select(self.connections[0])
+            self.connections_selection.select_path("0")
         self.connections.grab_focus()
 
     def get_selected(self):
-        return self.connections.get_selected()
+        print ("Called get_selected connection!")
+        model, tIter = self.connections_selection.get_selected()
+        row = model.get(tIter, 0, 1, 2)
+        connections = filter(lambda c: c.model_index_hash == ''.join(row), 
+            self.connection_objects)       
+        return connections[0]
 
     def update(self, connection):
         os.utime(connection.filename, None)
@@ -107,17 +142,20 @@ class Connections(GladeWidget):
     # Callbacks
 
     def on_button_clear_clicked(self, button):
-        conn = self.connections.get_selected()
-        if conn:
-            self._clear(conn)
+        tModel, tIter = self.connections_selection.get_selected()
+        if tIter:
+            tModel.remove(tIter)  # Get rid of the row
+            # self._clear(conn) # How do we get the filename to unlink it?
         self._updateButtons()
 
     def on_button_clear_all_clicked(self, button):
         self._clear_all()
         self._updateButtons()
 
-    def _on_connections_row_activated(self, connections, connection):
-        self.emit('connection-activated', connection)
+    def _on_connections_row_activated(self, *args):
+        #import pdb; pdb.set_trace()
+        selection = self.get_selected()
+        self.emit('connection-activated', selection)
 
     def _on_connections_selection_changed(self, connections, connection):
         self.emit('have-connection', bool(connection))

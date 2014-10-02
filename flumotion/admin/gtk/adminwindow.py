@@ -65,7 +65,6 @@ import gobject
 import gtk
 from gtk import gdk
 from gtk import keysyms
-from kiwi.ui.dialogs import yesno
 from twisted.internet import defer, reactor
 from zope.interface import implements
 
@@ -95,6 +94,7 @@ from flumotion.manager import admin # Register types
 from flumotion.twisted.flavors import IStateListener
 from flumotion.ui.trayicon import FluTrayIcon
 from flumotion.ui.glade import GladeBacked
+from flumotion.ui.kiwipatches import yesno
 
 admin # pyflakes
 
