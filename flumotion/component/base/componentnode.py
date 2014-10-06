@@ -113,12 +113,15 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         return True
 
     def _on_gst_profile_changed(self, combo):
+        print("fired on gst combo box changed!")
         profile = combo.get_selected()
+        print("Got selected item: %s" % str(profile))
         if profile is not None:
             gtk.Entry.set_text(self.gst_mask, profile)
         self.gst_mask.set_sensitive(profile is None)
 
     def _on_flu_profile_changed(self, combo):
+        print("fired on flu combo box changed!")
         profile = combo.get_selected()
         if profile is not None:
             gtk.Entry.set_text(self.flu_mask, profile)
@@ -192,19 +195,18 @@ class ComponentAdminGtkNode(BaseAdminGtkNode):
         """
         self.gst_mask.set_text(value)
         try:
-            a = 1#self.gst_profile.select_item_by_data(value)
+           print("value is: %s" % value)
+           self.gst_profile.select_item_by_data(value)
         except KeyError:
-            pass
-            #self.gst_profile.select_item_by_data(None)
+            self.gst_profile.select_item_by_data(None)
 
     def _setFluDebug(self, value):
         self.flu_mask.set_text(value)
         try:
             b = 2
-            #self.flu_profile.select_item_by_data(value)
+            self.flu_profile.select_item_by_data(value)
         except KeyError:
-            pass
-            #self.flu_profile.select_item_by_data(None)
+            self.flu_profile.select_item_by_data(None)
 
     def _updateCPU(self, cpu):
         # given float for cpu, update the label

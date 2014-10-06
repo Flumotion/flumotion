@@ -45,13 +45,22 @@ class PropertiesAdminGtkNode(BaseAdminGtkNode):
         self.widget = gtk.VBox()
         self.widget.set_border_width(6)
 
-        self.properties = gtk.TreeView(gtk.TreeStore(
-            gobject.TYPE_STRING, gobject.TYPE_STRING))
-            #[Column('name'),
-            # Column('value')])
-        #self.properties.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+        self.properties = gtk.TreeView(gtk.TreeStore(str, str))
+        name_column = gtk.TreeViewColumn('Name')
+        value_column = gtk.TreeViewColumn('Value')
+        self.properties.append_column(name_column)
+        self.properties.append_column(value_column)
+        self.properties.set_rules_hint(True)
+        for i, c in enumerate([name_column, value_column]):
+            c.set_resizable(True)
+            cell_renderer = gtk.CellRendererText()
+            c.pack_start(cell_renderer, True)
+            c.add_attribute(cell_renderer, 'text', i)
+        c.set_sort_column_id(0) # allow sorting by name
+
         self.widget.pack_start(self.properties, False, False)
 
+        self.properties.show()
         self._reloadProperties(self.state.get('config')['properties'])
         return self.widget
 
@@ -71,6 +80,7 @@ class PropertiesAdminGtkNode(BaseAdminGtkNode):
         properties_model = self.properties.get_model()
         tIter = properties_model.get_iter_first()
         for ind, name in enumerate(propertyNames):
+            print("Property name: %s, property value: %s" % (name, properties[name]))
             if tIter is not None:
                 properties_model.set_value(tIter, ind, properties[name])
                 tIter = properties_model.iter_next(tIter)

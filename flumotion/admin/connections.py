@@ -107,14 +107,12 @@ class RecentConnection(object):
 
 
 def _getRecentFilenames():
-    print("This is the registry dir: %s" % configure.registrydir)
     # DSU, or as perl folks call it, a Schwartz Transform
     common.ensureDir(configure.registrydir, "registry dir")
 
     for filename in os.listdir(configure.registrydir):
         filename = os.path.join(configure.registrydir, filename)
         if filename.endswith('.connection'):
-            print("Yield this: %s" % filename)
             yield filename
 
 

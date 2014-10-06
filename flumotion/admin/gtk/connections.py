@@ -57,6 +57,7 @@ class Connections(GladeWidget):
         self.connections_tree.append_column(host_column)
         self.connections_tree.append_column(manager_column)
         self.connections_tree.append_column(timestamp_column)
+        self.connections_tree.set_rules_hint(True)
         for i, c in enumerate([host_column, manager_column, timestamp_column]):
             c.set_resizable(True)
             cell_renderer = gtk.CellRendererText()
@@ -64,7 +65,8 @@ class Connections(GladeWidget):
             c.add_attribute(cell_renderer, 'text', i)
         c.set_sort_column_id(i) # Sort by last column above - timestamp
 
-        self.connection_objects = getRecentConnections();
+        self.connection_objects = getRecentConnections()
+        self.connection_objects.sort(key=lambda c: c.timestamp, reverse=True)
         for ind, c in enumerate(self.connection_objects):
             print("Inserting row: host: %s, manager: %s, timestamp: %s" % (c.host, c.manager, c.timestamp))
             self.connections_model.insert(None, ind, (c.host, c.manager, c.timestamp.strftime('%Y-%m-%d %H:%M')))
@@ -118,7 +120,7 @@ class Connections(GladeWidget):
         self.connection_objects = []
 
     def _clear(self, conn):
-        self.connections.remove(conn)
+        self.connection_objects.remove(conn)
         os.unlink(conn.filename)
 
     # Public API
@@ -128,13 +130,17 @@ class Connections(GladeWidget):
             self.connections_selection.select_path("0")
         self.connections.grab_focus()
 
+
+    def get_connection_for_row(self, row):
+        connections = filter(lambda c: c.model_index_hash == ''.join(row),
+            self.connection_objects)
+        return connections[0] # First connection which matches...
+
     def get_selected(self):
         print ("Called get_selected connection!")
         model, tIter = self.connections_selection.get_selected()
         row = model.get(tIter, 0, 1, 2)
-        connections = filter(lambda c: c.model_index_hash == ''.join(row), 
-            self.connection_objects)       
-        return connections[0]
+        return self.get_connection_for_row(row)
 
     def update(self, connection):
         os.utime(connection.filename, None)
@@ -144,8 +150,10 @@ class Connections(GladeWidget):
     def on_button_clear_clicked(self, button):
         tModel, tIter = self.connections_selection.get_selected()
         if tIter:
+            row = tModel.get(tIter, 0, 1, 2)
+            conn = self.get_connection_for_row(row)
             tModel.remove(tIter)  # Get rid of the row
-            # self._clear(conn) # How do we get the filename to unlink it?
+            self._clear(conn) 
         self._updateButtons()
 
     def on_button_clear_all_clicked(self, button):

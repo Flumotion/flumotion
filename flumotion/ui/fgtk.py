@@ -35,51 +35,82 @@ class FProxyComboBox(gtk.ComboBox):
         """
 
         values = []
-        liststore = gtk.ListStore(str, str)  
-        self.set_model(liststore)
-        cell_nick = gtk.CellRendererText()
-        cell_name = gtk.CellRendererText()
-        self.pack_start(cell_nick, True)
-        self.pack_start(cell_name, True)
-        self.add_attribute(cell_nick, 'text', 0)
-        self.add_attribute(cell_name, 'text', 1)
+        self.enum_objects = []
+        self.init_model() 
         for enum in enum_class:
             # If values are specified, filter them out
             if value_filter and not enum in value_filter:
                 continue
-            values.append((enum.nick, enum))
+            values.append((enum.name,))
         
         self.prefill(values)
         self.set_active(0)
         self.emit('changed')
 
-    def create_model(self, itemdata):
+
+    def init_model(self):
         """ """
-        if len(itemdata) < 1 or type(itemdata[0]) not in (list, tuple):
-            liststore = gtk.ListStore(str)
-        else:
-            liststore = gtk.ListStore(*[type(x) for x in itemdata[0]])
-        #import pdb; pdb.set_trace()     
-        for ind, item in enumerate(itemdata):
-            if type(item) not in (list, tuple):
-                item = [item]
-            liststore.insert(ind, item)
+        liststore = gtk.ListStore(str)
         self.set_model(liststore)
+        cell = gtk.CellRendererText()
+        self.pack_start(cell, True)
+        self.add_attribute(cell, 'text', 0)
         return liststore
+ 
+        
+    def get_selected(self):
+        """ """
+        tIter = self.get_active_iter()
+        model = self.get_model()
+        row =  model.get(tIter, *range(model.get_n_columns()))
+        if hasattr(self, 'prefill_objects'):
+            for o in self.prefill_objects:
+                if row[0] == o[0]:
+                    print("Got selected object...%s" % str(o))
+                    return o[1]
+        return row
         
 
+    def select_item_by_data(self, value):
+        """ """
+        model = self.get_model()
+        if not model:
+            model = self.init_model()
+        tIter = model.get_iter_first()
+        while tIter:
+            row = model.get(tIter, *range(model.get_n_columns()))
+            print("Got the following row from the combobox: %s" % str(row))
+            print("Value to compare against is: %s" % value)
+            if hasattr(self, 'prefill_objects'):
+                for o in self.prefill_objects:
+                    if row[0] == o[0] and value in o[1]:
+                        print("Matched value to object...%s" % o[1])
+                        self.set_active_iter(tIter)
+                        tIter = None
+                if tIter:
+                    tIter = model.iter_next(tIter)
+            elif row[0] == value or value in [i for i in row[0]]:
+                    self.set_active_iter(tIter)
+                    tIter = None
+            else:
+                tIter = model.iter_next(tIter)
+
+
+
     def prefill(self, itemdata):
+        print("Just got prefill data for the combobox: %s" % str(itemdata))
         model = self.get_model()
         if model is None:
-            model = self.create_model(itemdata)
+            model = self.init_model()
         values = set()
         is_tuple = False
+        self.prefill_objects = itemdata
         for item in itemdata:
             if type(item) == str:
                 text = item
                 data = None  
             else:
-                text, data = item
+                text = item[0]
                 is_tuple = True
             orig = text
             count = 1
@@ -87,10 +118,7 @@ class FProxyComboBox(gtk.ComboBox):
                 text = orig + ' (%d)' % count
                 count += 1
             values.add(text)
-            if is_tuple:
-                model.append((text, data))
-            else:
-                model.append((text,))
+            model.append((text,))
 
 gobject.type_register(FProxyComboBox)
 
