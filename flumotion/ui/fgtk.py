@@ -83,7 +83,8 @@ class FProxyComboBox(gtk.ComboBox):
             print("Value to compare against is: %s" % value)
             if hasattr(self, 'prefill_objects'):
                 for o in self.prefill_objects:
-                    if row[0] == o[0] and value in o[1]:
+                    print("object: %s, row: %s, value: %s" % (o, str(row), value))
+                    if row[0] == o[0] and str(value) in str(o[1]):
                         print("Matched value to object...%s" % o[1])
                         self.set_active_iter(tIter)
                         tIter = None
