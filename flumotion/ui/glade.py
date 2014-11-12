@@ -61,6 +61,78 @@ def _flumotion_glade_custom_handler(xml, proc, name, *args):
 glade.set_custom_handler(_flumotion_glade_custom_handler)
 
 
+class SimpleProxy(object):
+    """ I am the replacement for the kiwi proxy thingy.... am I needed?"""
+    
+    def __init__(self, view, model, widget_names):
+        self.view = view
+        self.model = model
+        self.widget_names = widget_names
+        self.widgets = {}
+        print("Proxy created - got this view %s, this model %s, this widget_names: %s" % (view, model, widget_names))
+        for wn in self.widget_names:
+            #import pdb; pdb.set_trace()
+            widget = getattr(self.view, wn)
+            self.widgets[wn] = widget
+            if hasattr(widget, 'get_value'):
+                #widget.set_value(getattr(self.model, wn))
+                val = widget.get_value()
+            elif hasattr(self.widgets[wn], 'get_text'):
+                #widget.set_text(getattr(self.model, wn))
+                val = widget.get_text()
+            elif hasattr(self.widgets[wn], 'get_active'):
+                #widget.set_text(getattr(self.model, wn))
+                val = widget.get_active()
+            else:
+                print("ERROR: widget does not have either get_value or get_text methods: %s" % widget)
+                val = ''
+            if hasattr(widget, 'data_type'):
+                val = widget.data_type(val) 
+            setattr(self.model, wn, val)
+            connection_id = self.widgets[wn].connect(
+                'content-changed',
+                self._on_widget__content_changed,
+                wn)
+            self.widgets[wn].set_data('content-changed-id', connection_id)
+
+
+
+    def _on_widget__content_changed(self, widget, attribute):
+        print("On_widget content changed!!!")
+        value = widget.read()
+        setattr(self.model, attribute, value)
+        getattr(self.view, attribute).set_text(value)
+
+    def update(self, prop):
+        """ """
+        print("Got a call to update this prop, self.widgets is: %s" % self.widgets)
+        if prop in self.widgets.keys() and self.model:
+            self.widgets[prop] = getattr(self.view, prop)
+            widget = self.widgets[prop]
+            if hasattr(self.widgets[prop], 'get_value'):
+                val = widget.get_value()
+            elif hasattr(self.widgets[prop], 'get_text'):
+                val = widget.get_text()
+            elif hasattr(self.widgets[wn], 'get_active'):
+                #widget.set_text(getattr(self.model, wn))
+                val = widget.get_active()
+                val = widget.data_type(val)
+            else:
+                print("ERROR: widget does not have either get_value or get_text methods: %s" % widget)
+                val = ''
+
+            if hasattr(widget, 'data_type'):
+                val = widget.data_type(val)
+            setattr(self.model, prop, val)
+            
+
+    def set_model(self, model):
+        """ """
+        print("Got a call to set_model!!")
+        self.model = model
+
+
+
 class GladeBacked(gobject.GObject):
     """
     Base class for objects backed by glade interface definitions.
@@ -88,9 +160,14 @@ class GladeBacked(gobject.GObject):
         wtree.signal_autoconnect(self)
         self.widgets = {}
         for widget in wtree.get_widgets():
-            print("Parsing widget tree, widget is: %s" % widget.get_name())
+            print("Parsing widget tree, widget is: %s" % (widget.get_name()))
             self.widgets[widget.get_name()] = widget
         self._window = self.widgets[self.toplevel_name]
+
+
+    def add_proxy(self, model, widgets):
+        """ """
+        return SimpleProxy(self, model, widgets)
 
 
     def get_glade_adaptor(self):

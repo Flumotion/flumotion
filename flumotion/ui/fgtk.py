@@ -21,11 +21,23 @@ I am a collection of extended GTK widgets for use in Flumotion.
 
 import gobject
 import gtk
+from flumotion.common.pygobject import gsignal
 
 __version__ = "$Rev$"
 
+class FProxySpinButton(gtk.SpinButton):
+    gsignal('content-changed')
+
+
+class FProxyEntry(gtk.Entry):
+    gsignal('content-changed')
+
+class FProxyCheckButton(gtk.CheckButton):
+    gsignal('content-changed')
 
 class FProxyComboBox(gtk.ComboBox):
+
+    gsignal('content-changed')
 
     def set_enum(self, enum_class, value_filter=()):
         """
@@ -33,7 +45,7 @@ class FProxyComboBox(gtk.ComboBox):
         As a side effect, this makes the combobox an enum-based one.
         This also sets the combobox to the first enum value.
         """
-
+        print("Just got a call to set_enum: enum_class: %s, value_filter: %s" % (enum_class, value_filter))
         values = []
         self.enum_objects = []
         self.init_model() 
@@ -50,16 +62,19 @@ class FProxyComboBox(gtk.ComboBox):
 
     def init_model(self):
         """ """
+        print("Just got a call to init_model ")
         liststore = gtk.ListStore(str)
         self.set_model(liststore)
         cell = gtk.CellRendererText()
         self.pack_start(cell, True)
         self.add_attribute(cell, 'text', 0)
+        self.prop_model = {}
         return liststore
  
         
     def get_selected(self):
         """ """
+        print("Just got a call to get selected ")
         tIter = self.get_active_iter()
         model = self.get_model()
         row =  model.get(tIter, *range(model.get_n_columns()))
@@ -73,6 +88,7 @@ class FProxyComboBox(gtk.ComboBox):
 
     def select_item_by_data(self, value):
         """ """
+        print("Just got a call to select item by data %s" % (value)) 
         model = self.get_model()
         if not model:
             model = self.init_model()
@@ -95,7 +111,30 @@ class FProxyComboBox(gtk.ComboBox):
                     tIter = None
             else:
                 tIter = model.iter_next(tIter)
+    
+    def append_item(self, description, num):
+        """ """
+        print("Just got an item to append: description: %s, num: %s" % (description, num)) 
+        """
+        model = self.get_model()
+        if not model:
+            model = self.init_model()
+        print("appending description:%s" % (description)) 
+        model.append((description,))
+        self.prop_model[description] = num
+        """
+        self.prefill([(description, num)])
 
+
+    def get_value(self):
+        model = self.get_model()
+        if not model:
+            model = self.init_model()
+        tIter = self.get_active_iter()
+        if not tIter:
+            tIter = model.get_iter_root()
+        row = model.get(tIter, 0)
+        return row[0]
 
 
     def prefill(self, itemdata):
@@ -119,9 +158,15 @@ class FProxyComboBox(gtk.ComboBox):
                 text = orig + ' (%d)' % count
                 count += 1
             values.add(text)
-            model.append((text,))
+            if text == '...':
+                print("Ok, this is the wizard, thingy...(%s) ignore" % text)
+            else:
+                model.append((text,))
 
 gobject.type_register(FProxyComboBox)
+gobject.type_register(FProxySpinButton)
+gobject.type_register(FProxyCheckButton)
+gobject.type_register(FProxyEntry)
 
 class ProxyWidgetMapping:
     # In PyGTK 2.4.0 gtk.glade.XML type_dict parameter is buggy
@@ -131,7 +176,10 @@ class ProxyWidgetMapping:
     # as it is internally, eg failback to the real GType, by doing
     # this PyMapping_GetItemString will never set the error.
 
-    types = {'GtkComboBox': FProxyComboBox}
+    types = {'GtkComboBox': FProxyComboBox,
+             'GtkSpinButton': FProxySpinButton,
+             'GtkEntry': FProxyEntry,
+             'GtkCheckButton': FProxyCheckButton}
 
     def __getitem__(self, name):
         if name in self.types:

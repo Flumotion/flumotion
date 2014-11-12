@@ -266,6 +266,7 @@ class MultifdSinkStreamer(streamer.Streamer, Stats):
 
     def _client_removed_cb(self, sink, fd, reason):
         stats = sink.emit('get-stats', fd)
+        self.debug("Client removed!!! reason: %s, fd: %s, reason: %s" % (reason, fd, stats))
         self._pending_removals[fd] = (stats, reason)
 
     # this can be called from both application and streaming thread !

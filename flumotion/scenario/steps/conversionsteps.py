@@ -103,6 +103,7 @@ class ConversionStep(WorkerWizardStep):
     # WizardStep
 
     def activated(self):
+        print("Wizard conversion step activated!!!")
         data = [('muxer', self.muxer, None, None)]
 
         if self.wizard.getScenario().hasAudio(self.wizard):
@@ -129,9 +130,11 @@ class ConversionStep(WorkerWizardStep):
         # If there is data in the combo already, do not populate it,
         # Because it means we're pressing "back" in the wizard and the
         # combo is already populated.
-        hasVideo = len(self.video) > 0
-        hasAudio = len(self.audio) > 0
-
+        #hasVideo = len(self.video) > 0
+        #hasAudio = len(self.audio) > 0
+        hasVideo = hasattr(self.video, 'prefill_objects')
+        hasAudio = hasattr(self.audio, 'prefill_objects')
+        #import pdb; pdb.set_trace()
         if not hasVideo or not hasAudio:
             self._populateCombos(data)
 
@@ -151,6 +154,7 @@ class ConversionStep(WorkerWizardStep):
     # Private
 
     def _populateCombos(self, combos, provides=None):
+        print("Populating combos: %s" % combos)
         self.debug("populating combos %r", combos)
         self.wizard.waitForTask('querying encoders')
 
@@ -216,7 +220,7 @@ class ConversionStep(WorkerWizardStep):
 
         def no_bundle(failure):
             failure.trap(errors.NoBundleError)
-
+        import pdb; pdb.set_trace()
         d = self.wizard.getWizardEntry(entry.componentType)
         d.addCallback(gotFactory)
         d.addErrback(no_bundle)
@@ -229,7 +233,7 @@ class ConversionStep(WorkerWizardStep):
             # FIXME: verify that factory implements IEncoderPlugin
             step = plugin.getConversionStep()
             return step
-
+        #import pdb; pdb.set_trace()
         entry = combo.get_selected()
         d = self._loadPlugin(entry)
         d.addCallback(pluginLoaded, entry)
@@ -391,12 +395,16 @@ class SelectFormatStep(WizardStep):
         muxer = self.muxer.get_selected()
 
         def gotFactory(factory):
+            print("Hello.... got factory is called")
             plugin = factory(self.wizard)
             step = plugin.getConsumptionStep(muxer.type)
             self.wizard.addStepSection(step)
             self.wizard.addStepSection(LiveSummaryStep)
+            print("Hello.... got factory is finished")
 
         def noBundle(failure):
+            import pdb; pdb.set_trace()
+            print("Oh no...got an errback...")
             failure.trap(NoBundleError)
 
         d = self.wizard.getWizardEntry('http-streamer')
