@@ -22,7 +22,6 @@ import gettext
 
 import gobject
 import gtk
-#from kiwi.ui.objectlist import Column
 from pango import ELLIPSIZE_MIDDLE, ELLIPSIZE_END
 
 from flumotion.admin.connections import getRecentConnections, \
@@ -62,6 +61,7 @@ class Connections(GladeWidget):
             c.set_resizable(True)
             cell_renderer = gtk.CellRendererText()
             c.pack_start(cell_renderer, True)
+            c.set_expand(True)
             c.add_attribute(cell_renderer, 'text', i)
         c.set_sort_column_id(i) # Sort by last column above - timestamp
 
@@ -73,24 +73,7 @@ class Connections(GladeWidget):
             c.model_index = ind
             c.model_index_hash = '%s%s%s' % (c.host, c.manager, c.timestamp.strftime('%Y-%m-%d %H:%M'))
         
-        #self.connections_tree.add_attribute(cell_renderer, 'text', 0)
 
-        
-
-        """
-        self.connections.set_columns(
-                  [Column("host", title=_("Hostname"), searchable=True,
-                          ellipsize=ELLIPSIZE_MIDDLE, expand=True, width=100),
-                   Column("manager", title=_("Manager"), searchable=True,
-                          ellipsize=ELLIPSIZE_END, expand=True, width=50),
-                   Column("timestamp", title=_("Last used"),
-                          sorted=True,
-                          order=gtk.SORT_DESCENDING,
-                          format_func=format_timestamp),
-                   ])
-        
-        self.connections.add_list(getRecentConnections())
-        """
         self.connections_tree.set_search_equal_func(self._searchEqual)
         self.connections.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.connections_selection = self.connections_tree.get_selection()
@@ -161,7 +144,6 @@ class Connections(GladeWidget):
         self._updateButtons()
 
     def _on_connections_row_activated(self, *args):
-        #import pdb; pdb.set_trace()
         selection = self.get_selected()
         self.emit('connection-activated', selection)
 
