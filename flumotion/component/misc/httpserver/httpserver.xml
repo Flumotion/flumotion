@@ -92,6 +92,8 @@
                   _description="The mount point on which the stream can be accessed." />
         <property name="path" type="string"
                   _description="The base path to map to the mount-point" />
+        <property name="domain-mapping" type="string"
+                  _description="A regex which will automatically prepend the mount point for a matched domain name in ondemand multifile mode." />
 
         <property name="type" type="string"
                   _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />

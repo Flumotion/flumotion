@@ -85,6 +85,12 @@ class PorterMedium(medium.BaseMedium):
     def deregisterPrefix(self, prefix):
         return self.callRemote("deregisterPrefix", prefix)
 
+    def registerDomainMapping(self, prefix, domain):
+        return self.callRemote("registerDomainMapping", prefix, domain)
+
+    def deregisterDomainMapping(self, prefix, domain):
+        return self.callRemote("deregisterDomainMapping", prefix, domain)
+
     def getPort(self):
 
         def handle_error(failure):
@@ -138,11 +144,17 @@ class PorterClientFactory(fpb.ReconnectingPBClientFactory):
     def deregisterDefault(self):
         return self.medium.deregisterPrefix("/")
 
+    def registerDomainMapping(self, prefix, mapping):
+        return self.medium.registerDomainMapping(prefix, mapping)
+
+    def deregisterDomainMapping(self, prefix, mapping):
+        return self.medium.deregisterDomainMapping(prefix, mapping)
+
 
 class HTTPPorterClientFactory(PorterClientFactory):
 
     def __init__(self, childFactory, mountPoints, do_start_deferred,
-                 prefixes=None):
+                 prefixes=None, domainMapping=None):
         """
         @param mountPoints: a list of mountPoint strings that should be
                             registered to the porter
@@ -152,6 +164,7 @@ class HTTPPorterClientFactory(PorterClientFactory):
         self._prefixes = prefixes or []
         self._do_start_deferred = do_start_deferred
         self.remote_port = None
+        self.domainMapping = domainMapping
 
     def _fireDeferred(self, r):
         # If we still have the deferred, fire it (this happens after we've
@@ -177,6 +190,11 @@ class HTTPPorterClientFactory(PorterClientFactory):
         for mount in self._prefixes:
             self.debug("Registering mount prefix %s with porter", mount)
             deferred.addCallback(lambda r, m: self.registerPrefix(m), mount)
+            # Hack for cope
+            # Register prefixes for domain mapping
+            if self.domainMapping:
+                deferred.addCallback(lambda r, p, dm: self.registerDomainMapping(p, dm),
+                    mount, self.domainMapping)
         deferred.addCallback(self._fireDeferred)
 
     def _setRemotePort(self, port):

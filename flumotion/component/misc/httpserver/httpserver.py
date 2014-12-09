@@ -366,6 +366,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         if plugs:
             self._metadataProviderPlug = plugs[-1]
 
+        # Hack for cope
+        self.domainMapping = props.get('domain-mapping', None)
+
         # Update uiState
         self.uiState.set('stream-url', self.getUrl())
         self.uiState.set('allow-browsing', self._allowBrowsing)
@@ -398,11 +401,12 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             # Streamer is slaved to a porter.
             if self._singleFile:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    site, [self.mountPoint], d)
+                    site, [self.mountPoint], d) 
             else:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
                     site, [], d,
-                    prefixes=[self.mountPoint])
+                    prefixes=[self.mountPoint],
+                    domainMapping=self.domainMapping)
             creds = credentials.UsernamePassword(self._porterUsername,
                 self._porterPassword)
             self._pbclient.startLogin(creds, self._pbclient.medium)
@@ -464,6 +468,9 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
                 l.append(self._pbclient.deregisterPath(self.mountPoint))
             else:
                 l.append(self._pbclient.deregisterPrefix(self.mountPoint))
+                if self.domainMapping:
+                    l.append(self._pbclient.deregisterDomainMapping(
+                        self.mountPoint, self.domainMapping))
         return defer.DeferredList(l)
 
     def updatePorterDetails(self, path, username, password):

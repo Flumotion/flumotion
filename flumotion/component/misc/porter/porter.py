@@ -16,6 +16,7 @@
 # Headers in this file shall remain intact.
 
 import os
+import re
 import random
 import socket
 import string
@@ -74,6 +75,14 @@ class PorterAvatar(pb.Avatar, log.Loggable):
         self.log("Perspective called: deregistering default")
         self.porter.deregisterPrefix(prefix, self)
 
+    def perspective_registerDomainMapping(self, prefix, domain):
+        self.log("Perspective called: registering Domain mapping: %s", domain)
+        self.porter.registerDomainMapping(prefix, domain, self)
+
+    def perspective_deregisterDomainMapping(self, prefix, domain):
+        self.log("Perspective called: deregistering Domain mapping: %s", domain)
+        self.porter.deregisterDomainMapping(prefix, domain, self)
+
     def perspective_getPort(self):
         return self.porter._iptablesPort
 
@@ -130,6 +139,7 @@ class Porter(component.BaseComponent, log.Loggable):
         # accessible from the avatar, we need this for FD-passing)
         self._mappings = {}
         self._prefixes = {}
+        self._domain_mappings = {}
 
         self._socketlistener = None
 
@@ -216,6 +226,32 @@ class Porter(component.BaseComponent, log.Loggable):
             self.warning(
                 "Not removing prefix destination: expected avatar not found")
 
+    def registerDomainMapping(self, prefix, domain, avatar):
+        """ 
+            Allows the registering of a domain name regex which will 
+            rewrite the request url, prepending the mount point if the 
+            request comes from a given domain
+        
+        """
+        self.debug("Registering domain mapping \"%s\" to %r" % (domain, avatar))
+        if domain in self._domain_mappings:
+            self.warning("Replacing existing mapping for domain \"%s\"" % domain)
+        self._domain_mappings[domain] = (prefix, avatar)
+
+    def deregisterDomainMapping(self, prefix, domain, avatar):
+        """ Deregisters a domainName mapping. """
+
+        if domain not in self._domain_mappings:
+            self.warning("Mapping not removed: no mapping found for %s", domain)
+            return
+
+        if self._domain_mappings[domain] == (prefix, avatar):
+            self.debug("Removing domain mapping from porter %s", domain)
+            del self._domain_mappings[domain]
+        else:
+            self.warning(
+                "Not removing domain mapping: expected avatar not found")
+
     def findPrefixMatch(self, path):
         found = None
         # TODO: Horribly inefficient. Replace with pathtree code.
@@ -234,11 +270,19 @@ class Porter(component.BaseComponent, log.Loggable):
         Find a destination Avatar for this path.
         @returns: The Avatar for this mapping, or None.
         """
-
         if path in self._mappings:
             return self._mappings[path]
         else:
             return self.findPrefixMatch(path)
+
+
+    def mapDomainToDestination(self, hostname=None):
+        for mapping in self._domain_mappings:
+                if re.compile(mapping).match(hostname):
+                    return self._domain_mappings[mapping]
+        return None, None
+
+            
 
     def generateSocketPath(self):
         """
@@ -433,6 +477,8 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             self._timeoutDC.cancel()
             self._timeoutDC = None
 
+         
+
     def dataReceived(self, data):
         self._buffer = self._buffer + data
         self.log("Got data, buffer now \"%s\"" % self._buffer)
@@ -470,6 +516,8 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             return self.transport.loseConnection()
 
         identifier = self.extractIdentifier(parsed)
+        # Horrible hack for COPE - rewrite paths based on host
+        hostname = self.extractHostname(self._buffer)
         if not identifier:
             self.log("Couldn't find identifier in first line")
             return self.transport.loseConnection()
@@ -491,7 +539,14 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         # Ok, we have an identifier. Is it one we know about, or do we have
         # a default destination?
         destinationAvatar = self._porter.findDestination(identifier)
-
+        if not destinationAvatar and hostname:
+            # If we didn't get a match we try domain name matching
+            (path_to_prepend, destinationAvatar) = self._porter.mapDomainToDestination(hostname)
+            if path_to_prepend:
+                method, parsed_url, proto = parsed
+                new_uri = "%s%s" % (path_to_prepend, parsed_url[2]) 
+                parsed_url = (parsed_url[0], parsed_url[1], new_uri, parsed_url[3],parsed_url[4], parsed_url[5])
+                parsed = (method, parsed_url, proto)
         if not destinationAvatar or not destinationAvatar.isAttached():
             if destinationAvatar:
                 self.debug("There was an avatar, but it logged out?")
@@ -503,6 +558,15 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
             self.writeNotFoundResponse()
             return self.transport.loseConnection()
+
+        if self.requestId:
+            self.log("Injecting request-id %r", self.requestId)
+            parsed = self.injectRequestId(parsed, self.requestId)
+            # Since injecting the token might have modified the parsed
+            # representation of the request, we need to reconstruct the buffer.
+            # Fortunately, we know what delimiter did we split on, what's the
+            # remaining part and that we only split the buffer in two parts
+            self._buffer = delim.join((self.unparseLine(parsed), remaining))
 
         # Transfer control over this FD. Pass all the data so-far received
         # along in the same message. The receiver will push that data into
@@ -569,6 +633,13 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
 
         Subclasses should override this, depending on how they implemented
         parseLine.
+        """
+        raise NotImplementedError
+
+    def extractHostname(self, request_buffer):
+        """
+        Extract the hostname from the request buffer...
+
         """
         raise NotImplementedError
 
@@ -660,6 +731,17 @@ class HTTPPorterProtocol(PorterProtocol):
         method, parsed_url, proto = parsed
         # Currently, we just return the path part of the URL.
         return parsed_url[2]
+
+    def extractHostname(self, request_buffer):
+        try:
+            hostname = filter(lambda x: x.lower().startswith('host'),
+                request_buffer.split('\r\n'))[0]
+        except Exception, e:
+            log.debug("Failed to parse hostname from buffer: %s", self._buffer)
+            hostname = None
+        return hostname
+ 
+   
 
     def writeNotFoundResponse(self):
         self.transport.write("HTTP/1.0 404 Not Found\r\n\r\nResource unknown")
