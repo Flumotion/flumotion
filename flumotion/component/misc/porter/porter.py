@@ -277,10 +277,26 @@ class Porter(component.BaseComponent, log.Loggable):
 
 
     def mapDomainToDestination(self, hostname=None):
+        """ 
+            If no mount-point has been found then we try domain name
+            matching if configured with a domain mapping
+            Warn about conflicting matches which can produce strange behaviour.
+
+        """
+        found_mapping = None
         for mapping in self._domain_mappings:
                 if re.compile(mapping).match(hostname):
-                    return self._domain_mappings[mapping]
-        return None, None
+                    if found_mapping:
+                        self.warning("Found more than 1 domain name match %s %s %s", 
+                            hostname, mapping, self._domain_mappings[mapping][0])
+                    else:
+                        self.debug("Found a domain name match: %s %s %s",
+                            hostname, mapping, self._domain_mappings[mapping][0])
+                        found_mapping = self._domain_mappings[mapping]
+        if found_mapping:
+            return found_mapping
+        else:
+            return None, None
 
             
 
@@ -734,10 +750,11 @@ class HTTPPorterProtocol(PorterProtocol):
 
     def extractHostname(self, request_buffer):
         try:
-            hostname = filter(lambda x: x.lower().startswith('host'),
-                request_buffer.split('\r\n'))[0]
+            hostname = filter(lambda x: x.lower().startswith('host:'),
+                request_buffer.split('\r\n'))[0][5:].strip(' ')
         except Exception, e:
-            log.debug("Failed to parse hostname from buffer: %s", self._buffer)
+            self.warning("Failed to parse hostname (error=%s) from buffer: %s",
+                e, self._buffer)
             hostname = None
         return hostname
  
