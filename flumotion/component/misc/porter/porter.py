@@ -285,14 +285,14 @@ class Porter(component.BaseComponent, log.Loggable):
         """
         found_mapping = None
         for mapping in self._domain_mappings:
-                if re.compile(mapping).match(hostname):
-                    if found_mapping:
-                        self.warning("Found more than 1 domain name match %s %s %s", 
-                            hostname, mapping, self._domain_mappings[mapping][0])
-                    else:
-                        self.debug("Found a domain name match: %s %s %s",
-                            hostname, mapping, self._domain_mappings[mapping][0])
-                        found_mapping = self._domain_mappings[mapping]
+            if re.compile(mapping).match(hostname):
+                if found_mapping:
+                    self.warning("Found more than 1 domain name match %s %s %s", 
+                        hostname, mapping, self._domain_mappings[mapping][0])
+                else:
+                    self.debug("Found a domain name match: %s %s %s",
+                        hostname, mapping, self._domain_mappings[mapping][0])
+                    found_mapping = self._domain_mappings[mapping]
         if found_mapping:
             return found_mapping
         else:
