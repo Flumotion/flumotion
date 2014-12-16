@@ -16,7 +16,6 @@
 # Headers in this file shall remain intact.
 
 import os
-import re
 import random
 import string
 import time
@@ -285,7 +284,7 @@ class Porter(component.BaseComponent, log.Loggable):
         """
         found_mapping = None
         for mapping in self._domain_mappings:
-            if re.compile(mapping).match(hostname):
+            if mapping.lower() in hostname.lower():
                 if found_mapping:
                     self.warning(
                         "Found more than 1 domain name match %s %s %s",

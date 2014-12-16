@@ -93,7 +93,7 @@
         <property name="path" type="string"
                   _description="The base path to map to the mount-point" />
         <property name="domain-mapping" type="string"
-                  _description="A regex which will automatically prepend the mount point for a matched domain name in ondemand multifile mode." />
+                  _description="Automatically prepend the mount point for a exact match on domain name in ondemand multifile mode." />
 
         <property name="type" type="string"
                   _description="'master' to listen on a port, or 'slave' to slave to a porter (default master)." />
