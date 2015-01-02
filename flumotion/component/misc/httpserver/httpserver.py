@@ -192,6 +192,9 @@ class HTTPFileMedium(component.BaseComponentMedium):
 
     def remote_getLoadData(self):
         return self.comp.getLoadData()
+        
+    def remote_getAllStats(self):
+        return self.comp.getAllStats()
 
     def remote_updatePorterDetails(self, path, username, password):
         return self.comp.updatePorterDetails(path, username, password)
@@ -658,6 +661,14 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             return {'protocol': 'HTTP',
                     'description': self._description,
                     'url': self.getUrl()}
+                    
+    def getAllStats(self):
+        """ Get all the stats we have:
+            1. self.site has all sorts of request info
+            2. We have the stats object too....
+            3. Other stuff
+        """
+        
 
     def getClients(self):
         """
