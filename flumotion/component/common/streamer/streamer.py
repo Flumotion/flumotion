@@ -243,6 +243,9 @@ class HTTPMedium(feedcomponent.FeedComponentMedium):
     def remote_getLoadData(self):
         return self.comp.getLoadData()
 
+    def remote_getAllStats(self):
+        return self.comp.getAllStats()
+
     def remote_updatePorterDetails(self, path, username, password):
         return self.comp.updatePorterDetails(path, username, password)
 
@@ -482,6 +485,38 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
 
         return (deltaadded * bitrate, deltaremoved * bitrate, bytes_sent,
             clients_connected, current_load)
+
+    def getAllStats(self):
+        """ """
+        data = {}
+        data['stream_data'] = self.getStreamData()
+        data['load_data'] = self.getLoadData()
+        data['bytes_sent'] = self.getBytesSent()
+        data['num_clients'] = self.getClients()
+        # Stats per client
+        data['clients'] = {}
+        for fd in self.resource._requests:
+            data['clients'][fd] = self.resource.getLogFields(self.resource._requests[fd])
+        # Global stats for the streamer
+        data['ondemand'] = None
+
+        bytes_sent = self.getBytesSent()
+        bytes_received = self.getBytesReceived()
+        uptime = self.getUptime()
+
+        data['live'] =  {}
+        data['live']['stream_mime'] = self.get_mime()
+        data['live']['uptime'] = uptime
+        data['live']['bitrate'] = bytes_received * 8 / uptime
+        data['live']['bytes_received'] = bytes_received 
+        data['live']['current_bitrate'] = self.getCurrentBitrate()
+        data['live']['clients_current'] = self.getClients()
+        data['live']['clients_max'] = self.getMaxClients()
+        data['live']['clients_peak'] = self.getPeakClients()
+        data['live']['clients_peak_time'] = self.getPeakEpoch()
+        data['live']['clients_average'] = self.getAverageClients()
+        return data
+
 
     def update_ui_state(self):
         """Update the uiState object.

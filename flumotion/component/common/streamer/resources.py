@@ -118,6 +118,26 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             self.debug('rotating logger %r' % logger)
             logger.rotate()
 
+
+    def getLogFields(self, request):
+        """ """
+        headers = request.getAllHeaders()
+
+        args = {'ip': request.getClientIP(),
+                'time': time.mktime(time.gmtime()),
+                'method': request.method,
+                'uri': request.uri,
+                'username': '-',  # FIXME: put the httpauth name
+                'get-parameters': request.args,
+                'clientproto': request.clientproto,
+                'response': request.code,
+                'referer': headers.get('referer', None),
+                'user-agent': headers.get('user-agent', None)}
+
+        args.update(self._getExtraLogArgs(request))
+        return args
+
+
     def logWrite(self, request, bytes_sent, time_connected):
         headers = request.getAllHeaders()
 

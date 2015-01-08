@@ -668,6 +668,25 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             2. We have the stats object too....
             3. Other stuff
         """
+        data = {}
+        data['stream_data'] = self.getStreamData()
+        data['load_data'] = self.getLoadData()
+        data['bytes_sent'] = self.getBytesSent()
+        data['num_clients'] = self.getClients()
+        # Stats per client
+        for fd in self._connected_clients.keys():
+            data['clients'][fd] = self._connected_clients[fd].getLogFields()
+        # Global stats for the streamer
+        data['live'] = None
+        data['ondemand'] = {}
+        
+        data['ondemand']['total_request_count'] = self.stats.totalRequestCount
+        data['ondemand']['current_request_count'] = self.stats.currentRequestCount
+        data['ondemand']['current_request_rate'] = self.stats.currentRequestRate
+        data['ondemand']['mean_request_rate'] = self.stats.meanRequestRate
+        data['ondemand']['mean_file_read_ratio'] = self.stats.meanFileReadRatio
+        data['ondemand']['mean_bitrate'] = self.stats.meanBitrate
+        data['ondemand']['current_bitrate'] = self.stats.currentBitrate
         
 
     def getClients(self):
