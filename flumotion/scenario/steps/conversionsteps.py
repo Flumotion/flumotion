@@ -220,7 +220,7 @@ class ConversionStep(WorkerWizardStep):
 
         def no_bundle(failure):
             failure.trap(errors.NoBundleError)
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         d = self.wizard.getWizardEntry(entry.componentType)
         d.addCallback(gotFactory)
         d.addErrback(no_bundle)
@@ -403,7 +403,7 @@ class SelectFormatStep(WizardStep):
             print("Hello.... got factory is finished")
 
         def noBundle(failure):
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
             print("Oh no...got an errback...")
             failure.trap(NoBundleError)
 
