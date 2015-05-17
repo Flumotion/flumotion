@@ -1,3 +1,5 @@
+* update translations
+  cd po; make update-po
 * Pick a new version number and set it for the rest of the commands:
   export VERSION=0.6.2
 * Choose release name:
@@ -46,7 +48,7 @@
 * add news entry on site (edit flumotion.net/src/htdocs/news/news.xml, then commit)
 * send out release announcement mail;
   see https://apestaart.org/thomas/trac/browser/src/moap/trunk/README.
-  Example: from the tag, do 
+  Example: from the tag, do
     moap doap -v $VERSION mail -f msmith@fluendo.com flumotion-devel@lists.fluendo.com theora@xiph.org
 * submit release to freshmeat:
   moap doap -v $VERSION freshmeat
