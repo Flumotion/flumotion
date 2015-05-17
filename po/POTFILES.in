@@ -1,3 +1,4 @@
+[encoding: UTF-8]
 data/glade/admin-wizard.glade
 data/glade/admin.glade
 data/glade/audio-encoder-wizard.glade
@@ -14,7 +15,6 @@ data/glade/greeter-load_connection.glade
 data/glade/greeter-start_new.glade
 data/glade/greeter-start_new_error.glade
 data/glade/greeter-start_new_success.glade
-data/glade/license-wizard.glade
 data/glade/loadflow-wizard.glade
 data/glade/ondemand-wizard.glade
 data/glade/open-connection.glade
@@ -169,6 +169,10 @@ flumotion/component/combiners/switch/basicwatchdog.py
 flumotion/component/combiners/switch/patternswitch.py
 flumotion/component/combiners/switch/switch.py
 flumotion/component/combiners/switch/switch.xml
+flumotion/component/common/fgdp/__init__.py
+flumotion/component/common/fgdp/fgdp.py
+flumotion/component/common/fgdp/fgdp.xml
+flumotion/component/common/fgdp/protocol.py
 flumotion/component/component.py
 flumotion/component/consumers/__init__.py
 flumotion/component/consumers/disker/__init__.py
@@ -181,15 +185,15 @@ flumotion/component/consumers/disker/disker_plug.py
 flumotion/component/consumers/disker/status.glade
 flumotion/component/consumers/disker/wizard.glade
 flumotion/component/consumers/disker/wizard_gtk.py
-flumotion/component/consumers/gdp/__init__.py
-flumotion/component/consumers/gdp/gdp.py
-flumotion/component/consumers/gdp/gdp.xml
+flumotion/component/consumers/fgdp/__init__.py
+flumotion/component/consumers/fgdp/fgdp.py
+flumotion/component/consumers/fgdp/fgdp.xml
+flumotion/component/consumers/fgdp/wizard.glade
+flumotion/component/consumers/fgdp/wizard_gtk.py
 flumotion/component/consumers/httpstreamer/__init__.py
 flumotion/component/consumers/httpstreamer/admin_gtk.py
-flumotion/component/consumers/httpstreamer/httpstreamer.glade
 flumotion/component/consumers/httpstreamer/httpstreamer.py
 flumotion/component/consumers/httpstreamer/httpstreamer.xml
-flumotion/component/consumers/httpstreamer/resources.py
 flumotion/component/consumers/httpstreamer/wizard.glade
 flumotion/component/consumers/httpstreamer/wizard_gtk.py
 flumotion/component/consumers/preview/__init__.py
@@ -352,15 +356,15 @@ flumotion/component/producers/bttv/colorbalance.glade
 flumotion/component/producers/bttv/wizard.glade
 flumotion/component/producers/bttv/wizard_gtk.py
 flumotion/component/producers/checks.py
+flumotion/component/producers/fgdp/__init__.py
+flumotion/component/producers/fgdp/fgdp.xml
+flumotion/component/producers/fgdp/fgdp.py
 flumotion/component/producers/firewire/__init__.py
 flumotion/component/producers/firewire/admin_gtk.py
 flumotion/component/producers/firewire/firewire.py
 flumotion/component/producers/firewire/firewire.xml
 flumotion/component/producers/firewire/wizard.glade
 flumotion/component/producers/firewire/wizard_gtk.py
-flumotion/component/producers/gdp/__init__.py
-flumotion/component/producers/gdp/gdp.py
-flumotion/component/producers/gdp/gdp.xml
 flumotion/component/producers/icecast/__init__.py
 flumotion/component/producers/icecast/icecast.py
 flumotion/component/producers/icecast/icecast.xml
@@ -456,7 +460,6 @@ flumotion/scenario/ondemand/wizard_gtk.py
 flumotion/scenario/scenario.xml
 flumotion/scenario/steps/consumptionsteps.py
 flumotion/scenario/steps/conversionsteps.py
-flumotion/scenario/steps/licensestep.py
 flumotion/scenario/steps/ondemandstep.py
 flumotion/scenario/steps/productionsteps.py
 flumotion/scenario/steps/steps.xml
@@ -604,3 +607,6 @@ flumotion/worker/job.py
 flumotion/worker/main.py
 flumotion/worker/medium.py
 flumotion/worker/worker.py
+flumotion/component/common/streamer/mfdsresources.py
+flumotion/component/common/streamer/resources.py
+
