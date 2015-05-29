@@ -675,7 +675,7 @@ def detect(agent, fill_none=False):
         for detector in detectors:
             try:
                 detector.detect(agent, result)
-            except Exception as _err:
+            except Exception:
                 pass
 
     if fill_none:
