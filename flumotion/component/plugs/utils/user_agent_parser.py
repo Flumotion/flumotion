@@ -447,6 +447,7 @@ class AndroidBrowser(Browser):
     skip_if_found = ["Chrome"]
 
     # http://decadecity.net/blog/2013/11/21/android-browser-versions
+
     def getVersion(self, agent, word):
         pass
 
@@ -546,7 +547,7 @@ class Windows(OS):
         "NT 5.1": "XP",
         "NT 5.01": "2000 SP1",
         "NT 5.0": "2000",
-        "98; Win 9x 4.90": "Me"
+        "98; Win 9x 4.90": "Me",
     }
 
     def getVersion(self, agent, word):
@@ -647,7 +648,7 @@ class prefs:  # experimental
         Macintosh=dict(flavor=[MacOS]),
         Windows=dict(browser=[MSIE, Firefox]),
         ChromeOS=dict(browser=[Chrome]),
-        Debian=dict(browser=[Firefox])
+        Debian=dict(browser=[Firefox]),
     )
     dist = dict(
         Ubuntu=dict(browser=[Firefox]),
@@ -656,7 +657,7 @@ class prefs:  # experimental
         IPad=dict(browser=[Safari]),
     )
     flavor = dict(
-        MacOS=dict(browser=[Opera, Chrome, Firefox, MSIE])
+        MacOS=dict(browser=[Opera, Chrome, Firefox, MSIE]),
     )
 
 
