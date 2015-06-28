@@ -6,7 +6,6 @@ MODULE_FILES = $(shell cd $(top_srcdir) && ls		\
 	flumotion/component/*.py			\
 	flumotion/component/base/*.py			\
 	flumotion/component/bouncers/__init__.py	\
-	flumotion/component/bouncers/bouncer.py		\
 	flumotion/configure/__init__.py			\
 	flumotion/configure/configure.py		\
 	flumotion/extern/*.py				\
@@ -16,7 +15,6 @@ MODULE_FILES = $(shell cd $(top_srcdir) && ls		\
 	flumotion/project/*.py				\
 	flumotion/service/*.py				\
 	flumotion/twisted/*.py				\
-	flumotion/wizard/*.py				\
 	flumotion/worker/*.py				\
 	flumotion/worker/checks/*.py			\
 	)
