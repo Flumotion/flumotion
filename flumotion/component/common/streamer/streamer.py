@@ -501,7 +501,6 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
         # Global stats for the streamer
         data['ondemand'] = None
 
-        bytes_sent = self.getBytesSent()
         bytes_received = self.getBytesReceived()
         uptime = self.getUptime()
 
