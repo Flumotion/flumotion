@@ -17,8 +17,8 @@
 
 from twisted.internet import reactor
 
-from flumotion.twisted import credentials, fdserver
-from flumotion.common import log, common, options
+from flumotion.twisted import fdserver
+from flumotion.common import log, options
 from flumotion.job import job
 
 # register serializables
@@ -52,8 +52,8 @@ def main(args):
     log.info('job', 'Connecting to worker on socket %s' % (socket))
 
     job_factory = job.JobClientFactory(avatarId)
-    c = fdserver.FDConnector( socket, job_factory,
-        10, checkPID=False, reactor=reactor)
+    c = fdserver.FDConnector(socket, job_factory, 10, checkPID=False,
+        reactor=reactor)
     c.connect()
 
     reactor.addSystemEventTrigger('before', 'shutdown',

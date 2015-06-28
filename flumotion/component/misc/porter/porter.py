@@ -17,7 +17,6 @@
 
 import os
 import random
-import socket
 import string
 import time
 from urllib2 import urlparse
@@ -27,7 +26,7 @@ from twisted.internet import protocol, reactor, error, defer
 from twisted.spread import pb
 from zope.interface import implements
 
-from flumotion.common import medium, log, messages, errors
+from flumotion.common import log, messages, errors
 from flumotion.common.i18n import N_, gettexter
 from flumotion.component import component
 from flumotion.component.component import moods
@@ -351,9 +350,8 @@ class Porter(component.BaseComponent, log.Loggable):
         # appropriate protocol (HTTP, RTSP, etc.)
         factory = PorterProtocolFactory(self, proto)
         try:
-            p = fdserver.PassableServerPort( 
-                self._port, factory,
-                    interface=self._interface, reactor=reactor)
+            p = fdserver.PassableServerPort(self._port, factory,
+                interface=self._interface, reactor=reactor)
             p.startListening()
             self.info("Now listening on interface %r on port %d",
                       self._interface, self._port)
