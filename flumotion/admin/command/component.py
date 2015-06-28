@@ -298,6 +298,7 @@ class PropertyList(common.AdminCommand):
 
 # FIXME: why is this called property when it really is about ui state ?
 
+
 class PropertyAll(common.AdminCommand):
     description = "List all properties of a component with their values."
     name = 'all'
