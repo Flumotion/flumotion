@@ -401,7 +401,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             # Streamer is slaved to a porter.
             if self._singleFile:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
-                    site, [self.mountPoint], d) 
+                    site, [self.mountPoint], d)
             else:
                 self._pbclient = porterclient.HTTPPorterClientFactory(
                     site, [], d,

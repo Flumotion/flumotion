@@ -18,7 +18,6 @@
 import os
 import re
 import random
-import socket
 import string
 import time
 from urllib2 import urlparse
@@ -80,7 +79,8 @@ class PorterAvatar(pb.Avatar, log.Loggable):
         self.porter.registerDomainMapping(prefix, domain, self)
 
     def perspective_deregisterDomainMapping(self, prefix, domain):
-        self.log("Perspective called: deregistering Domain mapping: %s", domain)
+        self.log("Perspective called: deregistering Domain mapping: %s",
+            domain)
         self.porter.deregisterDomainMapping(prefix, domain, self)
 
     def perspective_getPort(self):
@@ -227,22 +227,24 @@ class Porter(component.BaseComponent, log.Loggable):
                 "Not removing prefix destination: expected avatar not found")
 
     def registerDomainMapping(self, prefix, domain, avatar):
-        """ 
-            Allows the registering of a domain name regex which will 
-            rewrite the request url, prepending the mount point if the 
-            request comes from a given domain
-        
         """
-        self.debug("Registering domain mapping \"%s\" to %r" % (domain, avatar))
+        Allows the registering of a domain name regex which will
+        rewrite the request url, prepending the mount point if the
+        request comes from a given domain
+        """
+        self.debug("Registering domain mapping \"%s\" to %r" % (
+            domain, avatar))
         if domain in self._domain_mappings:
-            self.warning("Replacing existing mapping for domain \"%s\"" % domain)
+            self.warning("Replacing existing mapping for domain \"%s\"" %
+                domain)
         self._domain_mappings[domain] = (prefix, avatar)
 
     def deregisterDomainMapping(self, prefix, domain, avatar):
         """ Deregisters a domainName mapping. """
 
         if domain not in self._domain_mappings:
-            self.warning("Mapping not removed: no mapping found for %s", domain)
+            self.warning("Mapping not removed: no mapping found for %s",
+                domain)
             return
 
         if self._domain_mappings[domain] == (prefix, avatar):
@@ -275,19 +277,18 @@ class Porter(component.BaseComponent, log.Loggable):
         else:
             return self.findPrefixMatch(path)
 
-
     def mapDomainToDestination(self, hostname=None):
-        """ 
-            If no mount-point has been found then we try domain name
-            matching if configured with a domain mapping
-            Warn about conflicting matches which can produce strange behaviour.
-
+        """
+        If no mount-point has been found then we try domain name
+        matching if configured with a domain mapping
+        Warn about conflicting matches which can produce strange behaviour.
         """
         found_mapping = None
         for mapping in self._domain_mappings:
             if re.compile(mapping).match(hostname):
                 if found_mapping:
-                    self.warning("Found more than 1 domain name match %s %s %s", 
+                    self.warning(
+                        "Found more than 1 domain name match %s %s %s",
                         hostname, mapping, self._domain_mappings[mapping][0])
                 else:
                     self.debug("Found a domain name match: %s %s %s",
@@ -297,8 +298,6 @@ class Porter(component.BaseComponent, log.Loggable):
             return found_mapping
         else:
             return None, None
-
-            
 
     def generateSocketPath(self):
         """
@@ -493,8 +492,6 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
             self._timeoutDC.cancel()
             self._timeoutDC = None
 
-         
-
     def dataReceived(self, data):
         self._buffer = self._buffer + data
         self.log("Got data, buffer now \"%s\"" % self._buffer)
@@ -557,11 +554,13 @@ class PorterProtocol(protocol.Protocol, log.Loggable):
         destinationAvatar = self._porter.findDestination(identifier)
         if not destinationAvatar and hostname:
             # If we didn't get a match we try domain name matching
-            (path_to_prepend, destinationAvatar) = self._porter.mapDomainToDestination(hostname)
+            (path_to_prepend, destinationAvatar) = \
+                self._porter.mapDomainToDestination(hostname)
             if path_to_prepend:
                 method, parsed_url, proto = parsed
-                new_uri = "%s%s" % (path_to_prepend, parsed_url[2]) 
-                parsed_url = (parsed_url[0], parsed_url[1], new_uri, parsed_url[3],parsed_url[4], parsed_url[5])
+                new_uri = "%s%s" % (path_to_prepend, parsed_url[2])
+                parsed_url = (parsed_url[0], parsed_url[1], new_uri,
+                    parsed_url[3], parsed_url[4], parsed_url[5])
                 parsed = (method, parsed_url, proto)
         if not destinationAvatar or not destinationAvatar.isAttached():
             if destinationAvatar:
@@ -757,8 +756,6 @@ class HTTPPorterProtocol(PorterProtocol):
                 e, self._buffer)
             hostname = None
         return hostname
- 
-   
 
     def writeNotFoundResponse(self):
         self.transport.write("HTTP/1.0 404 Not Found\r\n\r\nResource unknown")

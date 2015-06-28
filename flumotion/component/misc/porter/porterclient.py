@@ -193,8 +193,9 @@ class HTTPPorterClientFactory(PorterClientFactory):
             # Hack for cope
             # Register prefixes for domain mapping
             if self.domainMapping:
-                deferred.addCallback(lambda r, p, dm: self.registerDomainMapping(p, dm),
-                    mount, self.domainMapping)
+                deferred.addCallback(
+                    lambda r, p, dm: self.registerDomainMapping(p, dm),
+                        mount, self.domainMapping)
         deferred.addCallback(self._fireDeferred)
 
     def _setRemotePort(self, port):
