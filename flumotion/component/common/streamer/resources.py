@@ -118,7 +118,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
             self.debug('rotating logger %r' % logger)
             logger.rotate()
 
-
     def getLogFields(self, request):
         """ """
         headers = request.getAllHeaders()
@@ -136,7 +135,6 @@ class HTTPStreamingResource(web_resource.Resource, log.Loggable):
 
         args.update(self._getExtraLogArgs(request))
         return args
-
 
     def logWrite(self, request, bytes_sent, time_connected):
         headers = request.getAllHeaders()

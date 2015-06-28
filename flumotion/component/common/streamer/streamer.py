@@ -496,7 +496,8 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
         # Stats per client
         data['clients'] = {}
         for fd in self.resource._requests:
-            data['clients'][fd] = self.resource.getLogFields(self.resource._requests[fd])
+            data['clients'][fd] = self.resource.getLogFields(
+                self.resource._requests[fd])
         # Global stats for the streamer
         data['ondemand'] = None
 
@@ -504,11 +505,11 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
         bytes_received = self.getBytesReceived()
         uptime = self.getUptime()
 
-        data['live'] =  {}
+        data['live'] = {}
         data['live']['stream_mime'] = self.get_mime()
         data['live']['uptime'] = uptime
         data['live']['bitrate'] = bytes_received * 8 / uptime
-        data['live']['bytes_received'] = bytes_received 
+        data['live']['bytes_received'] = bytes_received
         data['live']['current_bitrate'] = self.getCurrentBitrate()
         data['live']['clients_current'] = self.getClients()
         data['live']['clients_max'] = self.getMaxClients()
@@ -516,7 +517,6 @@ class Streamer(feedcomponent.ParseLaunchComponent, Stats):
         data['live']['clients_peak_time'] = self.getPeakEpoch()
         data['live']['clients_average'] = self.getAverageClients()
         return data
-
 
     def update_ui_state(self):
         """Update the uiState object.

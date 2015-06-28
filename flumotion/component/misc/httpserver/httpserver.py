@@ -192,7 +192,7 @@ class HTTPFileMedium(component.BaseComponentMedium):
 
     def remote_getLoadData(self):
         return self.comp.getLoadData()
-        
+
     def remote_getAllStats(self):
         return self.comp.getAllStats()
 
@@ -661,7 +661,7 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
             return {'protocol': 'HTTP',
                     'description': self._description,
                     'url': self.getUrl()}
-                    
+
     def getAllStats(self):
         """ Get all the stats we have:
             1. self.site has all sorts of request info
@@ -679,15 +679,16 @@ class HTTPFileStreamer(component.BaseComponent, log.Loggable):
         # Global stats for the streamer
         data['live'] = None
         data['ondemand'] = {}
-        
+
         data['ondemand']['total_request_count'] = self.stats.totalRequestCount
-        data['ondemand']['current_request_count'] = self.stats.currentRequestCount
-        data['ondemand']['current_request_rate'] = self.stats.currentRequestRate
+        data['ondemand']['current_request_count'] = \
+            self.stats.currentRequestCount
+        data['ondemand']['current_request_rate'] = \
+            self.stats.currentRequestRate
         data['ondemand']['mean_request_rate'] = self.stats.meanRequestRate
         data['ondemand']['mean_file_read_ratio'] = self.stats.meanFileReadRatio
         data['ondemand']['mean_bitrate'] = self.stats.meanBitrate
         data['ondemand']['current_bitrate'] = self.stats.currentBitrate
-        
 
     def getClients(self):
         """
